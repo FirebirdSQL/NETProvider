@@ -130,6 +130,12 @@ namespace FirebirdSql.Data.Common
 						}
 						break;
 
+					case IscCodes.isc_info_creation_date:
+						var date = TypeDecoder.DecodeDate((int)VaxInteger(buffer, pos, 4));
+						var time = TypeDecoder.DecodeTime((int)VaxInteger(buffer, pos + 4, 4));
+						info.Add(date.Add(time));
+						break;
+
 					default:
 						throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 				}

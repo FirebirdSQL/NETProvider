@@ -386,6 +386,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<string>(IscCodes.fb_info_crypt_plugin, cancellationToken);
 		}
 
+		public DateTime GetCreationDate()
+		{
+			return GetValue<DateTime>(IscCodes.isc_info_creation_date);
+		}
+		public Task<DateTime> GetCreationDateAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<DateTime>(IscCodes.isc_info_creation_date, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors
