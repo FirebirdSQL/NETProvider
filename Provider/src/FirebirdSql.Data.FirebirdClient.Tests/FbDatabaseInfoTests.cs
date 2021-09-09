@@ -15,6 +15,7 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -33,7 +34,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		{ }
 
 		[Test]
-		public void DatabaseInfoTest()
+		public void CompleteDatabaseInfoTest()
 		{
 			var dbInfo = new FbDatabaseInfo(Connection);
 			foreach (var m in dbInfo.GetType()
@@ -41,6 +42,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				.Where(x => !x.IsSpecialName)
 				.Where(x => x.Name.EndsWith("Async")))
 			{
+				if (ServerVersion < new Version(4, 0, 0, 0) && new[] { "GetWireCryptAsync" }.Contains(m.Name))
+					continue;
+
 				Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
 			}
 		}
