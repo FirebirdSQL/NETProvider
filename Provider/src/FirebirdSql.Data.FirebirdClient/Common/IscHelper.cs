@@ -72,6 +72,7 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.isc_info_active_transactions:
 					case IscCodes.isc_info_active_tran_count:
 					case IscCodes.fb_info_next_attachment:
+					case IscCodes.fb_info_next_statement:
 						info.Add(VaxInteger(buffer, pos, length));
 						break;
 

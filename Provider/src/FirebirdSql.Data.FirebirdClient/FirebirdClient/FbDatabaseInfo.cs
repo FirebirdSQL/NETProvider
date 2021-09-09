@@ -404,6 +404,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<long>(IscCodes.fb_info_next_attachment, cancellationToken);
 		}
 
+		public long GetNextStatement()
+		{
+			return GetValue<long>(IscCodes.fb_info_next_statement);
+		}
+		public Task<long> GetNextStatementAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<long>(IscCodes.fb_info_next_statement, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors
