@@ -49,7 +49,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 						nameof(FbDatabaseInfo.GetNextAttachmentAsync),
 						nameof(FbDatabaseInfo.GetNextStatementAsync),
 						nameof(FbDatabaseInfo.GetReplicaModeAsync),
-						nameof(FbDatabaseInfo.GetDbFileIdAsync)
+						nameof(FbDatabaseInfo.GetDbFileIdAsync),
+						nameof(FbDatabaseInfo.GetDbGuidAsync),
 					}.Contains(m.Name))
 					continue;
 

@@ -92,6 +92,10 @@ namespace FirebirdSql.Data.Common
 						info.Add(Encoding2.Default.GetString(buffer, pos, length));
 						break;
 
+					case IscCodes.fb_info_db_guid:
+						info.Add(Guid.ParseExact(Encoding2.Default.GetString(buffer, pos, length), "B"));
+						break;
+
 					case IscCodes.isc_info_base_level:
 						info.Add(string.Format(CultureInfo.CurrentCulture, "{0}.{1}", buffer[pos], buffer[pos + 1]));
 						break;
