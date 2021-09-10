@@ -441,7 +441,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<Guid>(IscCodes.fb_info_db_guid, cancellationToken);
 		}
 
-		public FbZonedDateTime GeCreationTimestamp()
+		public FbZonedDateTime GetCreationTimestamp()
 		{
 			return GetValue<FbZonedDateTime>(IscCodes.fb_info_creation_timestamp_tz);
 		}
