@@ -22,6 +22,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -440,6 +441,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<Guid>(IscCodes.fb_info_db_guid, cancellationToken);
 		}
 
+		public FbZonedDateTime GeCreationTimestamp()
+		{
+			return GetValue<FbZonedDateTime>(IscCodes.fb_info_creation_timestamp_tz);
+		}
+		public Task<FbZonedDateTime> GetCreationTimestampAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<FbZonedDateTime>(IscCodes.fb_info_creation_timestamp_tz, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors
@@ -463,7 +473,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				IscCodes.isc_info_end
 			};
 			var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
-			return info.Any() ? (T)Convert.ChangeType(info[0], typeof(T)) : default;
+			return info.Any() ? (T)info[0]: default;
 		}
 		private async Task<T> GetValueAsync<T>(byte item, CancellationToken cancellationToken = default)
 		{
@@ -475,7 +485,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				IscCodes.isc_info_end
 			};
 			var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false);
-			return info.Any() ? (T)Convert.ChangeType(info[0], typeof(T)) : default;
+			return info.Any() ? (T)info[0] : default;
 		}
 
 		private List<T> GetList<T>(byte item)

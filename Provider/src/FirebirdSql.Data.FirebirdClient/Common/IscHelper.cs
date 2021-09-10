@@ -166,6 +166,17 @@ namespace FirebirdSql.Data.Common
 						}
 						break;
 
+					case IscCodes.fb_info_creation_timestamp_tz:
+						{
+							var date = TypeDecoder.DecodeDate((int)VaxInteger(buffer, pos, 4));
+							var time = TypeDecoder.DecodeTime((int)VaxInteger(buffer, pos + 4, 4));
+							var tzId = (ushort)VaxInteger(buffer, pos + 4 + 4, 4);
+							var dt = date.Add(time);
+							dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+							info.Add(TypeHelper.CreateZonedDateTime(dt, tzId, null));
+						}
+						break;
+
 					default:
 						throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 				}
