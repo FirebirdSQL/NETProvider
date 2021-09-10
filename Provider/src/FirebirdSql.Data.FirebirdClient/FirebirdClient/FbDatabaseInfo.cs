@@ -473,7 +473,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				IscCodes.isc_info_end
 			};
 			var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
-			return info.Any() ? (T)info[0]: default;
+			return info.Any() ? ConvertValue<T>(info[0]): default;
 		}
 		private async Task<T> GetValueAsync<T>(byte item, CancellationToken cancellationToken = default)
 		{
@@ -485,7 +485,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				IscCodes.isc_info_end
 			};
 			var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false);
-			return info.Any() ? (T)info[0] : default;
+			return info.Any() ? ConvertValue<T>(info[0]) : default;
 		}
 
 		private List<T> GetList<T>(byte item)
@@ -499,7 +499,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					IscCodes.isc_info_end
 				};
 
-			return (db.GetDatabaseInfo(items)).Cast<T>().ToList();
+			return (db.GetDatabaseInfo(items)).Select(ConvertValue<T>).ToList();
 		}
 		private async Task<List<T>> GetListAsync<T>(byte item, CancellationToken cancellationToken = default)
 		{
@@ -512,8 +512,10 @@ namespace FirebirdSql.Data.FirebirdClient
 					IscCodes.isc_info_end
 				};
 
-			return (await db.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Cast<T>().ToList();
+			return (await db.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Select(ConvertValue<T>).ToList();
 		}
+
+		static T ConvertValue<T>(object value) => value is IConvertible ? (T)Convert.ChangeType(value, typeof(T)) : (T)value;
 
 		#endregion
 	}
