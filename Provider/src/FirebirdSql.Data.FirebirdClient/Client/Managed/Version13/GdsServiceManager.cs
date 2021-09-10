@@ -50,10 +50,6 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					var genericResponse = (GenericResponse)response;
 					base.ProcessAttachResponse(genericResponse);
 
-					Connection.AuthBlock.SendWireCryptToBuffer(Database.Xdr);
-					Database.Xdr.Flush();
-					Connection.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection);
-
 					if (genericResponse.Data.Any())
 					{
 						Database.AuthBlock.SendWireCryptToBuffer(Database.Xdr);
@@ -99,10 +95,6 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					}
 					var genericResponse = (GenericResponse)response;
 					await base.ProcessAttachResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
-
-					await Connection.AuthBlock.SendWireCryptToBufferAsync(Database.Xdr, cancellationToken).ConfigureAwait(false);
-					await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-					await Connection.AuthBlock.ProcessWireCryptResponseAsync(Database.Xdr, Connection, cancellationToken).ConfigureAwait(false);
 
 					if (genericResponse.Data.Any())
 					{
