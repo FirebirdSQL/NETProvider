@@ -112,6 +112,19 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		}
 
 		[Test]
+		public async Task SelectEmptyResultSet()
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(null as decfloat(16)) from rdb$database where 0=1";
+				await using (var reader = await cmd.ExecuteReaderAsync())
+				{
+					Assert.DoesNotThrowAsync(reader.ReadAsync);
+				}
+			}
+		}
+
+		[Test]
 		public async Task SimpleSelectSchemaTableTest()
 		{
 			await using (var cmd = Connection.CreateCommand())

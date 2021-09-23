@@ -477,20 +477,31 @@ namespace FirebirdSql.Data.Client.Native
 				return null;
 			}
 
-			DbValue[] row = null;
-			if (!_allRowsFetched)
+			if (_allRowsFetched)
 			{
-				_fields.ResetValues();
+				return null;
+			}
 
-				if (_fetchSqlDa == IntPtr.Zero)
-				{
-					_fetchSqlDa = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-				}
+			_fields.ResetValues();
 
-				ClearStatusVector();
+			if (_fetchSqlDa == IntPtr.Zero)
+			{
+				_fetchSqlDa = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
+			}
 
-				var status = _db.FbClient.isc_dsql_fetch(_statusVector, ref _handle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
+			ClearStatusVector();
 
+			var status = _db.FbClient.isc_dsql_fetch(_statusVector, ref _handle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
+			if (status == new IntPtr(100))
+			{
+				_allRowsFetched = true;
+
+				XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
+
+				return null;
+			}
+			else
+			{
 				var rowDesc = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, _fetchSqlDa, true);
 
 				if (_fields.Count == rowDesc.Count)
@@ -508,24 +519,15 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.ProcessStatusVector(_statusVector);
 
-				if (status == new IntPtr(100))
+				var row = new DbValue[_fields.ActualCount];
+				for (var i = 0; i < row.Length; i++)
 				{
-					_allRowsFetched = true;
-
-					XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
+					var d = _fields[i];
+					var value = d.DbValue.GetValue();
+					row[i] = new DbValue(this, d, value);
 				}
-				else
-				{
-					row = new DbValue[_fields.ActualCount];
-					for (var i = 0; i < row.Length; i++)
-					{
-						var d = _fields[i];
-						var value = d.DbValue.GetValue();
-						row[i] = new DbValue(this, d, value);
-					}
-				}
+				return row;
 			}
-			return row;
 		}
 		public override async ValueTask<DbValue[]> FetchAsync(CancellationToken cancellationToken = default)
 		{
@@ -545,20 +547,31 @@ namespace FirebirdSql.Data.Client.Native
 				return null;
 			}
 
-			DbValue[] row = null;
-			if (!_allRowsFetched)
+			if (_allRowsFetched)
 			{
-				_fields.ResetValues();
+				return null;
+			}
 
-				if (_fetchSqlDa == IntPtr.Zero)
-				{
-					_fetchSqlDa = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-				}
+			_fields.ResetValues();
 
-				ClearStatusVector();
+			if (_fetchSqlDa == IntPtr.Zero)
+			{
+				_fetchSqlDa = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
+			}
 
-				var status = _db.FbClient.isc_dsql_fetch(_statusVector, ref _handle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
+			ClearStatusVector();
 
+			var status = _db.FbClient.isc_dsql_fetch(_statusVector, ref _handle, IscCodes.SQLDA_VERSION1, _fetchSqlDa);
+			if (status == new IntPtr(100))
+			{
+				_allRowsFetched = true;
+
+				XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
+
+				return null;
+			}
+			else
+			{
 				var rowDesc = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, _fetchSqlDa, true);
 
 				if (_fields.Count == rowDesc.Count)
@@ -576,24 +589,15 @@ namespace FirebirdSql.Data.Client.Native
 
 				_db.ProcessStatusVector(_statusVector);
 
-				if (status == new IntPtr(100))
+				var row = new DbValue[_fields.ActualCount];
+				for (var i = 0; i < row.Length; i++)
 				{
-					_allRowsFetched = true;
-
-					XsqldaMarshaler.CleanUpNativeData(ref _fetchSqlDa);
+					var d = _fields[i];
+					var value = await d.DbValue.GetValueAsync(cancellationToken).ConfigureAwait(false);
+					row[i] = new DbValue(this, d, value);
 				}
-				else
-				{
-					row = new DbValue[_fields.ActualCount];
-					for (var i = 0; i < row.Length; i++)
-					{
-						var d = _fields[i];
-						var value = await d.DbValue.GetValueAsync(cancellationToken).ConfigureAwait(false);
-						row[i] = new DbValue(this, d, value);
-					}
-				}
+				return row;
 			}
-			return row;
 		}
 
 		public override void Describe()

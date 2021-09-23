@@ -178,6 +178,24 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[TestCase(true)]
+		[TestCase(false)]
+		public async Task SelectEmptyResultSet(bool isExtended)
+		{
+			if (isExtended)
+			{
+				await SetExtended();
+			}
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(null as time with time zone) from rdb$database where 0=1";
+				await using (var reader = await cmd.ExecuteReaderAsync())
+				{
+					Assert.DoesNotThrowAsync(reader.ReadAsync);
+				}
+			}
+		}
+
 		[Test]
 		public async Task SimpleSelectSchemaTableTest()
 		{
