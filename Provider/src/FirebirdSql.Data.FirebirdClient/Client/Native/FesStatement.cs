@@ -124,6 +124,25 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Dispose2
 
+		public override void Dispose2()
+		{
+			if (!_disposed)
+			{
+				_disposed = true;
+				Release();
+				Clear();
+				_db = null;
+				_fields = null;
+				_parameters = null;
+				_transaction = null;
+				OutputParameters = null;
+				_statusVector = null;
+				_allRowsFetched = false;
+				_handle.Dispose();
+				FetchSize = 0;
+				base.Dispose2();
+			}
+		}
 		public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
 		{
 			if (!_disposed)
