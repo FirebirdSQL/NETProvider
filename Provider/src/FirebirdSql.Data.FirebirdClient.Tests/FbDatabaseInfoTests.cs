@@ -52,6 +52,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 						nameof(FbDatabaseInfo.GetDbFileIdAsync),
 						nameof(FbDatabaseInfo.GetDbGuidAsync),
 						nameof(FbDatabaseInfo.GetCreationTimestampAsync),
+						nameof(FbDatabaseInfo.GetProtocolVersionAsync),
 					}.Contains(m.Name))
 					continue;
 

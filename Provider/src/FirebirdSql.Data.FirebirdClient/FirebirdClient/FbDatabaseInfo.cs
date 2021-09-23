@@ -450,6 +450,15 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<FbZonedDateTime>(IscCodes.fb_info_creation_timestamp_tz, cancellationToken);
 		}
 
+		public int GetProtocolVersion()
+		{
+			return GetValue<int>(IscCodes.fb_info_protocol_version);
+		}
+		public Task<int> GetProtocolVersionAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.fb_info_protocol_version, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors
@@ -473,7 +482,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				IscCodes.isc_info_end
 			};
 			var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
-			return info.Any() ? ConvertValue<T>(info[0]): default;
+			return info.Any() ? ConvertValue<T>(info[0]) : default;
 		}
 		private async Task<T> GetValueAsync<T>(byte item, CancellationToken cancellationToken = default)
 		{
