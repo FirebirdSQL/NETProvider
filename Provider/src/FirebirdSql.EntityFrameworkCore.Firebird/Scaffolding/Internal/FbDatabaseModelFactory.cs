@@ -21,6 +21,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Services;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -31,6 +32,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 {
 	public class FbDatabaseModelFactory : DatabaseModelFactory
 	{
+		public int MajorVersionNumber { get; private set; }
+
 		public override DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
 		{
 			using (var connection = new FbConnection(connectionString))
@@ -48,6 +51,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 			{
 				connection.Open();
 			}
+
+			var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+			MajorVersionNumber = serverVersion.Major;
 
 			try
 			{
@@ -76,7 +82,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 			}
 		}
 
-
 		private string GetDefaultSchema(DbConnection connection)
 		{
 			return null;
@@ -84,7 +89,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 
 		private static Func<string, string, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
 		{
-			return tables.Any() ? (s, t) => tables.Contains(t) : (Func<string, string, bool>)null;
+			return tables.Any() ? (s, t) => tables.Contains(t) : null;
 		}
 
 		private const string GetTablesQuery =
@@ -178,7 +183,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 				ELSE 'RDB$FIELD_TYPE: ' || F.RDB$FIELD_TYPE || '?'
 			   END as STORE_TYPE,
                F.rdb$description as COLUMN_COMMENT,
-               COALESCE(RF.RDB$IDENTITY_TYPE, 0)   as AUTO_GENERATED,
+               COALESCE({1}, 0)   as AUTO_GENERATED,
                ch.RDB$CHARACTER_SET_NAME as CHARACTER_SET_NAME
               FROM
                RDB$RELATION_FIELDS RF
@@ -192,11 +197,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 
 		private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
 		{
+			var identityType = MajorVersionNumber < 3 ? "null" : "rf.RDB$IDENTITY_TYPE";
+
 			foreach (var table in tables)
 			{
 				using (var command = connection.CreateCommand())
 				{
-					command.CommandText = string.Format(GetColumnsQuery, table.Name);
+					command.CommandText = string.Format(GetColumnsQuery, table.Name, identityType);
 					using (var reader = command.ExecuteReader())
 					{
 						while (reader.Read())
@@ -393,7 +400,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 
 		private static ReferentialAction? ConvertToReferentialAction(string onDeleteAction)
 		{
-			return (onDeleteAction.ToUpperInvariant()) switch
+			return onDeleteAction.ToUpperInvariant() switch
 			{
 				"RESTRICT" => ReferentialAction.Restrict,
 				"CASCADE" => ReferentialAction.Cascade,
