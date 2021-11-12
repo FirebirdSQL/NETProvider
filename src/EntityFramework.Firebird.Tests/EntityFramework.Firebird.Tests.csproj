@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -11,7 +11,7 @@
 		<OutputType>Exe</OutputType>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<None Remove="app.config" />
 	</ItemGroup>
 	<ItemGroup>
