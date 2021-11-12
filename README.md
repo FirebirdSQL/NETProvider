@@ -12,7 +12,6 @@
 	* [Time zones](Provider/docs/time-zones.md)
 	* [DECFLOAT datatype](Provider/docs/decfloat.md)
 	* [INT128 datatype](Provider/docs/int128.md)
-* [DDEX provider](DDEX/readme.txt)
 
 ## Packages
 
