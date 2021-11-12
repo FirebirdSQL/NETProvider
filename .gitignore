@@ -4,6 +4,5 @@
 .vs
 bin
 obj
-packages
 Provider/out/
 .idea
