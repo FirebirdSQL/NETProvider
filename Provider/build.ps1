@@ -10,13 +10,6 @@ $baseDir = Split-Path -Parent $PSCommandPath
 $outDir = "$baseDir\out"
 $version = ''
 
-if ($env:build_wix) {
-	$wix = $env:build_wix
-}
-else {
-	$wix = 'I:\devel\bin\wix-binaries'
-}
-
 function Clean() {
 	if (Test-Path $outDir) {
 		rm -Force -Recurse $outDir
@@ -49,15 +42,6 @@ function NuGets() {
 	cp $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\FirebirdSql.EntityFrameworkCore.Firebird.$version.snupkg $outDir
 }
 
-function WiX() {
-	$wixVersion = $version -replace '(.+?)(-[a-z0-9]+)?','$1'
-	& $wix\candle.exe "-dBaseDir=$baseDir" "-dVersion=$wixVersion" "-dConfiguration=$Configuration" -ext $wix\WixUtilExtension.dll -out $outDir\Installer.wixobj $baseDir\installer\Installer.wxs
-	& $wix\light.exe -ext $wix\WixUIExtension.dll -ext $wix\WixUtilExtension.dll -out $outDir\FirebirdSql.Data.FirebirdClient-$version.msi $outDir\Installer.wixobj
-	rm $outDir\Installer.wixobj
-	rm $outDir\FirebirdSql.Data.FirebirdClient-$version.wixpdb
-}
-
 Clean
 Build
 NuGets
-WiX
