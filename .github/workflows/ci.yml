@@ -18,11 +18,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: .NET 6.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: .NET 5.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
 
       - name: Build
         run: |
           try {
-            .\Provider\build.ps1 -Configuration ${{ env.CONFIGURATION }}
+            .\build.ps1 -Configuration ${{ env.CONFIGURATION }}
             exit $LASTEXITCODE
           }
           catch {
@@ -36,7 +46,7 @@ jobs:
           try {
             $env:tests_firebird_dir = 'C:\firebird'
 
-            .\Provider\tests.ps1 -Configuration ${{ env.CONFIGURATION }} -FirebirdSelection ${{ matrix.FIREBIRD_SELECTION }} -TestSuite ${{ matrix.TEST_SUITE }}
+            .\tests.ps1 -Configuration ${{ env.CONFIGURATION }} -FirebirdSelection ${{ matrix.FIREBIRD_SELECTION }} -TestSuite ${{ matrix.TEST_SUITE }}
             exit $LASTEXITCODE
           }
           catch {
@@ -48,4 +58,4 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: '.\\Provider\\out\\'
+          path: '.\\out\\'

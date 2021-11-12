@@ -18,6 +18,7 @@
 		<Title>Firebird ADO.NET Data provider</Title>
 		<PackageDescription>Firebird ADO.NET data provider</PackageDescription>
 		<PackageTags>firebird;firebirsql;firebirdclient;adonet;database</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>TRACE</DefineConstants>
@@ -32,9 +33,9 @@
 		<EmbeddedResource Include="Schema\FbMetaData.xml" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\..\readme.txt" Pack="true" PackagePath="" />
-		<None Include="..\..\..\license.txt" Pack="true" PackagePath="" />
-		<None Include="..\..\..\firebird-logo.png" Pack="true" PackagePath="" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\license.txt" Pack="true" PackagePath="" />
+		<None Include="..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
 		<Reference Include="System.Transactions" />
