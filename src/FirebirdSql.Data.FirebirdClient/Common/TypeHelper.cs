@@ -778,7 +778,7 @@ namespace FirebirdSql.Data.Common
 			return (DbDataType)type;
 		}
 
-		public static TimeSpan DateTimeToTimeSpan(DateTime d)
+		public static TimeSpan DateTimeTimeToTimeSpan(DateTime d)
 		{
 			return TimeSpan.FromTicks(d.Subtract(d.Date).Ticks);
 		}

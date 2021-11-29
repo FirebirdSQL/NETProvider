@@ -711,12 +711,12 @@ namespace FirebirdSql.Data.Client.Managed
 		public void Write(DateTime value)
 		{
 			WriteDate(value);
-			WriteTime(TypeHelper.DateTimeToTimeSpan(value));
+			WriteTime(TypeHelper.DateTimeTimeToTimeSpan(value));
 		}
 		public async ValueTask WriteAsync(DateTime value, CancellationToken cancellationToken = default)
 		{
 			await WriteDateAsync(value, cancellationToken).ConfigureAwait(false);
-			await WriteTimeAsync(TypeHelper.DateTimeToTimeSpan(value), cancellationToken).ConfigureAwait(false);
+			await WriteTimeAsync(TypeHelper.DateTimeTimeToTimeSpan(value), cancellationToken).ConfigureAwait(false);
 		}
 
 		public void Write(Guid value)

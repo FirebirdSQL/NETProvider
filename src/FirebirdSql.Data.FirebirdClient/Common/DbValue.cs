@@ -296,7 +296,7 @@ namespace FirebirdSql.Data.Common
 			{
 				TimeSpan ts => TypeEncoder.EncodeTime(ts),
 				FbZonedTime zt => TypeEncoder.EncodeTime(zt.Time),
-				_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(GetDateTime())),
+				_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(GetDateTime())),
 			};
 		}
 
@@ -451,7 +451,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 
 						var result = new byte[8];
 						Buffer.BlockCopy(date, 0, result, 0, date.Length);
@@ -469,7 +469,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 
 						var result = new byte[10];
@@ -483,7 +483,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 						var offset = new byte[] { 0, 0 };
 
@@ -651,7 +651,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 
 						var result = new byte[8];
 						Buffer.BlockCopy(date, 0, result, 0, date.Length);
@@ -669,7 +669,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 
 						var result = new byte[10];
@@ -683,7 +683,7 @@ namespace FirebirdSql.Data.Common
 					{
 						var dt = GetDateTime();
 						var date = BitConverter.GetBytes(TypeEncoder.EncodeDate(dt));
-						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeToTimeSpan(dt)));
+						var time = BitConverter.GetBytes(TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(dt)));
 						var tzId = BitConverter.GetBytes(GetTimeZoneId());
 						var offset = new byte[] { 0, 0 };
 
