@@ -4,8 +4,8 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup>
-		<VersionPrefix>8.5.4</VersionPrefix>
-		<VersionSuffix></VersionSuffix>
+		<VersionPrefix>9.0.0</VersionPrefix>
+		<VersionSuffix>alpha</VersionSuffix>
 		<Company>FirebirdSQL</Company>
 		<Product>NETProvider</Product>
 		<Authors>FirebirdSQL</Authors>
