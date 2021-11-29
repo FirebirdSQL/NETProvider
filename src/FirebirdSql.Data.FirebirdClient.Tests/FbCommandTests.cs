@@ -790,5 +790,31 @@ end";
 				}
 			}
 		}
+
+		[Test]
+		public async Task PassDateOnly()
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@x as date) from rdb$database";
+				cmd.Parameters.Add("x", new DateOnly(2021, 11, 29));
+				var value = (DateTime)await cmd.ExecuteScalarAsync();
+				Assert.AreEqual(2021, value.Year);
+				Assert.AreEqual(11, value.Month);
+				Assert.AreEqual(29, value.Day);
+			}
+		}
+
+		[Test]
+		public async Task PassTimeOnly()
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select cast(@x as time) from rdb$database";
+				cmd.Parameters.Add("x", new TimeOnly(501940213000));
+				var value = (TimeSpan)await cmd.ExecuteScalarAsync();
+				Assert.AreEqual(501940213000, value.Ticks);
+			}
+		}
 	}
 }

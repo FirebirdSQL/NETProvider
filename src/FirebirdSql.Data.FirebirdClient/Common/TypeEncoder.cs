@@ -57,18 +57,29 @@ namespace FirebirdSql.Data.Common
 		{
 			return (int)(t.Ticks / 1000L);
 		}
+#if NET6_0_OR_GREATER
+		public static int EncodeTime(TimeOnly t)
+		{
+			return (int)(t.Ticks / 1000L);
+		}
+#endif
 
 		public static int EncodeDate(DateTime d)
 		{
-			int day, month, year;
-			int c, ya;
-
 			var calendar = new GregorianCalendar();
-
-			day = calendar.GetDayOfMonth(d);
-			month = calendar.GetMonth(d);
-			year = calendar.GetYear(d);
-
+			var day = calendar.GetDayOfMonth(d);
+			var month = calendar.GetMonth(d);
+			var year = calendar.GetYear(d);
+			return EncodeDateImpl(year, month, day);
+		}
+#if NET6_0_OR_GREATER
+		public static int EncodeDate(DateOnly d)
+		{
+			return EncodeDateImpl(d.Year, d.Month, d.Day);
+		}
+#endif
+		static int EncodeDateImpl(int year, int month, int day)
+		{
 			if (month > 2)
 			{
 				month -= 3;
@@ -79,8 +90,8 @@ namespace FirebirdSql.Data.Common
 				year -= 1;
 			}
 
-			c = year / 100;
-			ya = year - 100 * c;
+			var c = year / 100;
+			var ya = year - 100 * c;
 
 			return ((146097 * c) / 4 + (1461 * ya) / 4 + (153 * month + 2) / 5 + day + 1721119 - 2400001);
 		}

@@ -287,7 +287,13 @@ namespace FirebirdSql.Data.Common
 
 		public int GetDate()
 		{
-			return TypeEncoder.EncodeDate(GetDateTime());
+			return _value switch
+			{
+#if NET6_0_OR_GREATER
+				DateOnly @do => TypeEncoder.EncodeDate(@do),
+#endif
+				_ => TypeEncoder.EncodeDate(GetDateTime()),
+			};
 		}
 
 		public int GetTime()
@@ -296,6 +302,9 @@ namespace FirebirdSql.Data.Common
 			{
 				TimeSpan ts => TypeEncoder.EncodeTime(ts),
 				FbZonedTime zt => TypeEncoder.EncodeTime(zt.Time),
+#if NET6_0_OR_GREATER
+				TimeOnly to => TypeEncoder.EncodeTime(to),
+#endif
 				_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(GetDateTime())),
 			};
 		}

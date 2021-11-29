@@ -59,22 +59,26 @@ namespace FirebirdSql.Data.Common
 
 		public static DateTime DecodeDate(int sqlDate)
 		{
-			int year, month, day, century;
-
+			var (year, month, day) = DecodeDateImpl(sqlDate);
+			var date = new DateTime(year, month, day);
+			return date.Date;
+		}
+		static (int year, int month, int day) DecodeDateImpl(int sqlDate)
+		{
 			sqlDate -= 1721119 - 2400001;
-			century = (4 * sqlDate - 1) / 146097;
+			var century = (4 * sqlDate - 1) / 146097;
 			sqlDate = 4 * sqlDate - 1 - 146097 * century;
-			day = sqlDate / 4;
+			var day = sqlDate / 4;
 
 			sqlDate = (4 * day + 3) / 1461;
 			day = 4 * day + 3 - 1461 * sqlDate;
 			day = (day + 4) / 4;
 
-			month = (5 * day - 3) / 153;
+			var month = (5 * day - 3) / 153;
 			day = 5 * day - 3 - 153 * month;
 			day = (day + 5) / 5;
 
-			year = 100 * century + sqlDate;
+			var year = 100 * century + sqlDate;
 
 			if (month < 10)
 			{
@@ -86,9 +90,7 @@ namespace FirebirdSql.Data.Common
 				year += 1;
 			}
 
-			var date = new DateTime(year, month, day);
-
-			return date.Date;
+			return (year, month, day);
 		}
 
 		public static bool DecodeBoolean(byte[] value)
