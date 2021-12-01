@@ -513,7 +513,7 @@ namespace FirebirdSql.Data.Common
 
 					case DbDataType.Date:
 					case DbDataType.TimeStamp:
-						DbValue.SetValue(new DateTime(0 * 10000L + 621355968000000000));
+						DbValue.SetValue(DateTime2.UnixEpoch);
 						break;
 
 					case DbDataType.Time:
@@ -526,7 +526,7 @@ namespace FirebirdSql.Data.Common
 
 					case DbDataType.TimeStampTZ:
 					case DbDataType.TimeStampTZEx:
-						DbValue.SetValue(new FbZonedDateTime(new DateTime(0 * 10000L + 621355968000000000), TimeZoneMapping.DefaultTimeZoneName));
+						DbValue.SetValue(new FbZonedDateTime(DateTime2.UnixEpoch, TimeZoneMapping.DefaultTimeZoneName));
 						break;
 
 					case DbDataType.TimeTZ:

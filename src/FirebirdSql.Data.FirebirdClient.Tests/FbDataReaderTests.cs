@@ -508,9 +508,31 @@ end";
 				cts.Cancel();
 				await using (var cmd = Connection.CreateCommand())
 				{
-					cmd.CommandText ="select 1 from rdb$database";
+					cmd.CommandText = "select 1 from rdb$database";
 					Assert.ThrowsAsync<OperationCanceledException>(() => cmd.ExecuteReaderAsync(cts.Token));
 				}
+			}
+		}
+
+		[Test]
+		public async Task GetFieldValueTest()
+		{
+			await using (var transaction = await Connection.BeginTransactionAsync())
+			{
+				await using (var command = new FbCommand("select * from TEST", Connection, transaction))
+				{
+					await using (var reader = await command.ExecuteReaderAsync())
+					{
+						while (await reader.ReadAsync())
+						{
+							await reader.GetFieldValueAsync<int>("int_field");
+							await reader.GetFieldValueAsync<long>("bigint_field");
+							await reader.GetFieldValueAsync<string>("varchar_field");
+							await reader.GetFieldValueAsync<TimeOnly>("time_field");
+						}
+					}
+				}
+				await transaction.RollbackAsync();
 			}
 		}
 	}

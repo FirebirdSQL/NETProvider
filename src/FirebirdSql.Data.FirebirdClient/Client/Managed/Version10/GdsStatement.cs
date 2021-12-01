@@ -1312,11 +1312,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Dec16:
-						xdr.Write(field.DbValue.GetDec16(), 16);
+						xdr.Write(field.DbValue.GetDecFloat(), 16);
 						break;
 
 					case DbDataType.Dec34:
-						xdr.Write(field.DbValue.GetDec34(), 34);
+						xdr.Write(field.DbValue.GetDecFloat(), 34);
 						break;
 
 					case DbDataType.Int128:
@@ -1460,11 +1460,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 						break;
 
 					case DbDataType.Dec16:
-						await xdr.WriteAsync(field.DbValue.GetDec16(), 16, cancellationToken).ConfigureAwait(false);
+						await xdr.WriteAsync(field.DbValue.GetDecFloat(), 16, cancellationToken).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Dec34:
-						await xdr.WriteAsync(field.DbValue.GetDec34(), 34, cancellationToken).ConfigureAwait(false);
+						await xdr.WriteAsync(field.DbValue.GetDecFloat(), 34, cancellationToken).ConfigureAwait(false);
 						break;
 
 					case DbDataType.Int128:

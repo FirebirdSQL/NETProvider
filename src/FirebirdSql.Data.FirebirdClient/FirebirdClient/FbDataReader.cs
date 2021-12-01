@@ -22,10 +22,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
@@ -594,27 +596,20 @@ namespace FirebirdSql.Data.FirebirdClient
 					}
 					if (nullableUnderlying == typeof(bool))
 					{
-						return GetBoolean(i);
+						return GetFieldValue<bool>(i);
 					}
 				}
 				if (type == typeof(bool))
 				{
-					return GetBoolean(i);
+					return GetFieldValue<bool>(i);
 				}
 			}
 
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetValue);
+			return GetFieldValue<object>(i);
 		}
 
 		public override int GetValues(object[] values)
 		{
-			CheckState();
-			CheckPosition();
-
 			var count = Math.Min(_fields.Count, values.Length);
 			for (var i = 0; i < count; i++)
 			{
@@ -623,22 +618,224 @@ namespace FirebirdSql.Data.FirebirdClient
 			return count;
 		}
 
-		public override bool GetBoolean(int i)
+		public override T GetFieldValue<T>(int i)
 		{
 			CheckState();
 			CheckPosition();
 			CheckIndex(i);
 
-			return CheckedGetValue(_row[i].GetBoolean);
+			var type = typeof(T);
+			type = Nullable.GetUnderlyingType(type) ?? type;
+			try
+			{
+				if (type == typeof(bool))
+				{
+					return (T)(object)_row[i].GetBoolean();
+				}
+				else if (type == typeof(byte))
+				{
+					return (T)(object)_row[i].GetByte();
+				}
+				else if (type == typeof(char))
+				{
+					return (T)(object)_row[i].GetChar();
+				}
+				else if (type == typeof(Guid))
+				{
+					return (T)(object)_row[i].GetGuid();
+				}
+				else if (type == typeof(short))
+				{
+					return (T)(object)_row[i].GetInt16();
+				}
+				else if (type == typeof(int))
+				{
+					return (T)(object)_row[i].GetInt32();
+				}
+				else if (type == typeof(long))
+				{
+					return (T)(object)_row[i].GetInt64();
+				}
+				else if (type == typeof(float))
+				{
+					return (T)(object)_row[i].GetFloat();
+				}
+				else if (type == typeof(double))
+				{
+					return (T)(object)_row[i].GetDouble();
+				}
+				else if (type == typeof(string))
+				{
+					return (T)(object)_row[i].GetString();
+				}
+				else if (type == typeof(decimal))
+				{
+					return (T)(object)_row[i].GetDecimal();
+				}
+				else if (type == typeof(DateTime))
+				{
+					return (T)(object)_row[i].GetDateTime();
+				}
+				else if (type == typeof(TimeSpan))
+				{
+					return (T)(object)_row[i].GetTimeSpan();
+				}
+				else if (type == typeof(byte[]))
+				{
+					return (T)(object)_row[i].GetBinary();
+				}
+				else if (type == typeof(FbDecFloat))
+				{
+					return (T)(object)_row[i].GetDecFloat();
+				}
+				else if (type == typeof(BigInteger))
+				{
+					return (T)(object)_row[i].GetInt128();
+				}
+				else if (type == typeof(FbZonedDateTime))
+				{
+					return (T)(object)_row[i].GetZonedDateTime();
+				}
+				else if (type == typeof(FbZonedTime))
+				{
+					return (T)(object)_row[i].GetZonedTime();
+				}
+#if NET6_0_OR_GREATER
+				else if (type == typeof(DateOnly))
+				{
+					return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
+				}
+#endif
+#if NET6_0_OR_GREATER
+				else if (type == typeof(TimeOnly))
+				{
+					return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
+				}
+#endif
+				else
+				{
+					return (T)_row[i].GetValue();
+				}
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+
+		public override async Task<T> GetFieldValueAsync<T>(int i, CancellationToken cancellationToken)
+		{
+			CheckState();
+			CheckPosition();
+			CheckIndex(i);
+
+			var type = typeof(T);
+			type = Nullable.GetUnderlyingType(type) ?? type;
+			try
+			{
+				if (type == typeof(bool))
+				{
+					return (T)(object)_row[i].GetBoolean();
+				}
+				else if (type == typeof(byte))
+				{
+					return (T)(object)_row[i].GetByte();
+				}
+				else if (type == typeof(char))
+				{
+					return (T)(object)_row[i].GetChar();
+				}
+				else if (type == typeof(Guid))
+				{
+					return (T)(object)_row[i].GetGuid();
+				}
+				else if (type == typeof(short))
+				{
+					return (T)(object)_row[i].GetInt16();
+				}
+				else if (type == typeof(int))
+				{
+					return (T)(object)_row[i].GetInt32();
+				}
+				else if (type == typeof(long))
+				{
+					return (T)(object)_row[i].GetInt64();
+				}
+				else if (type == typeof(float))
+				{
+					return (T)(object)_row[i].GetFloat();
+				}
+				else if (type == typeof(double))
+				{
+					return (T)(object)_row[i].GetDouble();
+				}
+				else if (type == typeof(string))
+				{
+					return (T)(object)await _row[i].GetStringAsync(cancellationToken).ConfigureAwait(false);
+				}
+				else if (type == typeof(decimal))
+				{
+					return (T)(object)_row[i].GetDecimal();
+				}
+				else if (type == typeof(DateTime))
+				{
+					return (T)(object)_row[i].GetDateTime();
+				}
+				else if (type == typeof(TimeSpan))
+				{
+					return (T)(object)_row[i].GetTimeSpan();
+				}
+				else if (type == typeof(byte[]))
+				{
+					return (T)(object)await _row[i].GetBinaryAsync().ConfigureAwait(false);
+				}
+				else if (type == typeof(FbDecFloat))
+				{
+					return (T)(object)_row[i].GetDecFloat();
+				}
+				else if (type == typeof(BigInteger))
+				{
+					return (T)(object)_row[i].GetInt128();
+				}
+				else if (type == typeof(FbZonedDateTime))
+				{
+					return (T)(object)_row[i].GetZonedDateTime();
+				}
+				else if (type == typeof(FbZonedTime))
+				{
+					return (T)(object)_row[i].GetZonedTime();
+				}
+#if NET6_0_OR_GREATER
+				else if (type == typeof(DateOnly))
+				{
+					return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
+				}
+#endif
+#if NET6_0_OR_GREATER
+				else if (type == typeof(TimeOnly))
+				{
+					return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
+				}
+#endif
+				else
+				{
+					return (T)await _row[i].GetValueAsync().ConfigureAwait(false);
+				}
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+
+		public override bool GetBoolean(int i)
+		{
+			return GetFieldValue<bool>(i);
 		}
 
 		public override byte GetByte(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetByte);
+			return GetFieldValue<byte>(i);
 		}
 
 		public override long GetBytes(int i, long dataIndex, byte[] buffer, int bufferIndex, int length)
@@ -658,12 +855,12 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return CheckedGetValue(_row[i].GetBinary).Length;
+					return GetFieldValue<byte[]>(i).Length;
 				}
 			}
 			else
 			{
-				var byteArray = CheckedGetValue(_row[i].GetBinary);
+				var byteArray = GetFieldValue<byte[]>(i);
 
 				if (length > (byteArray.Length - dataIndex))
 				{
@@ -687,11 +884,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override char GetChar(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetChar);
+			return GetFieldValue<char>(i);
 		}
 
 		public override long GetChars(int i, long dataIndex, char[] buffer, int bufferIndex, int length)
@@ -708,13 +901,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 				else
 				{
-					return ((string)GetValue(i)).ToCharArray().Length;
+					return GetFieldValue<string>(i).ToCharArray().Length;
 				}
 			}
 			else
 			{
 
-				var charArray = ((string)GetValue(i)).ToCharArray();
+				var charArray = GetFieldValue<string>(i).ToCharArray();
 
 				var charsRead = 0;
 				var realLength = length;
@@ -724,7 +917,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					realLength = charArray.Length - (int)dataIndex;
 				}
 
-				System.Array.Copy(charArray, (int)dataIndex, buffer,
+				Array.Copy(charArray, (int)dataIndex, buffer,
 					bufferIndex, realLength);
 
 				if ((charArray.Length - dataIndex) < length)
@@ -742,83 +935,47 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override Guid GetGuid(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetGuid);
+			return GetFieldValue<Guid>(i);
 		}
 
-		public override Int16 GetInt16(int i)
+		public override short GetInt16(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetInt16);
+			return GetFieldValue<short>(i);
 		}
 
-		public override Int32 GetInt32(int i)
+		public override int GetInt32(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetInt32);
+			return GetFieldValue<int>(i);
 		}
 
-		public override Int64 GetInt64(int i)
+		public override long GetInt64(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetInt64);
+			return GetFieldValue<long>(i);
 		}
 
 		public override float GetFloat(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetFloat);
+			return GetFieldValue<float>(i);
 		}
 
 		public override double GetDouble(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetDouble);
+			return GetFieldValue<double>(i);
 		}
 
 		public override string GetString(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetString);
+			return GetFieldValue<string>(i);
 		}
 
-		public override Decimal GetDecimal(int i)
+		public override decimal GetDecimal(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetDecimal);
+			return GetFieldValue<decimal>(i);
 		}
 
 		public override DateTime GetDateTime(int i)
 		{
-			CheckState();
-			CheckPosition();
-			CheckIndex(i);
-
-			return CheckedGetValue(_row[i].GetDateTime);
+			return GetFieldValue<DateTime>(i);
 		}
 
 		public override bool IsDBNull(int i)
@@ -949,26 +1106,26 @@ namespace FirebirdSql.Data.FirebirdClient
 			var schema = new DataTable("Schema");
 
 			// Schema table structure
-			schema.Columns.Add("ColumnName", System.Type.GetType("System.String"));
-			schema.Columns.Add("ColumnOrdinal", System.Type.GetType("System.Int32"));
-			schema.Columns.Add("ColumnSize", System.Type.GetType("System.Int32"));
-			schema.Columns.Add("NumericPrecision", System.Type.GetType("System.Int32"));
-			schema.Columns.Add("NumericScale", System.Type.GetType("System.Int32"));
-			schema.Columns.Add("DataType", System.Type.GetType("System.Type"));
-			schema.Columns.Add("ProviderType", System.Type.GetType("System.Int32"));
-			schema.Columns.Add("IsLong", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("AllowDBNull", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsReadOnly", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsRowVersion", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsUnique", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsKey", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsAutoIncrement", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsAliased", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("IsExpression", System.Type.GetType("System.Boolean"));
-			schema.Columns.Add("BaseSchemaName", System.Type.GetType("System.String"));
-			schema.Columns.Add("BaseCatalogName", System.Type.GetType("System.String"));
-			schema.Columns.Add("BaseTableName", System.Type.GetType("System.String"));
-			schema.Columns.Add("BaseColumnName", System.Type.GetType("System.String"));
+			schema.Columns.Add("ColumnName", Type.GetType("System.String"));
+			schema.Columns.Add("ColumnOrdinal", Type.GetType("System.Int32"));
+			schema.Columns.Add("ColumnSize", Type.GetType("System.Int32"));
+			schema.Columns.Add("NumericPrecision", Type.GetType("System.Int32"));
+			schema.Columns.Add("NumericScale", Type.GetType("System.Int32"));
+			schema.Columns.Add("DataType", Type.GetType("System.Type"));
+			schema.Columns.Add("ProviderType", Type.GetType("System.Int32"));
+			schema.Columns.Add("IsLong", Type.GetType("System.Boolean"));
+			schema.Columns.Add("AllowDBNull", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsReadOnly", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsRowVersion", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsUnique", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsKey", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsAutoIncrement", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsAliased", Type.GetType("System.Boolean"));
+			schema.Columns.Add("IsExpression", Type.GetType("System.Boolean"));
+			schema.Columns.Add("BaseSchemaName", Type.GetType("System.String"));
+			schema.Columns.Add("BaseCatalogName", Type.GetType("System.String"));
+			schema.Columns.Add("BaseTableName", Type.GetType("System.String"));
+			schema.Columns.Add("BaseColumnName", Type.GetType("System.String"));
 
 			return schema;
 		}
@@ -1002,7 +1159,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static T CheckedGetValue<T>(Func<T> getter)
+		private static T CheckedGetValue2<T>(Func<T> getter)
 		{
 			try
 			{

@@ -231,12 +231,35 @@ namespace FirebirdSql.Data.Common
 		{
 			return _value switch
 			{
-				TimeSpan ts => new DateTime(0 * 10000L + 621355968000000000 + ts.Ticks),
 				DateTimeOffset dto => dto.DateTime,
 				FbZonedDateTime zdt => zdt.DateTime,
-				FbZonedTime zt => new DateTime(0 * 10000L + 621355968000000000 + zt.Time.Ticks),
 				_ => Convert.ToDateTime(_value, CultureInfo.CurrentCulture.DateTimeFormat),
 			};
+		}
+
+		public TimeSpan GetTimeSpan()
+		{
+			return (TimeSpan)_value;
+		}
+
+		public FbDecFloat GetDecFloat()
+		{
+			return (FbDecFloat)_value;
+		}
+
+		public BigInteger GetInt128()
+		{
+			return (BigInteger)_value;
+		}
+
+		public FbZonedDateTime GetZonedDateTime()
+		{
+			return (FbZonedDateTime)_value;
+		}
+
+		public FbZonedTime GetZonedTime()
+		{
+			return (FbZonedTime)_value;
 		}
 
 		public Array GetArray()
@@ -324,21 +347,6 @@ namespace FirebirdSql.Data.Common
 				}
 			}
 			throw new InvalidOperationException($"Incorrect time zone value.");
-		}
-
-		public FbDecFloat GetDec16()
-		{
-			return (FbDecFloat)_value;
-		}
-
-		public FbDecFloat GetDec34()
-		{
-			return (FbDecFloat)_value;
-		}
-
-		public BigInteger GetInt128()
-		{
-			return (BigInteger)_value;
 		}
 
 		public byte[] GetBytes()
@@ -529,10 +537,10 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.Dec16:
-					return DecimalCodec.DecFloat16.EncodeDecimal(GetDec16());
+					return DecimalCodec.DecFloat16.EncodeDecimal(GetDecFloat());
 
 				case DbDataType.Dec34:
-					return DecimalCodec.DecFloat34.EncodeDecimal(GetDec34());
+					return DecimalCodec.DecFloat34.EncodeDecimal(GetDecFloat());
 
 				case DbDataType.Int128:
 					return Int128Helper.GetBytes(GetInt128());
@@ -729,10 +737,10 @@ namespace FirebirdSql.Data.Common
 					}
 
 				case DbDataType.Dec16:
-					return DecimalCodec.DecFloat16.EncodeDecimal(GetDec16());
+					return DecimalCodec.DecFloat16.EncodeDecimal(GetDecFloat());
 
 				case DbDataType.Dec34:
-					return DecimalCodec.DecFloat34.EncodeDecimal(GetDec34());
+					return DecimalCodec.DecFloat34.EncodeDecimal(GetDecFloat());
 
 				case DbDataType.Int128:
 					return Int128Helper.GetBytes(GetInt128());

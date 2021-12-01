@@ -15,24 +15,17 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Threading.Tasks;
+using System;
 
 namespace FirebirdSql.Data.Common
 {
-	internal static class ValueTask2
+	internal static class DateTime2
 	{
-		public static ValueTask<TResult> FromResult<TResult>(TResult result) =>
-#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-			new ValueTask<TResult>(result);
+		public static DateTime UnixEpoch =>
+#if NET48 || NETSTANDARD2_0
+			new DateTime(621355968000000000);
 #else
-			ValueTask.FromResult(result);
-#endif
-
-		public static ValueTask CompletedTask =>
-#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-			default;
-#else
-			ValueTask.CompletedTask;
+			DateTime.UnixEpoch;
 #endif
 	}
 }
