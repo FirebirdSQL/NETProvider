@@ -32,13 +32,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			: base(dependencies)
 		{ }
 
-		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification)
+		protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, IColumnModification columnModification)
 			=> throw new InvalidOperationException();
 
 		protected override void AppendRowsAffectedWhereCondition(StringBuilder commandStringBuilder, int expectedRowsAffected)
 			=> throw new InvalidOperationException();
 
-		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
 		{
 			var result = ResultSetMapping.NoResultSet;
 			var name = command.TableName;
@@ -63,7 +63,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			return result;
 		}
 
-		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
 		{
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
@@ -132,7 +132,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			return ResultSetMapping.LastInResultSet;
 		}
 
-		public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, ModificationCommand command, int commandPosition)
+		public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
 		{
 			var name = command.TableName;
 			var operations = command.ColumnModifications;
@@ -162,7 +162,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		}
 
 		// workaround for GenerateBlockParameterName
-		protected override void AppendUpdateCommandHeader(StringBuilder commandStringBuilder, string name, string schema, IReadOnlyList<ColumnModification> operations)
+		protected override void AppendUpdateCommandHeader(StringBuilder commandStringBuilder, string name, string schema, IReadOnlyList<IColumnModification> operations)
 		{
 			commandStringBuilder.Append("UPDATE ");
 			SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, name, schema);
@@ -186,7 +186,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 		}
 
 		// workaround for GenerateBlockParameterName
-		protected override void AppendWhereCondition(StringBuilder commandStringBuilder, ColumnModification columnModification, bool useOriginalValue)
+		protected override void AppendWhereCondition(StringBuilder commandStringBuilder, IColumnModification columnModification, bool useOriginalValue)
 		{
 			SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, columnModification.ColumnName);
 			if ((useOriginalValue ? columnModification.OriginalValue : columnModification.Value) == null)
@@ -206,12 +206,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
 			}
 		}
 
-		string GetColumnType(ColumnModification column)
+		string GetColumnType(IColumnModification column)
 		{
 			return Dependencies.TypeMappingSource.GetMapping(column.Property).StoreType;
 		}
 
-		IEnumerable<(string name, string type)> GenerateParameters(IEnumerable<ColumnModification> columns)
+		IEnumerable<(string name, string type)> GenerateParameters(IEnumerable<IColumnModification> columns)
 		{
 			foreach (var item in columns)
 			{

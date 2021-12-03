@@ -222,6 +222,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 				modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(IdentityString)))
 					.HasSchema(null);
+
+				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
 			}
 		}
 

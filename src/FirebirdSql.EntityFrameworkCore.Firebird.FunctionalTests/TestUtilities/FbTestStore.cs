@@ -48,6 +48,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
 			Connection = new FbConnection(ConnectionString);
 		}
 
+		protected override string OpenDelimiter => "\"";
+		protected override string CloseDelimiter => "\"";
+
 		protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
 		{
 			using (var context = createContext())

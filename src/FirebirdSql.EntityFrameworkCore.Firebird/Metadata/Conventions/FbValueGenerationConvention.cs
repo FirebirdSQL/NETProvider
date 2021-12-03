@@ -41,9 +41,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 		}
 
 		protected override ValueGenerated? GetValueGenerated(IConventionProperty property)
-			=> GetValueGenerated(property);
-
-		public static new ValueGenerated? GetValueGenerated(IProperty property)
 			=> RelationalValueGenerationConvention.GetValueGenerated(property)
 				?? (property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None
 					? ValueGenerated.OnAdd

@@ -15,14 +15,19 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.GearsOfWarModel;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
-	public class GearsOfWarQueryFbTest : GearsOfWarQueryTestBase<GearsOfWarQueryFbFixture>
+	public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWarQueryFbFixture>
 	{
 		public GearsOfWarQueryFbTest(GearsOfWarQueryFbFixture fixture)
 			: base(fixture)
@@ -271,6 +276,146 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion(bool async)
 		{
 			return base.Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Array_access_on_byte_array(bool async)
+		{
+			return base.Array_access_on_byte_array(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_after_distinct_3_levels(bool async)
+		{
+			return base.Correlated_collection_after_distinct_3_levels(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_via_SelectMany_with_Distinct_missing_indentifying_columns_in_projection(bool async)
+		{
+			return base.Correlated_collection_via_SelectMany_with_Distinct_missing_indentifying_columns_in_projection(async);
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task ToString_boolean_property_non_nullable(bool async)
+		{
+			return AssertQuery(async, ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.InvariantCultureIgnoreCase)); });
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task ToString_boolean_property_nullable(bool async)
+		{
+			return AssertQuery(async, ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.InvariantCultureIgnoreCase)); });
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_inner_collection_references_element_two_levels_up(bool async)
+		{
+			return base.Correlated_collection_with_inner_collection_references_element_two_levels_up(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_groupby_not_projecting_identifier_column_with_group_aggregate_in_final_projection_multiple_grouping_keys(bool async)
+		{
+			return base.Correlated_collection_with_groupby_not_projecting_identifier_column_with_group_aggregate_in_final_projection_multiple_grouping_keys(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_groupby_not_projecting_identifier_column_with_group_aggregate_in_final_projection(bool async)
+		{
+			return base.Correlated_collection_with_groupby_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_groupby_not_projecting_identifier_column_but_only_grouping_key_in_final_projection(bool async)
+		{
+			return base.Correlated_collection_with_groupby_not_projecting_identifier_column_but_only_grouping_key_in_final_projection(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_distinct_projecting_identifier_column(bool async)
+		{
+			return base.Correlated_collection_with_distinct_projecting_identifier_column(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_with_distinct_not_projecting_identifier_column(bool async)
+		{
+			return base.Correlated_collection_with_distinct_not_projecting_identifier_column(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collections_with_Distinct(bool async)
+		{
+			return base.Correlated_collections_with_Distinct(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task First_on_byte_array(bool async)
+		{
+			return base.First_on_byte_array(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_TimeOnly_subtract_TimeOnly(bool async)
+		{
+			return base.Where_TimeOnly_subtract_TimeOnly(async);
+		}
+
+		[Theory(Skip = "NETProvider#1008")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_TimeOnly_IsBetween(bool async)
+		{
+			return base.Where_TimeOnly_IsBetween(async);
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_TimeOnly_AddMinutes(bool async)
+		{
+			return base.Where_TimeOnly_AddMinutes(async);
+		}
+
+		[Theory(Skip = "NETProvider#1009")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_TimeOnly_Add_TimeSpan(bool async)
+		{
+			return base.Where_TimeOnly_Add_TimeSpan(async);
+		}
+
+		[Theory(Skip = "Nullability propagation from functions")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_property_converted_to_nullable_into_member_access(bool async)
+		{
+			return base.Projecting_property_converted_to_nullable_into_member_access(async);
+		}
+
+		[Theory(Skip = "Nullability propagation from functions")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_property_converted_to_nullable_with_function_call(bool async)
+		{
+			return base.Projecting_property_converted_to_nullable_with_function_call(async);
+		}
+
+		[Theory(Skip = "Nullability propagation from functions")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_property_converted_to_nullable_with_function_call2(bool async)
+		{
+			return base.Projecting_property_converted_to_nullable_with_function_call2(async);
 		}
 	}
 }

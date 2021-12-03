@@ -31,8 +31,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal
 			: base(dependencies)
 		{ }
 
-		public override IEnumerable<IAnnotation> For(IColumn column)
+		public override IEnumerable<IAnnotation> For(IColumn column, bool designTime)
 		{
+			if (!designTime)
+			{
+				yield break;
+			}
+
 			var property = column.PropertyMappings.Select(x => x.Property)
 				.FirstOrDefault(x => x.GetValueGenerationStrategy() != FbValueGenerationStrategy.None);
 			if (property != null)

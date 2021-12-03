@@ -37,9 +37,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		readonly IntTypeMapping _integer = new IntTypeMapping("INTEGER", DbType.Int32);
 		readonly LongTypeMapping _bigint = new LongTypeMapping("BIGINT", DbType.Int64);
 
-		readonly FbStringTypeMapping _char = new FbStringTypeMapping("CHAR", FbDbType.Char);
-		readonly FbStringTypeMapping _varchar = new FbStringTypeMapping("VARCHAR", FbDbType.VarChar);
-		readonly FbStringTypeMapping _clob = new FbStringTypeMapping("BLOB SUB_TYPE TEXT", FbDbType.Text);
+		readonly FbStringTypeMapping _char = new FbStringTypeMapping("CHAR", DbType.StringFixedLength, FbDbType.Char);
+		readonly FbStringTypeMapping _varchar = new FbStringTypeMapping("VARCHAR", DbType.String, FbDbType.VarChar);
+		readonly FbStringTypeMapping _clob = new FbStringTypeMapping("BLOB SUB_TYPE TEXT", DbType.String, FbDbType.Text);
 
 		readonly FbByteArrayTypeMapping _binary = new FbByteArrayTypeMapping();
 
@@ -49,8 +49,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		readonly FbDateTimeTypeMapping _timestamp = new FbDateTimeTypeMapping("TIMESTAMP", FbDbType.TimeStamp);
 		readonly FbDateTimeTypeMapping _date = new FbDateTimeTypeMapping("DATE", FbDbType.Date);
+		readonly FbDateOnlyTypeMapping _dateOnly = new FbDateOnlyTypeMapping("DATE");
 
-		readonly FbTimeSpanTypeMapping _time = new FbTimeSpanTypeMapping("TIME", FbDbType.Time);
+		readonly FbTimeSpanTypeMapping _timeSpan = new FbTimeSpanTypeMapping("TIME", FbDbType.Time);
+		readonly FbTimeOnlyTypeMapping _timeOnly = new FbTimeOnlyTypeMapping("TIME");
 
 		readonly FbGuidTypeMapping _guid = new FbGuidTypeMapping();
 
@@ -76,7 +78,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ "DECIMAL", _decimal },
 				{ "TIMESTAMP", _timestamp },
 				{ "DATE", _date },
-				{ "TIME", _time },
+				{ "TIME", _timeSpan },
 				{ "CHAR(16) CHARACTER SET OCTETS", _guid },
 			};
 
@@ -90,8 +92,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 				{ typeof(double), _double},
 				{ typeof(decimal), _decimal },
 				{ typeof(DateTime), _timestamp },
-				{ typeof(TimeSpan), _time },
+				{ typeof(TimeSpan), _timeSpan },
 				{ typeof(Guid), _guid },
+				{ typeof(DateOnly), _dateOnly },
+				{ typeof(TimeOnly), _timeOnly },
 			};
 
 			_disallowedMappings = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -174,11 +178,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 					{
 						if (!isFixedLength)
 						{
-							return new FbStringTypeMapping($"VARCHAR({size})", FbDbType.VarChar, size);
+							return new FbStringTypeMapping($"VARCHAR({size})", DbType.String, FbDbType.VarChar, size);
 						}
 						else
 						{
-							return new FbStringTypeMapping($"CHAR({size})", FbDbType.Char, size);
+							return new FbStringTypeMapping($"CHAR({size})", DbType.StringFixedLength, FbDbType.Char, size);
 						}
 					}
 				}

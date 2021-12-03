@@ -65,7 +65,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 
 		sealed class ExtensionInfo : RelationalExtensionInfo
 		{
-			long? _serviceProviderHash;
+			int? _serviceProviderHash;
 
 			public ExtensionInfo(IDbContextOptionsExtension extension)
 				: base(extension)
@@ -73,7 +73,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
 
 			new FbOptionsExtension Extension => (FbOptionsExtension)base.Extension;
 
-			public override long GetServiceProviderHashCode()
+			public override int GetServiceProviderHashCode()
 			{
 				return _serviceProviderHash ??= HashCode.Combine(base.GetServiceProviderHashCode(), Extension._explicitParameterTypes, Extension._explicitStringLiteralTypes);
 			}

@@ -425,12 +425,10 @@ namespace System
 #pragma warning disable IDE0034 // Simplify 'default' expression - default causes default(object)
 			{ typeof(int), default(int) },
 			{ typeof(Guid), default(Guid) },
-#warning net6.0
-			//{ typeof(DateOnly), default(DateOnly) },
+			{ typeof(DateOnly), default(DateOnly) },
 			{ typeof(DateTime), default(DateTime) },
 			{ typeof(DateTimeOffset), default(DateTimeOffset) },
-#warning net6.0
-			//{ typeof(TimeOnly), default(TimeOnly) },
+			{ typeof(TimeOnly), default(TimeOnly) },
 			{ typeof(long), default(long) },
 			{ typeof(bool), default(bool) },
 			{ typeof(double), default(double) },

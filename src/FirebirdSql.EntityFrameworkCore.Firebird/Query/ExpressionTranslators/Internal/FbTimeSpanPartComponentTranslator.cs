@@ -28,12 +28,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 {
 	public class FbTimeSpanPartComponentTranslator : IMemberTranslator
 	{
+		const string SecondPart = "SECOND";
+		const string MillisecondPart = "MILLISECOND";
 		private static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
 		{
 			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Hours)), "HOUR" },
 			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Minutes)), "MINUTE" },
-			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Seconds)), "SECOND" },
-			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Milliseconds)), "MILLISECOND" },
+			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Seconds)), SecondPart },
+			{  typeof(TimeSpan).GetProperty(nameof(TimeSpan.Milliseconds)), MillisecondPart },
 		};
 
 		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
@@ -49,6 +51,10 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 				return null;
 
 			var result = (SqlExpression)_fbSqlExpressionFactory.Extract(part, instance);
+			if (part == SecondPart || part == MillisecondPart)
+			{
+				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, returnType);
+			}
 			return result;
 		}
 	}

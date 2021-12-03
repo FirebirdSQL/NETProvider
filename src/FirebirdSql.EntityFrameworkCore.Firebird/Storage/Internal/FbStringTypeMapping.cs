@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Data;
 using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -25,8 +26,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 	{
 		readonly FbDbType _fbDbType;
 
-		public FbStringTypeMapping(string storeType, FbDbType fbDbType, int? size = null)
-			: base(storeType, unicode: true, size: size)
+		public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null)
+			: base(storeType, dbType, unicode: true, size: size)
 		{
 			_fbDbType = fbDbType;
 		}

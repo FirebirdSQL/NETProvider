@@ -26,27 +26,21 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
 {
-	public class FbDateTimePartComponentTranslator : IMemberTranslator
+	public class FbDateOnlyPartComponentTranslator : IMemberTranslator
 	{
 		const string YearDayPart = "YEARDAY";
-		const string SecondPart = "SECOND";
-		const string MillisecondPart = "MILLISECOND";
 		static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
 		{
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Year)), "YEAR" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Month)), "MONTH" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Day)), "DAY" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Hour)), "HOUR" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Minute)), "MINUTE" },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Second)), SecondPart },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.Millisecond)), MillisecondPart },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfYear)), YearDayPart },
-			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfWeek)), "WEEKDAY" },
+			{  typeof(DateOnly).GetProperty(nameof(DateOnly.Year)), "YEAR" },
+			{  typeof(DateOnly).GetProperty(nameof(DateOnly.Month)), "MONTH" },
+			{  typeof(DateOnly).GetProperty(nameof(DateOnly.Day)), "DAY" },
+			{  typeof(DateOnly).GetProperty(nameof(DateOnly.DayOfYear)), YearDayPart },
+			{  typeof(DateOnly).GetProperty(nameof(DateOnly.DayOfWeek)), "WEEKDAY" },
 		};
 
 		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
-		public FbDateTimePartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+		public FbDateOnlyPartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 		{
 			_fbSqlExpressionFactory = fbSqlExpressionFactory;
 		}
@@ -60,10 +54,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (part == YearDayPart)
 			{
 				result = _fbSqlExpressionFactory.Add(result, _fbSqlExpressionFactory.Constant(1));
-			}
-			else if (part == SecondPart || part == MillisecondPart)
-			{
-				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, returnType);
 			}
 			return result;
 		}

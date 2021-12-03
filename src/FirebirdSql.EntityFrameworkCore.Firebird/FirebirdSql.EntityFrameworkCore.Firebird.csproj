@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird</AssemblyName>
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird</RootNamespace>
 		<SignAssembly>true</SignAssembly>
@@ -29,8 +29,8 @@
 		<None Include="..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.12" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />

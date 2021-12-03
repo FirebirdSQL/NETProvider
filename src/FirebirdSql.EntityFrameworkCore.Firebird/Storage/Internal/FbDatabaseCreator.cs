@@ -91,7 +91,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 
 		public override bool HasTables()
 		{
-			return Dependencies.ExecutionStrategyFactory.Create().Execute(
+			return Dependencies.ExecutionStrategy.Execute(
 				_connection,
 				connection => Convert.ToInt64(CreateHasTablesCommand().ExecuteScalar(
 					new RelationalCommandParameterObject(
@@ -104,7 +104,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		}
 		public override Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
 		{
-			return Dependencies.ExecutionStrategyFactory.Create().ExecuteAsync(
+			return Dependencies.ExecutionStrategy.ExecuteAsync(
 				_connection,
 				async (connection, ct) => Convert.ToInt64(await CreateHasTablesCommand().ExecuteScalarAsync(
 					new RelationalCommandParameterObject(

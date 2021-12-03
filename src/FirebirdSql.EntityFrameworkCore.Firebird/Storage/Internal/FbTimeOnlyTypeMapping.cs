@@ -15,28 +15,26 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Data.Common;
-using System.Threading;
-using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
-	public class FbRelationalConnection : RelationalConnection, IFbRelationalConnection
+	public class FbTimeOnlyTypeMapping : TimeOnlyTypeMapping
 	{
-		public FbRelationalConnection(RelationalConnectionDependencies dependencies)
-			: base(dependencies)
+		public FbTimeOnlyTypeMapping(string storeType)
+			: base(storeType)
 		{ }
 
-		protected override DbConnection CreateDbConnection()
-			=> new FbConnection(ConnectionString);
+		protected FbTimeOnlyTypeMapping(RelationalTypeMappingParameters parameters)
+			: base(parameters)
+		{ }
 
-		public override bool Close()
+		protected override string GenerateNonNullSqlLiteral(object value)
 		{
-			var result = base.Close();
-#warning Very dirty quick-fix for efcore#26790
-			Thread.Sleep(50);
-			return result;
+			return $"CAST('{value:HH:mm:ss.ffff}' AS TIME)";
 		}
+
+		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+			=> new FbTimeOnlyTypeMapping(parameters);
 	}
 }

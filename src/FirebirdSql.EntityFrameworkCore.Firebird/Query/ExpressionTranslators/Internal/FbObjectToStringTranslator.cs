@@ -46,6 +46,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(ushort),
 			typeof(ulong),
 			typeof(sbyte),
+			typeof(DateOnly),
+			typeof(TimeOnly),
 		};
 
 		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;

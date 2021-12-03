@@ -25,11 +25,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
 	public class FbRelationalTransaction : RelationalTransaction, IFbRelationalTransaction
 	{
-		public FbRelationalTransaction(IRelationalConnection connection, DbTransaction transaction, Guid transactionId, IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger, bool transactionOwned)
-			: base(connection, transaction, transactionId, logger, transactionOwned)
+		public FbRelationalTransaction(IRelationalConnection connection, DbTransaction transaction, Guid transactionId, IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger, bool transactionOwned, ISqlGenerationHelper sqlGenerationHelper)
+			: base(connection, transaction, transactionId, logger, transactionOwned, sqlGenerationHelper)
 		{ }
-
-		// quick fix for now for https://github.com/dotnet/efcore/pull/23036
-		public override bool SupportsSavepoints => false;
 	}
 }

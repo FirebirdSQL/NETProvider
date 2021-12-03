@@ -204,10 +204,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[DoesNotHaveTheDataTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Owned_entity_without_owner_does_not_throw_for_identity_resolution(bool isAsync) => base.Owned_entity_without_owner_does_not_throw_for_identity_resolution(isAsync);
-
-		[DoesNotHaveTheDataTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Can_project_owned_indexer_properties_converted(bool isAsync) => base.Can_project_owned_indexer_properties_converted(isAsync);
 
 		[DoesNotHaveTheDataTheory]
@@ -233,10 +229,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		[DoesNotHaveTheDataTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task GroupBy_with_multiple_aggregates_on_owned_navigation_properties(bool isAsync) => base.GroupBy_with_multiple_aggregates_on_owned_navigation_properties(isAsync);
-
-		[DoesNotHaveTheDataTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(bool isAsync) => base.NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(isAsync);
 
 		[DoesNotHaveTheDataTheory]
 		[MemberData(nameof(IsAsyncData))]
@@ -361,6 +353,40 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		[DoesNotHaveTheDataTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Ordering_by_identifying_projection(bool isAsync) => base.Ordering_by_identifying_projection(isAsync);
+
+		[HasDataInTheSameTransactionAsDDLTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filter_on_indexer_using_closure(bool async)
+		{
+			return base.Filter_on_indexer_using_closure(async);
+		}
+
+		[HasDataInTheSameTransactionAsDDLTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Filter_on_indexer_using_function_argument(bool async)
+		{
+			return base.Filter_on_indexer_using_function_argument(async);
+		}
+
+		[HasDataInTheSameTransactionAsDDLTheory]
+		[InlineData(false, false)]
+		[InlineData(false, true)]
+		[InlineData(true, false)]
+		[InlineData(true, true)]
+		public override Task NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(bool async, bool useAsTracking)
+		{
+			return base.NoTracking_Include_with_cycles_does_not_throw_when_performing_identity_resolution(async, useAsTracking);
+		}
+
+		[HasDataInTheSameTransactionAsDDLTheory]
+		[InlineData(false, false)]
+		[InlineData(false, true)]
+		[InlineData(true, false)]
+		[InlineData(true, true)]
+		public override Task Owned_entity_without_owner_does_not_throw_for_identity_resolution(bool async, bool useAsTracking)
+		{
+			return base.Owned_entity_without_owner_does_not_throw_for_identity_resolution(async, useAsTracking);
+		}
 
 		public class OwnedQueryFbFixture : RelationalOwnedQueryFixture
 		{

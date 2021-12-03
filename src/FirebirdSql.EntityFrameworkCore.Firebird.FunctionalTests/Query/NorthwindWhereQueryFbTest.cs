@@ -78,5 +78,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Where_datetimeoffset_utcnow_component(async);
 		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Where_datetimeoffset_utcnow(bool async)
+		{
+			return base.Where_datetimeoffset_utcnow(async);
+		}
 	}
 }

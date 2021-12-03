@@ -48,11 +48,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 			switch (_fbDbType)
 			{
 				case FbDbType.TimeStamp:
-					return $"CAST('{value:yyyy-MM-dd HH:mm:ss}' AS TIMESTAMP)";
+					return $"CAST('{value:yyyy-MM-dd HH:mm:ss.ffff}' AS TIMESTAMP)";
 				case FbDbType.Date:
 					return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
 				case FbDbType.Time:
-					return $"CAST('{value:HH:mm:ss}' AS TIME)";
+					return $"CAST('{value:HH:mm:ss.ffff}' AS TIME)";
 				default:
 					throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
 			}

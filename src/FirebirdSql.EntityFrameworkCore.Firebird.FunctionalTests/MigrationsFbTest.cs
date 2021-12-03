@@ -16,10 +16,9 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Threading.Tasks;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -282,6 +281,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
 
 		[Fact(Skip = SkipReason)]
 		public override Task UpdateDataOperation_multiple_columns() => base.UpdateDataOperation_multiple_columns();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_column_make_non_computed() => base.Alter_column_make_non_computed();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Alter_computed_column_add_comment() => base.Alter_computed_column_add_comment();
+
+		[Fact(Skip = SkipReason)]
+		public override Task Drop_column_computed_and_non_computed_with_dependency() => base.Drop_column_computed_and_non_computed_with_dependency();
 
 		[Fact(Skip = SkipReason)]
 		public override Task SqlOperation() => base.SqlOperation();

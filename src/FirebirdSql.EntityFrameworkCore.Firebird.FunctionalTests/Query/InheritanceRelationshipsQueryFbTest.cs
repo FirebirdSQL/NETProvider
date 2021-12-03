@@ -354,5 +354,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Include_collection_without_inheritance_with_filter(async);
 		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Include_on_derived_type_with_queryable_Cast(bool async)
+		{
+			return base.Include_on_derived_type_with_queryable_Cast(async);
+		}
 	}
 }

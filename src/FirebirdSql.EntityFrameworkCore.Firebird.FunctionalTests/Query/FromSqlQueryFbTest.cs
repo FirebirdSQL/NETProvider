@@ -15,14 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -35,41 +35,126 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			: base(fixture)
 		{ }
 
-		[NotSupportedOnFirebirdFact]
-		public override void Bad_data_error_handling_invalid_cast_key()
-		{
-			base.Bad_data_error_handling_invalid_cast_key();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void Bad_data_error_handling_invalid_cast_no_tracking()
-		{
-			base.Bad_data_error_handling_invalid_cast_no_tracking();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void Bad_data_error_handling_invalid_cast_projection()
-		{
-			base.Bad_data_error_handling_invalid_cast_projection();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void Bad_data_error_handling_invalid_cast()
-		{
-			base.Bad_data_error_handling_invalid_cast();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void FromSqlRaw_queryable_simple_projection_composed()
-		{
-			base.FromSqlRaw_queryable_simple_projection_composed();
-		}
-
 		protected override DbParameter CreateDbParameter(string name, object value)
 			=> new FbParameter
 			{
 				ParameterName = name,
 				Value = value
 			};
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override async Task FromSql_Count_used_twice_without_parameters(bool async)
+		{
+			using var context = CreateContext();
+
+			var query = context.Set<OrderQuery>()
+				.FromSqlRaw(NormalizeDelimitersInRawString("SELECT 'ALFKI' AS [CustomerID] FROM RDB$DATABASE"))
+				.IgnoreQueryFilters();
+
+			var result1 = async
+				? await query.CountAsync() > 0
+				: query.Count() > 0;
+
+			var result2 = async
+				? await query.CountAsync() > 0
+				: query.Count() > 0;
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override async Task FromSql_Count_used_twice_with_parameters(bool async)
+		{
+			using var context = CreateContext();
+
+			var query = context.Set<OrderQuery>()
+				.FromSqlRaw(NormalizeDelimitersInRawString("SELECT CAST({0} AS CHAR(5)) AS [CustomerID] FROM RDB$DATABASE"), "ALFKI")
+				.IgnoreQueryFilters();
+
+			var result1 = async
+				? await query.CountAsync() > 0
+				: query.Count() > 0;
+
+			var result2 = async
+				? await query.CountAsync() > 0
+				: query.Count() > 0;
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override async Task FromSql_used_twice_without_parameters(bool async)
+		{
+			using var context = CreateContext();
+
+			var query = context.Set<OrderQuery>()
+				.FromSqlRaw(NormalizeDelimitersInRawString("SELECT 'ALFKI' AS [CustomerID] FROM RDB$DATABASE"))
+				.IgnoreQueryFilters();
+
+			var result1 = async
+				? await query.AnyAsync()
+				: query.Any();
+
+			Assert.Equal(
+				RelationalStrings.QueryFromSqlInsideExists,
+				async
+					? (await Assert.ThrowsAsync<InvalidOperationException>(() => query.AnyAsync())).Message
+					: Assert.Throws<InvalidOperationException>(() => query.Any()).Message);
+		}
+
+		[Theory]
+		[MemberData(nameof(IsAsyncData))]
+		public override async Task FromSql_used_twice_with_parameters(bool async)
+		{
+			using var context = CreateContext();
+
+			var query = context.Set<OrderQuery>()
+				.FromSqlRaw(NormalizeDelimitersInRawString("SELECT CAST({0} AS CHAR(5)) AS [CustomerID] FROM RDB$DATABASE"), "ALFKI")
+				.IgnoreQueryFilters();
+
+			var result1 = async
+				? await query.AnyAsync()
+				: query.Any();
+
+			Assert.Equal(
+				RelationalStrings.QueryFromSqlInsideExists,
+				async
+					? (await Assert.ThrowsAsync<InvalidOperationException>(() => query.AnyAsync())).Message
+					: Assert.Throws<InvalidOperationException>(() => query.Any()).Message);
+		}
+
+		[Theory(Skip = "Provider does the casting.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Bad_data_error_handling_invalid_cast(bool async)
+		{
+			return base.Bad_data_error_handling_invalid_cast(async);
+		}
+
+		[Theory(Skip = "Provider does the casting.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Bad_data_error_handling_invalid_cast_key(bool async)
+		{
+			return base.Bad_data_error_handling_invalid_cast_key(async);
+		}
+
+		[Theory(Skip = "Provider does the casting.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Bad_data_error_handling_invalid_cast_no_tracking(bool async)
+		{
+			return base.Bad_data_error_handling_invalid_cast_no_tracking(async);
+		}
+
+		[Theory(Skip = "Provider does the casting.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Bad_data_error_handling_invalid_cast_projection(bool async)
+		{
+			return base.Bad_data_error_handling_invalid_cast_projection(async);
+		}
+
+		[Theory(Skip = "Provider does the casting.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task FromSqlRaw_queryable_simple_projection_composed(bool async)
+		{
+			return base.FromSqlRaw_queryable_simple_projection_composed(async);
+		}
 	}
 }

@@ -15,15 +15,26 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 {
-	public class AsyncFromSqlQueryFbTest : AsyncFromSqlQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+	public class FbDateOnlyTypeMapping : DateOnlyTypeMapping
 	{
-		public AsyncFromSqlQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
+		public FbDateOnlyTypeMapping(string storeType)
+			: base(storeType)
 		{ }
+
+		protected FbDateOnlyTypeMapping(RelationalTypeMappingParameters parameters)
+			: base(parameters)
+		{ }
+
+		protected override string GenerateNonNullSqlLiteral(object value)
+		{
+			return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
+		}
+
+		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+			=> new FbDateOnlyTypeMapping(parameters);
 	}
 }

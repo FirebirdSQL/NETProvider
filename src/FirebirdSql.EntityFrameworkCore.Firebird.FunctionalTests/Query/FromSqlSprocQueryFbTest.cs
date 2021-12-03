@@ -200,5 +200,29 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.From_sql_queryable_with_multiple_stored_procedures_on_client(async);
 		}
+
+		[DoesNotHaveTheDataTheory]
+		[InlineData(false)]
+		[InlineData(true)]
+		public override Task From_sql_queryable_stored_procedure_with_caller_info_tag(bool async)
+		{
+			return base.From_sql_queryable_stored_procedure_with_caller_info_tag(async);
+		}
+
+		[DoesNotHaveTheDataTheory]
+		[InlineData(false)]
+		[InlineData(true)]
+		public override Task From_sql_queryable_stored_procedure_with_caller_info_tag_and_other_tags(bool async)
+		{
+			return base.From_sql_queryable_stored_procedure_with_caller_info_tag_and_other_tags(async);
+		}
+
+		[DoesNotHaveTheDataTheory]
+		[InlineData(false)]
+		[InlineData(true)]
+		public override Task From_sql_queryable_stored_procedure_with_tags(bool async)
+		{
+			return base.From_sql_queryable_stored_procedure_with_tags(async);
+		}
 	}
 }

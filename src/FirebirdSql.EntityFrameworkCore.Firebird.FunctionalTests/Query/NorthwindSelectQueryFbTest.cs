@@ -33,27 +33,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[Theory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Reverse_without_explicit_ordering_throws(bool async)
-		{
-			return AssertTranslationFailedWithDetails(
-				() => base.Reverse_without_explicit_ordering_throws(async), RelationalStrings.MissingOrderingInSelectExpression);
-		}
-
-		[Theory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Member_binding_after_ctor_arguments_fails_with_client_eval(bool async)
 		{
 			return AssertTranslationFailed(() => base.Member_binding_after_ctor_arguments_fails_with_client_eval(async));
-		}
-
-		[Theory]
-		[MemberData(nameof(IsAsyncData))]
-		public override async Task Projecting_after_navigation_and_distinct_throws(bool async)
-		{
-			var message = (await Assert.ThrowsAsync<InvalidOperationException>(
-				() => base.Projecting_after_navigation_and_distinct_throws(async))).Message;
-
-			Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyOuterElementOfCollectionJoin, message);
 		}
 
 		[NotSupportedOnFirebirdTheory]
@@ -138,6 +120,62 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task SelectMany_whose_selector_references_outer_source(bool async)
 		{
 			return base.SelectMany_whose_selector_references_outer_source(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Collection_projection_selecting_outer_element_followed_by_take(bool async)
+		{
+			return base.Collection_projection_selecting_outer_element_followed_by_take(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_after_distinct_not_containing_original_identifier(bool async)
+		{
+			return base.Correlated_collection_after_distinct_not_containing_original_identifier(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_after_distinct_with_complex_projection_containing_original_identifier(bool async)
+		{
+			return base.Correlated_collection_after_distinct_with_complex_projection_containing_original_identifier(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Correlated_collection_after_groupby_with_complex_projection_containing_original_identifier(bool async)
+		{
+			return base.Correlated_collection_after_groupby_with_complex_projection_containing_original_identifier(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Projecting_after_navigation_and_distinct(bool async)
+		{
+			return base.Projecting_after_navigation_and_distinct(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Select_nested_collection_deep_distinct_no_identifiers(bool async)
+		{
+			return base.Select_nested_collection_deep_distinct_no_identifiers(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Take_on_correlated_collection_in_first(bool async)
+		{
+			return base.Take_on_correlated_collection_in_first(async);
+		}
+
+		[NotSupportedOnFirebirdTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Take_on_top_level_and_on_collection_projection_with_outer_apply(bool async)
+		{
+			return base.Take_on_top_level_and_on_collection_projection_with_outer_apply(async);
 		}
 	}
 }

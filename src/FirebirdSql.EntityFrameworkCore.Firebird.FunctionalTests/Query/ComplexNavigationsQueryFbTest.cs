@@ -34,27 +34,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_multi_include_with_order_by_and_paging(bool isAsync)
-		{
-			return base.Complex_multi_include_with_order_by_and_paging(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_multi_include_with_order_by_and_paging_joins_on_correct_key(bool isAsync)
-		{
-			return base.Complex_multi_include_with_order_by_and_paging_joins_on_correct_key(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_multi_include_with_order_by_and_paging_joins_on_correct_key2(bool isAsync)
-		{
-			return base.Complex_multi_include_with_order_by_and_paging_joins_on_correct_key2(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Complex_navigations_with_predicate_projected_into_anonymous_type(bool isAsync)
 		{
 			return base.Complex_navigations_with_predicate_projected_into_anonymous_type(isAsync);
@@ -72,55 +51,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Complex_query_with_optional_navigations_and_client_side_evaluation(bool isAsync)
 		{
 			return base.Complex_query_with_optional_navigations_and_client_side_evaluation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_SelectMany_with_nested_navigations_and_explicit_DefaultIfEmpty_with_other_query_operators_composed_on_top(bool isAsync)
-		{
-			return base.Complex_SelectMany_with_nested_navigations_and_explicit_DefaultIfEmpty_with_other_query_operators_composed_on_top(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_after_multiple_SelectMany_and_reference_navigation(bool isAsync)
-		{
-			return base.Include_after_multiple_SelectMany_and_reference_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_after_SelectMany_and_multiple_reference_navigations(bool isAsync)
-		{
-			return base.Include_after_SelectMany_and_multiple_reference_navigations(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_after_SelectMany_and_reference_navigation(bool isAsync)
-		{
-			return base.Include_after_SelectMany_and_reference_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_after_SelectMany_and_reference_navigation_with_another_SelectMany_with_Distinct(bool isAsync)
-		{
-			return base.Include_after_SelectMany_and_reference_navigation_with_another_SelectMany_with_Distinct(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_nested_with_optional_navigation(bool isAsync)
-		{
-			return base.Include_nested_with_optional_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_reference_collection_order_by_reference_navigation(bool isAsync)
-		{
-			return base.Include_reference_collection_order_by_reference_navigation(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -149,48 +79,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Manually_created_left_join_propagates_nullability_to_navigations(bool isAsync)
 		{
 			return base.Manually_created_left_join_propagates_nullability_to_navigations(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_complex_includes(bool isAsync)
-		{
-			return base.Multiple_complex_includes(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_complex_includes_self_ref(bool isAsync)
-		{
-			return base.Multiple_complex_includes_self_ref(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_complex_include_select(bool isAsync)
-		{
-			return base.Multiple_complex_include_select(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_include_with_multiple_optional_navigations(bool isAsync)
-		{
-			return base.Multiple_include_with_multiple_optional_navigations(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_optional_navigation_with_Include(bool isAsync)
-		{
-			return base.Multiple_optional_navigation_with_Include(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_optional_navigation_with_string_based_Include(bool isAsync)
-		{
-			return base.Multiple_optional_navigation_with_string_based_Include(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -230,20 +118,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_SelectMany_navigation_property_followed_by_select_collection_navigation(bool isAsync)
-		{
-			return base.Multiple_SelectMany_navigation_property_followed_by_select_collection_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multiple_SelectMany_with_Include(bool isAsync)
-		{
-			return base.Multiple_SelectMany_with_Include(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Multiple_SelectMany_with_navigation_and_explicit_DefaultIfEmpty(bool isAsync)
 		{
 			return base.Multiple_SelectMany_with_navigation_and_explicit_DefaultIfEmpty(isAsync);
@@ -272,20 +146,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Multi_level_include_correct_PK_is_chosen_as_the_join_predicate_for_queries_that_join_same_table_multiple_times(bool isAsync)
-		{
-			return base.Multi_level_include_correct_PK_is_chosen_as_the_join_predicate_for_queries_that_join_same_table_multiple_times(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Multi_level_include_one_to_many_optional_and_one_to_many_optional_produces_valid_sql(bool isAsync)
-		{
-			return base.Multi_level_include_one_to_many_optional_and_one_to_many_optional_produces_valid_sql(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Multi_level_navigation_with_same_navigation_compared_to_null(bool isAsync)
 		{
 			return base.Multi_level_navigation_with_same_navigation_compared_to_null(isAsync);
@@ -310,27 +170,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task Optional_navigation_with_Include(bool isAsync)
 		{
 			return base.Optional_navigation_with_Include(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Optional_navigation_with_Include_and_order(bool isAsync)
-		{
-			return base.Optional_navigation_with_Include_and_order(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Optional_navigation_with_Include_ThenInclude(bool isAsync)
-		{
-			return base.Optional_navigation_with_Include_ThenInclude(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Optional_navigation_with_order_by_and_Include(bool isAsync)
-		{
-			return base.Optional_navigation_with_order_by_and_Include(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -384,34 +223,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Project_collection_navigation_nested(bool isAsync)
-		{
-			return base.Project_collection_navigation_nested(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Project_collection_navigation_nested_anonymous(bool isAsync)
-		{
-			return base.Project_collection_navigation_nested_anonymous(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Project_collection_navigation_using_ef_property(bool isAsync)
-		{
-			return base.Project_collection_navigation_using_ef_property(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Project_navigation_and_collection(bool isAsync)
-		{
-			return base.Project_navigation_and_collection(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task Required_navigation_on_a_subquery_with_complex_projection_and_First(bool isAsync)
 		{
 			return base.Required_navigation_on_a_subquery_with_complex_projection_and_First(isAsync);
@@ -433,41 +244,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Required_navigation_with_Include(bool isAsync)
-		{
-			return base.Required_navigation_with_Include(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Required_navigation_with_Include_ThenInclude(bool isAsync)
-		{
-			return base.Required_navigation_with_Include_ThenInclude(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_navigation_property_followed_by_select_collection_navigation(bool isAsync)
-		{
-			return base.SelectMany_navigation_property_followed_by_select_collection_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_navigation_property_with_another_navigation_in_subquery(bool isAsync)
-		{
-			return base.SelectMany_navigation_property_with_another_navigation_in_subquery(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation(bool isAsync)
-		{
-			return base.SelectMany_navigation_property_with_include_and_followed_by_select_collection_navigation(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
 		public override Task SelectMany_nested_navigation_property_optional_and_projection(bool isAsync)
 		{
 			return base.SelectMany_nested_navigation_property_optional_and_projection(isAsync);
@@ -478,34 +254,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task SelectMany_nested_navigation_property_required(bool isAsync)
 		{
 			return base.SelectMany_nested_navigation_property_required(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_with_Include1(bool isAsync)
-		{
-			return base.SelectMany_with_Include1(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_with_Include2(bool isAsync)
-		{
-			return base.SelectMany_with_Include2(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_with_Include_and_order_by(bool isAsync)
-		{
-			return base.SelectMany_with_Include_and_order_by(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_with_Include_ThenInclude(bool isAsync)
-		{
-			return base.SelectMany_with_Include_ThenInclude(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -576,13 +324,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public override Task SelectMany_with_nested_required_navigation_filter_and_explicit_DefaultIfEmpty(bool isAsync)
 		{
 			return base.SelectMany_with_nested_required_navigation_filter_and_explicit_DefaultIfEmpty(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task SelectMany_with_order_by_and_Include(bool isAsync)
-		{
-			return base.SelectMany_with_order_by_and_Include(isAsync);
 		}
 
 		[GeneratedNameTooLongTheory]
@@ -835,68 +576,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			base.Include19();
 		}
 
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection2()
-		{
-			base.IncludeCollection2();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection5()
-		{
-			base.IncludeCollection6();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection6()
-		{
-			base.IncludeCollection6();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection6_1()
-		{
-			base.IncludeCollection6_1();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection6_2()
-		{
-			base.IncludeCollection6_2();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection6_3()
-		{
-			base.IncludeCollection6_3();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection6_4()
-		{
-			base.IncludeCollection6_4();
-		}
-
-		[GeneratedNameTooLongFact]
-		public override void IncludeCollection7()
-		{
-			base.IncludeCollection7();
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task IncludeCollection8(bool isAsync)
-		{
-			return base.IncludeCollection8(isAsync);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Include_inside_subquery(bool isAsync)
-		{
-			return base.Include_inside_subquery(isAsync);
-		}
-
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Join_navigation_deeply_nested_non_key_join(bool isAsync)
@@ -1002,13 +681,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Optional_navigation_propagates_nullability_to_manually_created_left_join2(isAsync);
 		}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Project_collection_navigation_nested_with_take(bool isAsync)
-		{
-			return base.Project_collection_navigation_nested_with_take(isAsync);
-		}
-
 		[GeneratedNameTooLongTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task Union_over_entities_with_different_nullability(bool isAsync)
@@ -1016,6 +688,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Union_over_entities_with_different_nullability(isAsync);
 		}
 
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Include_reference_with_groupby_in_subquery(bool async)
+		{
+			return base.Include_reference_with_groupby_in_subquery(async);
+		}
+
+		[GeneratedNameTooLongTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Project_shadow_properties(bool async)
+		{
+			return base.Project_shadow_properties(async);
+		}
 		[NotSupportedOnFirebirdTheory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task SelectMany_with_outside_reference_to_joined_table_correctly_translated_to_apply(bool isAsync)
@@ -1030,67 +715,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.Let_let_contains_from_outer_let(async);
 		}
 
-		[GeneratedNameTooLongTheory]
+		[NotSupportedOnFirebirdTheory]
 		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_complex_three_level_with_middle_having_filter1(bool async)
+		public override Task Prune_does_not_throw_null_ref(bool async)
 		{
-			return base.Filtered_include_complex_three_level_with_middle_having_filter1(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(bool async)
-		{
-			return base.Filtered_include_multiple_multi_level_includes_with_first_level_using_filter_include_on_one_of_the_chains_only(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_ThenInclude_OrderBy(bool async)
-		{
-			return base.Filtered_ThenInclude_OrderBy(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_complex_three_level_with_middle_having_filter2(bool async)
-		{
-			return base.Filtered_include_complex_three_level_with_middle_having_filter2(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_ThenInclude_OrderBy(bool async)
-		{
-			return base.Filtered_include_ThenInclude_OrderBy(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(bool async)
-		{
-			return base.Filtered_include_same_filter_set_on_same_navigation_twice_followed_by_ThenIncludes(async);
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_after_different_filtered_include_different_level(bool async)
-		{
-			return base.Filtered_include_after_different_filtered_include_different_level(async);
-		}
-
-		[GeneratedNameTooLongFact]
-		[MemberData(nameof(IsAsyncData))]
-		public override void Filtered_include_outer_parameter_used_inside_filter()
-		{
-			base.Filtered_include_outer_parameter_used_inside_filter();
-		}
-
-		[GeneratedNameTooLongTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(bool async)
-		{
-			return base.Filtered_include_and_non_filtered_include_followed_by_then_include_on_same_navigation(async);
+			return base.Prune_does_not_throw_null_ref(async);
 		}
 	}
 }

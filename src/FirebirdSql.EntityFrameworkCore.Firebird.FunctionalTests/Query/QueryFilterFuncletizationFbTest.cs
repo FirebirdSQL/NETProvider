@@ -15,12 +15,16 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
@@ -29,6 +33,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public QueryFilterFuncletizationFbTest(QueryFilterFuncletizationFbFixture fixture)
 			: base(fixture)
 		{ }
+
+		[Fact]
+		public override void DbContext_list_is_parameterized()
+		{
+			using var context = CreateContext();
+			// Default value of TenantIds is null InExpression over null values throws
+			Assert.Throws<NullReferenceException>(() => context.Set<ListFilter>().ToList());
+
+			context.TenantIds = new List<int>();
+			var query = context.Set<ListFilter>().ToList();
+			Assert.Empty(query);
+
+			context.TenantIds = new List<int> { 1 };
+			query = context.Set<ListFilter>().ToList();
+			Assert.Single(query);
+
+			context.TenantIds = new List<int> { 2, 3 };
+			query = context.Set<ListFilter>().ToList();
+			Assert.Equal(2, query.Count);
+		}
 
 		public class QueryFilterFuncletizationFbFixture : QueryFilterFuncletizationRelationalFixture
 		{

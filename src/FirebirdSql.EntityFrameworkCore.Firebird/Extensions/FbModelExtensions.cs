@@ -31,5 +31,11 @@ namespace Microsoft.EntityFrameworkCore
 
 		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IModel model)
 			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
+
+		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IMutableModel model)
+			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
+
+		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IConventionModel model)
+			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
 	}
 }

@@ -113,5 +113,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Include_duplicate_collection_result_operator(async);
 		}
+
+		[Theory(Skip = "Different implicit ordering on Firebird.")]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Repro9735(bool async)
+		{
+			return base.Repro9735(async);
+		}
 	}
 }

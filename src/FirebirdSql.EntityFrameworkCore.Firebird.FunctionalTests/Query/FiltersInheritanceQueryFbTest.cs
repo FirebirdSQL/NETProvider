@@ -15,10 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
-using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 {
@@ -27,35 +24,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		public FiltersInheritanceQueryFbTest(FiltersInheritanceQueryFbFixture fixture)
 			: base(fixture)
 		{ }
-
-		[Fact(Skip = "Currently wrong test.")]
-		public override void Can_use_is_kiwi_in_projection()
-		{
-			base.Can_use_is_kiwi_in_projection();
-		}
-
-		[Fact(Skip = "Currently wrong test.")]
-		public override void Can_use_of_type_animal()
-		{
-			base.Can_use_of_type_animal();
-		}
-
-		[Fact(Skip = "Currently wrong test.")]
-		public override void Can_use_of_type_bird()
-		{
-			base.Can_use_of_type_bird();
-		}
-
-		[Fact(Skip = "Currently wrong test.")]
-		public override void Can_use_of_type_bird_with_projection()
-		{
-			base.Can_use_of_type_bird_with_projection();
-		}
-
-		[Fact(Skip = "Currently wrong test.")]
-		public override void Can_use_derived_set()
-		{
-			base.Can_use_derived_set();
-		}
 	}
 }
