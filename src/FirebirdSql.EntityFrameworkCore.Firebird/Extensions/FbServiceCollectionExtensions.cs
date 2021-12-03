@@ -15,8 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using FirebirdSql.EntityFrameworkCore.Firebird;
 using FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
@@ -41,6 +43,17 @@ namespace Microsoft.EntityFrameworkCore
 {
 	public static class FbServiceCollectionExtensions
 	{
+		public static IServiceCollection AddFirebird<TContext>(this IServiceCollection serviceCollection, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null, Action<DbContextOptionsBuilder> optionsAction = null)
+			where TContext : DbContext
+		{
+			return serviceCollection.AddDbContext<TContext>(
+				(serviceProvider, options) =>
+				{
+					optionsAction?.Invoke(options);
+					options.UseFirebird(connectionString, fbOptionsAction);
+				});
+		}
+
 		public static IServiceCollection AddEntityFrameworkFirebird(this IServiceCollection serviceCollection)
 		{
 			var builder = new EntityFrameworkRelationalServicesBuilder(serviceCollection)
