@@ -258,16 +258,6 @@ end";
 			return false;
 		}
 
-		protected static int GetId()
-		{
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				var buffer = new byte[4];
-				rng.GetBytes(buffer);
-				return BitConverter.ToInt32(buffer, 0);
-			}
-		}
-
 		#endregion
 	}
 }

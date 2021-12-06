@@ -35,7 +35,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task IntegerArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new int[] { 10, 20, 30, 40 };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -69,7 +69,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ShortArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new short[] { 50, 60, 70, 80 };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -104,7 +104,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task BigIntArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new long[] { 50, 60, 70, 80 };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -138,7 +138,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task FloatArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new float[] { 130.10F, 140.20F, 150.30F, 160.40F };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -172,7 +172,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task DoubleArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new double[] { 170.10, 180.20, 190.30, 200.40 };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -206,7 +206,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task NumericArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new decimal[] { 210.10M, 220.20M, 230.30M, 240.40M };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -240,7 +240,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task DateArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new DateTime[] { DateTime.Today.AddDays(10), DateTime.Today.AddDays(20), DateTime.Today.AddDays(30), DateTime.Today.AddDays(40) };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -274,7 +274,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task TimeArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new TimeSpan[] { new TimeSpan(3, 9, 10), new TimeSpan(4, 11, 12), new TimeSpan(6, 13, 14), new TimeSpan(8, 15, 16) };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -308,7 +308,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task TimeStampArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new DateTime[] { DateTime.Now.AddSeconds(10), DateTime.Now.AddSeconds(20), DateTime.Now.AddSeconds(30), DateTime.Now.AddSeconds(40) };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -343,7 +343,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task CharArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -378,7 +378,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task VarCharArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var insert_values = new string[] { "abc", "abcdef", "abcdefghi", "abcdefghijkl" };
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
@@ -544,13 +544,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task BigArrayTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			int elements = short.MaxValue;
-			var bytes = new byte[elements * 4];
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				rng.GetBytes(bytes);
-			}
+			var bytes = RandomNumberGenerator.GetBytes(elements * 4);
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 
@@ -585,13 +581,9 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task PartialUpdatesTest()
 		{
-			var id_value = GetId();
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 			var elements = 16384;
-			var bytes = new byte[elements * 4];
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				rng.GetBytes(bytes);
-			}
+			var bytes = RandomNumberGenerator.GetBytes(elements * 4);
 			var insert_values = new int[elements];
 			Buffer.BlockCopy(bytes, 0, insert_values, 0, bytes.Length);
 

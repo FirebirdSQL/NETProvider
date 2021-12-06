@@ -33,12 +33,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task BinaryBlobTest()
 		{
-			var id_value = GetId();
-			var insert_values = new byte[100000 * 4];
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				rng.GetBytes(insert_values);
-			}
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+			var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
 			{
@@ -61,12 +57,8 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ReaderGetBytes()
 		{
-			var id_value = GetId();
-			var insert_values = new byte[100000 * 4];
-			using (var rng = new RNGCryptoServiceProvider())
-			{
-				rng.GetBytes(insert_values);
-			}
+			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+			var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
 
 			await using (var transaction = await Connection.BeginTransactionAsync())
 			{

@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -59,7 +60,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task InsertNullGuidTest()
 		{
-			var id = GetId();
+			var id = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
 
 			await using (var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection))
 			{
