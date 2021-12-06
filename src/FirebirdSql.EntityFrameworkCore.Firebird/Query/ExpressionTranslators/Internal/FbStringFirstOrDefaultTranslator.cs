@@ -44,12 +44,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!method.Equals(MethodInfo))
 				return null;
 
-			var argument = arguments[0];
+			var argument = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
 			return _fbSqlExpressionFactory.Function(
 				"LEFT",
 				new[] { argument, _fbSqlExpressionFactory.Constant(1) },
 				true,
-				new[] { true, default },
+				new[] { true, false },
 				typeof(string));
 		}
 	}

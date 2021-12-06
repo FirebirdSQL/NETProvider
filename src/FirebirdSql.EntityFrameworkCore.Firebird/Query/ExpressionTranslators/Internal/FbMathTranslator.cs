@@ -132,27 +132,27 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			}
 			if (TruncateMethodInfos.Contains(method))
 			{
-				return _fbSqlExpressionFactory.Function(
+				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
 					"TRUNC",
-					new[] { arguments[0], _fbSqlExpressionFactory.Constant(0) },
+					new[] { _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), _fbSqlExpressionFactory.Constant(0) },
 					true,
-					new[] { true, default },
-					method.ReturnType);
+					new[] { true, false },
+					method.ReturnType));
 			}
 			if (RoundMethodInfos.Contains(method))
 			{
-				var args = arguments.Count == 1
-					? new[] { arguments[0], _fbSqlExpressionFactory.Constant(0) }
-					: new[] { arguments[0], arguments[1] };
-				var argsNullability = arguments.Count == 1
-					? new[] { true, default }
+				var roundArguments = arguments.Count == 1
+					? new[] { _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), _fbSqlExpressionFactory.Constant(0) }
+					: new[] { _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]) };
+				var nullability = arguments.Count == 1
+					? new[] { true, false }
 					: new[] { true, true };
-				return _fbSqlExpressionFactory.Function(
+				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
 					"ROUND",
-					args,
+					roundArguments,
 					true,
-					argsNullability,
-					method.ReturnType);
+					nullability,
+					method.ReturnType));
 			}
 			return null;
 		}

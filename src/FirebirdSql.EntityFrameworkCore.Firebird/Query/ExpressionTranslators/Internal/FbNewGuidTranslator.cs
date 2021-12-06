@@ -39,7 +39,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		{
 			if (method.DeclaringType == typeof(Guid) && method.Name == nameof(Guid.NewGuid))
 			{
-				return _fbSqlExpressionFactory.NiladicFunction("GEN_UUID", false, typeof(Guid));
+				return _fbSqlExpressionFactory.Function("GEN_UUID", Array.Empty<SqlExpression>(), false, Array.Empty<bool>(), typeof(Guid));
 			}
 			return null;
 		}

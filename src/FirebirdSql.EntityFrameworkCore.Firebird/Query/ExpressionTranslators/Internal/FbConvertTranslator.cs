@@ -72,7 +72,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!SupportedMethods.Contains(method))
 				return null;
 
-			return _fbSqlExpressionFactory.Convert(arguments[0], method.ReturnType);
+			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
+				_fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), method.ReturnType));
 		}
 	}
 }

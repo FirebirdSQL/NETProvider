@@ -42,8 +42,14 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!method.Equals(ReplaceMethod))
 				return null;
 
-			var args = new[] { instance }.Concat(arguments);
-			return _fbSqlExpressionFactory.Function("REPLACE", args, true, args.Select(_ => true), instance.Type);
+			var args = new List<SqlExpression>();
+			args.Add(instance);
+			foreach (var a in arguments)
+			{
+				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
+			}
+			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
+				_fbSqlExpressionFactory.Function("REPLACE", args, true, Enumerable.Repeat(true, args.Count), instance.Type));
 		}
 	}
 }

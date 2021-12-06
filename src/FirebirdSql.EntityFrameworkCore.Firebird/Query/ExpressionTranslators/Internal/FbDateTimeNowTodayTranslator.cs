@@ -38,11 +38,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		{
 			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Now))
 			{
-				return _fbSqlExpressionFactory.NiladicFunction("LOCALTIMESTAMP", false, typeof(DateTime));
+				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("LOCALTIMESTAMP", false, typeof(DateTime)));
 			}
 			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Today))
 			{
-				return _fbSqlExpressionFactory.NiladicFunction("CURRENT_DATE", false, typeof(DateTime));
+				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("CURRENT_DATE", false, typeof(DateTime)));
 			}
 			return null;
 		}

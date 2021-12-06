@@ -42,12 +42,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			{
 				var value = arguments[1] is SqlConstantExpression constantValue
 					? _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Constant((byte)constantValue.Value) }, false, new[] { false }, typeof(string))
-					: _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Convert(arguments[1], typeof(byte)) }, true, new[] { true }, typeof(string));
+					: _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]), typeof(byte)) }, true, new[] { true }, typeof(string));
 
 				return _fbSqlExpressionFactory.GreaterThan(
 					_fbSqlExpressionFactory.Function(
 						"POSITION",
-						new[] { value, arguments[0] },
+						new[] { value, _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]) },
 						true,
 						new[] { true, true },
 						typeof(int)),

@@ -15,7 +15,8 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq.Expressions;
+using System;
+using System.Collections.Generic;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -25,69 +26,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 {
 	public class FbSqlExpressionFactory : SqlExpressionFactory
 	{
-		readonly IRelationalTypeMappingSource _typeMappingSource;
-
 		public FbSqlExpressionFactory(SqlExpressionFactoryDependencies dependencies)
 			: base(dependencies)
-		{
-			_typeMappingSource = dependencies.TypeMappingSource;
-		}
+		{ }
 
-		public FbSubstringExpression Substring(SqlExpression valueExpression, SqlExpression fromExpression, SqlExpression forExpression)
-			=> (FbSubstringExpression)ApplyDefaultTypeMapping(new FbSubstringExpression(valueExpression, fromExpression, forExpression, null));
-
-		public FbExtractExpression Extract(string part, SqlExpression valueExpression)
-			=> (FbExtractExpression)ApplyDefaultTypeMapping(new FbExtractExpression(part, valueExpression, null));
-
-		public FbDateTimeDateMemberExpression DateTimeDateMember(SqlExpression valueExpression)
-			=> (FbDateTimeDateMemberExpression)ApplyDefaultTypeMapping(new FbDateTimeDateMemberExpression(valueExpression, null));
-
-		public FbTrimExpression Trim(string where, SqlExpression whatExpression, SqlExpression valueExpression)
-			=> (FbTrimExpression)ApplyDefaultTypeMapping(new FbTrimExpression(where, whatExpression, valueExpression, null));
+		public FbSpacedFunctionExpression SpacedFunction(string name, IEnumerable<SqlExpression> arguments, bool nullable, IEnumerable<bool> argumentsPropagateNullability, Type type, RelationalTypeMapping typeMapping = null)
+			=> (FbSpacedFunctionExpression)ApplyDefaultTypeMapping(new FbSpacedFunctionExpression(name, arguments, nullable, argumentsPropagateNullability, type, typeMapping));
 
 		public override SqlExpression ApplyTypeMapping(SqlExpression sqlExpression, RelationalTypeMapping typeMapping)
 			=> sqlExpression == null || sqlExpression.TypeMapping != null
 				? sqlExpression
 				: sqlExpression switch
 				{
-					FbSubstringExpression e => ApplyTypeMappingOnSubstring(e),
-					FbExtractExpression e => ApplyTypeMappingOnExtract(e),
-					FbDateTimeDateMemberExpression e => ApplyTypeMappingOnDateTimeDateMember(e),
-					FbTrimExpression e => ApplyTypeMappingOnTrim(e),
+					FbSpacedFunctionExpression e => e.ApplyTypeMapping(typeMapping),
 					_ => base.ApplyTypeMapping(sqlExpression, typeMapping)
 				};
-
-		SqlExpression ApplyTypeMappingOnSubstring(FbSubstringExpression expression)
-		{
-			return new FbSubstringExpression(
-				ApplyDefaultTypeMapping(expression.ValueExpression),
-				ApplyDefaultTypeMapping(expression.FromExpression),
-				ApplyDefaultTypeMapping(expression.ForExpression),
-				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
-		}
-
-		SqlExpression ApplyTypeMappingOnExtract(FbExtractExpression expression)
-		{
-			return new FbExtractExpression(
-				expression.Part,
-				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
-		}
-
-		SqlExpression ApplyTypeMappingOnDateTimeDateMember(FbDateTimeDateMemberExpression expression)
-		{
-			return new FbDateTimeDateMemberExpression(
-				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
-		}
-
-		SqlExpression ApplyTypeMappingOnTrim(FbTrimExpression expression)
-		{
-			return new FbTrimExpression(
-				expression.Where,
-				ApplyDefaultTypeMapping(expression.WhatExpression),
-				ApplyDefaultTypeMapping(expression.ValueExpression),
-				expression.TypeMapping ?? _typeMappingSource.FindMapping(expression.Type));
-		}
 	}
 }

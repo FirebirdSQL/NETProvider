@@ -258,52 +258,29 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
 			return tableValuedFunctionExpression;
 		}
 
-		public virtual Expression VisitSubstring(FbSubstringExpression substringExpression)
+		protected override Expression VisitExtension(Expression extensionExpression)
 		{
-			Sql.Append("SUBSTRING(");
-			Visit(substringExpression.ValueExpression);
-			Sql.Append(" FROM ");
-			Visit(substringExpression.FromExpression);
-			if (substringExpression.ForExpression != null)
+			return extensionExpression switch
 			{
-				Sql.Append(" FOR ");
-				Visit(substringExpression.ForExpression);
+				FbSpacedFunctionExpression spacedFunctionExpression => VisitSpacedFunction(spacedFunctionExpression),
+				_ => base.VisitExtension(extensionExpression),
+			};
+		}
+
+		public virtual Expression VisitSpacedFunction(FbSpacedFunctionExpression spacedFunctionExpression)
+		{
+			Sql.Append(spacedFunctionExpression.Name);
+			Sql.Append("(");
+			for (var i = 0; i < spacedFunctionExpression.Arguments.Count; i++)
+			{
+				Visit(spacedFunctionExpression.Arguments[i]);
+				if (i < spacedFunctionExpression.Arguments.Count - 1)
+				{
+					Sql.Append(" ");
+				}
 			}
 			Sql.Append(")");
-			return substringExpression;
-		}
-
-		public virtual Expression VisitExtract(FbExtractExpression extractExpression)
-		{
-			Sql.Append("EXTRACT(");
-			Sql.Append(extractExpression.Part);
-			Sql.Append(" FROM ");
-			Visit(extractExpression.ValueExpression);
-			Sql.Append(")");
-			return extractExpression;
-		}
-
-		public virtual Expression VisitDateTimeDateMember(FbDateTimeDateMemberExpression dateTimeDateMemberExpression)
-		{
-			Sql.Append("CAST(");
-			Visit(dateTimeDateMemberExpression.ValueExpression);
-			Sql.Append(" AS DATE)");
-			return dateTimeDateMemberExpression;
-		}
-
-		public virtual Expression VisitTrim(FbTrimExpression trimExpression)
-		{
-			Sql.Append("TRIM(");
-			Sql.Append(trimExpression.Where);
-			if (trimExpression.WhatExpression != null)
-			{
-				Sql.Append(" ");
-				Visit(trimExpression.WhatExpression);
-			}
-			Sql.Append(" FROM ");
-			Visit(trimExpression.ValueExpression);
-			Sql.Append(")");
-			return trimExpression;
+			return spacedFunctionExpression;
 		}
 
 		void GenerateList<T>(IReadOnlyList<T> items, Action<T> generationAction, Action<IRelationalCommandBuilder> joinAction = null)

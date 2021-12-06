@@ -42,9 +42,20 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!(method.Equals(SubstringOnlyStartMethod) || method.Equals(SubstringStartAndLengthMethod)))
 				return null;
 
-			var fromExpression = _fbSqlExpressionFactory.Add(arguments[0], _fbSqlExpressionFactory.Constant(1));
-			var forExpression = arguments.Count == 2 ? arguments[1] : null;
-			return _fbSqlExpressionFactory.Substring(instance, fromExpression, forExpression);
+			var fromExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Add(arguments[0], _fbSqlExpressionFactory.Constant(1)));
+			var forExpression = arguments.Count == 2 ? _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]) : null;
+			var substringArguments = forExpression != null
+				? new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression, _fbSqlExpressionFactory.Fragment("FOR"), forExpression }
+				: new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression };
+			var nullability = forExpression != null
+				? new[] { true, false, true, false, true }
+				: new[] { true, false, true };
+			return _fbSqlExpressionFactory.SpacedFunction(
+				"SUBSTRING",
+				substringArguments,
+				true,
+				nullability,
+				typeof(string));
 		}
 	}
 }

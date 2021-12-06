@@ -41,7 +41,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!method.Equals(IsNullOrWhiteSpaceMethod))
 				return null;
 
-			var argument = arguments[0];
+			var argument = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
 			return _fbSqlExpressionFactory.OrElse(
 				_fbSqlExpressionFactory.IsNull(argument),
 				_fbSqlExpressionFactory.Equal(

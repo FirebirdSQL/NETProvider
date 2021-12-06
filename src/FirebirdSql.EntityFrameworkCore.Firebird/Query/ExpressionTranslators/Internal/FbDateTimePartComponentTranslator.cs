@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -56,14 +57,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!MemberMapping.TryGetValue(member, out var part))
 				return null;
 
-			var result = (SqlExpression)_fbSqlExpressionFactory.Extract(part, instance);
+			var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
+				"EXTRACT",
+				new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
+				true,
+				new[] { false, false, true },
+				typeof(int));
 			if (part == YearDayPart)
 			{
 				result = _fbSqlExpressionFactory.Add(result, _fbSqlExpressionFactory.Constant(1));
 			}
 			else if (part == SecondPart || part == MillisecondPart)
 			{
-				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, returnType);
+				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
 			}
 			return result;
 		}

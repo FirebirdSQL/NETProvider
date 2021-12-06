@@ -41,9 +41,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!method.Equals(MethodInfo))
 				return null;
 
-			var patternExpression = arguments[0];
+			var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
 			var endsWithExpression = _fbSqlExpressionFactory.Equal(
-				_fbSqlExpressionFactory.Function(
+				_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
 						"RIGHT",
 						new[] {
 							instance,
@@ -55,7 +55,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 								typeof(int)) },
 						true,
 						new[] { true, true },
-						instance.Type),
+						instance.Type)),
 				patternExpression);
 			return patternExpression is SqlConstantExpression sqlConstantExpression
 				? (string)sqlConstantExpression.Value == string.Empty

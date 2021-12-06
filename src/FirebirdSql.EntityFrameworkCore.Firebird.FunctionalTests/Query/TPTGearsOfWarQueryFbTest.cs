@@ -297,27 +297,6 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 			return base.First_on_byte_array(async);
 		}
 
-		[Theory(Skip = "Nullability propagation from functions")]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Projecting_property_converted_to_nullable_into_member_access(bool async)
-		{
-			return base.Projecting_property_converted_to_nullable_into_member_access(async);
-		}
-
-		[Theory(Skip = "Nullability propagation from functions")]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Projecting_property_converted_to_nullable_with_function_call(bool async)
-		{
-			return base.Projecting_property_converted_to_nullable_with_function_call(async);
-		}
-
-		[Theory(Skip = "Nullability propagation from functions")]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Projecting_property_converted_to_nullable_with_function_call2(bool async)
-		{
-			return base.Projecting_property_converted_to_nullable_with_function_call2(async);
-		}
-
 		[Theory]
 		[MemberData(nameof(IsAsyncData))]
 		public override Task ToString_boolean_property_nullable(bool async)

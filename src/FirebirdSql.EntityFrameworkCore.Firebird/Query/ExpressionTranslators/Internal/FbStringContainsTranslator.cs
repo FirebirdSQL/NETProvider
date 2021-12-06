@@ -41,7 +41,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!method.Equals(MethodInfo))
 				return null;
 
-			var patternExpression = arguments[0];
+			var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
 			var positionExpression = _fbSqlExpressionFactory.GreaterThan(
 				_fbSqlExpressionFactory.Function(
 					"POSITION",

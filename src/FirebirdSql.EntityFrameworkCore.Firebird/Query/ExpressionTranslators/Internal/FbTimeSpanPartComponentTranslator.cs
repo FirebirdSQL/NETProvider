@@ -50,10 +50,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!MemberMapping.TryGetValue(member, out var part))
 				return null;
 
-			var result = (SqlExpression)_fbSqlExpressionFactory.Extract(part, instance);
+			var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
+				"EXTRACT",
+				new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
+				true,
+				new[] { false, false, true },
+				typeof(int));
 			if (part == SecondPart || part == MillisecondPart)
 			{
-				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, returnType);
+				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
 			}
 			return result;
 		}

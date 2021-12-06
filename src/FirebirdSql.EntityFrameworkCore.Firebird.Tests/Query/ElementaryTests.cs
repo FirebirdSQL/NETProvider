@@ -89,6 +89,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Query
 		}
 
 		[Test]
+		public async Task SelectWithNewGuid()
+		{
+			await using (var db = await GetDbContext<SelectContext>())
+			{
+				var query = db.Set<MonAttachment>()
+					.Where(x => x.AttachmentName == Guid.NewGuid().ToString());
+				Assert.DoesNotThrowAsync(() => query.LoadAsync());
+				var sql = db.LastCommandText;
+			}
+		}
+
+		[Test]
 		public async Task SelectTake()
 		{
 			await using (var db = await GetDbContext<SelectContext>())

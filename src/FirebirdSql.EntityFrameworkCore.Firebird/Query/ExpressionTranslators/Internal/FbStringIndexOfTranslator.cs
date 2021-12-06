@@ -39,9 +39,15 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		{
 			if (method.DeclaringType == typeof(string) && method.Name == nameof(string.IndexOf))
 			{
-				var args = new[] { arguments[0], instance }.Concat(arguments.Skip(1));
+				var args = new List<SqlExpression>();
+				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]));
+				args.Add(instance);
+				foreach (var a in arguments.Skip(1))
+				{
+					args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
+				}
 				return _fbSqlExpressionFactory.Subtract(
-					_fbSqlExpressionFactory.Function("POSITION", args, true, args.Select(_ => true), typeof(int)),
+					_fbSqlExpressionFactory.Function("POSITION", args, true, Enumerable.Repeat(true, args.Count), typeof(int)),
 					_fbSqlExpressionFactory.Constant(1));
 			}
 			return null;

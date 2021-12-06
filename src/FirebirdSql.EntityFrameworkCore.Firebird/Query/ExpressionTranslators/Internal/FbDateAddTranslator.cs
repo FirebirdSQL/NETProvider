@@ -58,12 +58,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			if (!MethodInfoDatePartMapping.TryGetValue(method, out var part))
 				return null;
 
-			return _fbSqlExpressionFactory.Function(
+			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
 				"DATEADD",
-				new[] { _fbSqlExpressionFactory.Fragment(part), arguments[0], instance },
+				new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), instance },
 				true,
-				new[] { default, true, true },
-				instance.Type);
+				new[] { false, true, true },
+				instance.Type));
 		}
 	}
 }

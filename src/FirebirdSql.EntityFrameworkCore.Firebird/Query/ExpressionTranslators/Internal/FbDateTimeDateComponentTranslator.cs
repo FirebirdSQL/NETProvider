@@ -38,7 +38,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 		{
 			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Date))
 			{
-				return _fbSqlExpressionFactory.DateTimeDateMember(instance);
+				return _fbSqlExpressionFactory.SpacedFunction(
+					"CAST",
+					new[] { instance, _fbSqlExpressionFactory.Fragment("AS"), _fbSqlExpressionFactory.Fragment("DATE") },
+					true,
+					new[] { true, false, false },
+					typeof(DateTime));
 			}
 			return null;
 		}
