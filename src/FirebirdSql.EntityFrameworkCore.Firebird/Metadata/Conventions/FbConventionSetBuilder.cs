@@ -31,24 +31,22 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
 		public override ConventionSet CreateConventionSet()
 		{
 			var conventionSet = base.CreateConventionSet();
+
 			var valueGenerationStrategyConvention = new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies);
 			conventionSet.ModelInitializedConventions.Add(valueGenerationStrategyConvention);
 			conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
 
 			var valueGenerationConvention = new FbValueGenerationConvention(Dependencies, RelationalDependencies);
-
 			ReplaceConvention(conventionSet.EntityTypeBaseTypeChangedConventions, valueGenerationConvention);
 			ReplaceConvention(conventionSet.EntityTypePrimaryKeyChangedConventions, valueGenerationConvention);
 			ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
 			ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
 
-			ConventionSet.AddBefore(conventionSet.ModelFinalizingConventions, valueGenerationStrategyConvention, typeof(ValidatingConvention));
-
 			var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
-
 			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
 			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
 
+			conventionSet.ModelFinalizingConventions.Add(valueGenerationStrategyConvention);
 			ReplaceConvention(conventionSet.ModelFinalizingConventions, storeGenerationConvention);
 
 			return conventionSet;
