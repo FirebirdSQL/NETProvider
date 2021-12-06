@@ -15,22 +15,32 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Reflection;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
 {
-	public class FbProviderConfigurationCodeGenerator : ProviderCodeGenerator
+	public class FbProviderCodeGenerator : ProviderCodeGenerator
 	{
-		public FbProviderConfigurationCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
+		static readonly MethodInfo UseFirebirdMethodInfo
+			= typeof(FbDbContextOptionsBuilderExtensions).GetRequiredRuntimeMethod(
+				nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
+				typeof(DbContextOptionsBuilder),
+				typeof(string),
+				typeof(Action<FbDbContextOptionsBuilder>));
+
+		public FbProviderCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
 			: base(dependencies)
 		{ }
 
 		public override MethodCallCodeFragment GenerateUseProvider(string connectionString, MethodCallCodeFragment providerOptions)
 		{
 			return new MethodCallCodeFragment(
-				nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
+				UseFirebirdMethodInfo,
 				providerOptions == null
 					? new object[] { connectionString }
 					: new object[] { connectionString, new NestedClosureCodeFragment("x", providerOptions) });

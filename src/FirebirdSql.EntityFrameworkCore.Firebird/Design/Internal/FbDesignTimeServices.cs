@@ -33,7 +33,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal
 				.AddSingleton<LoggingDefinitions, FbLoggingDefinitions>()
 				.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
 				.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
-				.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderConfigurationCodeGenerator>()
+				.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
 				.AddSingleton<IAnnotationCodeGenerator, AnnotationCodeGenerator>();
 	}
 }
