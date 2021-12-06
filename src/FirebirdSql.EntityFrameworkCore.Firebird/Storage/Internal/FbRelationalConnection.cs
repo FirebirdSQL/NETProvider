@@ -17,6 +17,7 @@
 
 using System.Data.Common;
 using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -31,12 +32,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
 		protected override DbConnection CreateDbConnection()
 			=> new FbConnection(ConnectionString);
 
-		public override bool Close()
+		protected override Task CloseDbConnectionAsync()
 		{
-			var result = base.Close();
-#warning Very dirty quick-fix for efcore#26790
-			Thread.Sleep(50);
-			return result;
+#warning Quick-fix for efcore#26790
+			base.CloseDbConnection();
+			return Task.CompletedTask;
 		}
 	}
 }
