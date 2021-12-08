@@ -15,36 +15,28 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed.Version15
 {
-	interface IResponse
-	{ }
-
-	static class IResponseExtensions
+	internal class GdsServiceManager : Version13.GdsServiceManager
 	{
-		public static void HandleResponseException(this IResponse response)
+		public GdsServiceManager(GdsConnection connection)
+			: base(connection)
+		{ }
+
+		public override ServiceParameterBufferBase CreateServiceParameterBuffer()
 		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
-				{
-					throw genericResponse.Exception;
-				}
-			}
+			return new ServiceParameterBuffer3();
 		}
 
-		public static void HandleResponseWarning(this IResponse response, Action<IscException> onWarning)
+		protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)
 		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
-				{
-					onWarning?.Invoke(genericResponse.Exception);
-				}
-			}
+			return new GdsDatabase(connection);
 		}
 	}
 }

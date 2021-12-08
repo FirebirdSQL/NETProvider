@@ -67,7 +67,7 @@ namespace FirebirdSql.Data.Client
 
 		private static DatabaseBase CreateManagedDatabase(ConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.CryptKey);
 			connection.Connect();
 			try
 			{
@@ -80,6 +80,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION11 => new Managed.Version11.GdsDatabase(connection),
@@ -89,7 +90,7 @@ namespace FirebirdSql.Data.Client
 		}
 		private static async ValueTask<DatabaseBase> CreateManagedDatabaseAsync(ConnectionString options, CancellationToken cancellationToken = default)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.CryptKey);
 			await connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 			try
 			{
@@ -102,6 +103,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION11 => new Managed.Version11.GdsDatabase(connection),
@@ -112,7 +114,7 @@ namespace FirebirdSql.Data.Client
 
 		private static ServiceManagerBase CreateManagedServiceManager(ConnectionString options)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.CryptKey);
 			connection.Connect();
 			try
 			{
@@ -125,6 +127,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION11 => new Managed.Version11.GdsServiceManager(connection),
@@ -134,7 +137,7 @@ namespace FirebirdSql.Data.Client
 		}
 		private static async ValueTask<ServiceManagerBase> CreateManagedServiceManagerAsync(ConnectionString options, CancellationToken cancellationToken = default)
 		{
-			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt));
+			var connection = new GdsConnection(options.UserID, options.Password, options.DataSource, options.Port, options.ConnectionTimeout, options.PacketSize, Charset.GetCharset(options.Charset), options.Compression, FbWireCryptToWireCryptOption(options.WireCrypt), options.CryptKey);
 			await connection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 			try
 			{
@@ -147,6 +150,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION11 => new Managed.Version11.GdsServiceManager(connection),

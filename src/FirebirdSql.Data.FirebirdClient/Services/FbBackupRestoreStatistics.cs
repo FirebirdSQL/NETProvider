@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.Services
 		PageWrites = 0b1000,
 	}
 
-	internal static class Ext
+	internal static class FbBackupRestoreStatisticsExtensions
 	{
 		public static string BuildConfiguration(this FbBackupRestoreStatistics statistics)
 		{

@@ -16,35 +16,22 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed.Version15
 {
-	interface IResponse
-	{ }
-
-	static class IResponseExtensions
+	internal class GdsStatement : Version13.GdsStatement
 	{
-		public static void HandleResponseException(this IResponse response)
-		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
-				{
-					throw genericResponse.Exception;
-				}
-			}
-		}
+		public GdsStatement(DatabaseBase db)
+			: base(db)
+		{ }
 
-		public static void HandleResponseWarning(this IResponse response, Action<IscException> onWarning)
-		{
-			if (response is GenericResponse genericResponse)
-			{
-				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
-				{
-					onWarning?.Invoke(genericResponse.Exception);
-				}
-			}
-		}
+		public GdsStatement(DatabaseBase db, TransactionBase transaction)
+			: base(db, transaction)
+		{ }
 	}
 }

@@ -799,26 +799,26 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		public virtual IResponse ReadResponse()
 		{
 			var response = ReadSingleResponse();
-			GdsConnection.HandleResponseException(response);
+			response.HandleResponseException();
 			return response;
 		}
 		public virtual async ValueTask<IResponse> ReadResponseAsync(CancellationToken cancellationToken = default)
 		{
 			var response = await ReadSingleResponseAsync(cancellationToken).ConfigureAwait(false);
-			GdsConnection.HandleResponseException(response);
+			response.HandleResponseException();
 			return response;
 		}
 
 		public virtual IResponse ReadResponse(int operation)
 		{
 			var response = ReadSingleResponse(operation);
-			GdsConnection.HandleResponseException(response);
+			response.HandleResponseException();
 			return response;
 		}
 		public virtual async ValueTask<IResponse> ReadResponseAsync(int operation, CancellationToken cancellationToken = default)
 		{
 			var response = await ReadSingleResponseAsync(operation, cancellationToken).ConfigureAwait(false);
-			GdsConnection.HandleResponseException(response);
+			response.HandleResponseException();
 			return response;
 		}
 
@@ -837,14 +837,14 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		protected virtual IResponse ReadSingleResponse(int operation)
 		{
-			var response = GdsConnection.ProcessOperation(operation, Xdr);
-			GdsConnection.HandleResponseWarning(response, WarningMessage);
+			var response = _connection.ProcessOperation(operation);
+			response.HandleResponseWarning(WarningMessage);
 			return response;
 		}
 		protected virtual async ValueTask<IResponse> ReadSingleResponseAsync(int operation, CancellationToken cancellationToken = default)
 		{
-			var response = await GdsConnection.ProcessOperationAsync(operation, Xdr, cancellationToken).ConfigureAwait(false);
-			GdsConnection.HandleResponseWarning(response, WarningMessage);
+			var response = await _connection.ProcessOperationAsync(operation, cancellationToken).ConfigureAwait(false);
+			response.HandleResponseWarning(WarningMessage);
 			return response;
 		}
 

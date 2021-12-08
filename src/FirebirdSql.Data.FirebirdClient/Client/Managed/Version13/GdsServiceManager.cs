@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.IO;
 using System.Linq;
@@ -42,9 +42,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						Connection.AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						Connection.AuthBlock.SendContAuthToBuffer(Database.Xdr);
+						Connection.AuthBlock.SendContAuthToBuffer();
 						Database.Xdr.Flush();
-						response = Connection.AuthBlock.ProcessContAuthResponse(Database.Xdr);
+						response = Connection.AuthBlock.ProcessContAuthResponse();
 						response = (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -52,9 +52,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						Database.AuthBlock.SendWireCryptToBuffer(Database.Xdr);
+						Database.AuthBlock.SendWireCryptToBuffer();
 						Database.Xdr.Flush();
-						Database.AuthBlock.ProcessWireCryptResponse(Database.Xdr, Connection);
+						Database.AuthBlock.ProcessWireCryptResponse();
 					}
 				}
 				else
@@ -88,9 +88,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						Connection.AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await Connection.AuthBlock.SendContAuthToBufferAsync(Database.Xdr, cancellationToken).ConfigureAwait(false);
+						await Connection.AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						response = await Connection.AuthBlock.ProcessContAuthResponseAsync(Database.Xdr, cancellationToken).ConfigureAwait(false);
+						response = await Connection.AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
 						response = await (Database as GdsDatabase).ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -98,9 +98,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						await Database.AuthBlock.SendWireCryptToBufferAsync(Database.Xdr, cancellationToken).ConfigureAwait(false);
+						await Database.AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						await Database.AuthBlock.ProcessWireCryptResponseAsync(Database.Xdr, Connection, cancellationToken).ConfigureAwait(false);
+						await Database.AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
 					}
 				}
 				else

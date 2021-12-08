@@ -25,13 +25,11 @@ namespace FirebirdSql.Data.Client.Managed
 		internal class Protocol
 		{
 			public int Version { get; }
-			public int MinPType { get; }
 			public int MaxPType { get; }
 
-			public Protocol(int version, int minPType, int maxPType)
+			public Protocol(int version, int maxPType)
 			{
 				Version = version;
-				MinPType = minPType;
 				MaxPType = maxPType;
 			}
 		}
@@ -40,10 +38,11 @@ namespace FirebirdSql.Data.Client.Managed
 		{
 			return new[]
 			{
-				new Protocol(IscCodes.PROTOCOL_VERSION10, IscCodes.ptype_rpc, IscCodes.ptype_batch_send),
-				new Protocol(IscCodes.PROTOCOL_VERSION11, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
-				new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send),
-				new Protocol(IscCodes.PROTOCOL_VERSION13, IscCodes.ptype_rpc, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
+				new Protocol(IscCodes.PROTOCOL_VERSION10, IscCodes.ptype_batch_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION11, IscCodes.ptype_lazy_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_lazy_send),
+				new Protocol(IscCodes.PROTOCOL_VERSION13, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
+				new Protocol(IscCodes.PROTOCOL_VERSION15, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
 			};
 		}
 	}

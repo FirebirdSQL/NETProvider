@@ -68,9 +68,12 @@ namespace FirebirdSql.Data.Common
 		public const int FB_PROTOCOL_FLAG = 0x8000;
 		public const int FB_PROTOCOL_MASK = ~FB_PROTOCOL_FLAG;
 
-		public const int PROTOCOL_VERSION11 = (FB_PROTOCOL_FLAG | 11);
-		public const int PROTOCOL_VERSION12 = (FB_PROTOCOL_FLAG | 12);
-		public const int PROTOCOL_VERSION13 = (FB_PROTOCOL_FLAG | 13);
+		public const int PROTOCOL_VERSION11 = FB_PROTOCOL_FLAG | 11;
+		public const int PROTOCOL_VERSION12 = FB_PROTOCOL_FLAG | 12;
+		public const int PROTOCOL_VERSION13 = FB_PROTOCOL_FLAG | 13;
+		public const int PROTOCOL_VERSION15 = FB_PROTOCOL_FLAG | 15;
+
+		public const int p_cnct_min_type = 0;
 
 		public const int ptype_rpc = 2;
 		public const int ptype_batch_send = 3;

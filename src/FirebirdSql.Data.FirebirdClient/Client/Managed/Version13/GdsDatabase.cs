@@ -43,9 +43,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						AuthBlock.SendContAuthToBuffer(Xdr);
+						AuthBlock.SendContAuthToBuffer();
 						Xdr.Flush();
-						response = AuthBlock.ProcessContAuthResponse(Xdr);
+						response = AuthBlock.ProcessContAuthResponse();
 						response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -53,9 +53,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						AuthBlock.SendWireCryptToBuffer(Xdr);
+						AuthBlock.SendWireCryptToBuffer();
 						Xdr.Flush();
-						AuthBlock.ProcessWireCryptResponse(Xdr, _connection);
+						AuthBlock.ProcessWireCryptResponse();
 					}
 				}
 				else
@@ -92,9 +92,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
 						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -102,9 +102,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						await AuthBlock.SendWireCryptToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponseAsync(Xdr, _connection, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
 					}
 				}
 				else
@@ -177,9 +177,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						AuthBlock.SendContAuthToBuffer(Xdr);
+						AuthBlock.SendContAuthToBuffer();
 						Xdr.Flush();
-						response = AuthBlock.ProcessContAuthResponse(Xdr);
+						response = AuthBlock.ProcessContAuthResponse();
 						response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -187,9 +187,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						AuthBlock.SendWireCryptToBuffer(Xdr);
+						AuthBlock.SendWireCryptToBuffer();
 						Xdr.Flush();
-						AuthBlock.ProcessWireCryptResponse(Xdr, _connection);
+						AuthBlock.ProcessWireCryptResponse();
 					}
 				}
 				else
@@ -217,9 +217,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 					{
 						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponseAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
 						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
 					}
 					var genericResponse = (GenericResponse)response;
@@ -227,9 +227,9 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 
 					if (genericResponse.Data.Any())
 					{
-						await AuthBlock.SendWireCryptToBufferAsync(Xdr, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponseAsync(Xdr, _connection, cancellationToken).ConfigureAwait(false);
+						await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
 					}
 				}
 				else
@@ -298,7 +298,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			return CreateDatabaseAsync(dpb, database, cryptKey, cancellationToken);
 		}
 
-		protected internal IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
+		protected internal virtual IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
 		{
 			while (response is CryptKeyCallbackResponse)
 			{
@@ -309,7 +309,7 @@ namespace FirebirdSql.Data.Client.Managed.Version13
 			}
 			return response;
 		}
-		protected internal async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
+		protected internal virtual async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
 		{
 			while (response is CryptKeyCallbackResponse)
 			{

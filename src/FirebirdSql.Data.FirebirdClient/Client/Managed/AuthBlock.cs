@@ -21,8 +21,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FirebirdSql.Data.Client.Managed.Version13;
 using FirebirdSql.Data.Common;
+using WireCryptOption = FirebirdSql.Data.Client.Managed.Version13.WireCryptOption;
 
 namespace FirebirdSql.Data.Client.Managed
 {
@@ -32,6 +32,7 @@ namespace FirebirdSql.Data.Client.Managed
 		SrpClient _srp;
 		SspiHelper _sspi;
 
+		public GdsConnection Connection { get; }
 		public string User { get; }
 		public string Password { get; }
 		public WireCryptOption WireCrypt { get; }
@@ -49,12 +50,13 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public bool WireCryptInitialized { get; private set; }
 
-		public AuthBlock(string user, string password, WireCryptOption wireCrypt)
+		public AuthBlock(GdsConnection connection, string user, string password, WireCryptOption wireCrypt)
 		{
 			_srp256 = new Srp256Client();
 			_srp = new SrpClient();
 			_sspi = new SspiHelper();
 
+			Connection = connection;
 			User = user;
 			Password = password;
 			WireCrypt = wireCrypt;
@@ -124,58 +126,34 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 		}
 
-		public void SendContAuthToBuffer(IXdrWriter xdr)
+		public void SendContAuthToBuffer()
 		{
-			xdr.Write(IscCodes.op_cont_auth);
-			xdr.WriteBuffer(HasClientData ? ClientData : PublicClientData); // p_data
-			xdr.Write(AcceptPluginName); // p_name
-			xdr.Write(AcceptPluginName); // p_list
-			xdr.WriteBuffer(ServerKeys); // p_keys
+			Connection.Xdr.Write(IscCodes.op_cont_auth);
+			Connection.Xdr.WriteBuffer(HasClientData ? ClientData : PublicClientData); // p_data
+			Connection.Xdr.Write(AcceptPluginName); // p_name
+			Connection.Xdr.Write(AcceptPluginName); // p_list
+			Connection.Xdr.WriteBuffer(ServerKeys); // p_keys
 		}
-		public async ValueTask SendContAuthToBufferAsync(IXdrWriter xdr, CancellationToken cancellationToken = default)
+		public async ValueTask SendContAuthToBufferAsync(CancellationToken cancellationToken = default)
 		{
-			await xdr.WriteAsync(IscCodes.op_cont_auth, cancellationToken).ConfigureAwait(false);
-			await xdr.WriteBufferAsync(HasClientData ? ClientData : PublicClientData, cancellationToken).ConfigureAwait(false); // p_data
-			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_name
-			await xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_list
-			await xdr.WriteBufferAsync(ServerKeys, cancellationToken).ConfigureAwait(false); // p_keys
+			await Connection.Xdr.WriteAsync(IscCodes.op_cont_auth, cancellationToken).ConfigureAwait(false);
+			await Connection.Xdr.WriteBufferAsync(HasClientData ? ClientData : PublicClientData, cancellationToken).ConfigureAwait(false); // p_data
+			await Connection.Xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_name
+			await Connection.Xdr.WriteAsync(AcceptPluginName, cancellationToken).ConfigureAwait(false); // p_list
+			await Connection.Xdr.WriteBufferAsync(ServerKeys, cancellationToken).ConfigureAwait(false); // p_keys
 		}
 
 		// TODO: maybe more logic can be pulled up here
-		public IResponse ProcessContAuthResponse(IXdrReader xdr)
+		public IResponse ProcessContAuthResponse()
 		{
-			var operation = xdr.ReadOperation();
-			var response = GdsConnection.ProcessOperation(operation, xdr);
-			GdsConnection.HandleResponseException(response);
-			if (response is ContAuthResponse)
+			var operation = Connection.Xdr.ReadOperation();
+			var response = Connection.ProcessOperation(operation);
+			response.HandleResponseException();
+			if (response is Version13.ContAuthResponse)
 			{
 				return response;
 			}
-			else if (response is CryptKeyCallbackResponse)
-			{
-				return response;
-			}
-			else if (response is GenericResponse genericResponse)
-			{
-				ServerKeys = genericResponse.Data;
-				Complete();
-			}
-			else
-			{
-				throw new InvalidOperationException($"Unexpected response ({operation}).");
-			}
-			return response;
-		}
-		public async ValueTask<IResponse> ProcessContAuthResponseAsync(IXdrReader xdr, CancellationToken cancellationToken = default)
-		{
-			var operation = await xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
-			var response = await GdsConnection.ProcessOperationAsync(operation, xdr, cancellationToken).ConfigureAwait(false);
-			GdsConnection.HandleResponseException(response);
-			if (response is ContAuthResponse)
-			{
-				return response;
-			}
-			else if (response is CryptKeyCallbackResponse)
+			else if (response is Version13.CryptKeyCallbackResponse || response is Version15.CryptKeyCallbackResponse)
 			{
 				return response;
 			}
@@ -190,56 +168,84 @@ namespace FirebirdSql.Data.Client.Managed
 			}
 			return response;
 		}
+		public async ValueTask<IResponse> ProcessContAuthResponseAsync(CancellationToken cancellationToken = default)
+		{
+			var operation = await Connection.Xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
+			var response = await Connection.ProcessOperationAsync(operation, cancellationToken).ConfigureAwait(false);
+			response.HandleResponseException();
+			if (response is Version13.ContAuthResponse)
+			{
+				return response;
+			}
+			else if (response is Version13.CryptKeyCallbackResponse || response is Version15.CryptKeyCallbackResponse)
+			{
+				return response;
+			}
+			else if (response is GenericResponse genericResponse)
+			{
+				ServerKeys = genericResponse.Data;
+				Complete();
+			}
+			else
+			{
+				throw new InvalidOperationException($"Unexpected response ({operation}).");
+			}
+			return response;
+		}
 
-		public void SendWireCryptToBuffer(IXdrWriter xdr)
+		public void SendWireCryptToBuffer()
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
-			xdr.Write(IscCodes.op_crypt);
-			xdr.Write(FirebirdNetworkHandlingWrapper.EncryptionName);
-			xdr.Write(SessionKeyName);
+			Connection.Xdr.Write(IscCodes.op_crypt);
+			Connection.Xdr.Write(FirebirdNetworkHandlingWrapper.EncryptionName);
+			Connection.Xdr.Write(SessionKeyName);
 		}
-		public async ValueTask SendWireCryptToBufferAsync(IXdrWriter xdr, CancellationToken cancellationToken = default)
+		public async ValueTask SendWireCryptToBufferAsync(CancellationToken cancellationToken = default)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
-			await xdr.WriteAsync(IscCodes.op_crypt, cancellationToken).ConfigureAwait(false);
-			await xdr.WriteAsync(FirebirdNetworkHandlingWrapper.EncryptionName, cancellationToken).ConfigureAwait(false);
-			await xdr.WriteAsync(SessionKeyName, cancellationToken).ConfigureAwait(false);
+			await Connection.Xdr.WriteAsync(IscCodes.op_crypt, cancellationToken).ConfigureAwait(false);
+			await Connection.Xdr.WriteAsync(FirebirdNetworkHandlingWrapper.EncryptionName, cancellationToken).ConfigureAwait(false);
+			await Connection.Xdr.WriteAsync(SessionKeyName, cancellationToken).ConfigureAwait(false);
 		}
 
-		public void ProcessWireCryptResponse(IXdrReader xdr, GdsConnection connection)
+		public void ProcessWireCryptResponse()
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
 			// after writing before reading
-			connection.StartEncryption();
+			Connection.StartEncryption();
 
-			var response = GdsConnection.ProcessOperation(xdr.ReadOperation(), xdr);
-			GdsConnection.HandleResponseException(response);
+			var operation = Connection.Xdr.ReadOperation();
+			var response = Connection.ProcessOperation(operation);
+			response.HandleResponseException();
 
 			WireCryptInitialized = true;
 		}
-		public async ValueTask ProcessWireCryptResponseAsync(IXdrReader xdr, GdsConnection connection, CancellationToken cancellationToken = default)
+		public async ValueTask ProcessWireCryptResponseAsync(CancellationToken cancellationToken = default)
 		{
 			if (WireCrypt == WireCryptOption.Disabled)
 				return;
 
 			// after writing before reading
-			connection.StartEncryption();
+			Connection.StartEncryption();
 
-			var response = await GdsConnection.ProcessOperationAsync(await xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false), xdr, cancellationToken).ConfigureAwait(false);
-			GdsConnection.HandleResponseException(response);
+			var operation = await Connection.Xdr.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
+			var response = await Connection.ProcessOperationAsync(operation, cancellationToken).ConfigureAwait(false);
+			response.HandleResponseException();
 
 			WireCryptInitialized = true;
 		}
 
 		public void WireCryptValidate(int protocolVersion)
 		{
-			if (protocolVersion == IscCodes.PROTOCOL_VERSION13 && WireCrypt == WireCryptOption.Required && IsAuthenticated && !WireCryptInitialized)
+			var validProtocolVersion = protocolVersion == IscCodes.PROTOCOL_VERSION13
+				|| protocolVersion == IscCodes.PROTOCOL_VERSION15;
+			if (validProtocolVersion && WireCrypt == WireCryptOption.Required && IsAuthenticated && !WireCryptInitialized)
 			{
 				throw IscException.ForErrorCode(IscCodes.isc_wirecrypt_incompatible);
 			}
