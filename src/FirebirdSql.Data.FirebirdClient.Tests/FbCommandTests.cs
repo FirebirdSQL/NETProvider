@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -814,6 +815,20 @@ end";
 				cmd.Parameters.Add("x", new TimeOnly(501940213000));
 				var value = (TimeSpan)await cmd.ExecuteScalarAsync();
 				Assert.AreEqual(501940213000, value.Ticks);
+			}
+		}
+
+		[Test]
+		public async Task CommandTimeoutTest()
+		{
+			if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+				return;
+
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = FiniteInfiniteLoopCommand;
+				cmd.CommandTimeout = 2;
+				Assert.ThrowsAsync<OperationCanceledException>(async () => await cmd.ExecuteNonQueryAsync());
 			}
 		}
 	}
