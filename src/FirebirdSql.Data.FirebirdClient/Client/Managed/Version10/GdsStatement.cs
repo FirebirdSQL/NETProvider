@@ -286,7 +286,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Execute()
+		public override void Execute(int timeout)
 		{
 			EnsureNotDeallocated();
 
@@ -294,7 +294,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				SendExecuteToBuffer();
+				SendExecuteToBuffer(timeout);
 
 				_database.Xdr.Flush();
 
@@ -325,7 +325,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -333,7 +333,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				await SendExecuteToBufferAsync(cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
 
 				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -772,7 +772,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#endregion
 
 		#region op_execute/op_execute2 methods
-		protected void SendExecuteToBuffer()
+		protected virtual void SendExecuteToBuffer(int timeout)
 		{
 			// this may throw error, so it needs to be before any writing
 			var descriptor = WriteParameters();
@@ -809,7 +809,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_database.Xdr.Write(0); // Output message number
 			}
 		}
-		protected async ValueTask SendExecuteToBufferAsync(CancellationToken cancellationToken = default)
+		protected virtual async ValueTask SendExecuteToBufferAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			// this may throw error, so it needs to be before any writing
 			var descriptor = await WriteParametersAsync(cancellationToken).ConfigureAwait(false);

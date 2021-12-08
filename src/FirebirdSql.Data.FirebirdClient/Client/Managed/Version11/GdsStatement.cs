@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override void Execute()
+		public override void Execute(int timeout)
 		{
 			EnsureNotDeallocated();
 
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				SendExecuteToBuffer();
+				SendExecuteToBuffer(timeout);
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)
@@ -216,7 +216,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBufferAsync(cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)

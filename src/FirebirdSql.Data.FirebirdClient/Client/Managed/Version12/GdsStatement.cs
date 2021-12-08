@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#region Overriden Methods
 
-		public override void Execute()
+		public override void Execute(int timeout)
 		{
 			EnsureNotDeallocated();
 
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				RecordsAffected = -1;
 
-				SendExecuteToBuffer();
+				SendExecuteToBuffer(timeout);
 
 				_database.Xdr.Flush();
 
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBufferAsync(cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
 
 				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 

@@ -233,8 +233,8 @@ namespace FirebirdSql.Data.Common
 		public abstract void Prepare(string commandText);
 		public abstract ValueTask PrepareAsync(string commandText, CancellationToken cancellationToken = default);
 
-		public abstract void Execute();
-		public abstract ValueTask ExecuteAsync(CancellationToken cancellationToken = default);
+		public abstract void Execute(int timeout);
+		public abstract ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default);
 
 		public abstract DbValue[] Fetch();
 		public abstract ValueTask<DbValue[]> FetchAsync(CancellationToken cancellationToken = default);

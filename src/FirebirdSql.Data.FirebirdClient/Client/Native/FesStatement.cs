@@ -355,7 +355,8 @@ namespace FirebirdSql.Data.Client.Native
 			State = StatementState.Prepared;
 		}
 
-		public override void Execute()
+#warning Timeout
+		public override void Execute(int timeout)
 		{
 			EnsureNotDeallocated();
 
@@ -416,7 +417,8 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = StatementState.Executed;
 		}
-		public override async ValueTask ExecuteAsync(CancellationToken cancellationToken = default)
+#warning Timeout
+		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 

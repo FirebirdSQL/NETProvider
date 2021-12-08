@@ -1666,7 +1666,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 
 				// Execute statement
-				_statement.Execute();
+				_statement.Execute(CommandTimeout * 1000);
 			}
 		}
 		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
@@ -1704,7 +1704,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				}
 
 				// Execute statement
-				await _statement.ExecuteAsync(cancellationToken).ConfigureAwait(false);
+				await _statement.ExecuteAsync(CommandTimeout * 1000, cancellationToken).ConfigureAwait(false);
 			}
 		}
 

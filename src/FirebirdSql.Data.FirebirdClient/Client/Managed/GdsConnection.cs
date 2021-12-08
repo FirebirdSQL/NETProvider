@@ -410,7 +410,8 @@ namespace FirebirdSql.Data.Client.Managed
 						Xdr.ReadBuffer());
 
 				case IscCodes.op_crypt_key_callback:
-					if (ProtocolVersion == IscCodes.PROTOCOL_VERSION15)
+					if (ProtocolVersion == IscCodes.PROTOCOL_VERSION15
+						|| ProtocolVersion == IscCodes.PROTOCOL_VERSION16)
 					{
 						return new Version15.CryptKeyCallbackResponse(
 							Xdr.ReadBuffer(),
@@ -458,7 +459,8 @@ namespace FirebirdSql.Data.Client.Managed
 						await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
 
 				case IscCodes.op_crypt_key_callback:
-					if (ProtocolVersion == IscCodes.PROTOCOL_VERSION15)
+					if (ProtocolVersion == IscCodes.PROTOCOL_VERSION15
+						|| ProtocolVersion == IscCodes.PROTOCOL_VERSION16)
 					{
 						return new Version15.CryptKeyCallbackResponse(
 							await Xdr.ReadBufferAsync().ConfigureAwait(false),

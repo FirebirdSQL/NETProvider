@@ -72,6 +72,7 @@ namespace FirebirdSql.Data.Common
 		public const int PROTOCOL_VERSION12 = FB_PROTOCOL_FLAG | 12;
 		public const int PROTOCOL_VERSION13 = FB_PROTOCOL_FLAG | 13;
 		public const int PROTOCOL_VERSION15 = FB_PROTOCOL_FLAG | 15;
+		public const int PROTOCOL_VERSION16 = FB_PROTOCOL_FLAG | 16;
 
 		public const int p_cnct_min_type = 0;
 

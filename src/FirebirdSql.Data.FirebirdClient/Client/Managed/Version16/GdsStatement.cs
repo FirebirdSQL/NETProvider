@@ -1,0 +1,49 @@
+﻿/*
+ *    The contents of this file are subject to the Initial
+ *    Developer's Public License Version 1.0 (the "License");
+ *    you may not use this file except in compliance with the
+ *    License. You may obtain a copy of the License at
+ *    https://github.com/FirebirdSQL/NETProvider/raw/master/license.txt.
+ *
+ *    Software distributed under the License is distributed on
+ *    an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either
+ *    express or implied. See the License for the specific
+ *    language governing rights and limitations under the License.
+ *
+ *    All Rights Reserved.
+ */
+
+//$Authors = Jiri Cincura (jiri@cincura.net)
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using FirebirdSql.Data.Common;
+
+namespace FirebirdSql.Data.Client.Managed.Version16
+{
+	internal class GdsStatement : Version15.GdsStatement
+	{
+		public GdsStatement(DatabaseBase db)
+			: base(db)
+		{ }
+
+		public GdsStatement(DatabaseBase db, TransactionBase transaction)
+			: base(db, transaction)
+		{ }
+
+		protected override void SendExecuteToBuffer(int timeout)
+		{
+			base.SendExecuteToBuffer(timeout);
+			_database.Xdr.Write(timeout);
+		}
+
+		protected override async ValueTask SendExecuteToBufferAsync(int timeout, CancellationToken cancellationToken = default)
+		{
+			await base.SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(timeout, cancellationToken).ConfigureAwait(false);
+		}
+	}
+}

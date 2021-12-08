@@ -43,6 +43,7 @@ namespace FirebirdSql.Data.Client.Managed
 				new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_lazy_send),
 				new Protocol(IscCodes.PROTOCOL_VERSION13, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
 				new Protocol(IscCodes.PROTOCOL_VERSION15, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
+				new Protocol(IscCodes.PROTOCOL_VERSION16, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
 			};
 		}
 	}

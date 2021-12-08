@@ -80,6 +80,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION16 => new Managed.Version16.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsDatabase(connection),
@@ -103,6 +104,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION16 => new Managed.Version16.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsDatabase(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsDatabase(connection),
@@ -127,6 +129,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION16 => new Managed.Version16.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsServiceManager(connection),
@@ -150,6 +153,7 @@ namespace FirebirdSql.Data.Client
 			}
 			return connection.ProtocolVersion switch
 			{
+				IscCodes.PROTOCOL_VERSION16 => new Managed.Version16.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION15 => new Managed.Version15.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION13 => new Managed.Version13.GdsServiceManager(connection),
 				IscCodes.PROTOCOL_VERSION12 => new Managed.Version12.GdsServiceManager(connection),
