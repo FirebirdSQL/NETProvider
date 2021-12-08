@@ -74,6 +74,8 @@ namespace FirebirdSql.Data.Common
 					case IscCodes.fb_info_next_attachment:
 					case IscCodes.fb_info_next_statement:
 					case IscCodes.fb_info_protocol_version:
+					case IscCodes.fb_info_statement_timeout_db:
+					case IscCodes.fb_info_statement_timeout_att:
 						info.Add(VaxInteger(buffer, pos, length));
 						break;
 

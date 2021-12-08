@@ -459,6 +459,24 @@ namespace FirebirdSql.Data.FirebirdClient
 			return GetValueAsync<int>(IscCodes.fb_info_protocol_version, cancellationToken);
 		}
 
+		public int GetStatementTimeoutDatabase()
+		{
+			return GetValue<int>(IscCodes.fb_info_statement_timeout_db);
+		}
+		public Task<int> GetStatementTimeoutDatabaseAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.fb_info_statement_timeout_db, cancellationToken);
+		}
+
+		public int GetStatementTimeoutAttachment()
+		{
+			return GetValue<int>(IscCodes.fb_info_statement_timeout_att);
+		}
+		public Task<int> GetStatementTimeoutAttachmentAsync(CancellationToken cancellationToken = default)
+		{
+			return GetValueAsync<int>(IscCodes.fb_info_statement_timeout_att, cancellationToken);
+		}
+
 		#endregion
 
 		#region Constructors
