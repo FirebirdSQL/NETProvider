@@ -241,6 +241,12 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _options.PacketSize; }
 		}
 
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int CommandTimeout
+		{
+			get { return _options.CommandTimeout; }
+		}
+
 		#endregion
 
 		#region Internal Properties

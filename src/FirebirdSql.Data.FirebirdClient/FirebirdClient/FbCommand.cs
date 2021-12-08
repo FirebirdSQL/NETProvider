@@ -81,7 +81,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public override int CommandTimeout
 		{
-			get { return _commandTimeout; }
+			get
+			{
+				if (_commandTimeout > 0)
+					return _commandTimeout;
+				if (_connection?.ConnectionOptions.CommandTimeout > 0)
+					return (int)_connection?.ConnectionOptions.CommandTimeout;
+				return 30;
+			}
 			set
 			{
 				if (value < 0)
@@ -300,7 +307,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			_updatedRowSource = UpdateRowSource.Both;
 			_commandType = CommandType.Text;
 			_designTimeVisible = true;
-			_commandTimeout = 30;
+			_commandTimeout = 0;
 			_fetchSize = 200;
 			_commandText = string.Empty;
 

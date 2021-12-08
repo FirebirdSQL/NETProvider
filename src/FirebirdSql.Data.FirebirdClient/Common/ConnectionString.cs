@@ -56,6 +56,7 @@ namespace FirebirdSql.Data.Common
 		internal const byte[] DefaultValueCryptKey = null;
 		internal const FbWireCrypt DefaultValueWireCrypt = FbWireCrypt.Enabled;
 		internal const string DefaultValueApplicationName = "";
+		internal const int DefaultValueCommandTimeout = 0;
 
 		internal const string DefaultKeyUserId = "user id";
 		internal const string DefaultKeyPortNumber = "port number";
@@ -84,6 +85,7 @@ namespace FirebirdSql.Data.Common
 		internal const string DefaultKeyCryptKey = "crypt key";
 		internal const string DefaultKeyWireCrypt = "wire crypt";
 		internal const string DefaultKeyApplicationName = "application name";
+		internal const string DefaultKeyCommandTimeout = "command timeout";
 		#endregion
 
 		#region Static Fields
@@ -154,6 +156,8 @@ namespace FirebirdSql.Data.Common
 			{ DefaultKeyApplicationName, DefaultKeyApplicationName },
 			{ "applicationname", DefaultKeyApplicationName },
 			{ "app", DefaultKeyApplicationName },
+			{ DefaultKeyCommandTimeout, DefaultKeyCommandTimeout },
+			{ "commandtimeout", DefaultKeyCommandTimeout },
 		};
 
 		internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -185,6 +189,7 @@ namespace FirebirdSql.Data.Common
 			{ DefaultKeyCryptKey, DefaultValueCryptKey },
 			{ DefaultKeyWireCrypt, DefaultValueWireCrypt },
 			{ DefaultKeyApplicationName, DefaultValueApplicationName },
+			{ DefaultKeyCommandTimeout, DefaultValueCommandTimeout },
 		};
 
 		#endregion
@@ -224,6 +229,7 @@ namespace FirebirdSql.Data.Common
 		public byte[] CryptKey => GetBytes(DefaultKeyCryptKey, _options.TryGetValue);
 		public FbWireCrypt WireCrypt => GetWireCrypt(DefaultKeyWireCrypt, _options.TryGetValue);
 		public string ApplicationName => GetString(DefaultKeyApplicationName, _options.TryGetValue);
+		public int CommandTimeout => GetInt32(DefaultKeyCommandTimeout, _options.TryGetValue);
 
 		#endregion
 

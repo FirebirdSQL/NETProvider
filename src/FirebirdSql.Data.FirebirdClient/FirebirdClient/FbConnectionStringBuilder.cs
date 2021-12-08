@@ -299,6 +299,16 @@ namespace FirebirdSql.Data.FirebirdClient
 			set { SetValue(Common.ConnectionString.DefaultKeyApplicationName, value); }
 		}
 
+		[Category("Advanced")]
+		[DisplayName("Command Timeout")]
+		[Description("The time (in seconds) for command execution.")]
+		[DefaultValue(Common.ConnectionString.DefaultValueCommandTimeout)]
+		public int CommandTimeout
+		{
+			get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyCommandTimeout), base.TryGetValue, Common.ConnectionString.DefaultValueCommandTimeout); }
+			set { SetValue(Common.ConnectionString.DefaultKeyCommandTimeout, value); }
+		}
+
 		#endregion
 
 		#region Constructors
