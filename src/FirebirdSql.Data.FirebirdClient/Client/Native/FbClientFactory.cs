@@ -70,7 +70,7 @@ namespace FirebirdSql.Data.Client.Native
 			var result = cache.GetOrAdd(dllName, s => { createdNew = true; return BuildFbClient(s); });
 			if (createdNew)
 			{
-				ShutdownHelper.RegisterFbClientShutdown(() => ShutdownEntryPointWrapper(result));
+				ShutdownHelper.RegisterFbClientShutdown(() => NativeHelpers.CallIfExists(() => result.fb_shutdown(0, 0)));
 			}
 			return result;
 		}
@@ -295,19 +295,6 @@ namespace FirebirdSql.Data.Client.Native
 			// you're free to change it ;)
 
 			return "FB_" + Math.Abs(baseName.GetHashCode());
-		}
-
-		private static void ShutdownEntryPointWrapper(IFbClient fbClient)
-		{
-			// the fb_shutdown does not exists before 2.5
-			// the exception is just ignored
-			// once <2.5 is not existing we can remove this
-			try
-			{
-				fbClient.fb_shutdown(0, 0);
-			}
-			catch (EntryPointNotFoundException)
-			{ }
 		}
 	}
 }

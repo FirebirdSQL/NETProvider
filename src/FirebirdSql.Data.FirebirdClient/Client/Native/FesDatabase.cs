@@ -314,11 +314,11 @@ namespace FirebirdSql.Data.Client.Native
 
 		#region Cancel Methods
 
-		public override void CancelOperation(int kind)
+		public override void CancelOperation(short kind)
 		{
 			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
-			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
+			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, (ushort)kind);
 
 			try
 			{
@@ -327,11 +327,11 @@ namespace FirebirdSql.Data.Client.Native
 			catch (IscException ex) when (ex.ErrorCode == IscCodes.isc_nothing_to_cancel)
 			{ }
 		}
-		public override ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default)
+		public override ValueTask CancelOperationAsync(short kind, CancellationToken cancellationToken = default)
 		{
 			var localStatusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 
-			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, kind);
+			_fbClient.fb_cancel_operation(localStatusVector, ref _handle, (ushort)kind);
 
 			try
 			{

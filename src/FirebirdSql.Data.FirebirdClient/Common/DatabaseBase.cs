@@ -76,8 +76,8 @@ namespace FirebirdSql.Data.Common
 		public abstract void CancelEvents(RemoteEvent events);
 		public abstract ValueTask CancelEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default);
 
-		public abstract void CancelOperation(int kind);
-		public abstract ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default);
+		public abstract void CancelOperation(short kind);
+		public abstract ValueTask CancelOperationAsync(short kind, CancellationToken cancellationToken = default);
 
 		public string GetServerVersion()
 		{

@@ -355,10 +355,16 @@ namespace FirebirdSql.Data.Client.Native
 			State = StatementState.Prepared;
 		}
 
-#warning Timeout
 		public override void Execute(int timeout)
 		{
 			EnsureNotDeallocated();
+
+			ClearStatusVector();
+			NativeHelpers.CallIfExists(() =>
+			{
+				_db.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
+				_db.ProcessStatusVector(_statusVector);
+			});
 
 			ClearStatusVector();
 
@@ -417,10 +423,16 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = StatementState.Executed;
 		}
-#warning Timeout
 		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
+
+			ClearStatusVector();
+			NativeHelpers.CallIfExists(() =>
+			{
+				_db.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
+				_db.ProcessStatusVector(_statusVector);
+			});
 
 			ClearStatusVector();
 

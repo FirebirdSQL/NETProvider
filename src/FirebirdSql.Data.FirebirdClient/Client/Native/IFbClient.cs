@@ -144,13 +144,13 @@ namespace FirebirdSql.Data.Client.Native
 			[MarshalAs(UnmanagedType.I4)] ref TransactionHandle trHandle);
 
 		IntPtr fb_shutdown(
-			int timeout,
+			uint timeout,
 			int reason);
 
 		IntPtr fb_cancel_operation(
 			[In, Out] IntPtr[] statusVector,
 			[MarshalAs(UnmanagedType.I4)] ref DatabaseHandle dbHandle,
-			int option);
+			ushort option);
 
 		IntPtr isc_dsql_allocate_statement(
 			[In, Out] IntPtr[] statusVector,
@@ -241,6 +241,11 @@ namespace FirebirdSql.Data.Client.Native
 			byte[] requestSpb,
 			short bufferLength,
 			byte[] buffer);
+
+		IntPtr fb_dsql_set_timeout(
+			[In, Out] IntPtr[] statusVector,
+			[MarshalAs(UnmanagedType.I4)] ref StatementHandle stmtHandle,
+			uint timeout);
 
 #pragma warning restore IDE1006
 	}

@@ -676,11 +676,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#region Cancel Methods
 
-		public override void CancelOperation(int kind)
+		public override void CancelOperation(short kind)
 		{
 			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}
-		public override ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default)
+		public override ValueTask CancelOperationAsync(short kind, CancellationToken cancellationToken = default)
 		{
 			throw new NotSupportedException("Cancel Operation isn't supported on < FB2.5.");
 		}

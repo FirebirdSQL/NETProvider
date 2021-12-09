@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			return new GdsStatement(this, transaction);
 		}
 
-		public override void CancelOperation(int kind)
+		public override void CancelOperation(short kind)
 		{
 			try
 			{
@@ -102,7 +102,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask CancelOperationAsync(int kind, CancellationToken cancellationToken = default)
+		public override async ValueTask CancelOperationAsync(short kind, CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -116,7 +116,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			}
 		}
 
-		protected void SendCancelOperationToBuffer(int kind)
+		protected void SendCancelOperationToBuffer(short kind)
 		{
 			Xdr.Write(IscCodes.op_cancel);
 			Xdr.Write(kind);
