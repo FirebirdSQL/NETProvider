@@ -58,5 +58,9 @@ namespace FirebirdSql.Data.Common
 				yield return array.Skip(i * size).Take(size);
 			}
 		}
+
+#if NETSTANDARD2_0
+		public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
+#endif
 	}
 }

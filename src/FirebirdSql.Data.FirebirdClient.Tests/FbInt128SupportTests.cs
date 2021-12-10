@@ -29,7 +29,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	public class FbInt128SupportTests : FbTestsBase
 	{
 		public FbInt128SupportTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
+			: base(serverType, compression, wireCrypt, false)
 		{ }
 
 		[SetUp]

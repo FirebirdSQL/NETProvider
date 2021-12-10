@@ -817,5 +817,10 @@ namespace FirebirdSql.Data.Common
 		{
 			return new ArgumentException($"Invalid data type: {type}.");
 		}
+
+		public static int BlrAlign(int current, int alignment)
+		{
+			return (current + alignment - 1) & ~(alignment - 1);
+		}
 	}
 }

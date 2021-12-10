@@ -36,7 +36,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		private DatabaseBase _db;
 		private FbTransaction _activeTransaction;
-		private HashSet<FbCommand> _preparedCommands;
+		private HashSet<IFbPreparedCommand> _preparedCommands;
 		private ConnectionString _options;
 		private FbConnection _owningConnection;
 		private FbEnlistmentNotification _enlistmentNotification;
@@ -89,7 +89,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbConnectionInternal(ConnectionString options)
 		{
-			_preparedCommands = new HashSet<FbCommand>();
+			_preparedCommands = new HashSet<IFbPreparedCommand>();
 
 			_options = options;
 		}
@@ -456,22 +456,14 @@ namespace FirebirdSql.Data.FirebirdClient
 		{
 			foreach (var command in _preparedCommands)
 			{
-				if (command.Transaction != null)
-				{
-					command.DisposeReader();
-					command.Transaction = null;
-				}
+				command.TransactionCompleted();				
 			}
 		}
 		public async Task TransactionCompletedAsync(CancellationToken cancellationToken = default)
 		{
 			foreach (var command in _preparedCommands)
 			{
-				if (command.Transaction != null)
-				{
-					await command.DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
-					command.Transaction = null;
-				}
+				await command.TransactionCompletedAsync(cancellationToken).ConfigureAwait(false);				
 			}
 		}
 
@@ -551,14 +543,14 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		#region Prepared Commands Methods
 
-		public void AddPreparedCommand(FbCommand command)
+		public void AddPreparedCommand(IFbPreparedCommand command)
 		{
 			if (_preparedCommands.Contains(command))
 				return;
 			_preparedCommands.Add(command);
 		}
 
-		public void RemovePreparedCommand(FbCommand command)
+		public void RemovePreparedCommand(IFbPreparedCommand command)
 		{
 			_preparedCommands.Remove(command);
 		}

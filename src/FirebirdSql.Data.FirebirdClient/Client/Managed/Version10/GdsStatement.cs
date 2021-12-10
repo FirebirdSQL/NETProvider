@@ -92,6 +92,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			set { _fetchSize = value; }
 		}
 
+		public int Handle
+		{
+			get { return _handle; }
+		}
+
 		#endregion
 
 		#region Constructors
@@ -225,6 +230,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 		#endregion
 
+		#region Batch Creation Methods
+
+		public override BatchBase CreateBatch()
+		{
+			throw new NotSupportedException("Batching is not supported on this Firebird version.");
+		}
+
+		#endregion
+
 		#region Methods
 
 		public override void Prepare(string commandText)
@@ -286,7 +300,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			}
 		}
 
-		public override void Execute(int timeout)
+		public override void Execute(int timeout, IDescriptorFiller descriptorFiller)
 		{
 			EnsureNotDeallocated();
 
@@ -294,7 +308,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				SendExecuteToBuffer(timeout);
+				SendExecuteToBuffer(timeout, descriptorFiller);
 
 				_database.Xdr.Flush();
 
@@ -325,7 +339,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -333,7 +347,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			try
 			{
-				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
 
 				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -389,7 +403,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					_database.Xdr.Write(IscCodes.op_fetch);
 					_database.Xdr.Write(_handle);
-					_database.Xdr.WriteBuffer(_fields.ToBlrArray());
+					_database.Xdr.WriteBuffer(_fields.ToBlr().Data);
 					_database.Xdr.Write(0); // p_sqldata_message_number
 					_database.Xdr.Write(_fetchSize); // p_sqldata_messages
 					_database.Xdr.Flush();
@@ -470,7 +484,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				{
 					await _database.Xdr.WriteAsync(IscCodes.op_fetch, cancellationToken).ConfigureAwait(false);
 					await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-					await _database.Xdr.WriteBufferAsync(_fields.ToBlrArray(), cancellationToken).ConfigureAwait(false);
+					await _database.Xdr.WriteBufferAsync(_fields.ToBlr().Data, cancellationToken).ConfigureAwait(false);
 					await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // p_sqldata_message_number
 					await _database.Xdr.WriteAsync(_fetchSize, cancellationToken).ConfigureAwait(false); // p_sqldata_messages
 					await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -526,26 +540,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				_rows.Clear();
 				return null;
 			}
-		}
-
-		public override void Describe()
-		{
-			// Nothing for Gds, because it's pre-fetched in Prepare.
-		}
-		public override ValueTask DescribeAsync(CancellationToken cancellationToken = default)
-		{
-			// Nothing for Gds, because it's pre-fetched in Prepare.
-			return ValueTask2.CompletedTask;
-		}
-
-		public override void DescribeParameters()
-		{
-			// Nothing for Gds, because it's pre-fetched in Prepare.
-		}
-		public override ValueTask DescribeParametersAsync(CancellationToken cancellationToken = default)
-		{
-			// Nothing for Gds, because it's pre-fetched in Prepare.
-			return ValueTask2.CompletedTask;
 		}
 
 		#endregion
@@ -772,10 +766,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 		#endregion
 
 		#region op_execute/op_execute2 methods
-		protected virtual void SendExecuteToBuffer(int timeout)
+		protected virtual void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
 		{
+			descriptorFiller.Fill(_parameters, 0);
 			// this may throw error, so it needs to be before any writing
-			var descriptor = WriteParameters();
+			var parametersData = WriteParameters();
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
@@ -791,10 +786,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (_parameters != null)
 			{
-				_database.Xdr.WriteBuffer(_parameters.ToBlrArray());
+				_database.Xdr.WriteBuffer(_parameters.ToBlr().Data);
 				_database.Xdr.Write(0); // Message number
 				_database.Xdr.Write(1); // Number of messages
-				_database.Xdr.WriteBytes(descriptor, descriptor.Length);
+				_database.Xdr.WriteBytes(parametersData, parametersData.Length);
 			}
 			else
 			{
@@ -805,14 +800,15 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
-				_database.Xdr.WriteBuffer(_fields?.ToBlrArray());
+				_database.Xdr.WriteBuffer(_fields?.ToBlr().Data);
 				_database.Xdr.Write(0); // Output message number
 			}
 		}
-		protected virtual async ValueTask SendExecuteToBufferAsync(int timeout, CancellationToken cancellationToken = default)
+		protected virtual async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
+			await descriptorFiller.FillAsync(_parameters, 0, cancellationToken).ConfigureAwait(false);
 			// this may throw error, so it needs to be before any writing
-			var descriptor = await WriteParametersAsync(cancellationToken).ConfigureAwait(false);
+			var parametersData = await WriteParametersAsync(cancellationToken).ConfigureAwait(false);
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
@@ -828,10 +824,10 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (_parameters != null)
 			{
-				await _database.Xdr.WriteBufferAsync(_parameters.ToBlrArray(), cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBufferAsync(_parameters.ToBlr().Data, cancellationToken).ConfigureAwait(false);
 				await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // Message number
 				await _database.Xdr.WriteAsync(1, cancellationToken).ConfigureAwait(false); // Number of messages
-				await _database.Xdr.WriteBytesAsync(descriptor, descriptor.Length, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBytesAsync(parametersData, parametersData.Length, cancellationToken).ConfigureAwait(false);
 			}
 			else
 			{
@@ -842,7 +838,7 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 
 			if (StatementType == DbStatementType.StoredProcedure)
 			{
-				await _database.Xdr.WriteBufferAsync(_fields?.ToBlrArray(), cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBufferAsync(_fields?.ToBlr().Data, cancellationToken).ConfigureAwait(false);
 				await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // Output message number
 			}
 		}
@@ -1694,57 +1690,6 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			_fields = null;
 		}
 
-		protected virtual byte[] WriteParameters()
-		{
-			if (_parameters == null)
-				return null;
-
-			using (var ms = new MemoryStream())
-			{
-				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					try
-					{
-						WriteRawParameter(xdr, field);
-						xdr.Write(field.NullFlag);
-					}
-					catch (IOException ex)
-					{
-						throw IscException.ForIOException(ex);
-					}
-				}
-				xdr.Flush();
-				return ms.ToArray();
-			}
-		}
-		protected virtual async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
-		{
-			if (_parameters == null)
-				return null;
-
-			using (var ms = new MemoryStream())
-			{
-				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					try
-					{
-						await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
-						await xdr.WriteAsync(field.NullFlag, cancellationToken).ConfigureAwait(false);
-					}
-					catch (IOException ex)
-					{
-						throw IscException.ForIOException(ex);
-					}
-				}
-				await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				return ms.ToArray();
-			}
-		}
-
 		protected virtual DbValue[] ReadRow()
 		{
 			var row = new DbValue[_fields.Count];
@@ -1802,6 +1747,61 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 				throw IscException.ForIOException(ex);
 			}
 			return row;
+		}
+
+		#endregion
+
+		#region Protected Internal Methods
+
+		protected internal virtual byte[] WriteParameters()
+		{
+			if (_parameters == null)
+				return null;
+
+			using (var ms = new MemoryStream())
+			{
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					try
+					{
+						WriteRawParameter(xdr, field);
+						xdr.Write(field.NullFlag);
+					}
+					catch (IOException ex)
+					{
+						throw IscException.ForIOException(ex);
+					}
+				}
+				xdr.Flush();
+				return ms.ToArray();
+			}
+		}
+		protected internal virtual async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
+		{
+			if (_parameters == null)
+				return null;
+
+			using (var ms = new MemoryStream())
+			{
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					try
+					{
+						await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
+						await xdr.WriteAsync(field.NullFlag, cancellationToken).ConfigureAwait(false);
+					}
+					catch (IOException ex)
+					{
+						throw IscException.ForIOException(ex);
+					}
+				}
+				await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+				return ms.ToArray();
+			}
 		}
 
 		#endregion

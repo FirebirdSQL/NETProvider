@@ -40,7 +40,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 
 		#region Overriden Methods
 
-		public override void Execute(int timeout)
+		public override void Execute(int timeout, IDescriptorFiller descriptorFiller)
 		{
 			EnsureNotDeallocated();
 
@@ -50,7 +50,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				RecordsAffected = -1;
 
-				SendExecuteToBuffer(timeout);
+				SendExecuteToBuffer(timeout, descriptorFiller);
 
 				_database.Xdr.Flush();
 
@@ -71,7 +71,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				}
 				finally
 				{
-					numberOfResponses = SafeFinishFetching(numberOfResponses);
+					(Database as GdsDatabase).SafeFinishFetching(numberOfResponses);
 				}
 
 				// we need to split this in two, to allow server handle op_cancel properly
@@ -91,7 +91,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					}
 					finally
 					{
-						numberOfResponses = SafeFinishFetching(numberOfResponses);
+						(Database as GdsDatabase).SafeFinishFetching(numberOfResponses);
 					}
 				}
 
@@ -103,7 +103,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -113,7 +113,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
 
 				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -134,7 +134,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
+					await (Database as GdsDatabase).SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 				}
 
 				// we need to split this in two, to allow server handle op_cancel properly
@@ -154,7 +154,7 @@ namespace FirebirdSql.Data.Client.Managed.Version12
 					}
 					finally
 					{
-						numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
+						await (Database as GdsDatabase).SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 					}
 				}
 

@@ -469,6 +469,23 @@ namespace FirebirdSql.Data.FirebirdClient
 			return new FbCommand(null, this);
 		}
 
+#if NET6_0_OR_GREATER
+		public new DbBatch CreateBatch()
+		{
+			throw new NotSupportedException("DbBatch is currently not supported. Use FbBatchCommand instead.");
+		}
+
+		protected override DbBatch CreateDbBatch()
+		{
+			return CreateBatch();
+		}
+#endif
+
+		public FbBatchCommand CreateBatchCommand()
+		{
+			return new FbBatchCommand(null, this);
+		}
+
 		public override void ChangeDatabase(string db)
 		{
 			CheckClosed();
@@ -824,9 +841,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void CheckClosed()
 		{
@@ -836,9 +853,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Event Handlers
+#region Event Handlers
 
 		private void OnWarningMessage(IscException warning)
 		{
@@ -851,9 +868,9 @@ namespace FirebirdSql.Data.FirebirdClient
 			StateChange?.Invoke(this, new StateChangeEventArgs(originalState, currentState));
 		}
 
-		#endregion
+#endregion
 
-		#region Cancelation
+#region Cancelation
 		public void EnableCancel()
 		{
 			CheckClosed();
@@ -892,9 +909,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 			return _innerConnection.CancelCommandAsync(cancellationToken);
 		}
-		#endregion
+#endregion
 
-		#region Internal Methods
+#region Internal Methods
 
 		internal static void EnsureOpen(FbConnection connection)
 		{
@@ -902,6 +919,6 @@ namespace FirebirdSql.Data.FirebirdClient
 				throw new InvalidOperationException("Connection must be valid and open.");
 		}
 
-		#endregion
+#endregion
 	}
 }

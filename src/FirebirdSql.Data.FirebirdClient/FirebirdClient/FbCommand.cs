@@ -28,7 +28,7 @@ using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient
 {
-	public sealed class FbCommand : DbCommand, ICloneable
+	public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller, ICloneable
 	{
 		static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbCommand));
 
@@ -41,7 +41,7 @@ namespace FirebirdSql.Data.FirebirdClient
 		private FbParameterCollection _parameters;
 		private StatementBase _statement;
 		private FbDataReader _activeReader;
-		private List<string> _namedParameters;
+		private IReadOnlyList<string> _namedParameters;
 		private string _commandText;
 		private bool _disposed;
 		private bool _designTimeVisible;
@@ -275,6 +275,11 @@ namespace FirebirdSql.Data.FirebirdClient
 			get { return _statement?.Fields?.Count > 0; }
 		}
 
+		internal bool HasParameters
+		{
+			get { return _parameters != null && _parameters.Count > 0; }
+		}
+
 		internal bool IsDDLCommand
 		{
 			get { return _statement?.StatementType == DbStatementType.DDL; }
@@ -303,7 +308,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 		public FbCommand(string cmdText, FbConnection connection, FbTransaction transaction)
 		{
-			_namedParameters = new List<string>();
+			_namedParameters = Array.Empty<string>();
 			_updatedRowSource = UpdateRowSource.Both;
 			_commandType = CommandType.Text;
 			_designTimeVisible = true;
@@ -360,11 +365,7 @@ namespace FirebirdSql.Data.FirebirdClient
 					_parameters = null;
 					_statement = null;
 					_activeReader = null;
-					if (_namedParameters != null)
-					{
-						_namedParameters.Clear();
-						_namedParameters = null;
-					}
+					_namedParameters = null;
 				}
 			}
 			base.Dispose(disposing);
@@ -392,11 +393,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_parameters = null;
 				_statement = null;
 				_activeReader = null;
-				if (_namedParameters != null)
-				{
-					_namedParameters.Clear();
-					_namedParameters = null;
-				}
+				_namedParameters = null;
 			}
 			await base.DisposeAsync().ConfigureAwait(false);
 		}
@@ -809,7 +806,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					// Fetch the next row
 					return _statement.Fetch();
 				}
 				catch (IscException ex)
@@ -825,7 +821,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			{
 				try
 				{
-					// Fetch the next row
 					return await _statement.FetchAsync(cancellationToken).ConfigureAwait(false);
 				}
 				catch (IscException ex)
@@ -1069,6 +1064,7 @@ namespace FirebirdSql.Data.FirebirdClient
 			return Task.CompletedTask;
 		}
 
+		void IFbPreparedCommand.Release() => Release();
 		internal void Release()
 		{
 			RollbackImplicitTransaction();
@@ -1086,6 +1082,7 @@ namespace FirebirdSql.Data.FirebirdClient
 				_statement = null;
 			}
 		}
+		Task IFbPreparedCommand.ReleaseAsync(CancellationToken cancellationToken) => ReleaseAsync(cancellationToken);
 		internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
 		{
 			await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
@@ -1104,220 +1101,43 @@ namespace FirebirdSql.Data.FirebirdClient
 			}
 		}
 
+		void IFbPreparedCommand.TransactionCompleted() => TransactionCompleted();
+		internal void TransactionCompleted()
+		{
+			if (Transaction != null)
+			{
+				DisposeReader();
+				Transaction = null;
+			}
+		}
+		Task IFbPreparedCommand.TransactionCompletedAsync(CancellationToken cancellationToken) => TransactionCompletedAsync(cancellationToken);
+		internal async Task TransactionCompletedAsync(CancellationToken cancellationToken = default)
+		{
+			if (Transaction != null)
+			{
+				await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
+				Transaction = null;
+			}
+		}
+
 		#endregion
 
-		#region Input parameter descriptor generation methods
+		#region IDescriptorFiller
 
-		private void DescribeInput()
+		void IDescriptorFiller.Fill(Descriptor descriptor, int index) => UpdateParameterValues(descriptor);
+		private void UpdateParameterValues(Descriptor descriptor)
 		{
-			if (Parameters.Count > 0)
+			if (!HasParameters)
+				return;
+
+			for (var i = 0; i < descriptor.Count; i++)
 			{
-				var descriptor = BuildParametersDescriptor();
-				if (descriptor == null)
-				{
-					_statement.DescribeParameters();
-				}
-				else
-				{
-					_statement.Parameters = descriptor;
-				}
-			}
-		}
-		private async Task DescribeInputAsync(CancellationToken cancellationToken = default)
-		{
-			if (Parameters.Count > 0)
-			{
-				var descriptor = BuildParametersDescriptor();
-				if (descriptor == null)
-				{
-					await _statement.DescribeParametersAsync(cancellationToken).ConfigureAwait(false);
-				}
-				else
-				{
-					_statement.Parameters = descriptor;
-				}
-			}
-		}
-
-		private Descriptor BuildParametersDescriptor()
-		{
-			var count = ValidateInputParameters();
-
-			if (count > 0)
-			{
-				if (_namedParameters.Count > 0)
-				{
-					count = (short)_namedParameters.Count;
-					return BuildNamedParametersDescriptor(count);
-				}
-				else
-				{
-					return BuildPlaceHoldersDescriptor(count);
-				}
-			}
-
-			return null;
-		}
-
-		private Descriptor BuildNamedParametersDescriptor(short count)
-		{
-			var descriptor = new Descriptor(count);
-			var index = 0;
-
-			for (var i = 0; i < _namedParameters.Count; i++)
-			{
-				var parametersIndex = Parameters.IndexOf(_namedParameters[i], i);
-				if (parametersIndex == -1)
-				{
-					throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
-				}
-
-				var parameter = Parameters[parametersIndex];
-
-				if (parameter.Direction == ParameterDirection.Input ||
-					parameter.Direction == ParameterDirection.InputOutput)
-				{
-					if (!BuildParameterDescriptor(descriptor, parameter, index++))
-					{
-						return null;
-					}
-				}
-			}
-
-			return descriptor;
-		}
-
-		private Descriptor BuildPlaceHoldersDescriptor(short count)
-		{
-			var descriptor = new Descriptor(count);
-			var index = 0;
-
-			for (var i = 0; i < Parameters.Count; i++)
-			{
-				var parameter = Parameters[i];
-
-				if (parameter.Direction == ParameterDirection.Input ||
-					parameter.Direction == ParameterDirection.InputOutput)
-				{
-					if (!BuildParameterDescriptor(descriptor, parameter, index++))
-					{
-						return null;
-					}
-				}
-			}
-
-			return descriptor;
-		}
-
-		private bool BuildParameterDescriptor(Descriptor descriptor, FbParameter parameter, int index)
-		{
-			if (!parameter.IsTypeSet)
-			{
-				return false;
-			}
-
-			var type = parameter.FbDbType;
-			var charset = _connection.InnerConnection.Database.Charset;
-
-			// Check the parameter character set
-			if (parameter.Charset == FbCharset.Octets && !(parameter.InternalValue is byte[]))
-			{
-				throw new InvalidOperationException("Value for char octets fields should be a byte array");
-			}
-			else if (type == FbDbType.Guid)
-			{
-				charset = Charset.GetCharset(Charset.Octets);
-			}
-			else if (parameter.Charset != FbCharset.Default)
-			{
-				charset = Charset.GetCharset((int)parameter.Charset);
-			}
-
-			// Set parameter Data Type
-			descriptor[index].DataType = (short)TypeHelper.GetSqlTypeFromDbDataType(TypeHelper.GetDbDataTypeFromFbDbType(type), parameter.IsNullable);
-
-			// Set parameter Sub Type
-			switch (type)
-			{
-				case FbDbType.Binary:
-					descriptor[index].SubType = 0;
-					break;
-
-				case FbDbType.Text:
-					descriptor[index].SubType = 1;
-					break;
-
-				case FbDbType.Guid:
-					descriptor[index].SubType = (short)charset.Identifier;
-					break;
-
-				case FbDbType.Char:
-				case FbDbType.VarChar:
-					descriptor[index].SubType = (short)charset.Identifier;
-					if (charset.IsOctetsCharset)
-					{
-						descriptor[index].Length = (short)parameter.Size;
-					}
-					else if (parameter.HasSize)
-					{
-						var len = (short)(parameter.Size * charset.BytesPerCharacter);
-						descriptor[index].Length = len;
-					}
-					break;
-			}
-
-			// Set parameter length
-			if (descriptor[index].Length == 0)
-			{
-				descriptor[index].Length = TypeHelper.GetSize((DbDataType)type) ?? 0;
-			}
-
-			// Verify parameter
-			if (descriptor[index].SqlType == 0 || descriptor[index].Length == 0)
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		private short ValidateInputParameters()
-		{
-			short count = 0;
-
-			for (var i = 0; i < Parameters.Count; i++)
-			{
-				if (Parameters[i].Direction == ParameterDirection.Input ||
-					Parameters[i].Direction == ParameterDirection.InputOutput)
-				{
-					var type = Parameters[i].FbDbType;
-
-					if (type == FbDbType.Array || type == FbDbType.Decimal || type == FbDbType.Numeric)
-					{
-						return -1;
-					}
-					else
-					{
-						count++;
-					}
-				}
-			}
-
-			return count;
-		}
-
-		private void UpdateParameterValues()
-		{
-			var index = -1;
-
-			for (var i = 0; i < _statement.Parameters.Count; i++)
-			{
-				var statementParameter = _statement.Parameters[i];
-				index = i;
+				var parameter = descriptor[i];
+				var index = i;
 
 				if (_namedParameters.Count > 0)
 				{
-					index = Parameters.IndexOf(_namedParameters[i], i);
+					index = _parameters.IndexOf(_namedParameters[i], i);
 					if (index == -1)
 					{
 						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
@@ -1326,28 +1146,28 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (index != -1)
 				{
-					var commandParameter = Parameters[index];
+					var commandParameter = _parameters[index];
 					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
 					{
-						statementParameter.NullFlag = -1;
-						statementParameter.DbValue.SetValue(DBNull.Value);
+						parameter.NullFlag = -1;
+						parameter.DbValue.SetValue(DBNull.Value);
 
-						if (!statementParameter.AllowDBNull())
+						if (!parameter.AllowDBNull())
 						{
-							statementParameter.DataType++;
+							parameter.DataType++;
 						}
 					}
 					else
 					{
-						statementParameter.NullFlag = 0;
+						parameter.NullFlag = 0;
 
-						switch (statementParameter.DbDataType)
+						switch (parameter.DbDataType)
 						{
 							case DbDataType.Binary:
 								{
 									var blob = _statement.CreateBlob();
 									blob.Write((byte[])commandParameter.InternalValue);
-									statementParameter.DbValue.SetValue(blob.Id);
+									parameter.DbValue.SetValue(blob.Id);
 								}
 								break;
 
@@ -1362,26 +1182,25 @@ namespace FirebirdSql.Data.FirebirdClient
 									{
 										blob.Write((string)commandParameter.InternalValue);
 									}
-									statementParameter.DbValue.SetValue(blob.Id);
+									parameter.DbValue.SetValue(blob.Id);
 								}
 								break;
 
 							case DbDataType.Array:
 								{
-									if (statementParameter.ArrayHandle == null)
+									if (parameter.ArrayHandle == null)
 									{
-										statementParameter.ArrayHandle =
-										_statement.CreateArray(statementParameter.Relation, statementParameter.Name);
+										parameter.ArrayHandle = _statement.CreateArray(parameter.Relation, parameter.Name);
 									}
 									else
 									{
-										statementParameter.ArrayHandle.Database = _statement.Database;
-										statementParameter.ArrayHandle.Transaction = _statement.Transaction;
+										parameter.ArrayHandle.Database = _statement.Database;
+										parameter.ArrayHandle.Transaction = _statement.Transaction;
 									}
 
-									statementParameter.ArrayHandle.Handle = 0;
-									statementParameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
-									statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
+									parameter.ArrayHandle.Handle = 0;
+									parameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
+									parameter.DbValue.SetValue(parameter.ArrayHandle.Handle);
 								}
 								break;
 
@@ -1390,29 +1209,31 @@ namespace FirebirdSql.Data.FirebirdClient
 								{
 									throw new InvalidOperationException("Incorrect Guid value.");
 								}
-								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+								parameter.DbValue.SetValue(commandParameter.InternalValue);
 								break;
 
 							default:
-								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+								parameter.DbValue.SetValue(commandParameter.InternalValue);
 								break;
 						}
 					}
 				}
 			}
 		}
-		private async Task UpdateParameterValuesAsync(CancellationToken cancellationToken = default)
+		ValueTask IDescriptorFiller.FillAsync(Descriptor descriptor, int index, CancellationToken cancellationToken) => UpdateParameterValuesAsync(descriptor, cancellationToken);
+		private async ValueTask UpdateParameterValuesAsync(Descriptor descriptor, CancellationToken cancellationToken = default)
 		{
-			var index = -1;
+			if (!HasParameters)
+				return;
 
-			for (var i = 0; i < _statement.Parameters.Count; i++)
+			for (var i = 0; i < descriptor.Count; i++)
 			{
-				var statementParameter = _statement.Parameters[i];
-				index = i;
+				var statementParameter = descriptor[i];
+				var index = i;
 
 				if (_namedParameters.Count > 0)
 				{
-					index = Parameters.IndexOf(_namedParameters[i], i);
+					index = _parameters.IndexOf(_namedParameters[i], i);
 					if (index == -1)
 					{
 						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
@@ -1421,7 +1242,7 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				if (index != -1)
 				{
-					var commandParameter = Parameters[index];
+					var commandParameter = _parameters[index];
 					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
 					{
 						statementParameter.NullFlag = -1;
@@ -1465,8 +1286,7 @@ namespace FirebirdSql.Data.FirebirdClient
 								{
 									if (statementParameter.ArrayHandle == null)
 									{
-										statementParameter.ArrayHandle =
-										await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, cancellationToken).ConfigureAwait(false);
+										statementParameter.ArrayHandle = await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, cancellationToken).ConfigureAwait(false);
 									}
 									else
 									{
@@ -1548,8 +1368,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
+					(sql, _namedParameters) = NamedParametersParser.Parse(sql);
 					// Try to prepare the command
-					_statement.Prepare(ParseNamedParameters(sql));
+					_statement.Prepare(sql);
 				}
 				catch
 				{
@@ -1616,8 +1437,9 @@ namespace FirebirdSql.Data.FirebirdClient
 
 				try
 				{
+					(sql, _namedParameters) = NamedParametersParser.Parse(sql);
 					// Try to prepare the command
-					await _statement.PrepareAsync(ParseNamedParameters(sql), cancellationToken).ConfigureAwait(false);
+					await _statement.PrepareAsync(sql, cancellationToken).ConfigureAwait(false);
 				}
 				catch
 				{
@@ -1657,23 +1479,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
 
 				// Validate input parameter count
-				if (_namedParameters.Count > 0 && Parameters.Count == 0)
+				if (_namedParameters.Count > 0 && !HasParameters)
 				{
 					throw FbException.Create("Must declare command parameters.");
 				}
 
-				// Update input parameter values
-				if (Parameters.Count > 0)
-				{
-					if (_statement.Parameters == null)
-					{
-						DescribeInput();
-					}
-					UpdateParameterValues();
-				}
-
-				// Execute statement
-				_statement.Execute(CommandTimeout * 1000);
+				// Execute
+				_statement.Execute(CommandTimeout * 1000, this);
 			}
 		}
 		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
@@ -1695,23 +1507,13 @@ namespace FirebirdSql.Data.FirebirdClient
 				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
 
 				// Validate input parameter count
-				if (_namedParameters.Count > 0 && Parameters.Count == 0)
+				if (_namedParameters.Count > 0 && !HasParameters)
 				{
 					throw FbException.Create("Must declare command parameters.");
 				}
 
-				// Update input parameter values
-				if (Parameters.Count > 0)
-				{
-					if (_statement.Parameters == null)
-					{
-						await DescribeInputAsync(cancellationToken).ConfigureAwait(false);
-					}
-					await UpdateParameterValuesAsync(cancellationToken).ConfigureAwait(false);
-				}
-
-				// Execute statement
-				await _statement.ExecuteAsync(CommandTimeout * 1000, cancellationToken).ConfigureAwait(false);
+				// Execute
+				await _statement.ExecuteAsync(CommandTimeout * 1000, this, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
@@ -1761,70 +1563,6 @@ namespace FirebirdSql.Data.FirebirdClient
 			return sql;
 		}
 
-		private string ParseNamedParameters(string sql)
-		{
-			var builder = new StringBuilder();
-			var paramBuilder = new StringBuilder();
-			var inSingleQuotes = false;
-			var inDoubleQuotes = false;
-			var inParam = false;
-
-			_namedParameters.Clear();
-
-			if (sql.IndexOf('@') == -1)
-			{
-				return sql;
-			}
-
-			for (var i = 0; i < sql.Length; i++)
-			{
-				var sym = sql[i];
-
-				if (inParam)
-				{
-					if (char.IsLetterOrDigit(sym) || sym == '_' || sym == '$')
-					{
-						paramBuilder.Append(sym);
-					}
-					else
-					{
-						_namedParameters.Add(paramBuilder.ToString());
-						paramBuilder.Length = 0;
-						builder.Append('?');
-						builder.Append(sym);
-						inParam = false;
-					}
-				}
-				else
-				{
-					if (sym == '\'' && !inDoubleQuotes)
-					{
-						inSingleQuotes = !inSingleQuotes;
-					}
-					else if (sym == '\"' && !inSingleQuotes)
-					{
-						inDoubleQuotes = !inDoubleQuotes;
-					}
-					else if (!(inSingleQuotes || inDoubleQuotes) && sym == '@')
-					{
-						inParam = true;
-						paramBuilder.Append(sym);
-						continue;
-					}
-
-					builder.Append(sym);
-				}
-			}
-
-			if (inParam)
-			{
-				_namedParameters.Add(paramBuilder.ToString());
-				builder.Append('?');
-			}
-
-			return builder.ToString();
-		}
-
 		private void CheckCommand()
 		{
 			if (_transaction != null && _transaction.IsCompleted)
@@ -1868,16 +1606,16 @@ namespace FirebirdSql.Data.FirebirdClient
 				if (FbLogManager.IsParameterLoggingEnabled)
 				{
 					sb.AppendLine("Parameters:");
-					if (_parameters?.Count > 0)
+					if (!HasParameters)
 					{
-						foreach (FbParameter item in _parameters)
-						{
-							sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", item.ParameterName, item.FbDbType, (!IsNullParameterValue(item.InternalValue) ? item.InternalValue : "<null>")));
-						}
+						sb.AppendLine("<no parameters>");
 					}
 					else
 					{
-						sb.AppendLine("<no parameters>");
+						foreach (FbParameter parameter in _parameters)
+						{
+							sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", parameter.ParameterName, parameter.FbDbType, (!IsNullParameterValue(parameter.InternalValue) ? parameter.InternalValue : "<null>")));
+						}
 					}
 				}
 				Log.Debug(sb.ToString());

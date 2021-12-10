@@ -57,5 +57,8 @@
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
 	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="FirebirdClient\FbBatchCommand.cs" />
+	</ItemGroup>
 	<Import Project="..\FirebirdSql.Data.External\FirebirdSql.Data.External.projitems" Label="Shared" />
 </Project>

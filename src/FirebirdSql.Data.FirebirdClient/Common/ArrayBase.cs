@@ -120,7 +120,7 @@ namespace FirebirdSql.Data.Common
 			try
 			{
 				lookup.Prepare(GetArrayBounds());
-				lookup.Execute(0);
+				lookup.Execute(0, EmptyDescriptorFiller.Instance);
 
 				_descriptor.Bounds = new ArrayBound[16];
 				DbValue[] values;
@@ -146,7 +146,7 @@ namespace FirebirdSql.Data.Common
 			try
 			{
 				await lookup.PrepareAsync(GetArrayBounds(), cancellationToken).ConfigureAwait(false);
-				await lookup.ExecuteAsync(0, cancellationToken).ConfigureAwait(false);
+				await lookup.ExecuteAsync(0, EmptyDescriptorFiller.Instance, cancellationToken).ConfigureAwait(false);
 
 				_descriptor.Bounds = new ArrayBound[16];
 				DbValue[] values;
@@ -171,7 +171,7 @@ namespace FirebirdSql.Data.Common
 			try
 			{
 				lookup.Prepare(GetArrayDesc());
-				lookup.Execute(0);
+				lookup.Execute(0, EmptyDescriptorFiller.Instance);
 
 				_descriptor = new ArrayDesc();
 				var values = lookup.Fetch();
@@ -203,7 +203,7 @@ namespace FirebirdSql.Data.Common
 			try
 			{
 				await lookup.PrepareAsync(GetArrayDesc(), cancellationToken).ConfigureAwait(false);
-				await lookup.ExecuteAsync(0, cancellationToken).ConfigureAwait(false);
+				await lookup.ExecuteAsync(0, EmptyDescriptorFiller.Instance, cancellationToken).ConfigureAwait(false);
 
 				_descriptor = new ArrayDesc();
 				var values = await lookup.FetchAsync(cancellationToken).ConfigureAwait(false);

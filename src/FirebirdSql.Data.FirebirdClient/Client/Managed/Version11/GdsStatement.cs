@@ -15,6 +15,7 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -85,7 +86,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 				finally
 				{
-					numberOfResponses = SafeFinishFetching(numberOfResponses);
+					(Database as GdsDatabase).SafeFinishFetching(numberOfResponses);
 				}
 
 				State = StatementState.Prepared;
@@ -142,7 +143,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
+					await (Database as GdsDatabase).SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 				}
 
 				State = StatementState.Prepared;
@@ -154,7 +155,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			}
 		}
 
-		public override void Execute(int timeout)
+		public override void Execute(int timeout, IDescriptorFiller descriptorFiller)
 		{
 			EnsureNotDeallocated();
 
@@ -164,7 +165,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				SendExecuteToBuffer(timeout);
+				SendExecuteToBuffer(timeout, descriptorFiller);
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)
@@ -205,7 +206,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 				finally
 				{
-					numberOfResponses = SafeFinishFetching(numberOfResponses);
+					(Database as GdsDatabase).SafeFinishFetching(numberOfResponses);
 				}
 
 				State = StatementState.Executed;
@@ -216,7 +217,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				throw IscException.ForIOException(ex);
 			}
 		}
-		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
 
@@ -226,7 +227,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 			{
 				RecordsAffected = -1;
 
-				await SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
+				await SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
 
 				var readRowsAffectedResponse = false;
 				if (DoRecordsAffected)
@@ -267,7 +268,7 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 				}
 				finally
 				{
-					numberOfResponses = await SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
+					await (Database as GdsDatabase).SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 				}
 
 				State = StatementState.Executed;
@@ -282,35 +283,6 @@ namespace FirebirdSql.Data.Client.Managed.Version11
 		#endregion
 
 		#region Protected methods
-		protected int SafeFinishFetching(int numberOfResponses)
-		{
-			while (numberOfResponses > 0)
-			{
-				numberOfResponses--;
-				try
-				{
-					_database.ReadResponse();
-				}
-				catch (IscException)
-				{ }
-			}
-			return numberOfResponses;
-		}
-		protected async ValueTask<int> SafeFinishFetchingAsync(int numberOfResponses, CancellationToken cancellationToken = default)
-		{
-			while (numberOfResponses > 0)
-			{
-				numberOfResponses--;
-				try
-				{
-					await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-				}
-				catch (IscException)
-				{ }
-			}
-			return numberOfResponses;
-		}
-
 		protected override void Free(int option)
 		{
 			if (FreeNotNeeded(option))

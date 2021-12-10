@@ -23,6 +23,7 @@ namespace FirebirdSql.Data.Common
 {
 	internal abstract class ParameterBuffer
 	{
+#warning Strictly speaking this should be disposed
 		private MemoryStream _stream;
 
 		public short Length => (short)_stream.Length;

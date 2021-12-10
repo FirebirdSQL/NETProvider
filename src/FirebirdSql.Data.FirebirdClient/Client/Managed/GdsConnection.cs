@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -430,6 +431,40 @@ namespace FirebirdSql.Data.Client.Managed
 						Xdr.ReadBoolean(),
 						Xdr.ReadBuffer());
 
+				case IscCodes.op_batch_cs:
+					var statementHandle = Xdr.ReadInt16();
+					var p_batch_reccount = Xdr.ReadInt32();
+					var p_batch_updates = Xdr.ReadInt32();
+					var p_batch_vectors = Xdr.ReadInt32();
+					var p_batch_errors = Xdr.ReadInt32();
+
+					var p_batch_updates_data = new int[p_batch_updates];
+					for (var i = 0; i < p_batch_updates; i++)
+					{
+						p_batch_updates_data[i] = Xdr.ReadInt32();
+					}
+
+					var p_batch_vectors_data = new (int messageNumber, IscException statusVector)[p_batch_vectors];
+					for (var i = 0; i < p_batch_vectors; i++)
+					{
+						var messageNumber = Xdr.ReadInt32();
+						var statusVector = Xdr.ReadStatusVector();
+						p_batch_vectors_data[i] = (messageNumber, statusVector);
+					}
+
+					var p_batch_errors_data = new int[p_batch_errors];
+					for (var i = 0; i < p_batch_errors; i++)
+					{
+						p_batch_errors_data[i] = Xdr.ReadInt32();
+					}
+
+					return new Version16.BatchCompletionStateResponse(
+						statementHandle,
+						p_batch_reccount,
+						p_batch_updates_data,
+						p_batch_vectors_data,
+						p_batch_errors_data);
+
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");
 			}
@@ -463,13 +498,13 @@ namespace FirebirdSql.Data.Client.Managed
 						|| ProtocolVersion == IscCodes.PROTOCOL_VERSION16)
 					{
 						return new Version15.CryptKeyCallbackResponse(
-							await Xdr.ReadBufferAsync().ConfigureAwait(false),
-							await Xdr.ReadInt32Async().ConfigureAwait(false));
+							await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false),
+							await Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false));
 					}
 					else
 					{
 						return new Version13.CryptKeyCallbackResponse(
-							await Xdr.ReadBufferAsync().ConfigureAwait(false));
+							await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
 					}
 
 				case IscCodes.op_cont_auth:
@@ -478,6 +513,40 @@ namespace FirebirdSql.Data.Client.Managed
 						await Xdr.ReadStringAsync(cancellationToken).ConfigureAwait(false),
 						await Xdr.ReadBooleanAsync(cancellationToken).ConfigureAwait(false),
 						await Xdr.ReadBufferAsync(cancellationToken).ConfigureAwait(false));
+
+				case IscCodes.op_batch_cs:
+					var statementHandle = await Xdr.ReadInt16Async().ConfigureAwait(false);
+					var p_batch_reccount = await Xdr.ReadInt32Async().ConfigureAwait(false);
+					var p_batch_updates = await Xdr.ReadInt32Async().ConfigureAwait(false);
+					var p_batch_vectors = await Xdr.ReadInt32Async().ConfigureAwait(false);
+					var p_batch_errors = await Xdr.ReadInt32Async().ConfigureAwait(false);
+
+					var p_batch_updates_data = new int[p_batch_updates];
+					for (var i = 0; i < p_batch_updates; i++)
+					{
+						p_batch_updates_data[i] = await Xdr.ReadInt32Async().ConfigureAwait(false);
+					}
+
+					var p_batch_vectors_data = new (int messageNumber, IscException statusVector)[p_batch_vectors];
+					for (var i = 0; i < p_batch_vectors; i++)
+					{
+						var messageNumber = await Xdr.ReadInt32Async().ConfigureAwait(false);
+						var statusVector = await Xdr.ReadStatusVectorAsync().ConfigureAwait(false);
+						p_batch_vectors_data[i] = (messageNumber, statusVector);
+					}
+
+					var p_batch_errors_data = new int[p_batch_errors];
+					for (var i = 0; i < p_batch_errors; i++)
+					{
+						p_batch_errors_data[i] = await Xdr.ReadInt32Async().ConfigureAwait(false);
+					}
+
+					return new Version16.BatchCompletionStateResponse(
+						statementHandle,
+						p_batch_reccount,
+						p_batch_updates_data,
+						p_batch_vectors_data,
+						p_batch_errors_data);
 
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operation), $"{nameof(operation)}={operation}");

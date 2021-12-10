@@ -223,6 +223,20 @@ namespace FirebirdSql.Data.Common
 		public const int op_crypt_key_callback = 97;
 		public const int op_cond_accept = 98;
 
+		public const int op_batch_create = 99;
+		public const int op_batch_msg = 100;
+		public const int op_batch_exec = 101;
+		public const int op_batch_rls = 102;
+		public const int op_batch_cs = 103;
+		public const int op_batch_regblob = 104;
+		public const int op_batch_blob_stream = 105;
+		public const int op_batch_set_bpb = 106;
+
+		public const int op_repl_data = 107;
+		public const int op_repl_req = 108;
+
+		public const int op_batch_cancel = 109;
+
 		#endregion
 
 		#region Database Parameter Block
@@ -1044,5 +1058,23 @@ namespace FirebirdSql.Data.Common
 		public const int CNCT_client_crypt = 11;
 
 		#endregion
+
+		public static class Batch
+		{
+			public const int VERSION1 = 1;
+
+			public const int TAG_MULTIERROR = 1;
+			public const int TAG_RECORD_COUNTS = 2;
+			public const int TAG_BUFFER_BYTES_SIZE = 3;
+			public const int TAG_BLOB_POLICY = 4;
+			public const int TAG_DETAILED_ERRORS = 5;
+
+			public const int BLOB_NONE = 0;
+			public const int BLOB_ID_ENGINE = 1;
+			public const int BLOB_ID_USER = 2;
+			public const int BLOB_STREAM = 3;
+
+			public const int BLOB_SEGHDR_ALIGN = 2;
+		}
 	}
 }

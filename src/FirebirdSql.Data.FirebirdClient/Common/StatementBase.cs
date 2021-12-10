@@ -224,17 +224,11 @@ namespace FirebirdSql.Data.Common
 
 		#region Abstract Methods
 
-		public abstract void Describe();
-		public abstract ValueTask DescribeAsync(CancellationToken cancellationToken = default);
-
-		public abstract void DescribeParameters();
-		public abstract ValueTask DescribeParametersAsync(CancellationToken cancellationToken = default);
-
 		public abstract void Prepare(string commandText);
 		public abstract ValueTask PrepareAsync(string commandText, CancellationToken cancellationToken = default);
 
-		public abstract void Execute(int timeout);
-		public abstract ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default);
+		public abstract void Execute(int timeout, IDescriptorFiller descriptorFiller);
+		public abstract ValueTask ExecuteAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default);
 
 		public abstract DbValue[] Fetch();
 		public abstract ValueTask<DbValue[]> FetchAsync(CancellationToken cancellationToken = default);
@@ -250,6 +244,8 @@ namespace FirebirdSql.Data.Common
 
 		public abstract ArrayBase CreateArray(long handle, string tableName, string fieldName);
 		public abstract ValueTask<ArrayBase> CreateArrayAsync(long handle, string tableName, string fieldName, CancellationToken cancellationToken = default);
+
+		public abstract BatchBase CreateBatch();
 
 		#endregion
 

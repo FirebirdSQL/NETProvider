@@ -218,6 +218,12 @@ namespace FirebirdSql.Data.Client.Native
 			return array;
 		}
 
+		public override BatchBase CreateBatch()
+		{
+#warning Check supported fbclient?
+			throw new NotSupportedException("Batching is not supported on this Firebird version.");
+		}
+
 		#endregion
 
 		#region Methods
@@ -297,6 +303,8 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fields.ResetValues();
 
+			DescribeParameters();
+
 			StatementType = GetStatementType();
 
 			State = StatementState.Prepared;
@@ -338,7 +346,7 @@ namespace FirebirdSql.Data.Client.Native
 
 			if (_fields.ActualCount > 0 && _fields.ActualCount != _fields.Count)
 			{
-				await DescribeAsync(cancellationToken).ConfigureAwait(false);
+				Describe();
 			}
 			else
 			{
@@ -350,14 +358,18 @@ namespace FirebirdSql.Data.Client.Native
 
 			_fields.ResetValues();
 
+			DescribeParameters();
+
 			StatementType = await GetStatementTypeAsync(cancellationToken).ConfigureAwait(false);
 
 			State = StatementState.Prepared;
 		}
 
-		public override void Execute(int timeout)
+		public override void Execute(int timeout, IDescriptorFiller descriptorFiller)
 		{
 			EnsureNotDeallocated();
+
+			descriptorFiller.Fill(_parameters, 0);
 
 			ClearStatusVector();
 			NativeHelpers.CallIfExists(() =>
@@ -423,9 +435,11 @@ namespace FirebirdSql.Data.Client.Native
 
 			State = StatementState.Executed;
 		}
-		public override async ValueTask ExecuteAsync(int timeout, CancellationToken cancellationToken = default)
+		public override async ValueTask ExecuteAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
 			EnsureNotDeallocated();
+
+			await descriptorFiller.FillAsync(_parameters, 0, cancellationToken).ConfigureAwait(false);
 
 			ClearStatusVector();
 			NativeHelpers.CallIfExists(() =>
@@ -633,168 +647,6 @@ namespace FirebirdSql.Data.Client.Native
 			}
 		}
 
-		public override void Describe()
-		{
-			ClearStatusVector();
-
-			_fields = new Descriptor(_fields.ActualCount);
-
-			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-
-
-			_db.FbClient.isc_dsql_describe(
-				_statusVector,
-				ref _handle,
-				IscCodes.SQLDA_VERSION1,
-				sqlda);
-
-			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-			XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-			_db.ProcessStatusVector(_statusVector);
-
-			_fields = descriptor;
-		}
-		public override ValueTask DescribeAsync(CancellationToken cancellationToken = default)
-		{
-			ClearStatusVector();
-
-			_fields = new Descriptor(_fields.ActualCount);
-
-			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
-
-
-			_db.FbClient.isc_dsql_describe(
-				_statusVector,
-				ref _handle,
-				IscCodes.SQLDA_VERSION1,
-				sqlda);
-
-			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-			XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-			_db.ProcessStatusVector(_statusVector);
-
-			_fields = descriptor;
-
-			return ValueTask2.CompletedTask;
-		}
-
-		public override void DescribeParameters()
-		{
-			ClearStatusVector();
-
-			_parameters = new Descriptor(1);
-
-			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters);
-
-
-			_db.FbClient.isc_dsql_describe_bind(
-				_statusVector,
-				ref _handle,
-				IscCodes.SQLDA_VERSION1,
-				sqlda);
-
-			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-			_db.ProcessStatusVector(_statusVector);
-
-			if (descriptor.ActualCount != 0 && descriptor.Count != descriptor.ActualCount)
-			{
-				var n = descriptor.ActualCount;
-				descriptor = new Descriptor(n);
-
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-				sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, descriptor);
-
-				_db.FbClient.isc_dsql_describe_bind(
-					_statusVector,
-					ref _handle,
-					IscCodes.SQLDA_VERSION1,
-					sqlda);
-
-				descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-				_db.ProcessStatusVector(_statusVector);
-			}
-			else
-			{
-				if (descriptor.ActualCount == 0)
-				{
-					descriptor = new Descriptor(0);
-				}
-			}
-
-			if (sqlda != IntPtr.Zero)
-			{
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-			}
-
-			_parameters = descriptor;
-		}
-		public override ValueTask DescribeParametersAsync(CancellationToken cancellationToken = default)
-		{
-			ClearStatusVector();
-
-			_parameters = new Descriptor(1);
-
-			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters);
-
-
-			_db.FbClient.isc_dsql_describe_bind(
-				_statusVector,
-				ref _handle,
-				IscCodes.SQLDA_VERSION1,
-				sqlda);
-
-			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-			_db.ProcessStatusVector(_statusVector);
-
-			if (descriptor.ActualCount != 0 && descriptor.Count != descriptor.ActualCount)
-			{
-				var n = descriptor.ActualCount;
-				descriptor = new Descriptor(n);
-
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-				sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, descriptor);
-
-				_db.FbClient.isc_dsql_describe_bind(
-					_statusVector,
-					ref _handle,
-					IscCodes.SQLDA_VERSION1,
-					sqlda);
-
-				descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
-
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-
-				_db.ProcessStatusVector(_statusVector);
-			}
-			else
-			{
-				if (descriptor.ActualCount == 0)
-				{
-					descriptor = new Descriptor(0);
-				}
-			}
-
-			if (sqlda != IntPtr.Zero)
-			{
-				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
-			}
-
-			_parameters = descriptor;
-
-			return ValueTask2.CompletedTask;
-		}
-
 		#endregion
 
 		#region Protected Methods
@@ -943,6 +795,85 @@ namespace FirebirdSql.Data.Client.Native
 			_allRowsFetched = false;
 			State = StatementState.Allocated;
 			StatementType = DbStatementType.None;
+		}
+
+		private void Describe()
+		{
+			ClearStatusVector();
+
+			_fields = new Descriptor(_fields.ActualCount);
+
+			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _fields);
+
+			_db.FbClient.isc_dsql_describe(
+				_statusVector,
+				ref _handle,
+				IscCodes.SQLDA_VERSION1,
+				sqlda);
+
+			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
+
+			XsqldaMarshaler.CleanUpNativeData(ref sqlda);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			_fields = descriptor;
+		}
+
+		private void DescribeParameters()
+		{
+			ClearStatusVector();
+
+			_parameters = new Descriptor(1);
+
+			var sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, _parameters);
+
+
+			_db.FbClient.isc_dsql_describe_bind(
+				_statusVector,
+				ref _handle,
+				IscCodes.SQLDA_VERSION1,
+				sqlda);
+
+			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
+
+			_db.ProcessStatusVector(_statusVector);
+
+			if (descriptor.ActualCount != 0 && descriptor.Count != descriptor.ActualCount)
+			{
+				var n = descriptor.ActualCount;
+				descriptor = new Descriptor(n);
+
+				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
+
+				sqlda = XsqldaMarshaler.MarshalManagedToNative(_db.Charset, descriptor);
+
+				_db.FbClient.isc_dsql_describe_bind(
+					_statusVector,
+					ref _handle,
+					IscCodes.SQLDA_VERSION1,
+					sqlda);
+
+				descriptor = XsqldaMarshaler.MarshalNativeToManaged(_db.Charset, sqlda);
+
+				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
+
+				_db.ProcessStatusVector(_statusVector);
+			}
+			else
+			{
+				if (descriptor.ActualCount == 0)
+				{
+					descriptor = new Descriptor(0);
+				}
+			}
+
+			if (sqlda != IntPtr.Zero)
+			{
+				XsqldaMarshaler.CleanUpNativeData(ref sqlda);
+			}
+
+			_parameters = descriptor;
 		}
 
 		#endregion

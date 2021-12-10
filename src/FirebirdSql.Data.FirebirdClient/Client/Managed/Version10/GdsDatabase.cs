@@ -822,6 +822,33 @@ namespace FirebirdSql.Data.Client.Managed.Version10
 			return response;
 		}
 
+		public void SafeFinishFetching(int numberOfResponses)
+		{
+			while (numberOfResponses > 0)
+			{
+				numberOfResponses--;
+				try
+				{
+					ReadResponse();
+				}
+				catch (IscException)
+				{ }
+			}
+		}
+		public async ValueTask SafeFinishFetchingAsync(int numberOfResponses, CancellationToken cancellationToken = default)
+		{
+			while (numberOfResponses > 0)
+			{
+				numberOfResponses--;
+				try
+				{
+					await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+				}
+				catch (IscException)
+				{ }
+			}
+		}
+
 		#endregion
 
 		#region Protected Methods

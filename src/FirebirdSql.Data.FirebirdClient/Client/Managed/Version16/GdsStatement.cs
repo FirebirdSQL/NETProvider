@@ -16,8 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -34,16 +32,21 @@ namespace FirebirdSql.Data.Client.Managed.Version16
 			: base(db, transaction)
 		{ }
 
-		protected override void SendExecuteToBuffer(int timeout)
+		protected override void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
 		{
-			base.SendExecuteToBuffer(timeout);
+			base.SendExecuteToBuffer(timeout, descriptorFiller);
 			_database.Xdr.Write(timeout);
 		}
 
-		protected override async ValueTask SendExecuteToBufferAsync(int timeout, CancellationToken cancellationToken = default)
+		protected override async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 		{
-			await base.SendExecuteToBufferAsync(timeout, cancellationToken).ConfigureAwait(false);
+			await base.SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(timeout, cancellationToken).ConfigureAwait(false);
+		}
+
+		public override BatchBase CreateBatch()
+		{
+			return new GdsBatch(this);
 		}
 	}
 }

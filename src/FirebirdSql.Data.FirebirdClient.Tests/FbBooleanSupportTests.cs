@@ -16,7 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
@@ -49,17 +48,17 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				cmd.CommandText = "CREATE TABLE withboolean (id INTEGER, bool BOOLEAN)";
 				await cmd.ExecuteNonQueryAsync();
 			}
-			var data = new Dictionary<int, string>()
+			var data = new (int, string)[]
 			{
-				{ 0, "FALSE" },
-				{ 1, "TRUE" },
-				{ 2, "UNKNOWN" },
+				(0, "FALSE"),
+				(1, "TRUE"),
+				(2, "UNKNOWN"),
 			};
 			foreach (var item in data)
 			{
 				await using (var cmd = Connection.CreateCommand())
 				{
-					cmd.CommandText = $"INSERT INTO withboolean (id, bool) VALUES ({item.Key}, {item.Value})";
+					cmd.CommandText = $"INSERT INTO withboolean (id, bool) VALUES ({item.Item1}, {item.Item2})";
 					await cmd.ExecuteNonQueryAsync();
 				}
 			}

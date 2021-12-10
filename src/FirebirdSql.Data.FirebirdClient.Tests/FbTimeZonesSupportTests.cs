@@ -28,7 +28,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 	public class FbTimeZonesSupportTests : FbTestsBase
 	{
 		public FbTimeZonesSupportTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
+			: base(serverType, compression, wireCrypt, false)
 		{ }
 
 		[SetUp]
