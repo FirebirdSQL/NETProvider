@@ -120,5 +120,26 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
 		{
 			return base.Repro9735(async);
 		}
+
+		[LongExecutionTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_Include_reference_GroupBy_Select(bool async)
+		{
+			return base.SelectMany_Include_reference_GroupBy_Select(async);
+		}
+
+		[LongExecutionTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task SelectMany_Include_collection_GroupBy_Select(bool async)
+		{
+			return base.SelectMany_Include_collection_GroupBy_Select(async);
+		}
+
+		[LongExecutionTheory]
+		[MemberData(nameof(IsAsyncData))]
+		public override Task Join_Include_reference_GroupBy_Select(bool async)
+		{
+			return base.Join_Include_reference_GroupBy_Select(async);
+		}
 	}
 }

@@ -78,4 +78,19 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
 			Skip = "Does not have the data.";
 		}
 	}
+
+	public class LongExecutionFactAttribute : FactAttribute
+	{
+		public LongExecutionFactAttribute()
+		{
+			Skip = "Long execution.";
+		}
+	}
+	public class LongExecutionTheoryAttribute : TheoryAttribute
+	{
+		public LongExecutionTheoryAttribute()
+		{
+			Skip = "Long execution.";
+		}
+	}
 }
