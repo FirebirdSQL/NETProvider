@@ -979,6 +979,8 @@ Data source : {3}"},		/* eds_statement */
 	{335545270, "RDB$PAGES written by non-system transaction, DB appears to be damaged"},		/* wrong_page */
 	{335545271, "Replication error"},		/* repl_error */
 	{335545272, "Reset of user session failed. Connection is shut down."},		/* ses_reset_failed */
+	{335545273, "File size is less than expected"},		/* block_size */
+	{335545274, "Invalid key length {0}, need >{1}"},		/* tom_key_length */
 	{335740929, "data base file name ({0}) already given"},		/* gfix_db_name */
 	{335740930, "invalid switch {0}"},		/* gfix_invalid_sw */
 	{335740932, "incompatible switch combination"},		/* gfix_incmp_sw */
@@ -1416,6 +1418,7 @@ Data source : {3}"},		/* eds_statement */
 	{336986170, "Unknown tag ({0}) in isc_info_svc_limbo_trans block after isc_svc_query()"},		/* fbsvcmgr_info_limbo */
 	{336986171, "Unknown tag ({0}) in isc_spb_tra_state block after isc_svc_query()"},		/* fbsvcmgr_limbo_state */
 	{336986172, "Unknown tag ({0}) in isc_spb_tra_advise block after isc_svc_query()"},		/* fbsvcmgr_limbo_advise */
+	{336986173, "Wrong value for replica mode"},		/* fbsvcmgr_bad_rm */
 	{337051649, "Switches trusted_user and trusted_role are not supported from command line"},		/* utl_trusted_switch */
 	{337117213, "Missing parameter for switch {0}"},		/* nbackup_missing_param */
 	{337117214, "Only one of -LOCK, -UNLOCK, -FIXUP, -BACKUP or -RESTORE should be specified"},		/* nbackup_allowed_switches */
