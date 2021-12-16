@@ -622,7 +622,7 @@ namespace FirebirdSql.Data.Client.Managed
 
 		public void Write(long value)
 		{
-			_dataProvider.WriteAsync(TypeEncoder.EncodeInt64(value), 0, 8);
+			_dataProvider.Write(TypeEncoder.EncodeInt64(value), 0, 8);
 		}
 		public ValueTask WriteAsync(long value, CancellationToken cancellationToken = default)
 		{
