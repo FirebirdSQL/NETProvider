@@ -256,6 +256,28 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
+		[Test]
+		public async Task BigBatch()
+		{
+			await Empty();
+
+			const int Size = 60000;
+
+			await using (var cmd = Connection.CreateBatchCommand())
+			{
+				cmd.CommandText = "insert into batch (i) values (@i)";
+				for (var i = 0; i < Size; i++)
+				{
+					var b = cmd.AddBatchParameters();
+					b.Add("i", 6);
+				}
+				var result = await cmd.ExecuteNonQueryAsync();
+
+				Assert.AreEqual(Size, result.Count);
+				Assert.IsTrue(result.AllSuccess);
+			}
+		}
+
 		async Task Empty()
 		{
 			await using (var cmd = Connection.CreateCommand())
