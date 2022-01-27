@@ -68,7 +68,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task DataProperlyInDatabase()
 		{
-			await Empty();
+			await EmptyTable();
 
 			var @is = new[] { -1, 6 };
 			var bs = new[] { new BigInteger(long.MaxValue) * 2, new BigInteger(long.MaxValue) * 3 };
@@ -107,7 +107,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task SuccessWithRecordsAffected()
 		{
-			await Empty();
+			await EmptyTable();
 
 			await using (var cmd = Connection.CreateBatchCommand())
 			{
@@ -132,7 +132,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task SuccessWithoutRecordsAffected()
 		{
-			await Empty();
+			await EmptyTable();
 
 			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 			csb.ReturnRecordsAffected = false;
@@ -164,7 +164,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ErrorWithoutMultiError()
 		{
-			await Empty();
+			await EmptyTable();
 
 			await using (var cmd = Connection.CreateBatchCommand())
 			{
@@ -193,7 +193,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Test]
 		public async Task ErrorWithMultiError()
 		{
-			await Empty();
+			await EmptyTable();
 
 			await using (var cmd = Connection.CreateBatchCommand())
 			{
@@ -226,7 +226,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 		[Ignore("Server bug (#7099).")]
 		public async Task ErrorWithMultiErrorWithOverflow()
 		{
-			await Empty();
+			await EmptyTable();
 
 			await using (var cmd = Connection.CreateBatchCommand())
 			{
@@ -235,31 +235,43 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 				cmd.CommandText = "insert into batch (i) values (@i)";
 				var batch1 = cmd.AddBatchParameters();
 				batch1.Add("i", 1);
-				for (var i = 0; i < 100; i++)
+				for (var i = 0; i < 200; i++)
 				{
 					var b = cmd.AddBatchParameters();
 					b.Add("i", 1200);
 				}
+				var batch2 = cmd.AddBatchParameters();
+				batch2.Add("i", 1);
 				var result = await cmd.ExecuteNonQueryAsync();
 
-				Assert.AreEqual(3, result.Count);
+				Assert.AreEqual(202, result.Count);
 				Assert.IsFalse(result.AllSuccess);
+				Assert.AreEqual(1, result[0].RecordsAffected);
 				Assert.IsTrue(result[0].IsSuccess);
 				Assert.IsNull(result[0].Exception);
-				Assert.AreEqual(1, result[0].RecordsAffected);
-				Assert.IsFalse(result[1].IsSuccess);
-				Assert.IsInstanceOf<FbException>(result[1].Exception);
-				Assert.AreEqual(-1, result[1].RecordsAffected);
-				Assert.IsFalse(result[2].IsSuccess);
-				Assert.IsInstanceOf<FbException>(result[2].Exception);
-				Assert.AreEqual(-1, result[2].RecordsAffected);
+				Assert.AreEqual(1, result[201].RecordsAffected);
+				Assert.IsTrue(result[201].IsSuccess);
+				Assert.IsNull(result[201].Exception);
+				for (var i = 1; i < result.Count - 1; i++)
+				{
+					Assert.IsFalse(result[i].IsSuccess);
+					if (i <= 64)
+					{
+						Assert.IsInstanceOf<FbException>(result[i].Exception);
+					}
+					else
+					{
+						Assert.IsNull(result[i].Exception);
+					}
+					Assert.AreEqual(-1, result[i].RecordsAffected);
+				}
 			}
 		}
 
 		[Test]
 		public async Task BigBatch()
 		{
-			await Empty();
+			await EmptyTable();
 
 			const int Size = 60000;
 
@@ -278,7 +290,7 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			}
 		}
 
-		async Task Empty()
+		async Task EmptyTable()
 		{
 			await using (var cmd = Connection.CreateCommand())
 			{
