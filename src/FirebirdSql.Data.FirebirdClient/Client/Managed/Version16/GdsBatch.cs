@@ -147,7 +147,7 @@ namespace FirebirdSql.Data.Client.Managed.Version16
 			}
 			finally
 			{
-				await Database.SafeFinishFetchingAsync(numberOfResponses).ConfigureAwait(false);
+				await Database.SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
