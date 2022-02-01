@@ -20,76 +20,75 @@ using System.Data;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbParameterTests
 {
-	[NoServerCategory]
-	public class FbParameterTests
+	[Test]
+	public void ConstructorsTest()
 	{
-		[Test]
-		public void ConstructorsTest()
-		{
-			var ctor01 = new FbParameter();
-			var ctor02 = new FbParameter("ctor2", 10);
-			var ctor03 = new FbParameter("ctor3", FbDbType.Char);
-			var ctor04 = new FbParameter("ctor4", FbDbType.Integer, 4);
-			var ctor05 = new FbParameter("ctor5", FbDbType.Integer, 4, "int_field");
-			var ctor06 = new FbParameter(
-				"ctor6",
-				FbDbType.Integer,
-				4,
-				ParameterDirection.Input,
-				false,
-				0,
-				0,
-				"int_field",
-				DataRowVersion.Original,
-				100);
+		var ctor01 = new FbParameter();
+		var ctor02 = new FbParameter("ctor2", 10);
+		var ctor03 = new FbParameter("ctor3", FbDbType.Char);
+		var ctor04 = new FbParameter("ctor4", FbDbType.Integer, 4);
+		var ctor05 = new FbParameter("ctor5", FbDbType.Integer, 4, "int_field");
+		var ctor06 = new FbParameter(
+			"ctor6",
+			FbDbType.Integer,
+			4,
+			ParameterDirection.Input,
+			false,
+			0,
+			0,
+			"int_field",
+			DataRowVersion.Original,
+			100);
 
-			ctor01 = null;
-			ctor02 = null;
-			ctor03 = null;
-			ctor04 = null;
-			ctor05 = null;
-			ctor06 = null;
-		}
+		ctor01 = null;
+		ctor02 = null;
+		ctor03 = null;
+		ctor04 = null;
+		ctor05 = null;
+		ctor06 = null;
+	}
 
-		[Test]
-		public void CloneTest()
-		{
-			var p = new FbParameter("@p1", FbDbType.Integer);
-			p.Value = 1;
-			p.Charset = FbCharset.Dos850;
+	[Test]
+	public void CloneTest()
+	{
+		var p = new FbParameter("@p1", FbDbType.Integer);
+		p.Value = 1;
+		p.Charset = FbCharset.Dos850;
 
-			var p1 = ((ICloneable)p).Clone() as FbParameter;
+		var p1 = ((ICloneable)p).Clone() as FbParameter;
 
-			Assert.AreEqual(p1.ParameterName, p.ParameterName);
-			Assert.AreEqual(p1.FbDbType, p.FbDbType);
-			Assert.AreEqual(p1.DbType, p.DbType);
-			Assert.AreEqual(p1.Direction, p.Direction);
-			Assert.AreEqual(p1.SourceColumn, p.SourceColumn);
-			Assert.AreEqual(p1.SourceVersion, p.SourceVersion);
-			Assert.AreEqual(p1.Charset, p.Charset);
-			Assert.AreEqual(p1.IsNullable, p.IsNullable);
-			Assert.AreEqual(p1.Size, p.Size);
-			Assert.AreEqual(p1.Scale, p.Scale);
-			Assert.AreEqual(p1.Precision, p.Precision);
-			Assert.AreEqual(p1.Value, p.Value);
-		}
+		Assert.AreEqual(p1.ParameterName, p.ParameterName);
+		Assert.AreEqual(p1.FbDbType, p.FbDbType);
+		Assert.AreEqual(p1.DbType, p.DbType);
+		Assert.AreEqual(p1.Direction, p.Direction);
+		Assert.AreEqual(p1.SourceColumn, p.SourceColumn);
+		Assert.AreEqual(p1.SourceVersion, p.SourceVersion);
+		Assert.AreEqual(p1.Charset, p.Charset);
+		Assert.AreEqual(p1.IsNullable, p.IsNullable);
+		Assert.AreEqual(p1.Size, p.Size);
+		Assert.AreEqual(p1.Scale, p.Scale);
+		Assert.AreEqual(p1.Precision, p.Precision);
+		Assert.AreEqual(p1.Value, p.Value);
+	}
 
-		[Test]
-		public void FbDbTypeFromEnumAsValueTest()
-		{
-			var p = new FbParameter();
-			p.Value = FbServerType.Embedded;
-			Assert.AreEqual(FbDbType.Integer, p.FbDbType);
-		}
+	[Test]
+	public void FbDbTypeFromEnumAsValueTest()
+	{
+		var p = new FbParameter();
+		p.Value = FbServerType.Embedded;
+		Assert.AreEqual(FbDbType.Integer, p.FbDbType);
+	}
 
-		[Test]
-		public void FbDbTypeFromDBNullAsValueTest()
-		{
-			var p = new FbParameter();
-			p.Value = DBNull.Value;
-			Assert.AreEqual(FbDbType.VarChar, p.FbDbType);
-		}
+	[Test]
+	public void FbDbTypeFromDBNullAsValueTest()
+	{
+		var p = new FbParameter();
+		p.Value = DBNull.Value;
+		Assert.AreEqual(FbDbType.VarChar, p.FbDbType);
 	}
 }

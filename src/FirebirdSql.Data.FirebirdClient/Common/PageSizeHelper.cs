@@ -15,18 +15,17 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class PageSizeHelper
 {
-	internal static class PageSizeHelper
+	public static bool IsValidPageSize(int value)
 	{
-		public static bool IsValidPageSize(int value)
-		{
-			return value == 1024
-				|| value == 2048
-				|| value == 4096
-				|| value == 8192
-				|| value == 16384
-				|| value == 32768;
-		}
+		return value == 1024
+			|| value == 2048
+			|| value == 4096
+			|| value == 8192
+			|| value == 16384
+			|| value == 32768;
 	}
 }

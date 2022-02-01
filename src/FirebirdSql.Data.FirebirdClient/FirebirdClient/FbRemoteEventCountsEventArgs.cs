@@ -18,17 +18,16 @@
 using System;
 using System.ComponentModel;
 
-namespace FirebirdSql.Data.FirebirdClient
-{
-	public sealed class FbRemoteEventCountsEventArgs : EventArgs
-	{
-		public string Name { get; }
-		public int Counts { get; }
+namespace FirebirdSql.Data.FirebirdClient;
 
-		public FbRemoteEventCountsEventArgs(string name, int counts)
-		{
-			Name = name;
-			Counts = counts;
-		}
+public sealed class FbRemoteEventCountsEventArgs : EventArgs
+{
+	public string Name { get; }
+	public int Counts { get; }
+
+	public FbRemoteEventCountsEventArgs(string name, int counts)
+	{
+		Name = name;
+		Counts = counts;
 	}
 }

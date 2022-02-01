@@ -17,64 +17,63 @@
 
 using System;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+public sealed class FbError
 {
-	[Serializable]
-	public sealed class FbError
+	#region Fields
+
+	private byte _classError;
+	private int _lineNumber;
+	private string _message;
+	private int _number;
+
+	#endregion
+
+	#region Properties
+
+	public byte Class
 	{
-		#region Fields
-
-		private byte _classError;
-		private int _lineNumber;
-		private string _message;
-		private int _number;
-
-		#endregion
-
-		#region Properties
-
-		public byte Class
-		{
-			get { return _classError; }
-		}
-
-		public int LineNumber
-		{
-			get { return _lineNumber; }
-		}
-
-		public string Message
-		{
-			get { return _message; }
-		}
-
-		public int Number
-		{
-			get { return _number; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		internal FbError(string message, int number)
-			: this(0, 0, message, number)
-		{
-		}
-
-		internal FbError(byte classError, string message, int number)
-			: this(classError, 0, message, number)
-		{
-		}
-
-		internal FbError(byte classError, int line, string message, int number)
-		{
-			_classError = classError;
-			_lineNumber = line;
-			_number = number;
-			_message = message;
-		}
-
-		#endregion
+		get { return _classError; }
 	}
+
+	public int LineNumber
+	{
+		get { return _lineNumber; }
+	}
+
+	public string Message
+	{
+		get { return _message; }
+	}
+
+	public int Number
+	{
+		get { return _number; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	internal FbError(string message, int number)
+		: this(0, 0, message, number)
+	{
+	}
+
+	internal FbError(byte classError, string message, int number)
+		: this(classError, 0, message, number)
+	{
+	}
+
+	internal FbError(byte classError, int line, string message, int number)
+	{
+		_classError = classError;
+		_lineNumber = line;
+		_number = number;
+		_message = message;
+	}
+
+	#endregion
 }

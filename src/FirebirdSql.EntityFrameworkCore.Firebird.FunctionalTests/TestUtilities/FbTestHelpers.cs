@@ -22,23 +22,22 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+
+public class FbTestHelpers : TestHelpers
 {
-	public class FbTestHelpers : TestHelpers
-	{
-		protected FbTestHelpers()
-		{ }
+	protected FbTestHelpers()
+	{ }
 
-		public static FbTestHelpers Instance { get; } = new();
+	public static FbTestHelpers Instance { get; } = new();
 
-		public override IServiceCollection AddProviderServices(IServiceCollection services)
-			=> services.AddEntityFrameworkFirebird();
+	public override IServiceCollection AddProviderServices(IServiceCollection services)
+		=> services.AddEntityFrameworkFirebird();
 
-		public override void UseProviderOptions(DbContextOptionsBuilder optionsBuilder)
-			=> optionsBuilder.UseFirebird(new FbConnection("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"));
+	public override void UseProviderOptions(DbContextOptionsBuilder optionsBuilder)
+		=> optionsBuilder.UseFirebird(new FbConnection("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"));
 
 #pragma warning disable EF1001
-		public override LoggingDefinitions LoggingDefinitions { get; } = new FbLoggingDefinitions();
+	public override LoggingDefinitions LoggingDefinitions { get; } = new FbLoggingDefinitions();
 #pragma warning restore EF1001
-	}
 }

@@ -22,52 +22,51 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version15
+namespace FirebirdSql.Data.Client.Managed.Version15;
+
+internal class GdsDatabase : Version13.GdsDatabase
 {
-	internal class GdsDatabase : Version13.GdsDatabase
+	public GdsDatabase(GdsConnection connection)
+		: base(connection)
+	{ }
+
+	protected internal override IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
 	{
-		public GdsDatabase(GdsConnection connection)
-			: base(connection)
-		{ }
+		while (response is CryptKeyCallbackResponse cryptKeyCallbackResponse)
+		{
+			Xdr.Write(IscCodes.op_crypt_key_callback);
+			Xdr.WriteBuffer(cryptKey);
+			Xdr.Write(cryptKeyCallbackResponse.Size);
+			Xdr.Flush();
+			response = ReadResponse();
+		}
+		return response;
+	}
+	protected internal override async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		while (response is CryptKeyCallbackResponse cryptKeyCallbackResponse)
+		{
+			await Xdr.WriteAsync(IscCodes.op_crypt_key_callback, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(cryptKey, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteAsync(cryptKeyCallbackResponse.Size).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+		}
+		return response;
+	}
 
-		protected internal override IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
-		{
-			while (response is CryptKeyCallbackResponse cryptKeyCallbackResponse)
-			{
-				Xdr.Write(IscCodes.op_crypt_key_callback);
-				Xdr.WriteBuffer(cryptKey);
-				Xdr.Write(cryptKeyCallbackResponse.Size);
-				Xdr.Flush();
-				response = ReadResponse();
-			}
-			return response;
-		}
-		protected internal override async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
-		{
-			while (response is CryptKeyCallbackResponse cryptKeyCallbackResponse)
-			{
-				await Xdr.WriteAsync(IscCodes.op_crypt_key_callback, cancellationToken).ConfigureAwait(false);
-				await Xdr.WriteBufferAsync(cryptKey, cancellationToken).ConfigureAwait(false);
-				await Xdr.WriteAsync(cryptKeyCallbackResponse.Size).ConfigureAwait(false);
-				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-			}
-			return response;
-		}
+	public override StatementBase CreateStatement()
+	{
+		return new GdsStatement(this);
+	}
 
-		public override StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
+	public override StatementBase CreateStatement(TransactionBase transaction)
+	{
+		return new GdsStatement(this, transaction);
+	}
 
-		public override StatementBase CreateStatement(TransactionBase transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
-
-		public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
-		{
-			return new DatabaseParameterBuffer2();
-		}
+	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+	{
+		return new DatabaseParameterBuffer2();
 	}
 }

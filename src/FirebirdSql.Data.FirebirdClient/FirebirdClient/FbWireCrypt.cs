@@ -17,13 +17,12 @@
 
 using System;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+public enum FbWireCrypt
 {
-	[Serializable]
-	public enum FbWireCrypt
-	{
-		Disabled,
-		Enabled,
-		Required,
-	}
+	Disabled,
+	Enabled,
+	Required,
 }

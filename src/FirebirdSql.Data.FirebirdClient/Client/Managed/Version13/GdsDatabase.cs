@@ -22,318 +22,317 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version13
+namespace FirebirdSql.Data.Client.Managed.Version13;
+
+internal class GdsDatabase : Version12.GdsDatabase
 {
-	internal class GdsDatabase : Version12.GdsDatabase
+	public GdsDatabase(GdsConnection connection)
+		: base(connection)
+	{ }
+
+	public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
 	{
-		public GdsDatabase(GdsConnection connection)
-			: base(connection)
-		{ }
-
-		public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		try
 		{
-			try
+			SendAttachToBuffer(dpb, database);
+			Xdr.Flush();
+			var response = ReadResponse();
+			if (response is ContAuthResponse)
 			{
-				SendAttachToBuffer(dpb, database);
-				Xdr.Flush();
-				var response = ReadResponse();
-				if (response is ContAuthResponse)
+				while (response is ContAuthResponse contAuthResponse)
 				{
-					while (response is ContAuthResponse contAuthResponse)
-					{
-						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+					AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						AuthBlock.SendContAuthToBuffer();
-						Xdr.Flush();
-						response = AuthBlock.ProcessContAuthResponse();
-						response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-					}
-					var genericResponse = (GenericResponse)response;
-					ProcessAttachResponse(genericResponse);
-
-					if (genericResponse.Data.Any())
-					{
-						AuthBlock.SendWireCryptToBuffer();
-						Xdr.Flush();
-						AuthBlock.ProcessWireCryptResponse();
-					}
-				}
-				else
-				{
+					AuthBlock.SendContAuthToBuffer();
+					Xdr.Flush();
+					response = AuthBlock.ProcessContAuthResponse();
 					response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-					ProcessAttachResponse((GenericResponse)response);
-					AuthBlock.Complete();
 				}
-				AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
-			}
-			catch (IscException)
-			{
-				SafelyDetach();
-				throw;
-			}
-			catch (IOException ex)
-			{
-				SafelyDetach();
-				throw IscException.ForIOException(ex);
-			}
+				var genericResponse = (GenericResponse)response;
+				ProcessAttachResponse(genericResponse);
 
-			AfterAttachActions();
+				if (genericResponse.Data.Any())
+				{
+					AuthBlock.SendWireCryptToBuffer();
+					Xdr.Flush();
+					AuthBlock.ProcessWireCryptResponse();
+				}
+			}
+			else
+			{
+				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
+				ProcessAttachResponse((GenericResponse)response);
+				AuthBlock.Complete();
+			}
+			AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
 		}
-		public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+		catch (IscException)
 		{
-			try
+			SafelyDetach();
+			throw;
+		}
+		catch (IOException ex)
+		{
+			SafelyDetach();
+			throw IscException.ForIOException(ex);
+		}
+
+		AfterAttachActions();
+	}
+	public override async ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await SendAttachToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+			if (response is ContAuthResponse)
 			{
-				await SendAttachToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
-				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-				if (response is ContAuthResponse)
+				while (response is ContAuthResponse contAuthResponse)
 				{
-					while (response is ContAuthResponse contAuthResponse)
-					{
-						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+					AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
-						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
-						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
-					}
-					var genericResponse = (GenericResponse)response;
-					await ProcessAttachResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
-
-					if (genericResponse.Data.Any())
-					{
-						await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
-						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
-					}
-				}
-				else
-				{
+					await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
+					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+					response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
 					response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
-					await ProcessAttachResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
-					AuthBlock.Complete();
 				}
-				AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
-			}
-			catch (IscException)
-			{
-				await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
-				throw;
-			}
-			catch (IOException ex)
-			{
-				await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
-				throw IscException.ForIOException(ex);
-			}
+				var genericResponse = (GenericResponse)response;
+				await ProcessAttachResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
 
-			await AfterAttachActionsAsync(cancellationToken).ConfigureAwait(false);
-		}
-
-		protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
-		{
-			Xdr.Write(IscCodes.op_attach);
-			Xdr.Write(0);
-			if (!AuthBlock.HasClientData)
-			{
-				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+				if (genericResponse.Data.Any())
+				{
+					await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
+					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+					await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
+				}
 			}
 			else
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
+				response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
+				await ProcessAttachResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
+				AuthBlock.Complete();
 			}
-			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
+			AuthBlock.WireCryptValidate(IscCodes.PROTOCOL_VERSION13);
 		}
-		protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+		catch (IscException)
 		{
-			await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
-			await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
-			if (!AuthBlock.HasClientData)
-			{
-				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
-			}
-			else
-			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
-			}
-			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
-			await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
+			await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
+			throw;
+		}
+		catch (IOException ex)
+		{
+			await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
+			throw IscException.ForIOException(ex);
 		}
 
-		public override void CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		await AfterAttachActionsAsync(cancellationToken).ConfigureAwait(false);
+	}
+
+	protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
+	{
+		Xdr.Write(IscCodes.op_attach);
+		Xdr.Write(0);
+		if (!AuthBlock.HasClientData)
 		{
-			try
+			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+		}
+		else
+		{
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
+		}
+		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+		Xdr.WriteBuffer(dpb.ToArray());
+	}
+	protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+	{
+		await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		if (!AuthBlock.HasClientData)
+		{
+			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+		}
+		else
+		{
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
+		}
+		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
+	}
+
+	public override void CreateDatabase(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	{
+		try
+		{
+			SendCreateToBuffer(dpb, database);
+			Xdr.Flush();
+			var response = ReadResponse();
+			if (response is ContAuthResponse)
 			{
-				SendCreateToBuffer(dpb, database);
-				Xdr.Flush();
-				var response = ReadResponse();
-				if (response is ContAuthResponse)
+				while (response is ContAuthResponse contAuthResponse)
 				{
-					while (response is ContAuthResponse contAuthResponse)
-					{
-						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+					AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						AuthBlock.SendContAuthToBuffer();
-						Xdr.Flush();
-						response = AuthBlock.ProcessContAuthResponse();
-						response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-					}
-					var genericResponse = (GenericResponse)response;
-					ProcessCreateResponse(genericResponse);
-
-					if (genericResponse.Data.Any())
-					{
-						AuthBlock.SendWireCryptToBuffer();
-						Xdr.Flush();
-						AuthBlock.ProcessWireCryptResponse();
-					}
-				}
-				else
-				{
+					AuthBlock.SendContAuthToBuffer();
+					Xdr.Flush();
+					response = AuthBlock.ProcessContAuthResponse();
 					response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
-					ProcessCreateResponse((GenericResponse)response);
-					AuthBlock.Complete();
+				}
+				var genericResponse = (GenericResponse)response;
+				ProcessCreateResponse(genericResponse);
+
+				if (genericResponse.Data.Any())
+				{
+					AuthBlock.SendWireCryptToBuffer();
+					Xdr.Flush();
+					AuthBlock.ProcessWireCryptResponse();
 				}
 			}
-			catch (IOException ex)
+			else
 			{
-				throw IscException.ForIOException(ex);
+				response = ProcessCryptCallbackResponseIfNeeded(response, cryptKey);
+				ProcessCreateResponse((GenericResponse)response);
+				AuthBlock.Complete();
 			}
 		}
-		public override async ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+		catch (IOException ex)
 		{
-			try
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await SendCreateToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+			if (response is ContAuthResponse)
 			{
-				await SendCreateToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
-				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-				if (response is ContAuthResponse)
+				while (response is ContAuthResponse contAuthResponse)
 				{
-					while (response is ContAuthResponse contAuthResponse)
-					{
-						AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
+					AuthBlock.Start(contAuthResponse.ServerData, contAuthResponse.AcceptPluginName, contAuthResponse.IsAuthenticated, contAuthResponse.ServerKeys);
 
-						await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
-						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
-						response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
-					}
-					var genericResponse = (GenericResponse)response;
-					await ProcessCreateResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
-
-					if (genericResponse.Data.Any())
-					{
-						await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
-						await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-						await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
-					}
-				}
-				else
-				{
+					await AuthBlock.SendContAuthToBufferAsync(cancellationToken).ConfigureAwait(false);
+					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+					response = await AuthBlock.ProcessContAuthResponseAsync(cancellationToken).ConfigureAwait(false);
 					response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
-					await ProcessCreateResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
-					AuthBlock.Complete();
+				}
+				var genericResponse = (GenericResponse)response;
+				await ProcessCreateResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
+
+				if (genericResponse.Data.Any())
+				{
+					await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
+					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+					await AuthBlock.ProcessWireCryptResponseAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
-		{
-			Xdr.Write(IscCodes.op_create);
-			Xdr.Write(0);
-			if (!AuthBlock.HasClientData)
-			{
-				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
-			}
 			else
 			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
+				response = await ProcessCryptCallbackResponseIfNeededAsync(response, cryptKey, cancellationToken).ConfigureAwait(false);
+				await ProcessCreateResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
+				AuthBlock.Complete();
 			}
-			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
-			Xdr.WriteBuffer(dpb.ToArray());
 		}
-		protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+		catch (IOException ex)
 		{
-			await Xdr.WriteAsync(IscCodes.op_create, cancellationToken).ConfigureAwait(false);
-			await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
-			if (!AuthBlock.HasClientData)
-			{
-				dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
-			}
-			else
-			{
-				dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
-			}
-			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-			await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
-			await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
+			throw IscException.ForIOException(ex);
 		}
+	}
 
-		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
+	{
+		Xdr.Write(IscCodes.op_create);
+		Xdr.Write(0);
+		if (!AuthBlock.HasClientData)
 		{
-			Attach(dpb, database, cryptKey);
+			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
 		}
-		public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+		else
 		{
-			return AttachAsync(dpb, database, cryptKey, cancellationToken);
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 		}
+		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+		Xdr.WriteBuffer(dpb.ToArray());
+	}
+	protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
+	{
+		await Xdr.WriteAsync(IscCodes.op_create, cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		if (!AuthBlock.HasClientData)
+		{
+			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.PublicClientData);
+		}
+		else
+		{
+			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
+		}
+		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
+	}
 
-		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
-		{
-			CreateDatabase(dpb, database, cryptKey);
-		}
-		public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
-		{
-			return CreateDatabaseAsync(dpb, database, cryptKey, cancellationToken);
-		}
+	public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	{
+		Attach(dpb, database, cryptKey);
+	}
+	public override ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		return AttachAsync(dpb, database, cryptKey, cancellationToken);
+	}
 
-		protected internal virtual IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
-		{
-			while (response is CryptKeyCallbackResponse)
-			{
-				Xdr.Write(IscCodes.op_crypt_key_callback);
-				Xdr.WriteBuffer(cryptKey);
-				Xdr.Flush();
-				response = ReadResponse();
-			}
-			return response;
-		}
-		protected internal virtual async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
-		{
-			while (response is CryptKeyCallbackResponse)
-			{
-				await Xdr.WriteAsync(IscCodes.op_crypt_key_callback, cancellationToken).ConfigureAwait(false);
-				await Xdr.WriteBufferAsync(cryptKey, cancellationToken).ConfigureAwait(false);
-				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-			}
-			return response;
-		}
+	public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	{
+		CreateDatabase(dpb, database, cryptKey);
+	}
+	public override ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		return CreateDatabaseAsync(dpb, database, cryptKey, cancellationToken);
+	}
 
-		public override StatementBase CreateStatement()
+	protected internal virtual IResponse ProcessCryptCallbackResponseIfNeeded(IResponse response, byte[] cryptKey)
+	{
+		while (response is CryptKeyCallbackResponse)
 		{
-			return new GdsStatement(this);
+			Xdr.Write(IscCodes.op_crypt_key_callback);
+			Xdr.WriteBuffer(cryptKey);
+			Xdr.Flush();
+			response = ReadResponse();
 		}
+		return response;
+	}
+	protected internal virtual async ValueTask<IResponse> ProcessCryptCallbackResponseIfNeededAsync(IResponse response, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		while (response is CryptKeyCallbackResponse)
+		{
+			await Xdr.WriteAsync(IscCodes.op_crypt_key_callback, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(cryptKey, cancellationToken).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+		}
+		return response;
+	}
 
-		public override StatementBase CreateStatement(TransactionBase transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
+	public override StatementBase CreateStatement()
+	{
+		return new GdsStatement(this);
+	}
 
-		public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
-		{
-			return new DatabaseParameterBuffer2();
-		}
+	public override StatementBase CreateStatement(TransactionBase transaction)
+	{
+		return new GdsStatement(this, transaction);
+	}
+
+	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
+	{
+		return new DatabaseParameterBuffer2();
 	}
 }

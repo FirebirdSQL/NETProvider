@@ -23,12 +23,11 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class TPTFiltersInheritanceQueryFbTest : TPTFiltersInheritanceQueryTestBase<TPTFiltersInheritanceQueryFbFixture>
 {
-	public class TPTFiltersInheritanceQueryFbTest : TPTFiltersInheritanceQueryTestBase<TPTFiltersInheritanceQueryFbFixture>
-	{
-		public TPTFiltersInheritanceQueryFbTest(TPTFiltersInheritanceQueryFbFixture fixture)
-			: base(fixture)
-		{ }
-	}
+	public TPTFiltersInheritanceQueryFbTest(TPTFiltersInheritanceQueryFbFixture fixture)
+		: base(fixture)
+	{ }
 }

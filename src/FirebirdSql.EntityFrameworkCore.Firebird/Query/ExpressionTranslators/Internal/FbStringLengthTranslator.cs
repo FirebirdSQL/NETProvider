@@ -23,24 +23,23 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringLengthTranslator : IMemberTranslator
 {
-	public class FbStringLengthTranslator : IMemberTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringLengthTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbStringLengthTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (member.DeclaringType == typeof(string) && member.Name == nameof(string.Length))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			return _fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { instance }, true, new[] { true }, typeof(int));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (member.DeclaringType == typeof(string) && member.Name == nameof(string.Length))
-			{
-				return _fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { instance }, true, new[] { true }, typeof(int));
-			}
-			return null;
-		}
+		return null;
 	}
 }

@@ -22,12 +22,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class NorthwindQueryFbFixture<TModelCustomizer> : NorthwindQueryRelationalFixture<TModelCustomizer>
+	where TModelCustomizer : IModelCustomizer, new()
 {
-	public class NorthwindQueryFbFixture<TModelCustomizer> : NorthwindQueryRelationalFixture<TModelCustomizer>
-		where TModelCustomizer : IModelCustomizer, new()
-	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-		protected override Type ContextType => typeof(NorthwindFbContext);
-	}
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override Type ContextType => typeof(NorthwindFbContext);
 }

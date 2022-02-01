@@ -18,64 +18,63 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Types
+namespace FirebirdSql.Data.Types;
+
+[StructLayout(LayoutKind.Auto)]
+public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
 {
-	[StructLayout(LayoutKind.Auto)]
-	public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
+	public DateTime DateTime { get; }
+	public string TimeZone { get; }
+	public TimeSpan? Offset { get; }
+
+	internal FbZonedDateTime(DateTime dateTime, string timeZone, TimeSpan? offset)
 	{
-		public DateTime DateTime { get; }
-		public string TimeZone { get; }
-		public TimeSpan? Offset { get; }
+		if (dateTime.Kind != DateTimeKind.Utc)
+			throw new ArgumentException("Value must be in UTC.", nameof(dateTime));
+		if (timeZone == null)
+			throw new ArgumentNullException(nameof(timeZone));
+		if (string.IsNullOrWhiteSpace(timeZone))
+			throw new ArgumentException(nameof(timeZone));
 
-		internal FbZonedDateTime(DateTime dateTime, string timeZone, TimeSpan? offset)
-		{
-			if (dateTime.Kind != DateTimeKind.Utc)
-				throw new ArgumentException("Value must be in UTC.", nameof(dateTime));
-			if (timeZone == null)
-				throw new ArgumentNullException(nameof(timeZone));
-			if (string.IsNullOrWhiteSpace(timeZone))
-				throw new ArgumentException(nameof(timeZone));
-
-			DateTime = dateTime;
-			TimeZone = timeZone;
-			Offset = offset;
-		}
-
-		public FbZonedDateTime(DateTime dateTime, string timeZone)
-			: this(dateTime, timeZone, null)
-		{ }
-
-		public override string ToString()
-		{
-			if (Offset != null)
-			{
-				return $"{DateTime} {TimeZone} ({Offset})";
-			}
-			return $"{DateTime} {TimeZone}";
-		}
-
-		public override bool Equals(object obj)
-		{
-			return obj is FbZonedDateTime fbZonedDateTime && Equals(fbZonedDateTime);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var hash = (int)2166136261;
-				hash = (hash * 16777619) ^ DateTime.GetHashCode();
-				hash = (hash * 16777619) ^ TimeZone.GetHashCode();
-				if (Offset != null)
-					hash = (hash * 16777619) ^ Offset.GetHashCode();
-				return hash;
-			}
-		}
-
-		public bool Equals(FbZonedDateTime other) => DateTime.Equals(other.DateTime) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
-
-		public static bool operator ==(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
-
-		public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
+		DateTime = dateTime;
+		TimeZone = timeZone;
+		Offset = offset;
 	}
+
+	public FbZonedDateTime(DateTime dateTime, string timeZone)
+		: this(dateTime, timeZone, null)
+	{ }
+
+	public override string ToString()
+	{
+		if (Offset != null)
+		{
+			return $"{DateTime} {TimeZone} ({Offset})";
+		}
+		return $"{DateTime} {TimeZone}";
+	}
+
+	public override bool Equals(object obj)
+	{
+		return obj is FbZonedDateTime fbZonedDateTime && Equals(fbZonedDateTime);
+	}
+
+	public override int GetHashCode()
+	{
+		unchecked
+		{
+			var hash = (int)2166136261;
+			hash = (hash * 16777619) ^ DateTime.GetHashCode();
+			hash = (hash * 16777619) ^ TimeZone.GetHashCode();
+			if (Offset != null)
+				hash = (hash * 16777619) ^ Offset.GetHashCode();
+			return hash;
+		}
+	}
+
+	public bool Equals(FbZonedDateTime other) => DateTime.Equals(other.DateTime) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
+
+	public static bool operator ==(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
+
+	public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
 }

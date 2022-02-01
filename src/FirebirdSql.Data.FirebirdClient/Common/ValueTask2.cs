@@ -17,22 +17,21 @@
 
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class ValueTask2
 {
-	internal static class ValueTask2
-	{
-		public static ValueTask<TResult> FromResult<TResult>(TResult result) =>
+	public static ValueTask<TResult> FromResult<TResult>(TResult result) =>
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 			new ValueTask<TResult>(result);
 #else
 			ValueTask.FromResult(result);
 #endif
 
-		public static ValueTask CompletedTask =>
+	public static ValueTask CompletedTask =>
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 			default;
 #else
 			ValueTask.CompletedTask;
 #endif
-	}
 }

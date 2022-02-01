@@ -21,23 +21,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class IncludeOneToOneFbTest : IncludeOneToOneTestBase<IncludeOneToOneFbTest.OneToOneQueryFbFixture>
 {
-	public class IncludeOneToOneFbTest : IncludeOneToOneTestBase<IncludeOneToOneFbTest.OneToOneQueryFbFixture>
+	public IncludeOneToOneFbTest(OneToOneQueryFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	public class OneToOneQueryFbFixture : OneToOneQueryFixtureBase
 	{
-		public IncludeOneToOneFbTest(OneToOneQueryFbFixture fixture)
-			: base(fixture)
-		{ }
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
-		public class OneToOneQueryFbFixture : OneToOneQueryFixtureBase
+		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-			protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-			{
-				base.OnModelCreating(modelBuilder, context);
-				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
-			}
+			base.OnModelCreating(modelBuilder, context);
+			ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
 		}
 	}
 }

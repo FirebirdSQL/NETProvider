@@ -17,34 +17,33 @@
 
 using System;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+public enum FbDbType
 {
-	[Serializable]
-	public enum FbDbType
-	{
-		Array,
-		BigInt,
-		Binary,
-		Boolean,
-		Char,
-		Date,
-		Decimal,
-		Double,
-		Float,
-		Guid,
-		Integer,
-		Numeric,
-		SmallInt,
-		Text,
-		Time,
-		TimeStamp,
-		VarChar,
-		TimeStampTZ,
-		TimeStampTZEx,
-		TimeTZ,
-		TimeTZEx,
-		Dec16,
-		Dec34,
-		Int128,
-	}
+	Array,
+	BigInt,
+	Binary,
+	Boolean,
+	Char,
+	Date,
+	Decimal,
+	Double,
+	Float,
+	Guid,
+	Integer,
+	Numeric,
+	SmallInt,
+	Text,
+	Time,
+	TimeStamp,
+	VarChar,
+	TimeStampTZ,
+	TimeStampTZEx,
+	TimeTZ,
+	TimeTZEx,
+	Dec16,
+	Dec34,
+	Int128,
 }

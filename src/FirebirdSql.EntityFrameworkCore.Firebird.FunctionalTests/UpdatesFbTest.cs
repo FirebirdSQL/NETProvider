@@ -20,32 +20,31 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
-{
-	public class UpdatesFbTest : UpdatesRelationalTestBase<UpdatesFbFixture>
-	{
-		public UpdatesFbTest(UpdatesFbFixture fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests;
 
-		public override void Identifiers_are_generated_correctly()
+public class UpdatesFbTest : UpdatesRelationalTestBase<UpdatesFbFixture>
+{
+	public UpdatesFbTest(UpdatesFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	public override void Identifiers_are_generated_correctly()
+	{
+		using (var context = CreateContext())
 		{
-			using (var context = CreateContext())
-			{
-				var entityType = context.Model.FindEntityType(typeof(LoginEntityTypeWithAnExtremelyLongAndOverlyConvolutedNameThatIsUsedToVerifyThatTheStoreIdentifierGenerationLengthLimitIsWorkingCorrectly));
-				Assert.Equal(
-					"LoginEntityTypeWithAnExtremely~",
-					entityType.GetTableName());
-				Assert.Equal(
-					"PK_LoginEntityTypeWithAnExtrem~",
-					entityType.GetKeys().Single().GetName());
-				Assert.Equal(
-					"FK_LoginEntityTypeWithAnExtrem~",
-					entityType.GetForeignKeys().Single().GetConstraintName());
-				Assert.Equal(
-					"IX_LoginEntityTypeWithAnExtrem~",
-					entityType.GetIndexes().Single().GetDatabaseName());
-			}
+			var entityType = context.Model.FindEntityType(typeof(LoginEntityTypeWithAnExtremelyLongAndOverlyConvolutedNameThatIsUsedToVerifyThatTheStoreIdentifierGenerationLengthLimitIsWorkingCorrectly));
+			Assert.Equal(
+				"LoginEntityTypeWithAnExtremely~",
+				entityType.GetTableName());
+			Assert.Equal(
+				"PK_LoginEntityTypeWithAnExtrem~",
+				entityType.GetKeys().Single().GetName());
+			Assert.Equal(
+				"FK_LoginEntityTypeWithAnExtrem~",
+				entityType.GetForeignKeys().Single().GetConstraintName());
+			Assert.Equal(
+				"IX_LoginEntityTypeWithAnExtrem~",
+				entityType.GetIndexes().Single().GetDatabaseName());
 		}
 	}
 }

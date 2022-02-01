@@ -20,19 +20,19 @@ using System.Globalization;
 using System.Data;
 using System.Text;
 
-namespace FirebirdSql.Data.Schema
+namespace FirebirdSql.Data.Schema;
+
+internal class FbCollations : FbSchema
 {
-	internal class FbCollations : FbSchema
+	#region Protected Methods
+
+	protected override StringBuilder GetCommandText(string[] restrictions)
 	{
-		#region Protected Methods
+		var sql = new StringBuilder();
+		var where = new StringBuilder();
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			var sql = new StringBuilder();
-			var where = new StringBuilder();
-
-			sql.Append(
-				@"SELECT
+		sql.Append(
+			@"SELECT
 					null AS COLLATION_CATALOG,
 					null AS COLLATION_SCHEMA,
 					coll.rdb$collation_name AS COLLATION_NAME,
@@ -41,37 +41,36 @@ namespace FirebirdSql.Data.Schema
 				FROM rdb$collations coll
 					LEFT JOIN rdb$character_sets cs ON coll.rdb$character_set_id = cs.rdb$character_set_id");
 
-			if (restrictions != null)
+		if (restrictions != null)
+		{
+			var index = 0;
+
+			/* COLLATION_CATALOG */
+			if (restrictions.Length >= 1 && restrictions[0] != null)
 			{
-				var index = 0;
-
-				/* COLLATION_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
-
-				/* COLLATION_SCHEMA */
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
-
-				/* COLLATION_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat("coll.rdb$collation_name = @p{0}", index++);
-				}
 			}
 
-			if (where.Length > 0)
+			/* COLLATION_SCHEMA */
+			if (restrictions.Length >= 2 && restrictions[1] != null)
 			{
-				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY CHARACTER_SET_NAME, COLLATION_NAME");
-
-			return sql;
+			/* COLLATION_NAME */
+			if (restrictions.Length >= 3 && restrictions[2] != null)
+			{
+				where.AppendFormat("coll.rdb$collation_name = @p{0}", index++);
+			}
 		}
 
-		#endregion
+		if (where.Length > 0)
+		{
+			sql.AppendFormat(" WHERE {0} ", where.ToString());
+		}
+
+		sql.Append(" ORDER BY CHARACTER_SET_NAME, COLLATION_NAME");
+
+		return sql;
 	}
+
+	#endregion
 }

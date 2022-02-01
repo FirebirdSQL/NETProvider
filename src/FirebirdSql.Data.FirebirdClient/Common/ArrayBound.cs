@@ -18,12 +18,11 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+[StructLayout(LayoutKind.Auto)]
+internal struct ArrayBound
 {
-	[StructLayout(LayoutKind.Auto)]
-	internal struct ArrayBound
-	{
-		public int LowerBound { get; set; }
-		public int UpperBound { get; set; }
-	}
+	public int LowerBound { get; set; }
+	public int UpperBound { get; set; }
 }

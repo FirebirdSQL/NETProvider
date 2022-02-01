@@ -20,34 +20,33 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
+
+public class FbValueGenerationStrategyConvention : IModelInitializedConvention, IModelFinalizingConvention
 {
-	public class FbValueGenerationStrategyConvention : IModelInitializedConvention, IModelFinalizingConvention
+	public FbValueGenerationStrategyConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
 	{
-		public FbValueGenerationStrategyConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
-		{
-			Dependencies = dependencies;
-		}
+		Dependencies = dependencies;
+	}
 
-		protected virtual ProviderConventionSetBuilderDependencies Dependencies { get; }
+	protected virtual ProviderConventionSetBuilderDependencies Dependencies { get; }
 
-		public virtual void ProcessModelInitialized(IConventionModelBuilder modelBuilder, IConventionContext<IConventionModelBuilder> context)
-		{
-			modelBuilder.HasValueGenerationStrategy(FbValueGenerationStrategy.IdentityColumn);
-		}
+	public virtual void ProcessModelInitialized(IConventionModelBuilder modelBuilder, IConventionContext<IConventionModelBuilder> context)
+	{
+		modelBuilder.HasValueGenerationStrategy(FbValueGenerationStrategy.IdentityColumn);
+	}
 
-		public void ProcessModelFinalizing(IConventionModelBuilder modelBuilder, IConventionContext<IConventionModelBuilder> context)
+	public void ProcessModelFinalizing(IConventionModelBuilder modelBuilder, IConventionContext<IConventionModelBuilder> context)
+	{
+		foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
 		{
-			foreach (var entityType in modelBuilder.Metadata.GetEntityTypes())
+			foreach (var property in entityType.GetDeclaredProperties())
 			{
-				foreach (var property in entityType.GetDeclaredProperties())
+				// Needed for the annotation to show up in the model snapshot
+				var strategy = property.GetValueGenerationStrategy();
+				if (strategy != FbValueGenerationStrategy.None)
 				{
-					// Needed for the annotation to show up in the model snapshot
-					var strategy = property.GetValueGenerationStrategy();
-					if (strategy != FbValueGenerationStrategy.None)
-					{
-						property.Builder.HasValueGenerationStrategy(strategy);
-					}
+					property.Builder.HasValueGenerationStrategy(strategy);
 				}
 			}
 		}

@@ -18,43 +18,42 @@
 using System;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public sealed class FbInfoMessageEventArgs : EventArgs
 {
-	public sealed class FbInfoMessageEventArgs : EventArgs
+	#region Fields
+
+	private FbErrorCollection _errors;
+	private string _message;
+
+	#endregion
+
+	#region Properties
+
+	public FbErrorCollection Errors
 	{
-		#region Fields
-
-		private FbErrorCollection _errors;
-		private string _message;
-
-		#endregion
-
-		#region Properties
-
-		public FbErrorCollection Errors
-		{
-			get { return _errors; }
-		}
-
-		public string Message
-		{
-			get { return _message; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		internal FbInfoMessageEventArgs(IscException ex)
-		{
-			_message = ex.Message;
-			_errors = new FbErrorCollection();
-			foreach (var error in ex.Errors)
-			{
-				_errors.Add(error.Message, error.ErrorCode);
-			}
-		}
-
-		#endregion
+		get { return _errors; }
 	}
+
+	public string Message
+	{
+		get { return _message; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	internal FbInfoMessageEventArgs(IscException ex)
+	{
+		_message = ex.Message;
+		_errors = new FbErrorCollection();
+		foreach (var error in ex.Errors)
+		{
+			_errors.Add(error.Message, error.ErrorCode);
+		}
+	}
+
+	#endregion
 }

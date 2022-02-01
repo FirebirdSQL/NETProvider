@@ -19,22 +19,21 @@ using FirebirdSql.Data.Client.Managed;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class Srp256ClientTests
 {
-	[NoServerCategory]
-	public class Srp256ClientTests
+	[Test]
+	public void KeyMatchTest()
 	{
-		[Test]
-		public void KeyMatchTest()
-		{
-			var user = "SYSDBA";
-			var password = "masterkey";
-			var client = new Srp256Client();
-			var salt = client.GetSalt();
-			var serverKeyPair = client.ServerSeed(user, password, salt);
-			var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
-			client.ClientProof(user, password, salt, serverKeyPair.Item1);
-			Assert.AreEqual(serverSessionKey.ToString(), client.SessionKey.ToString());
-		}
+		var user = "SYSDBA";
+		var password = "masterkey";
+		var client = new Srp256Client();
+		var salt = client.GetSalt();
+		var serverKeyPair = client.ServerSeed(user, password, salt);
+		var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
+		client.ClientProof(user, password, salt, serverKeyPair.Item1);
+		Assert.AreEqual(serverSessionKey.ToString(), client.SessionKey.ToString());
 	}
 }

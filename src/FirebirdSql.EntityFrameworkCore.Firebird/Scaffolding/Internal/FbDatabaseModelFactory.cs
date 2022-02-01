@@ -28,72 +28,72 @@ using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using Microsoft.Extensions.Logging;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
-{
-	public class FbDatabaseModelFactory : DatabaseModelFactory
-	{
-		public int MajorVersionNumber { get; private set; }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 
-		public override DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
+public class FbDatabaseModelFactory : DatabaseModelFactory
+{
+	public int MajorVersionNumber { get; private set; }
+
+	public override DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
+	{
+		using (var connection = new FbConnection(connectionString))
 		{
-			using (var connection = new FbConnection(connectionString))
-			{
-				return Create(connection, options);
-			}
+			return Create(connection, options);
+		}
+	}
+
+	public override DatabaseModel Create(DbConnection connection, DatabaseModelFactoryOptions options)
+	{
+		var databaseModel = new DatabaseModel();
+
+		var connectionStartedOpen = connection.State == ConnectionState.Open;
+		if (!connectionStartedOpen)
+		{
+			connection.Open();
 		}
 
-		public override DatabaseModel Create(DbConnection connection, DatabaseModelFactoryOptions options)
-		{
-			var databaseModel = new DatabaseModel();
+		var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+		MajorVersionNumber = serverVersion.Major;
 
-			var connectionStartedOpen = connection.State == ConnectionState.Open;
+		try
+		{
+			databaseModel.DatabaseName = connection.Database;
+			databaseModel.DefaultSchema = GetDefaultSchema(connection);
+
+			var schemaList = new List<string>();
+			var tableList = options.Tables.ToList();
+			var tableFilter = GenerateTableFilter(tableList, schemaList);
+
+			var tables = GetTables(connection, tableFilter);
+			foreach (var table in tables)
+			{
+				table.Database = databaseModel;
+				databaseModel.Tables.Add(table);
+			}
+
+			return databaseModel;
+		}
+		finally
+		{
 			if (!connectionStartedOpen)
 			{
-				connection.Open();
-			}
-
-			var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
-			MajorVersionNumber = serverVersion.Major;
-
-			try
-			{
-				databaseModel.DatabaseName = connection.Database;
-				databaseModel.DefaultSchema = GetDefaultSchema(connection);
-
-				var schemaList = new List<string>();
-				var tableList = options.Tables.ToList();
-				var tableFilter = GenerateTableFilter(tableList, schemaList);
-
-				var tables = GetTables(connection, tableFilter);
-				foreach (var table in tables)
-				{
-					table.Database = databaseModel;
-					databaseModel.Tables.Add(table);
-				}
-
-				return databaseModel;
-			}
-			finally
-			{
-				if (!connectionStartedOpen)
-				{
-					connection.Close();
-				}
+				connection.Close();
 			}
 		}
+	}
 
-		private string GetDefaultSchema(DbConnection connection)
-		{
-			return null;
-		}
+	private string GetDefaultSchema(DbConnection connection)
+	{
+		return null;
+	}
 
-		private static Func<string, string, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
-		{
-			return tables.Any() ? (s, t) => tables.Contains(t) : null;
-		}
+	private static Func<string, string, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
+	{
+		return tables.Any() ? (s, t) => tables.Contains(t) : null;
+	}
 
-		private const string GetTablesQuery =
-			@"SELECT
+	private const string GetTablesQuery =
+		@"SELECT
                 trim(r.RDB$RELATION_NAME),
                 r.RDB$DESCRIPTION,
                 r.RDB$RELATION_TYPE
@@ -104,46 +104,46 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
              ORDER BY
               r.RDB$RELATION_NAME";
 
-		private IEnumerable<DatabaseTable> GetTables(DbConnection connection, Func<string, string, bool> filter)
+	private IEnumerable<DatabaseTable> GetTables(DbConnection connection, Func<string, string, bool> filter)
+	{
+		using (var command = connection.CreateCommand())
 		{
-			using (var command = connection.CreateCommand())
+			var tables = new List<DatabaseTable>();
+			command.CommandText = GetTablesQuery;
+			using (var reader = command.ExecuteReader())
 			{
-				var tables = new List<DatabaseTable>();
-				command.CommandText = GetTablesQuery;
-				using (var reader = command.ExecuteReader())
+				while (reader.Read())
 				{
-					while (reader.Read())
+					var name = reader.GetString(0);
+					var comment = reader.GetString(1);
+					var type = reader.GetInt32(2);
+
+					var table = type == 0
+						? new DatabaseTable()
+						: new DatabaseView();
+
+					table.Schema = null;
+					table.Name = name;
+					table.Comment = string.IsNullOrEmpty(comment) ? null : comment;
+
+					if (filter?.Invoke(table.Schema, table.Name) ?? true)
 					{
-						var name = reader.GetString(0);
-						var comment = reader.GetString(1);
-						var type = reader.GetInt32(2);
-
-						var table = type == 0
-							? new DatabaseTable()
-							: new DatabaseView();
-
-						table.Schema = null;
-						table.Name = name;
-						table.Comment = string.IsNullOrEmpty(comment) ? null : comment;
-
-						if (filter?.Invoke(table.Schema, table.Name) ?? true)
-						{
-							tables.Add(table);
-						}
+						tables.Add(table);
 					}
 				}
-
-				GetColumns(connection, tables, filter);
-				GetPrimaryKeys(connection, tables);
-				GetIndexes(connection, tables, filter);
-				GetConstraints(connection, tables);
-
-				return tables;
 			}
-		}
 
-		private const string GetColumnsQuery =
-			@"SELECT
+			GetColumns(connection, tables, filter);
+			GetPrimaryKeys(connection, tables);
+			GetIndexes(connection, tables, filter);
+			GetConstraints(connection, tables);
+
+			return tables;
+		}
+	}
+
+	private const string GetColumnsQuery =
+		@"SELECT
                trim(RF.RDB$FIELD_NAME) as COLUMN_NAME,
                COALESCE(RF.RDB$DEFAULT_SOURCE, F.RDB$DEFAULT_SOURCE) as COLUMN_DEFAULT,
                COALESCE(RF.RDB$NULL_FLAG, 0)  as NOT_NULL,
@@ -195,72 +195,72 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
              ORDER BY
               RF.RDB$FIELD_POSITION;";
 
-		private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	{
+		var identityType = MajorVersionNumber < 3 ? "null" : "rf.RDB$IDENTITY_TYPE";
+
+		foreach (var table in tables)
 		{
-			var identityType = MajorVersionNumber < 3 ? "null" : "rf.RDB$IDENTITY_TYPE";
-
-			foreach (var table in tables)
+			using (var command = connection.CreateCommand())
 			{
-				using (var command = connection.CreateCommand())
+				command.CommandText = string.Format(GetColumnsQuery, table.Name, identityType);
+				using (var reader = command.ExecuteReader())
 				{
-					command.CommandText = string.Format(GetColumnsQuery, table.Name, identityType);
-					using (var reader = command.ExecuteReader())
+					while (reader.Read())
 					{
-						while (reader.Read())
+						var name = reader["COLUMN_NAME"].ToString();
+						var defaultValue = reader["COLUMN_DEFAULT"].ToString();
+						var nullable = !Convert.ToBoolean(reader["NOT_NULL"]);
+						var autoGenerated = Convert.ToBoolean(reader["AUTO_GENERATED"]);
+						var storeType = reader["STORE_TYPE"].ToString();
+						var charset = reader["CHARACTER_SET_NAME"].ToString();
+						var comment = reader["COLUMN_COMMENT"].ToString();
+
+
+						var valueGenerated = ValueGenerated.Never;
+
+						if (autoGenerated)
 						{
-							var name = reader["COLUMN_NAME"].ToString();
-							var defaultValue = reader["COLUMN_DEFAULT"].ToString();
-							var nullable = !Convert.ToBoolean(reader["NOT_NULL"]);
-							var autoGenerated = Convert.ToBoolean(reader["AUTO_GENERATED"]);
-							var storeType = reader["STORE_TYPE"].ToString();
-							var charset = reader["CHARACTER_SET_NAME"].ToString();
-							var comment = reader["COLUMN_COMMENT"].ToString();
-
-
-							var valueGenerated = ValueGenerated.Never;
-
-							if (autoGenerated)
-							{
-								valueGenerated = ValueGenerated.OnAdd;
-							}
-
-							var column = new DatabaseColumn
-							{
-								Table = table,
-								Name = name,
-								StoreType = storeType,
-								IsNullable = nullable,
-								DefaultValueSql = CreateDefaultValueString(defaultValue),
-								ValueGenerated = valueGenerated,
-								Comment = string.IsNullOrEmpty(comment) ? null : comment,
-							};
-
-							table.Columns.Add(column);
+							valueGenerated = ValueGenerated.OnAdd;
 						}
+
+						var column = new DatabaseColumn
+						{
+							Table = table,
+							Name = name,
+							StoreType = storeType,
+							IsNullable = nullable,
+							DefaultValueSql = CreateDefaultValueString(defaultValue),
+							ValueGenerated = valueGenerated,
+							Comment = string.IsNullOrEmpty(comment) ? null : comment,
+						};
+
+						table.Columns.Add(column);
 					}
 				}
 			}
 		}
+	}
 
-		private string CreateDefaultValueString(string defaultValue)
+	private string CreateDefaultValueString(string defaultValue)
+	{
+		if (defaultValue == null)
 		{
-			if (defaultValue == null)
-			{
-				return null;
-			}
-			if (defaultValue.StartsWith("default "))
-			{
-				return defaultValue.Remove(0, 8);
-			}
-			else
-			{
-				return null;
-			}
-
+			return null;
+		}
+		if (defaultValue.StartsWith("default "))
+		{
+			return defaultValue.Remove(0, 8);
+		}
+		else
+		{
+			return null;
 		}
 
-		private const string GetPrimaryQuery =
-		@"SELECT
+	}
+
+	private const string GetPrimaryQuery =
+	@"SELECT
            trim(i.rdb$index_name) as INDEX_NAME,
            trim(sg.rdb$field_name) as FIELD_NAME
           FROM
@@ -272,37 +272,37 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
            AND trim(i.rdb$relation_name) = '{0}'
           ORDER BY sg.RDB$FIELD_POSITION;";
 
-		private void GetPrimaryKeys(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
+	private void GetPrimaryKeys(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
+	{
+		foreach (var x in tables)
 		{
-			foreach (var x in tables)
+			using (var command = connection.CreateCommand())
 			{
-				using (var command = connection.CreateCommand())
-				{
-					command.CommandText = string.Format(GetPrimaryQuery, x.Name);
+				command.CommandText = string.Format(GetPrimaryQuery, x.Name);
 
-					using (var reader = command.ExecuteReader())
+				using (var reader = command.ExecuteReader())
+				{
+					DatabasePrimaryKey index = null;
+					while (reader.Read())
 					{
-						DatabasePrimaryKey index = null;
-						while (reader.Read())
+						if (index == null)
 						{
-							if (index == null)
+							index = new DatabasePrimaryKey
 							{
-								index = new DatabasePrimaryKey
-								{
-									Table = x,
-									Name = reader.GetString(0).Trim()
-								};
-							}
-							index.Columns.Add(x.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
-							x.PrimaryKey = index;
+								Table = x,
+								Name = reader.GetString(0).Trim()
+							};
 						}
+						index.Columns.Add(x.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
+						x.PrimaryKey = index;
 					}
 				}
 			}
 		}
+	}
 
-		private const string GetIndexesQuery =
-			@"SELECT
+	private const string GetIndexesQuery =
+		@"SELECT
                trim(I.rdb$index_name) as INDEX_NAME,
                COALESCE(I.rdb$unique_flag, 0) as IS_UNIQUE,
                list(trim(sg.RDB$FIELD_NAME)) as COLUMNS
@@ -315,42 +315,42 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
               GROUP BY
                INDEX_NAME, IS_UNIQUE ;";
 
-		/// <remarks>
-		/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
-		/// </remarks>
-		private void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	/// <remarks>
+	/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
+	/// </remarks>
+	private void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	{
+		foreach (var table in tables)
 		{
-			foreach (var table in tables)
+			using (var command = connection.CreateCommand())
 			{
-				using (var command = connection.CreateCommand())
+				command.CommandText = string.Format(GetIndexesQuery, table.Name);
+
+				using (var reader = command.ExecuteReader())
 				{
-					command.CommandText = string.Format(GetIndexesQuery, table.Name);
-
-					using (var reader = command.ExecuteReader())
+					while (reader.Read())
 					{
-						while (reader.Read())
+						var index = new DatabaseIndex
 						{
-							var index = new DatabaseIndex
-							{
-								Table = table,
-								Name = reader.GetString(0).Trim(),
-								IsUnique = reader.GetBoolean(1),
-							};
+							Table = table,
+							Name = reader.GetString(0).Trim(),
+							IsUnique = reader.GetBoolean(1),
+						};
 
-							foreach (var column in reader.GetString(2).Split(','))
-							{
-								index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
-							}
-
-							table.Indexes.Add(index);
+						foreach (var column in reader.GetString(2).Split(','))
+						{
+							index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
 						}
+
+						table.Indexes.Add(index);
 					}
 				}
 			}
 		}
+	}
 
-		private const string GetConstraintsQuery =
-			@"SELECT
+	private const string GetConstraintsQuery =
+		@"SELECT
                trim(drs.rdb$constraint_name) as CONSTRAINT_NAME,
                trim(drs.RDB$RELATION_NAME) as TABLE_NAME,
                trim(mrc.rdb$relation_name) AS REFERENCED_TABLE_NAME,
@@ -369,45 +369,44 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
                drs.rdb$constraint_type = 'FOREIGN KEY'
                AND trim(drs.RDB$RELATION_NAME) = '{0}' ";
 
-		private void GetConstraints(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
+	private void GetConstraints(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
+	{
+		foreach (var table in tables)
 		{
-			foreach (var table in tables)
+			using (var command = connection.CreateCommand())
 			{
-				using (var command = connection.CreateCommand())
+				command.CommandText = string.Format(GetConstraintsQuery, table.Name);
+				using (var reader = command.ExecuteReader())
 				{
-					command.CommandText = string.Format(GetConstraintsQuery, table.Name);
-					using (var reader = command.ExecuteReader())
+					while (reader.Read())
 					{
-						while (reader.Read())
+						var referencedTableName = reader.GetString(2);
+						var referencedTable = tables.First(t => t.Name == referencedTableName);
+						var fkInfo = new DatabaseForeignKey { Name = reader.GetString(0), OnDelete = ConvertToReferentialAction(reader.GetString(4)), Table = table, PrincipalTable = referencedTable };
+						foreach (var pair in reader.GetString(3).Split(','))
 						{
-							var referencedTableName = reader.GetString(2);
-							var referencedTable = tables.First(t => t.Name == referencedTableName);
-							var fkInfo = new DatabaseForeignKey { Name = reader.GetString(0), OnDelete = ConvertToReferentialAction(reader.GetString(4)), Table = table, PrincipalTable = referencedTable };
-							foreach (var pair in reader.GetString(3).Split(','))
-							{
-								fkInfo.Columns.Add(table.Columns.Single(y =>
-									string.Equals(y.Name, pair.Split('|')[0], StringComparison.OrdinalIgnoreCase)));
-								fkInfo.PrincipalColumns.Add(fkInfo.PrincipalTable.Columns.Single(y =>
-									string.Equals(y.Name, pair.Split('|')[1], StringComparison.OrdinalIgnoreCase)));
-							}
-
-							table.ForeignKeys.Add(fkInfo);
+							fkInfo.Columns.Add(table.Columns.Single(y =>
+								string.Equals(y.Name, pair.Split('|')[0], StringComparison.OrdinalIgnoreCase)));
+							fkInfo.PrincipalColumns.Add(fkInfo.PrincipalTable.Columns.Single(y =>
+								string.Equals(y.Name, pair.Split('|')[1], StringComparison.OrdinalIgnoreCase)));
 						}
+
+						table.ForeignKeys.Add(fkInfo);
 					}
 				}
 			}
 		}
+	}
 
-		private static ReferentialAction? ConvertToReferentialAction(string onDeleteAction)
+	private static ReferentialAction? ConvertToReferentialAction(string onDeleteAction)
+	{
+		return onDeleteAction.ToUpperInvariant() switch
 		{
-			return onDeleteAction.ToUpperInvariant() switch
-			{
-				"RESTRICT" => ReferentialAction.Restrict,
-				"CASCADE" => ReferentialAction.Cascade,
-				"SET NULL" => ReferentialAction.SetNull,
-				"NO ACTION" => ReferentialAction.NoAction,
-				_ => null,
-			};
-		}
+			"RESTRICT" => ReferentialAction.Restrict,
+			"CASCADE" => ReferentialAction.Cascade,
+			"SET NULL" => ReferentialAction.SetNull,
+			"NO ACTION" => ReferentialAction.NoAction,
+			_ => null,
+		};
 	}
 }

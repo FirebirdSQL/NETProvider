@@ -20,28 +20,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public abstract class FbTraceConfiguration
 {
-	public abstract class FbTraceConfiguration
+	protected static string WriteBoolValue(bool b)
 	{
-		protected static string WriteBoolValue(bool b)
-		{
-			return b ? "true" : "false";
-		}
+		return b ? "true" : "false";
+	}
 
-		protected static string WriteString(string s)
-		{
-			return string.Format("'{0}'", s);
-		}
+	protected static string WriteString(string s)
+	{
+		return string.Format("'{0}'", s);
+	}
 
-		protected static string WriteNumber(int i)
-		{
-			return i.ToString();
-		}
+	protected static string WriteNumber(int i)
+	{
+		return i.ToString();
+	}
 
-		protected static string WriteRegEx(string re)
-		{
-			return WriteString(re.Replace(@"\", @"\\").Replace("'", @"\'"));
-		}
+	protected static string WriteRegEx(string re)
+	{
+		return WriteString(re.Replace(@"\", @"\\").Replace("'", @"\'"));
 	}
 }

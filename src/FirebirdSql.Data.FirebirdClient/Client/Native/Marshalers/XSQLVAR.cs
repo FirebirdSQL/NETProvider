@@ -18,28 +18,27 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Native.Marshalers
+namespace FirebirdSql.Data.Client.Native.Marshalers;
+
+[StructLayout(LayoutKind.Sequential)]
+internal class XSQLVAR
 {
-	[StructLayout(LayoutKind.Sequential)]
-	internal class XSQLVAR
-	{
-		public short sqltype;
-		public short sqlscale;
-		public short sqlsubtype;
-		public short sqllen;
-		public IntPtr sqldata;
-		public IntPtr sqlind;
-		public short sqlname_length;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-		public byte[] sqlname;
-		public short relname_length;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-		public byte[] relname;
-		public short ownername_length;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-		public byte[] ownername;
-		public short aliasname_length;
-		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-		public byte[] aliasname;
-	}
+	public short sqltype;
+	public short sqlscale;
+	public short sqlsubtype;
+	public short sqllen;
+	public IntPtr sqldata;
+	public IntPtr sqlind;
+	public short sqlname_length;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+	public byte[] sqlname;
+	public short relname_length;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+	public byte[] relname;
+	public short ownername_length;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+	public byte[] ownername;
+	public short aliasname_length;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+	public byte[] aliasname;
 }

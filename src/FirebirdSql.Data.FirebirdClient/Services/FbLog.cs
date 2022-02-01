@@ -21,51 +21,50 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
-{
-	public sealed class FbLog : FbService
-	{
-		public FbLog(string connectionString = null)
-			: base(connectionString)
-		{ }
+namespace FirebirdSql.Data.Services;
 
-		public void Execute()
+public sealed class FbLog : FbService
+{
+	public FbLog(string connectionString = null)
+		: base(connectionString)
+	{ }
+
+	public void Execute()
+	{
+		try
 		{
-			try
-			{
-				Open();
-				var startSpb = new ServiceParameterBuffer3();
-				startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
-				StartTask(startSpb);
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
+			Open();
+			var startSpb = new ServiceParameterBuffer3();
+			startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
+			StartTask(startSpb);
+			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 		}
-		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			try
-			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer3();
-				startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
+	}
+	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer3();
+			startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

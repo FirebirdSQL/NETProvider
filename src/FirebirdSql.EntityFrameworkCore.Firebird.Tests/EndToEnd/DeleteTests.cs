@@ -21,94 +21,93 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.EndToEnd;
+
+public class DeleteTests : EntityFrameworkCoreTestsBase
 {
-	public class DeleteTests : EntityFrameworkCoreTestsBase
+	class DeleteContext : FbTestDbContext
 	{
-		class DeleteContext : FbTestDbContext
-		{
-			public DeleteContext(string connectionString)
-				: base(connectionString)
-			{ }
+		public DeleteContext(string connectionString)
+			: base(connectionString)
+		{ }
 
-			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
-			{
-				base.OnTestModelCreating(modelBuilder);
+		protected override void OnTestModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnTestModelCreating(modelBuilder);
 
-				var insertEntityConf = modelBuilder.Entity<DeleteEntity>();
-				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
-				insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
-				insertEntityConf.ToTable("TEST_DELETE");
-			}
+			var insertEntityConf = modelBuilder.Entity<DeleteEntity>();
+			insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
+			insertEntityConf.ToTable("TEST_DELETE");
 		}
-		class DeleteEntity
+	}
+	class DeleteEntity
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+	[Test]
+	public async Task Delete()
+	{
+		await using (var db = await GetDbContext<DeleteContext>())
 		{
-			public int Id { get; set; }
-			public string Name { get; set; }
+			await db.Database.ExecuteSqlRawAsync("create table test_delete (id int primary key, name varchar(20))");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete values (65, 'test')");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete values (66, 'test')");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete values (67, 'test')");
+			var entity = new DeleteEntity() { Id = 66 };
+			var entry = db.Attach(entity);
+			entry.State = EntityState.Deleted;
+			await db.SaveChangesAsync();
+			var values = await db.Set<DeleteEntity>()
+				 .FromSqlRaw("select * from test_delete")
+				 .AsNoTracking()
+				 .OrderBy(x => x.Id)
+				 .ToListAsync();
+			Assert.AreEqual(2, values.Count());
+			Assert.AreEqual(65, values[0].Id);
+			Assert.AreEqual(67, values[1].Id);
 		}
-		[Test]
-		public async Task Delete()
-		{
-			await using (var db = await GetDbContext<DeleteContext>())
-			{
-				await db.Database.ExecuteSqlRawAsync("create table test_delete (id int primary key, name varchar(20))");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (65, 'test')");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (66, 'test')");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete values (67, 'test')");
-				var entity = new DeleteEntity() { Id = 66 };
-				var entry = db.Attach(entity);
-				entry.State = EntityState.Deleted;
-				await db.SaveChangesAsync();
-				var values = await db.Set<DeleteEntity>()
-					 .FromSqlRaw("select * from test_delete")
-					 .AsNoTracking()
-					 .OrderBy(x => x.Id)
-					 .ToListAsync();
-				Assert.AreEqual(2, values.Count());
-				Assert.AreEqual(65, values[0].Id);
-				Assert.AreEqual(67, values[1].Id);
-			}
-		}
+	}
 
-		class ConcurrencyDeleteContext : FbTestDbContext
-		{
-			public ConcurrencyDeleteContext(string connectionString)
-				: base(connectionString)
-			{ }
+	class ConcurrencyDeleteContext : FbTestDbContext
+	{
+		public ConcurrencyDeleteContext(string connectionString)
+			: base(connectionString)
+		{ }
 
-			protected override void OnTestModelCreating(ModelBuilder modelBuilder)
-			{
-				base.OnTestModelCreating(modelBuilder);
+		protected override void OnTestModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnTestModelCreating(modelBuilder);
 
-				var insertEntityConf = modelBuilder.Entity<ConcurrencyDeleteEntity>();
-				insertEntityConf.Property(x => x.Id).HasColumnName("ID");
-				insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
-				insertEntityConf.Property(x => x.Stamp).HasColumnName("STAMP")
-					.ValueGeneratedOnAddOrUpdate()
-					.IsConcurrencyToken();
-				insertEntityConf.ToTable("TEST_DELETE_CONCURRENCY");
-			}
+			var insertEntityConf = modelBuilder.Entity<ConcurrencyDeleteEntity>();
+			insertEntityConf.Property(x => x.Id).HasColumnName("ID");
+			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
+			insertEntityConf.Property(x => x.Stamp).HasColumnName("STAMP")
+				.ValueGeneratedOnAddOrUpdate()
+				.IsConcurrencyToken();
+			insertEntityConf.ToTable("TEST_DELETE_CONCURRENCY");
 		}
-		class ConcurrencyDeleteEntity
+	}
+	class ConcurrencyDeleteEntity
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public DateTime Stamp { get; set; }
+	}
+	[Test]
+	public async Task ConcurrencyDelete()
+	{
+		await using (var db = await GetDbContext<ConcurrencyDeleteContext>())
 		{
-			public int Id { get; set; }
-			public string Name { get; set; }
-			public DateTime Stamp { get; set; }
-		}
-		[Test]
-		public async Task ConcurrencyDelete()
-		{
-			await using (var db = await GetDbContext<ConcurrencyDeleteContext>())
-			{
-				await db.Database.ExecuteSqlRawAsync("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
-				await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
-				var entity = new ConcurrencyDeleteEntity() { Id = 66, Stamp = new DateTime(1970, 1, 1) };
-				var entry = db.Attach(entity);
-				entry.State = EntityState.Deleted;
-				Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => db.SaveChangesAsync());
-			}
+			await db.Database.ExecuteSqlRawAsync("create table test_delete_concurrency (id int primary key, name varchar(20), stamp timestamp)");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (65, 'test', current_timestamp)");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (66, 'test', current_timestamp)");
+			await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency values (67, 'test', current_timestamp)");
+			var entity = new ConcurrencyDeleteEntity() { Id = 66, Stamp = new DateTime(1970, 1, 1) };
+			var entry = db.Attach(entity);
+			entry.State = EntityState.Deleted;
+			Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => db.SaveChangesAsync());
 		}
 	}
 }

@@ -17,13 +17,12 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public enum FbShutdownOnlineMode
 {
-	public enum FbShutdownOnlineMode
-	{
-		Normal,
-		Multi,
-		Single,
-		Full,
-	}
+	Normal,
+	Multi,
+	Single,
+	Full,
 }

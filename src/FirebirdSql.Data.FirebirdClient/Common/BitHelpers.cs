@@ -19,13 +19,12 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class BitHelpers
 {
-	internal static class BitHelpers
+	public static int UnsignedRightShift(int value, int shift)
 	{
-		public static int UnsignedRightShift(int value, int shift)
-		{
-			return (int)((uint)value >> shift);
-		}
+		return (int)((uint)value >> shift);
 	}
 }

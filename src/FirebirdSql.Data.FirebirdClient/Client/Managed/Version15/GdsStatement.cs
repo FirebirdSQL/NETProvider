@@ -22,16 +22,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version15
-{
-	internal class GdsStatement : Version13.GdsStatement
-	{
-		public GdsStatement(DatabaseBase db)
-			: base(db)
-		{ }
+namespace FirebirdSql.Data.Client.Managed.Version15;
 
-		public GdsStatement(DatabaseBase db, TransactionBase transaction)
-			: base(db, transaction)
-		{ }
-	}
+internal class GdsStatement : Version13.GdsStatement
+{
+	public GdsStatement(DatabaseBase db)
+		: base(db)
+	{ }
+
+	public GdsStatement(DatabaseBase db, TransactionBase transaction)
+		: base(db, transaction)
+	{ }
 }

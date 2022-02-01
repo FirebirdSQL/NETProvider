@@ -17,11 +17,10 @@
 
 using System;
 
-namespace FirebirdSql.Data.Client.Native.Handle
+namespace FirebirdSql.Data.Client.Native.Handle;
+
+// public visibility added, because auto-generated assembly can't work with internal types
+public interface IFirebirdHandle
 {
-	// public visibility added, because auto-generated assembly can't work with internal types
-	public interface IFirebirdHandle
-	{
-		void SetClient(IFbClient fbClient);
-	}
+	void SetClient(IFbClient fbClient);
 }

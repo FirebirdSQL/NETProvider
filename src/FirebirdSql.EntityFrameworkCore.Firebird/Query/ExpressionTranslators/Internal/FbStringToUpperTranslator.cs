@@ -23,24 +23,23 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringToUpperTranslator : IMethodCallTranslator
 {
-	public class FbStringToUpperTranslator : IMethodCallTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringToUpperTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbStringToUpperTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (method.DeclaringType == typeof(string) && method.Name == nameof(string.ToUpper))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			return _fbSqlExpressionFactory.Function("UPPER", new[] { instance }, true, new[] { true }, typeof(string));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (method.DeclaringType == typeof(string) && method.Name == nameof(string.ToUpper))
-			{
-				return _fbSqlExpressionFactory.Function("UPPER", new[] { instance }, true, new[] { true }, typeof(string));
-			}
-			return null;
-		}
+		return null;
 	}
 }

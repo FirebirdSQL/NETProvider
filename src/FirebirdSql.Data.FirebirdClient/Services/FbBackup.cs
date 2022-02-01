@@ -21,100 +21,99 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public sealed class FbBackup : FbService
 {
-	public sealed class FbBackup : FbService
+	public FbBackupFileCollection BackupFiles { get; }
+	public bool Verbose { get; set; }
+	public int Factor { get; set; }
+	public string SkipData { get; set; }
+	public FbBackupFlags Options { get; set; }
+	public FbBackupRestoreStatistics Statistics { get; set; }
+
+	public FbBackup(string connectionString = null)
+		: base(connectionString)
 	{
-		public FbBackupFileCollection BackupFiles { get; }
-		public bool Verbose { get; set; }
-		public int Factor { get; set; }
-		public string SkipData { get; set; }
-		public FbBackupFlags Options { get; set; }
-		public FbBackupRestoreStatistics Statistics { get; set; }
+		BackupFiles = new FbBackupFileCollection();
+	}
 
-		public FbBackup(string connectionString = null)
-			: base(connectionString)
+	public void Execute()
+	{
+		EnsureDatabase();
+
+		try
 		{
-			BackupFiles = new FbBackupFileCollection();
-		}
-
-		public void Execute()
-		{
-			EnsureDatabase();
-
-			try
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_backup);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			foreach (var file in BackupFiles)
 			{
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				foreach (var file in BackupFiles)
-				{
-					startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
-					if (file.BackupLength.HasValue)
-						startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
-				}
-				if (Verbose)
-					startSpb.Append(IscCodes.isc_spb_verbose);
-				if (Factor > 0)
-					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
-				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
-				StartTask(startSpb);
-				if (Verbose)
-				{
-					ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-				}
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
+				if (file.BackupLength.HasValue)
+					startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 			}
-			catch (Exception ex)
+			if (Verbose)
+				startSpb.Append(IscCodes.isc_spb_verbose);
+			if (Factor > 0)
+				startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
+			if (!string.IsNullOrEmpty(SkipData))
+				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+			StartTask(startSpb);
+			if (Verbose)
 			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
+				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 			}
 		}
-		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			EnsureDatabase();
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
+	}
+	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureDatabase();
 
-			try
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_backup);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			foreach (var file in BackupFiles)
 			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				foreach (var file in BackupFiles)
-				{
-					startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
-					if (file.BackupLength.HasValue)
-						startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
-				}
-				if (Verbose)
-					startSpb.Append(IscCodes.isc_spb_verbose);
-				if (Factor > 0)
-					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
-				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				if (Verbose)
-				{
-					await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-				}
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
+				if (file.BackupLength.HasValue)
+					startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 			}
-			catch (Exception ex)
+			if (Verbose)
+				startSpb.Append(IscCodes.isc_spb_verbose);
+			if (Factor > 0)
+				startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
+			if (!string.IsNullOrEmpty(SkipData))
+				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			if (Verbose)
 			{
-				throw FbException.Create(ex);
+				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
 			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

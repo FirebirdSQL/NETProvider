@@ -26,44 +26,43 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class QueryFilterFuncletizationFbTest : QueryFilterFuncletizationTestBase<QueryFilterFuncletizationFbTest.QueryFilterFuncletizationFbFixture>
 {
-	public class QueryFilterFuncletizationFbTest : QueryFilterFuncletizationTestBase<QueryFilterFuncletizationFbTest.QueryFilterFuncletizationFbFixture>
+	public QueryFilterFuncletizationFbTest(QueryFilterFuncletizationFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	[Fact]
+	public override void DbContext_list_is_parameterized()
 	{
-		public QueryFilterFuncletizationFbTest(QueryFilterFuncletizationFbFixture fixture)
-			: base(fixture)
-		{ }
+		using var context = CreateContext();
+		// Default value of TenantIds is null InExpression over null values throws
+		Assert.Throws<NullReferenceException>(() => context.Set<ListFilter>().ToList());
 
-		[Fact]
-		public override void DbContext_list_is_parameterized()
+		context.TenantIds = new List<int>();
+		var query = context.Set<ListFilter>().ToList();
+		Assert.Empty(query);
+
+		context.TenantIds = new List<int> { 1 };
+		query = context.Set<ListFilter>().ToList();
+		Assert.Single(query);
+
+		context.TenantIds = new List<int> { 2, 3 };
+		query = context.Set<ListFilter>().ToList();
+		Assert.Equal(2, query.Count);
+	}
+
+	public class QueryFilterFuncletizationFbFixture : QueryFilterFuncletizationRelationalFixture
+	{
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
-			using var context = CreateContext();
-			// Default value of TenantIds is null InExpression over null values throws
-			Assert.Throws<NullReferenceException>(() => context.Set<ListFilter>().ToList());
-
-			context.TenantIds = new List<int>();
-			var query = context.Set<ListFilter>().ToList();
-			Assert.Empty(query);
-
-			context.TenantIds = new List<int> { 1 };
-			query = context.Set<ListFilter>().ToList();
-			Assert.Single(query);
-
-			context.TenantIds = new List<int> { 2, 3 };
-			query = context.Set<ListFilter>().ToList();
-			Assert.Equal(2, query.Count);
-		}
-
-		public class QueryFilterFuncletizationFbFixture : QueryFilterFuncletizationRelationalFixture
-		{
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-			protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-			{
-				base.OnModelCreating(modelBuilder, context);
-				ModelHelpers.SimpleTableNames(modelBuilder);
-				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, FbValueGenerationStrategy.IdentityColumn);
-			}
+			base.OnModelCreating(modelBuilder, context);
+			ModelHelpers.SimpleTableNames(modelBuilder);
+			ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, FbValueGenerationStrategy.IdentityColumn);
 		}
 	}
 }

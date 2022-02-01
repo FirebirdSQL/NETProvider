@@ -19,29 +19,28 @@ using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbGuidTypeMapping : GuidTypeMapping
 {
-	public class FbGuidTypeMapping : GuidTypeMapping
+	public FbGuidTypeMapping()
+		: base("CHAR(16) CHARACTER SET OCTETS")
+	{ }
+
+	protected FbGuidTypeMapping(RelationalTypeMappingParameters parameters)
+		: base(parameters)
+	{ }
+
+	protected override void ConfigureParameter(DbParameter parameter)
 	{
-		public FbGuidTypeMapping()
-			: base("CHAR(16) CHARACTER SET OCTETS")
-		{ }
-
-		protected FbGuidTypeMapping(RelationalTypeMappingParameters parameters)
-			: base(parameters)
-		{ }
-
-		protected override void ConfigureParameter(DbParameter parameter)
-		{
-			((FbParameter)parameter).FbDbType = FbDbType.Guid;
-		}
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			return $"CHAR_TO_UUID('{value}')";
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbGuidTypeMapping(parameters);
+		((FbParameter)parameter).FbDbType = FbDbType.Guid;
 	}
+
+	protected override string GenerateNonNullSqlLiteral(object value)
+	{
+		return $"CHAR_TO_UUID('{value}')";
+	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbGuidTypeMapping(parameters);
 }

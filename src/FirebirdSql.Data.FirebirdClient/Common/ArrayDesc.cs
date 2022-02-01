@@ -18,20 +18,19 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+[StructLayout(LayoutKind.Auto)]
+internal struct ArrayDesc
 {
-	[StructLayout(LayoutKind.Auto)]
-	internal struct ArrayDesc
-	{
-		public byte DataType { get; set; }
-		public short Scale { get; set; }
-		public short Length { get; set; }
-		public string FieldName { get; set; }
-		public string RelationName { get; set; }
-		public short Dimensions { get; set; }
-		// Specifies wheter array is to be accesed in
-		// row mayor or column-mayor order
-		public short Flags { get; set; }
-		public ArrayBound[] Bounds { get; set; }
-	}
+	public byte DataType { get; set; }
+	public short Scale { get; set; }
+	public short Length { get; set; }
+	public string FieldName { get; set; }
+	public string RelationName { get; set; }
+	public short Dimensions { get; set; }
+	// Specifies wheter array is to be accesed in
+	// row mayor or column-mayor order
+	public short Flags { get; set; }
+	public ArrayBound[] Bounds { get; set; }
 }

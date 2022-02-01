@@ -18,15 +18,14 @@
 using System;
 using FirebirdSql.Data.Client.Managed;
 
-namespace FirebirdSql.Data.Client.Managed.Version13
-{
-	internal class CryptKeyCallbackResponse : IResponse
-	{
-		public byte[] Data { get; }
+namespace FirebirdSql.Data.Client.Managed.Version13;
 
-		public CryptKeyCallbackResponse(byte[] data)
-		{
-			Data = data;
-		}
+internal class CryptKeyCallbackResponse : IResponse
+{
+	public byte[] Data { get; }
+
+	public CryptKeyCallbackResponse(byte[] data)
+	{
+		Data = data;
 	}
 }

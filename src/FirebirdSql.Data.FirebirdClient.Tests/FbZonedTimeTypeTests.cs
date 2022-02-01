@@ -20,31 +20,30 @@ using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbZonedTimeTypeTests
 {
-	[NoServerCategory]
-	public class FbZonedTimeTypeTests
+	static readonly object[] SimpleEqualityTrueSource = new object[]
 	{
-		static readonly object[] SimpleEqualityTrueSource = new object[]
-		{
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "UTC") },
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "utc") },
-		};
-		[TestCaseSource(nameof(SimpleEqualityTrueSource))]
-		public void EqualityTrue(FbZonedTime expected, FbZonedTime actual)
-		{
-			Assert.AreEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void EqualityTrue(FbZonedTime expected, FbZonedTime actual)
+	{
+		Assert.AreEqual(expected, actual);
+	}
 
-		static readonly object[] SimpleEqualityFalseSource = new object[]
-		{
+	static readonly object[] SimpleEqualityFalseSource = new object[]
+	{
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(141), "UTC") },
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "foo"), new FbZonedTime(TimeSpan.FromMinutes(142), "bar") },
-		};
-		[TestCaseSource(nameof(SimpleEqualityFalseSource))]
-		public void EqualityFalse(FbZonedTime expected, FbZonedTime actual)
-		{
-			Assert.AreNotEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityFalseSource))]
+	public void EqualityFalse(FbZonedTime expected, FbZonedTime actual)
+	{
+		Assert.AreNotEqual(expected, actual);
 	}
 }

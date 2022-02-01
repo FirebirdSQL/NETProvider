@@ -22,87 +22,86 @@ using FirebirdSql.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+
+public class FbTestStore : RelationalTestStore
 {
-	public class FbTestStore : RelationalTestStore
+	public static FbTestStore Create(string name)
+		=> new FbTestStore(name, shared: false);
+
+	public static FbTestStore GetOrCreate(string name)
+		=> new FbTestStore(name, shared: true);
+
+	public FbTestStore(string name, bool shared)
+		: base(name, shared)
 	{
-		public static FbTestStore Create(string name)
-			=> new FbTestStore(name, shared: false);
-
-		public static FbTestStore GetOrCreate(string name)
-			=> new FbTestStore(name, shared: true);
-
-		public FbTestStore(string name, bool shared)
-			: base(name, shared)
+		var csb = new FbConnectionStringBuilder
 		{
-			var csb = new FbConnectionStringBuilder
-			{
-				Database = $"EFCore_{name}.fdb",
-				DataSource = "localhost",
-				UserID = "sysdba",
-				Password = "masterkey",
-				Pooling = false,
-				Charset = "utf8"
-			};
-			ConnectionString = csb.ToString();
-			Connection = new FbConnection(ConnectionString);
-		}
-
-		protected override string OpenDelimiter => "\"";
-		protected override string CloseDelimiter => "\"";
-
-		protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
-		{
-			using (var context = createContext())
-			{
-				// create database explicitly to specify Page Size and Forced Writes
-				FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
-				context.Database.EnsureCreated();
-				clean?.Invoke(context);
-				Clean(context);
-				seed?.Invoke(context);
-			}
-		}
-
-		public override void OpenConnection()
-		{
-			base.OpenConnection();
-			if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
-			{
-				using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = "set bind of decfloat to legacy";
-					cmd.ExecuteNonQuery();
-					cmd.CommandText = "set bind of int128 to legacy";
-					cmd.ExecuteNonQuery();
-					cmd.CommandText = "set bind of time zone to legacy";
-					cmd.ExecuteNonQuery();
-				}
-			}
-		}
-
-		public override async Task OpenConnectionAsync()
-		{
-			await base.OpenConnectionAsync();
-			if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
-			{
-				using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = "set bind of decfloat to legacy";
-					await cmd.ExecuteNonQueryAsync();
-					cmd.CommandText = "set bind of int128 to legacy";
-					await cmd.ExecuteNonQueryAsync();
-					cmd.CommandText = "set bind of time zone to legacy";
-					await cmd.ExecuteNonQueryAsync();
-				}
-			}
-		}
-
-		public override DbContextOptionsBuilder AddProviderOptions(DbContextOptionsBuilder builder)
-			=> builder.UseFirebird(Connection,
-				x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery));
-
-		public override void Clean(DbContext context)
-		{ }
+			Database = $"EFCore_{name}.fdb",
+			DataSource = "localhost",
+			UserID = "sysdba",
+			Password = "masterkey",
+			Pooling = false,
+			Charset = "utf8"
+		};
+		ConnectionString = csb.ToString();
+		Connection = new FbConnection(ConnectionString);
 	}
+
+	protected override string OpenDelimiter => "\"";
+	protected override string CloseDelimiter => "\"";
+
+	protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
+	{
+		using (var context = createContext())
+		{
+			// create database explicitly to specify Page Size and Forced Writes
+			FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
+			context.Database.EnsureCreated();
+			clean?.Invoke(context);
+			Clean(context);
+			seed?.Invoke(context);
+		}
+	}
+
+	public override void OpenConnection()
+	{
+		base.OpenConnection();
+		if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "set bind of decfloat to legacy";
+				cmd.ExecuteNonQuery();
+				cmd.CommandText = "set bind of int128 to legacy";
+				cmd.ExecuteNonQuery();
+				cmd.CommandText = "set bind of time zone to legacy";
+				cmd.ExecuteNonQuery();
+			}
+		}
+	}
+
+	public override async Task OpenConnectionAsync()
+	{
+		await base.OpenConnectionAsync();
+		if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+		{
+			using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "set bind of decfloat to legacy";
+				await cmd.ExecuteNonQueryAsync();
+				cmd.CommandText = "set bind of int128 to legacy";
+				await cmd.ExecuteNonQueryAsync();
+				cmd.CommandText = "set bind of time zone to legacy";
+				await cmd.ExecuteNonQueryAsync();
+			}
+		}
+	}
+
+	public override DbContextOptionsBuilder AddProviderOptions(DbContextOptionsBuilder builder)
+		=> builder.UseFirebird(Connection,
+			x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery));
+
+	public override void Clean(DbContext context)
+	{ }
 }

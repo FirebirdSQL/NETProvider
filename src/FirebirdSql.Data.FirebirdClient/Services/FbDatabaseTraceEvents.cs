@@ -17,34 +17,33 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+[Flags]
+public enum FbDatabaseTraceEvents
 {
-	[Flags]
-	public enum FbDatabaseTraceEvents
-	{
-		Connections			= 0x00_00_01,
-		Transactions		= 0x00_00_02,
-		StatementPrepare	= 0x00_00_04,
-		StatementFree		= 0x00_00_08,
-		StatementStart		= 0x00_00_10,
-		StatementFinish		= 0x00_00_20,
-		ProcedureStart		= 0x00_00_40,
-		ProcedureFinish		= 0x00_00_80,
-		FunctionStart		= 0x00_01_00,
-		FunctionFinish		= 0x00_02_00,
-		TriggerStart		= 0x00_04_00,
-		TriggerFinish		= 0x00_08_00,
-		Context				= 0x00_10_00,
-		Errors				= 0x00_20_00,
-		Warnings			= 0x00_40_00,
-		InitFini			= 0x00_80_00,
-		Sweep				= 0x01_00_00,
-		PrintPlan			= 0x02_00_00,
-		ExplainPlan			= 0x04_00_00,
-		PrintPerf			= 0x08_00_00,
-		BLRRequests			= 0x10_00_00,
-		PrintBLR			= 0x20_00_00,
-		DYNRequests			= 0x40_00_00,
-		PrintDYN			= 0x80_00_00,
-	}
+	Connections = 0x00_00_01,
+	Transactions = 0x00_00_02,
+	StatementPrepare = 0x00_00_04,
+	StatementFree = 0x00_00_08,
+	StatementStart = 0x00_00_10,
+	StatementFinish = 0x00_00_20,
+	ProcedureStart = 0x00_00_40,
+	ProcedureFinish = 0x00_00_80,
+	FunctionStart = 0x00_01_00,
+	FunctionFinish = 0x00_02_00,
+	TriggerStart = 0x00_04_00,
+	TriggerFinish = 0x00_08_00,
+	Context = 0x00_10_00,
+	Errors = 0x00_20_00,
+	Warnings = 0x00_40_00,
+	InitFini = 0x00_80_00,
+	Sweep = 0x01_00_00,
+	PrintPlan = 0x02_00_00,
+	ExplainPlan = 0x04_00_00,
+	PrintPerf = 0x08_00_00,
+	BLRRequests = 0x10_00_00,
+	PrintBLR = 0x20_00_00,
+	DYNRequests = 0x40_00_00,
+	PrintDYN = 0x80_00_00,
 }

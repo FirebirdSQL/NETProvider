@@ -21,26 +21,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+
+public class FbTestStoreFactory : RelationalTestStoreFactory
 {
-	public class FbTestStoreFactory : RelationalTestStoreFactory
+	public static FbTestStoreFactory Instance { get; } = new FbTestStoreFactory();
+
+	static FbTestStoreFactory()
 	{
-		public static FbTestStoreFactory Instance { get; } = new FbTestStoreFactory();
-
-		static FbTestStoreFactory()
-		{
-			// See #14847 on EntityFrameworkCore.
-			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-			Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-		}
-
-		public override TestStore Create(string storeName)
-			=> FbTestStore.Create(storeName);
-
-		public override TestStore GetOrCreate(string storeName)
-			=> FbTestStore.GetOrCreate(storeName);
-
-		public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection)
-			=> serviceCollection.AddEntityFrameworkFirebird();
+		// See #14847 on EntityFrameworkCore.
+		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+		Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 	}
+
+	public override TestStore Create(string storeName)
+		=> FbTestStore.Create(storeName);
+
+	public override TestStore GetOrCreate(string storeName)
+		=> FbTestStore.GetOrCreate(storeName);
+
+	public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection)
+		=> serviceCollection.AddEntityFrameworkFirebird();
 }

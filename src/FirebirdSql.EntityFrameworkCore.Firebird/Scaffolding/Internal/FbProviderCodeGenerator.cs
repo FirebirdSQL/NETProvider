@@ -22,28 +22,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
+
+public class FbProviderCodeGenerator : ProviderCodeGenerator
 {
-	public class FbProviderCodeGenerator : ProviderCodeGenerator
+	static readonly MethodInfo UseFirebirdMethodInfo
+		= typeof(FbDbContextOptionsBuilderExtensions).GetRequiredRuntimeMethod(
+			nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
+			typeof(DbContextOptionsBuilder),
+			typeof(string),
+			typeof(Action<FbDbContextOptionsBuilder>));
+
+	public FbProviderCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
+		: base(dependencies)
+	{ }
+
+	public override MethodCallCodeFragment GenerateUseProvider(string connectionString, MethodCallCodeFragment providerOptions)
 	{
-		static readonly MethodInfo UseFirebirdMethodInfo
-			= typeof(FbDbContextOptionsBuilderExtensions).GetRequiredRuntimeMethod(
-				nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
-				typeof(DbContextOptionsBuilder),
-				typeof(string),
-				typeof(Action<FbDbContextOptionsBuilder>));
-
-		public FbProviderCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
-			: base(dependencies)
-		{ }
-
-		public override MethodCallCodeFragment GenerateUseProvider(string connectionString, MethodCallCodeFragment providerOptions)
-		{
-			return new MethodCallCodeFragment(
-				UseFirebirdMethodInfo,
-				providerOptions == null
-					? new object[] { connectionString }
-					: new object[] { connectionString, new NestedClosureCodeFragment("x", providerOptions) });
-		}
+		return new MethodCallCodeFragment(
+			UseFirebirdMethodInfo,
+			providerOptions == null
+				? new object[] { connectionString }
+				: new object[] { connectionString, new NestedClosureCodeFragment("x", providerOptions) });
 	}
 }

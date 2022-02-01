@@ -21,16 +21,15 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class InheritanceQueryFbFixture : InheritanceQueryRelationalFixture
-	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			modelBuilder.Entity<AnimalQuery>().ToSqlQuery(@"SELECT * FROM ""Animals""");
-		}
+public class InheritanceQueryFbFixture : InheritanceQueryRelationalFixture
+{
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	{
+		base.OnModelCreating(modelBuilder, context);
+		modelBuilder.Entity<AnimalQuery>().ToSqlQuery(@"SELECT * FROM ""Animals""");
 	}
 }

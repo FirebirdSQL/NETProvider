@@ -20,39 +20,38 @@ using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbZonedDateTimeTypeTests
 {
-	[NoServerCategory]
-	public class FbZonedDateTimeTypeTests
+	static readonly object[] SimpleEqualityTrueSource = new object[]
 	{
-		static readonly object[] SimpleEqualityTrueSource = new object[]
-		{
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC") },
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "utc") },
-		};
-		[TestCaseSource(nameof(SimpleEqualityTrueSource))]
-		public void EqualityTrue(FbZonedDateTime expected, FbZonedDateTime actual)
-		{
-			Assert.AreEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void EqualityTrue(FbZonedDateTime expected, FbZonedDateTime actual)
+	{
+		Assert.AreEqual(expected, actual);
+	}
 
-		static readonly object[] SimpleEqualityFalseSource = new object[]
-		{
+	static readonly object[] SimpleEqualityFalseSource = new object[]
+	{
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 1, DateTimeKind.Utc), "UTC") },
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "foo"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "bar") },
-		};
-		[TestCaseSource(nameof(SimpleEqualityFalseSource))]
-		public void EqualityFalse(FbZonedDateTime expected, FbZonedDateTime actual)
-		{
-			Assert.AreNotEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityFalseSource))]
+	public void EqualityFalse(FbZonedDateTime expected, FbZonedDateTime actual)
+	{
+		Assert.AreNotEqual(expected, actual);
+	}
 
-		public void DateTimeShouldBeUtc()
+	public void DateTimeShouldBeUtc()
+	{
+		Assert.Throws<ArgumentException>(() =>
 		{
-			Assert.Throws<ArgumentException>(() =>
-			{
-				new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Local), "foo");
-			});
-		}
+			new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Local), "foo");
+		});
 	}
 }

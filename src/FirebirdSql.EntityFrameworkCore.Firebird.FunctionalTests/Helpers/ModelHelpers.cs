@@ -21,57 +21,56 @@ using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+
+public static class ModelHelpers
 {
-	public static class ModelHelpers
+	public static void SetStringLengths(ModelBuilder modelBuilder)
 	{
-		public static void SetStringLengths(ModelBuilder modelBuilder)
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 		{
-			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			foreach (var property in entityType.GetProperties())
 			{
-				foreach (var property in entityType.GetProperties())
+				if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
 				{
-					if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
-					{
-						property.SetMaxLength(500);
-					}
+					property.SetMaxLength(500);
 				}
 			}
 		}
+	}
 
-		public static void SimpleTableNames(ModelBuilder modelBuilder)
+	public static void SimpleTableNames(ModelBuilder modelBuilder)
+	{
+		var names = new HashSet<string>(StringComparer.InvariantCulture);
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 		{
-			var names = new HashSet<string>(StringComparer.InvariantCulture);
-			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			if (entityType.BaseType != null)
+				continue;
+			var name = new string(entityType.GetTableName().Where(char.IsUpper).ToArray());
+			var cnt = 1;
+			while (names.Contains(name))
 			{
-				if (entityType.BaseType != null)
-					continue;
-				var name = new string(entityType.GetTableName().Where(char.IsUpper).ToArray());
-				var cnt = 1;
-				while (names.Contains(name))
-				{
-					name += cnt++;
-				}
-				names.Add(name);
-				entityType.SetTableName(name);
+				name += cnt++;
 			}
+			names.Add(name);
+			entityType.SetTableName(name);
 		}
+	}
 
-		public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
+	public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
+	{
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 		{
-			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			var pk = entityType.FindPrimaryKey();
+			if (pk == null)
+				continue;
+			var properties = pk.Properties;
+			if (properties.Count() != 1)
+				continue;
+			var property = properties[0];
+			if (property.GetValueGenerationStrategy() == FbValueGenerationStrategy.None)
 			{
-				var pk = entityType.FindPrimaryKey();
-				if (pk == null)
-					continue;
-				var properties = pk.Properties;
-				if (properties.Count() != 1)
-					continue;
-				var property = properties[0];
-				if (property.GetValueGenerationStrategy() == FbValueGenerationStrategy.None)
-				{
-					property.SetValueGenerationStrategy(valueGenerationStrategy);
-				}
+				property.SetValueGenerationStrategy(valueGenerationStrategy);
 			}
 		}
 	}

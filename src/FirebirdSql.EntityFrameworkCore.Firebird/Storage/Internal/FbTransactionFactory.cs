@@ -21,18 +21,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+class FbTransactionFactory : IRelationalTransactionFactory
 {
-	class FbTransactionFactory : IRelationalTransactionFactory
+	public FbTransactionFactory(RelationalTransactionFactoryDependencies dependencies)
 	{
-		public FbTransactionFactory(RelationalTransactionFactoryDependencies dependencies)
-		{
-			Dependencies = dependencies;
-		}
-
-		protected virtual RelationalTransactionFactoryDependencies Dependencies { get; }
-
-		public RelationalTransaction Create(IRelationalConnection connection, DbTransaction transaction, Guid transactionId, IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger, bool transactionOwned)
-			=> new FbRelationalTransaction(connection, transaction, transactionId, logger, transactionOwned, Dependencies.SqlGenerationHelper);
+		Dependencies = dependencies;
 	}
+
+	protected virtual RelationalTransactionFactoryDependencies Dependencies { get; }
+
+	public RelationalTransaction Create(IRelationalConnection connection, DbTransaction transaction, Guid transactionId, IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger, bool transactionOwned)
+		=> new FbRelationalTransaction(connection, transaction, transactionId, logger, transactionOwned, Dependencies.SqlGenerationHelper);
 }

@@ -18,15 +18,14 @@
 using System;
 using System.ComponentModel;
 
-namespace FirebirdSql.Data.FirebirdClient
-{
-	public sealed class FbRemoteEventErrorEventArgs : EventArgs
-	{
-		public Exception Error { get; }
+namespace FirebirdSql.Data.FirebirdClient;
 
-		public FbRemoteEventErrorEventArgs(Exception error)
-		{
-			Error = error;
-		}
+public sealed class FbRemoteEventErrorEventArgs : EventArgs
+{
+	public Exception Error { get; }
+
+	public FbRemoteEventErrorEventArgs(Exception error)
+	{
+		Error = error;
 	}
 }

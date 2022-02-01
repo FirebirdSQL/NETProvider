@@ -23,39 +23,38 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringSubstringTranslator : IMethodCallTranslator
 {
-	public class FbStringSubstringTranslator : IMethodCallTranslator
+	static readonly MethodInfo SubstringOnlyStartMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int) });
+	static readonly MethodInfo SubstringStartAndLengthMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int), typeof(int) });
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringSubstringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo SubstringOnlyStartMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int) });
-		static readonly MethodInfo SubstringStartAndLengthMethod = typeof(string).GetRuntimeMethod(nameof(string.Substring), new[] { typeof(int), typeof(int) });
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!(method.Equals(SubstringOnlyStartMethod) || method.Equals(SubstringStartAndLengthMethod)))
+			return null;
 
-		public FbStringSubstringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!(method.Equals(SubstringOnlyStartMethod) || method.Equals(SubstringStartAndLengthMethod)))
-				return null;
-
-			var fromExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Add(arguments[0], _fbSqlExpressionFactory.Constant(1)));
-			var forExpression = arguments.Count == 2 ? _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]) : null;
-			var substringArguments = forExpression != null
-				? new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression, _fbSqlExpressionFactory.Fragment("FOR"), forExpression }
-				: new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression };
-			var nullability = forExpression != null
-				? new[] { true, false, true, false, true }
-				: new[] { true, false, true };
-			return _fbSqlExpressionFactory.SpacedFunction(
-				"SUBSTRING",
-				substringArguments,
-				true,
-				nullability,
-				typeof(string));
-		}
+		var fromExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Add(arguments[0], _fbSqlExpressionFactory.Constant(1)));
+		var forExpression = arguments.Count == 2 ? _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]) : null;
+		var substringArguments = forExpression != null
+			? new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression, _fbSqlExpressionFactory.Fragment("FOR"), forExpression }
+			: new[] { instance, _fbSqlExpressionFactory.Fragment("FROM"), fromExpression };
+		var nullability = forExpression != null
+			? new[] { true, false, true, false, true }
+			: new[] { true, false, true };
+		return _fbSqlExpressionFactory.SpacedFunction(
+			"SUBSTRING",
+			substringArguments,
+			true,
+			nullability,
+			typeof(string));
 	}
 }

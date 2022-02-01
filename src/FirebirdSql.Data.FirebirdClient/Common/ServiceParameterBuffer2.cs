@@ -17,40 +17,39 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal sealed class ServiceParameterBuffer2 : ServiceParameterBufferBase
 {
-	internal sealed class ServiceParameterBuffer2 : ServiceParameterBufferBase
+	public override void AppendPreamble()
 	{
-		public override void AppendPreamble()
-		{
-			Append(IscCodes.isc_spb_version);
-			Append(IscCodes.isc_spb_current_version);
-		}
+		Append(IscCodes.isc_spb_version);
+		Append(IscCodes.isc_spb_current_version);
+	}
 
-		public override void Append1(int type, byte[] value)
-		{
-			WriteByte(type);
-			WriteByte((byte)value.Length);
-			Write(value);
-		}
+	public override void Append1(int type, byte[] value)
+	{
+		WriteByte(type);
+		WriteByte((byte)value.Length);
+		Write(value);
+	}
 
-		public override void Append2(int type, byte[] value)
-		{
-			WriteByte(type);
-			Write((short)value.Length);
-			Write(value);
-		}
+	public override void Append2(int type, byte[] value)
+	{
+		WriteByte(type);
+		Write((short)value.Length);
+		Write(value);
+	}
 
-		public void Append(int type, byte value)
-		{
-			WriteByte(type);
-			WriteByte(value);
-		}
+	public void Append(int type, byte value)
+	{
+		WriteByte(type);
+		WriteByte(value);
+	}
 
-		public void Append(int type, int value)
-		{
-			WriteByte(type);
-			Write(value);
-		}
+	public void Append(int type, int value)
+	{
+		WriteByte(type);
+		Write(value);
 	}
 }

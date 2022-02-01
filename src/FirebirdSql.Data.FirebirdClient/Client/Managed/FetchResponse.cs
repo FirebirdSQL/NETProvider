@@ -18,17 +18,16 @@
 using System;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
-{
-	internal class FetchResponse : IResponse
-	{
-		public int Status { get; }
-		public int Count { get; }
+namespace FirebirdSql.Data.Client.Managed;
 
-		public FetchResponse(int status, int count)
-		{
-			Status = status;
-			Count = count;
-		}
+internal class FetchResponse : IResponse
+{
+	public int Status { get; }
+	public int Count { get; }
+
+	public FetchResponse(int status, int count)
+	{
+		Status = status;
+		Count = count;
 	}
 }

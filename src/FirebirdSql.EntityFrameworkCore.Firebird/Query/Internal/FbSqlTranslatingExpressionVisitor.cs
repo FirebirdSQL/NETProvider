@@ -19,25 +19,24 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
-{
-	public class FbSqlTranslatingExpressionVisitor : RelationalSqlTranslatingExpressionVisitor
-	{
-		public FbSqlTranslatingExpressionVisitor(RelationalSqlTranslatingExpressionVisitorDependencies dependencies, QueryCompilationContext queryCompilationContext, QueryableMethodTranslatingExpressionVisitor queryableMethodTranslatingExpressionVisitor)
-			: base(dependencies, queryCompilationContext, queryableMethodTranslatingExpressionVisitor)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 
-		protected override Expression VisitUnary(UnaryExpression unaryExpression)
+public class FbSqlTranslatingExpressionVisitor : RelationalSqlTranslatingExpressionVisitor
+{
+	public FbSqlTranslatingExpressionVisitor(RelationalSqlTranslatingExpressionVisitorDependencies dependencies, QueryCompilationContext queryCompilationContext, QueryableMethodTranslatingExpressionVisitor queryableMethodTranslatingExpressionVisitor)
+		: base(dependencies, queryCompilationContext, queryableMethodTranslatingExpressionVisitor)
+	{ }
+
+	protected override Expression VisitUnary(UnaryExpression unaryExpression)
+	{
+		if (unaryExpression.NodeType == ExpressionType.ArrayLength && unaryExpression.Operand.Type == typeof(byte[]))
 		{
-			if (unaryExpression.NodeType == ExpressionType.ArrayLength && unaryExpression.Operand.Type == typeof(byte[]))
+			if (!(base.Visit(unaryExpression.Operand) is SqlExpression sqlExpression))
 			{
-				if (!(base.Visit(unaryExpression.Operand) is SqlExpression sqlExpression))
-				{
-					return null;
-				}
-				return Dependencies.SqlExpressionFactory.Function("OCTET_LENGTH", new[] { sqlExpression }, true, new[] { true }, typeof(int));
+				return null;
 			}
-			return base.VisitUnary(unaryExpression);
+			return Dependencies.SqlExpressionFactory.Function("OCTET_LENGTH", new[] { sqlExpression }, true, new[] { true }, typeof(int));
 		}
+		return base.VisitUnary(unaryExpression);
 	}
 }

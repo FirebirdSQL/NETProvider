@@ -17,11 +17,10 @@
 
 using System.Collections.Generic;
 
-namespace EntityFramework.Firebird
+namespace EntityFramework.Firebird;
+
+public interface IFbMigrationSqlGeneratorBehavior
 {
-	public interface IFbMigrationSqlGeneratorBehavior
-	{
-		IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName);
-		IEnumerable<string> DropIdentityForColumn(string columnName, string tableName);
-	}
+	IEnumerable<string> CreateIdentityForColumn(string columnName, string tableName);
+	IEnumerable<string> DropIdentityForColumn(string columnName, string tableName);
 }

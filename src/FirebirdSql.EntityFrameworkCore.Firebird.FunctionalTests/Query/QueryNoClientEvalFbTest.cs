@@ -17,12 +17,11 @@
 
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class QueryNoClientEvalFbTest : QueryNoClientEvalTestBase<QueryNoClientEvalFbFixture>
 {
-	public class QueryNoClientEvalFbTest : QueryNoClientEvalTestBase<QueryNoClientEvalFbFixture>
-	{
-		public QueryNoClientEvalFbTest(QueryNoClientEvalFbFixture fixture)
-			: base(fixture)
-		{ }
-	}
+	public QueryNoClientEvalFbTest(QueryNoClientEvalFbFixture fixture)
+		: base(fixture)
+	{ }
 }

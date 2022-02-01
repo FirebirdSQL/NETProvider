@@ -23,102 +23,101 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
-	public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+	public NorthwindGroupByQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Select_uncorrelated_collection_with_groupby_works(bool async)
 	{
-		public NorthwindGroupByQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
+		return base.Select_uncorrelated_collection_with_groupby_works(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Select_uncorrelated_collection_with_groupby_works(bool async)
-		{
-			return base.Select_uncorrelated_collection_with_groupby_works(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Select_uncorrelated_collection_with_groupby_multiple_collections_work(bool async)
+	{
+		return base.Select_uncorrelated_collection_with_groupby_multiple_collections_work(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Select_uncorrelated_collection_with_groupby_multiple_collections_work(bool async)
-		{
-			return base.Select_uncorrelated_collection_with_groupby_multiple_collections_work(async);
-		}
+	[Theory(Skip = "efcore#19027")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task GroupBy_scalar_subquery(bool async)
+	{
+		return base.GroupBy_scalar_subquery(async);
+	}
 
-		[Theory(Skip = "efcore#19027")]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task GroupBy_scalar_subquery(bool async)
-		{
-			return base.GroupBy_scalar_subquery(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task AsEnumerable_in_subquery_for_GroupBy(bool async)
+	{
+		return base.AsEnumerable_in_subquery_for_GroupBy(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task AsEnumerable_in_subquery_for_GroupBy(bool async)
-		{
-			return base.AsEnumerable_in_subquery_for_GroupBy(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Complex_query_with_group_by_in_subquery5(bool async)
+	{
+		return base.Complex_query_with_group_by_in_subquery5(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_query_with_group_by_in_subquery5(bool async)
-		{
-			return base.Complex_query_with_group_by_in_subquery5(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Complex_query_with_groupBy_in_subquery1(bool async)
+	{
+		return base.Complex_query_with_groupBy_in_subquery1(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_query_with_groupBy_in_subquery1(bool async)
-		{
-			return base.Complex_query_with_groupBy_in_subquery1(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Complex_query_with_groupBy_in_subquery2(bool async)
+	{
+		return base.Complex_query_with_groupBy_in_subquery2(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_query_with_groupBy_in_subquery2(bool async)
-		{
-			return base.Complex_query_with_groupBy_in_subquery2(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Complex_query_with_groupBy_in_subquery3(bool async)
+	{
+		return base.Complex_query_with_groupBy_in_subquery3(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Complex_query_with_groupBy_in_subquery3(bool async)
-		{
-			return base.Complex_query_with_groupBy_in_subquery3(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Select_nested_collection_with_groupby(bool async)
+	{
+		return base.Select_nested_collection_with_groupby(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Select_nested_collection_with_groupby(bool async)
-		{
-			return base.Select_nested_collection_with_groupby(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Select_uncorrelated_collection_with_groupby_when_outer_is_distinct(bool async)
+	{
+		return base.Select_uncorrelated_collection_with_groupby_when_outer_is_distinct(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Select_uncorrelated_collection_with_groupby_when_outer_is_distinct(bool async)
-		{
-			return base.Select_uncorrelated_collection_with_groupby_when_outer_is_distinct(async);
-		}
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override async Task Complex_query_with_groupBy_in_subquery4(bool async)
+	{
+		var message = (await Assert.ThrowsAsync<InvalidOperationException>(
+			() => base.Complex_query_with_groupBy_in_subquery4(async))).Message;
 
-		[Theory]
-		[MemberData(nameof(IsAsyncData))]
-		public override async Task Complex_query_with_groupBy_in_subquery4(bool async)
-		{
-			var message = (await Assert.ThrowsAsync<InvalidOperationException>(
-				() => base.Complex_query_with_groupBy_in_subquery4(async))).Message;
+		Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
+	}
 
-			Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
-		}
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override async Task Select_correlated_collection_after_GroupBy_aggregate_when_identifier_changes_to_complex(bool async)
+	{
+		var message = (await Assert.ThrowsAsync<InvalidOperationException>(
+			() => base.Select_correlated_collection_after_GroupBy_aggregate_when_identifier_changes_to_complex(async))).Message;
 
-		[Theory]
-		[MemberData(nameof(IsAsyncData))]
-		public override async Task Select_correlated_collection_after_GroupBy_aggregate_when_identifier_changes_to_complex(bool async)
-		{
-			var message = (await Assert.ThrowsAsync<InvalidOperationException>(
-				() => base.Select_correlated_collection_after_GroupBy_aggregate_when_identifier_changes_to_complex(async))).Message;
-
-			Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
-		}
+		Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
 	}
 }

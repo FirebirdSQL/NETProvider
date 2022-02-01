@@ -23,27 +23,27 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
-{
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class FbDatabaseInfoTests : FbTestsBase
-	{
-		public FbDatabaseInfoTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+namespace FirebirdSql.Data.FirebirdClient.Tests;
 
-		[Test]
-		public void CompleteDatabaseInfoTest()
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class FbDatabaseInfoTests : FbTestsBase
+{
+	public FbDatabaseInfoTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public void CompleteDatabaseInfoTest()
+	{
+		var dbInfo = new FbDatabaseInfo(Connection);
+		foreach (var m in dbInfo.GetType()
+			.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+			.Where(x => !x.IsSpecialName)
+			.Where(x => x.Name.EndsWith("Async")))
 		{
-			var dbInfo = new FbDatabaseInfo(Connection);
-			foreach (var m in dbInfo.GetType()
-				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
-				.Where(x => !x.IsSpecialName)
-				.Where(x => x.Name.EndsWith("Async")))
-			{
-				if (ServerVersion < new Version(4, 0, 0, 0)
-					 && new[] {
+			if (ServerVersion < new Version(4, 0, 0, 0)
+				 && new[] {
 						nameof(FbDatabaseInfo.GetWireCryptAsync),
 						nameof(FbDatabaseInfo.GetCryptPluginAsync),
 						nameof(FbDatabaseInfo.GetNextAttachmentAsync),
@@ -55,11 +55,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 						nameof(FbDatabaseInfo.GetProtocolVersionAsync),
 						nameof(FbDatabaseInfo.GetStatementTimeoutDatabaseAsync),
 						nameof(FbDatabaseInfo.GetStatementTimeoutAttachmentAsync),
-					}.Contains(m.Name))
-					continue;
+				}.Contains(m.Name))
+				continue;
 
-				Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
-			}
+			Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
 		}
 	}
 }

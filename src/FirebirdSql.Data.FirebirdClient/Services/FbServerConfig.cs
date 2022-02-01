@@ -17,31 +17,30 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
-{
-	public class FbServerConfig
-	{
-		public int LockMemSize { get; internal set; }
-		public int LockSemCount { get; internal set; }
-		public int LockSignal { get; internal set; }
-		public int EventMemorySize { get; internal set; }
-		public int PrioritySwitchDelay { get; internal set; }
-		public int MinMemory { get; internal set; }
-		public int MaxMemory { get; internal set; }
-		public int LockGrantOrder { get; internal set; }
-		public int AnyLockMemory { get; internal set; }
-		public int AnyLockSemaphore { get; internal set; }
-		public int AnyLockSignal { get; internal set; }
-		public int AnyEventMemory { get; internal set; }
-		public int LockHashSlots { get; internal set; }
-		public int DeadlockTimeout { get; internal set; }
-		public int LockRequireSpins { get; internal set; }
-		public int ConnectionTimeout { get; internal set; }
-		public int DummyPacketInterval { get; internal set; }
-		public int IpcMapSize { get; internal set; }
-		public int DefaultDbCachePages { get; internal set; }
+namespace FirebirdSql.Data.Services;
 
-		internal FbServerConfig()
-		{ }
-	}
+public class FbServerConfig
+{
+	public int LockMemSize { get; internal set; }
+	public int LockSemCount { get; internal set; }
+	public int LockSignal { get; internal set; }
+	public int EventMemorySize { get; internal set; }
+	public int PrioritySwitchDelay { get; internal set; }
+	public int MinMemory { get; internal set; }
+	public int MaxMemory { get; internal set; }
+	public int LockGrantOrder { get; internal set; }
+	public int AnyLockMemory { get; internal set; }
+	public int AnyLockSemaphore { get; internal set; }
+	public int AnyLockSignal { get; internal set; }
+	public int AnyEventMemory { get; internal set; }
+	public int LockHashSlots { get; internal set; }
+	public int DeadlockTimeout { get; internal set; }
+	public int LockRequireSpins { get; internal set; }
+	public int ConnectionTimeout { get; internal set; }
+	public int DummyPacketInterval { get; internal set; }
+	public int IpcMapSize { get; internal set; }
+	public int DefaultDbCachePages { get; internal set; }
+
+	internal FbServerConfig()
+	{ }
 }

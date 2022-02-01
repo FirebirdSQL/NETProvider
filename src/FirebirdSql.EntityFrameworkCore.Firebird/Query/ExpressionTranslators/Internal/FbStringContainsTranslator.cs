@@ -23,42 +23,41 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringContainsTranslator : IMethodCallTranslator
 {
-	public class FbStringContainsTranslator : IMethodCallTranslator
+	static readonly MethodInfo MethodInfo = typeof(string).GetRuntimeMethod(nameof(string.Contains), new[] { typeof(string) });
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringContainsTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo MethodInfo = typeof(string).GetRuntimeMethod(nameof(string.Contains), new[] { typeof(string) });
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!method.Equals(MethodInfo))
+			return null;
 
-		public FbStringContainsTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!method.Equals(MethodInfo))
-				return null;
-
-			var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
-			var positionExpression = _fbSqlExpressionFactory.GreaterThan(
-				_fbSqlExpressionFactory.Function(
-					"POSITION",
-					new[] { patternExpression, instance },
-					true,
-					new[] { true, true },
-					typeof(int)),
-				_fbSqlExpressionFactory.Constant(0));
-			return patternExpression is SqlConstantExpression sqlConstantExpression
-				? ((string)sqlConstantExpression.Value)?.Length == 0
-					? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
-					: positionExpression
-				: _fbSqlExpressionFactory.OrElse(
-					positionExpression,
-					_fbSqlExpressionFactory.Equal(
-						patternExpression,
-						_fbSqlExpressionFactory.Constant(string.Empty)));
-		}
+		var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
+		var positionExpression = _fbSqlExpressionFactory.GreaterThan(
+			_fbSqlExpressionFactory.Function(
+				"POSITION",
+				new[] { patternExpression, instance },
+				true,
+				new[] { true, true },
+				typeof(int)),
+			_fbSqlExpressionFactory.Constant(0));
+		return patternExpression is SqlConstantExpression sqlConstantExpression
+			? ((string)sqlConstantExpression.Value)?.Length == 0
+				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
+				: positionExpression
+			: _fbSqlExpressionFactory.OrElse(
+				positionExpression,
+				_fbSqlExpressionFactory.Equal(
+					patternExpression,
+					_fbSqlExpressionFactory.Constant(string.Empty)));
 	}
 }

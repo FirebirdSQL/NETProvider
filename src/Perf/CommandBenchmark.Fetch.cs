@@ -18,25 +18,25 @@
 using BenchmarkDotNet.Attributes;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace Perf
+namespace Perf;
+
+partial class CommandBenchmark
 {
-	partial class CommandBenchmark
+	[GlobalSetup(Target = nameof(Fetch))]
+	public void FetchGlobalSetup()
 	{
-		[GlobalSetup(Target = nameof(Fetch))]
-		public void FetchGlobalSetup()
+		GlobalSetupBase();
+		using (var conn = new FbConnection(ConnectionString))
 		{
-			GlobalSetupBase();
-			using (var conn = new FbConnection(ConnectionString))
+			conn.Open();
+			using (var cmd = conn.CreateCommand())
 			{
-				conn.Open();
-				using (var cmd = conn.CreateCommand())
-				{
-					cmd.CommandText = $"create table foobar (x {DataType})";
-					cmd.ExecuteNonQuery();
-				}
-				using (var cmd = conn.CreateCommand())
-				{
-					cmd.CommandText = $@"execute block as
+				cmd.CommandText = $"create table foobar (x {DataType})";
+				cmd.ExecuteNonQuery();
+			}
+			using (var cmd = conn.CreateCommand())
+			{
+				cmd.CommandText = $@"execute block as
 declare cnt int;
 begin
 	cnt = {Count};
@@ -46,26 +46,25 @@ begin
 		cnt = cnt - 1;
 	end
 end";
-					cmd.ExecuteNonQuery();
-				}
+				cmd.ExecuteNonQuery();
 			}
 		}
+	}
 
-		[Benchmark]
-		public void Fetch()
+	[Benchmark]
+	public void Fetch()
+	{
+		using (var conn = new FbConnection(ConnectionString))
 		{
-			using (var conn = new FbConnection(ConnectionString))
+			conn.Open();
+			using (var cmd = conn.CreateCommand())
 			{
-				conn.Open();
-				using (var cmd = conn.CreateCommand())
+				cmd.CommandText = "select x from foobar";
+				using (var reader = cmd.ExecuteReader())
 				{
-					cmd.CommandText = "select x from foobar";
-					using (var reader = cmd.ExecuteReader())
+					while (reader.Read())
 					{
-						while (reader.Read())
-						{
-							var dummy = reader[0];
-						}
+						var dummy = reader[0];
 					}
 				}
 			}

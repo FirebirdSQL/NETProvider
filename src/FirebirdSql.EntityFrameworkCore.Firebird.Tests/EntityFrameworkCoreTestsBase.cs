@@ -20,18 +20,17 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
-{
-	public abstract class EntityFrameworkCoreTestsBase : FbTestsBase
-	{
-		public EntityFrameworkCoreTestsBase()
-			: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests;
 
-		public async Task<TContext> GetDbContext<TContext>() where TContext : FbTestDbContext
-		{
-			await Connection.CloseAsync();
-			return (TContext)Activator.CreateInstance(typeof(TContext), Connection.ConnectionString);
-		}
+public abstract class EntityFrameworkCoreTestsBase : FbTestsBase
+{
+	public EntityFrameworkCoreTestsBase()
+		: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
+	{ }
+
+	public async Task<TContext> GetDbContext<TContext>() where TContext : FbTestDbContext
+	{
+		await Connection.CloseAsync();
+		return (TContext)Activator.CreateInstance(typeof(TContext), Connection.ConnectionString);
 	}
 }

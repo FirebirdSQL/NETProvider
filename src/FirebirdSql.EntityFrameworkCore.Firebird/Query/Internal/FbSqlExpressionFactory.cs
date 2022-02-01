@@ -22,24 +22,23 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+
+public class FbSqlExpressionFactory : SqlExpressionFactory
 {
-	public class FbSqlExpressionFactory : SqlExpressionFactory
-	{
-		public FbSqlExpressionFactory(SqlExpressionFactoryDependencies dependencies)
-			: base(dependencies)
-		{ }
+	public FbSqlExpressionFactory(SqlExpressionFactoryDependencies dependencies)
+		: base(dependencies)
+	{ }
 
-		public FbSpacedFunctionExpression SpacedFunction(string name, IEnumerable<SqlExpression> arguments, bool nullable, IEnumerable<bool> argumentsPropagateNullability, Type type, RelationalTypeMapping typeMapping = null)
-			=> (FbSpacedFunctionExpression)ApplyDefaultTypeMapping(new FbSpacedFunctionExpression(name, arguments, nullable, argumentsPropagateNullability, type, typeMapping));
+	public FbSpacedFunctionExpression SpacedFunction(string name, IEnumerable<SqlExpression> arguments, bool nullable, IEnumerable<bool> argumentsPropagateNullability, Type type, RelationalTypeMapping typeMapping = null)
+		=> (FbSpacedFunctionExpression)ApplyDefaultTypeMapping(new FbSpacedFunctionExpression(name, arguments, nullable, argumentsPropagateNullability, type, typeMapping));
 
-		public override SqlExpression ApplyTypeMapping(SqlExpression sqlExpression, RelationalTypeMapping typeMapping)
-			=> sqlExpression == null || sqlExpression.TypeMapping != null
-				? sqlExpression
-				: sqlExpression switch
-				{
-					FbSpacedFunctionExpression e => e.ApplyTypeMapping(typeMapping),
-					_ => base.ApplyTypeMapping(sqlExpression, typeMapping)
-				};
-	}
+	public override SqlExpression ApplyTypeMapping(SqlExpression sqlExpression, RelationalTypeMapping typeMapping)
+		=> sqlExpression == null || sqlExpression.TypeMapping != null
+			? sqlExpression
+			: sqlExpression switch
+			{
+				FbSpacedFunctionExpression e => e.ApplyTypeMapping(typeMapping),
+				_ => base.ApplyTypeMapping(sqlExpression, typeMapping)
+			};
 }

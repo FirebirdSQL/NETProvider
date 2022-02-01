@@ -19,21 +19,20 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestModels.Northwind
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestModels.Northwind;
+
+public class NorthwindFbContext : NorthwindRelationalContext
 {
-	public class NorthwindFbContext : NorthwindRelationalContext
+	public NorthwindFbContext(DbContextOptions options)
+		: base(options)
+	{ }
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		public NorthwindFbContext(DbContextOptions options)
-			: base(options)
-		{ }
+		base.OnModelCreating(modelBuilder);
+		ModelHelpers.SetStringLengths(modelBuilder);
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-			base.OnModelCreating(modelBuilder);
-			ModelHelpers.SetStringLengths(modelBuilder);
-
-			modelBuilder.Entity<CustomerQuery>().ToSqlQuery(
-				@"SELECT ""c"".""CustomerID"", ""c"".""Address"", ""c"".""City"", ""c"".""CompanyName"", ""c"".""ContactName"", ""c"".""ContactTitle"", ""c"".""Country"", ""c"".""Fax"", ""c"".""Phone"", ""c"".""PostalCode"", ""c"".""Region"" FROM ""Customers"" AS ""c""");
-		}
+		modelBuilder.Entity<CustomerQuery>().ToSqlQuery(
+			@"SELECT ""c"".""CustomerID"", ""c"".""Address"", ""c"".""City"", ""c"".""CompanyName"", ""c"".""ContactName"", ""c"".""ContactTitle"", ""c"".""Country"", ""c"".""Fax"", ""c"".""Phone"", ""c"".""PostalCode"", ""c"".""Region"" FROM ""Customers"" AS ""c""");
 	}
 }

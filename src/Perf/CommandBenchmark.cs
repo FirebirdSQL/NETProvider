@@ -23,44 +23,43 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace Perf
+namespace Perf;
+
+[Config(typeof(Config))]
+public partial class CommandBenchmark
 {
-	[Config(typeof(Config))]
-	public partial class CommandBenchmark
+	class Config : ManualConfig
 	{
-		class Config : ManualConfig
+		public Config()
 		{
-			public Config()
-			{
-				var baseJob = Job.Default
-					.WithWarmupCount(3)
-					.WithToolchain(CsProjCoreToolchain.NetCoreApp50)
-					.WithPlatform(Platform.X64)
-					.WithJit(Jit.RyuJit);
-				AddDiagnoser(MemoryDiagnoser.Default);
-				AddJob(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
-				AddJob(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet").AsBaseline());
-			}
+			var baseJob = Job.Default
+				.WithWarmupCount(3)
+				.WithToolchain(CsProjCoreToolchain.NetCoreApp50)
+				.WithPlatform(Platform.X64)
+				.WithJit(Jit.RyuJit);
+			AddDiagnoser(MemoryDiagnoser.Default);
+			AddJob(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
+			AddJob(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet").AsBaseline());
 		}
+	}
 
-		protected const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
+	protected const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
 
-		[Params("bigint", "varchar(10) character set utf8")]
-		public string DataType { get; set; }
+	[Params("bigint", "varchar(10) character set utf8")]
+	public string DataType { get; set; }
 
-		[Params(100)]
-		public int Count { get; set; }
+	[Params(100)]
+	public int Count { get; set; }
 
-		void GlobalSetupBase()
-		{
-			FbConnection.CreateDatabase(ConnectionString, 16 * 1024, false, true);
-		}
+	void GlobalSetupBase()
+	{
+		FbConnection.CreateDatabase(ConnectionString, 16 * 1024, false, true);
+	}
 
-		[GlobalCleanup]
-		public void GlobalCleanup()
-		{
-			FbConnection.ClearAllPools();
-			FbConnection.DropDatabase(ConnectionString);
-		}
+	[GlobalCleanup]
+	public void GlobalCleanup()
+	{
+		FbConnection.ClearAllPools();
+		FbConnection.DropDatabase(ConnectionString);
 	}
 }

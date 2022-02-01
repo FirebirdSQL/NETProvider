@@ -17,12 +17,11 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal enum TransactionState
 {
-	internal enum TransactionState
-	{
-		NoTransaction,
-		Active,
-		Prepared
-	}
+	NoTransaction,
+	Active,
+	Prepared
 }

@@ -17,24 +17,23 @@
 
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbDateOnlyTypeMapping : DateOnlyTypeMapping
 {
-	public class FbDateOnlyTypeMapping : DateOnlyTypeMapping
+	public FbDateOnlyTypeMapping(string storeType)
+		: base(storeType)
+	{ }
+
+	protected FbDateOnlyTypeMapping(RelationalTypeMappingParameters parameters)
+		: base(parameters)
+	{ }
+
+	protected override string GenerateNonNullSqlLiteral(object value)
 	{
-		public FbDateOnlyTypeMapping(string storeType)
-			: base(storeType)
-		{ }
-
-		protected FbDateOnlyTypeMapping(RelationalTypeMappingParameters parameters)
-			: base(parameters)
-		{ }
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbDateOnlyTypeMapping(parameters);
+		return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
 	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbDateOnlyTypeMapping(parameters);
 }

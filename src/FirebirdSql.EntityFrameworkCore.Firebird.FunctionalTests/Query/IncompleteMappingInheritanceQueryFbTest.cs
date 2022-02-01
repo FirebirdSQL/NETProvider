@@ -18,12 +18,11 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class IncompleteMappingInheritanceQueryFbTest : InheritanceRelationalQueryTestBase<IncompleteMappingInheritanceQueryFbFixture>
 {
-	public class IncompleteMappingInheritanceQueryFbTest : InheritanceRelationalQueryTestBase<IncompleteMappingInheritanceQueryFbFixture>
-	{
-		public IncompleteMappingInheritanceQueryFbTest(IncompleteMappingInheritanceQueryFbFixture fixture)
-			: base(fixture)
-		{ }
-	}
+	public IncompleteMappingInheritanceQueryFbTest(IncompleteMappingInheritanceQueryFbFixture fixture)
+		: base(fixture)
+	{ }
 }

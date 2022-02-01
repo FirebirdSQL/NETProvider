@@ -17,80 +17,79 @@
 
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+
+public class HasDataInTheSameTransactionAsDDLFactAttribute : FactAttribute
 {
-	public class HasDataInTheSameTransactionAsDDLFactAttribute : FactAttribute
+	public HasDataInTheSameTransactionAsDDLFactAttribute()
 	{
-		public HasDataInTheSameTransactionAsDDLFactAttribute()
-		{
-			Skip = "HasData is called in the same transaction as DDL commands.";
-		}
+		Skip = "HasData is called in the same transaction as DDL commands.";
 	}
-	public class HasDataInTheSameTransactionAsDDLTheoryAttribute : TheoryAttribute
+}
+public class HasDataInTheSameTransactionAsDDLTheoryAttribute : TheoryAttribute
+{
+	public HasDataInTheSameTransactionAsDDLTheoryAttribute()
 	{
-		public HasDataInTheSameTransactionAsDDLTheoryAttribute()
-		{
-			Skip = "HasData is called in the same transaction as DDL commands.";
-		}
+		Skip = "HasData is called in the same transaction as DDL commands.";
 	}
+}
 
-	public class GeneratedNameTooLongFactAttribute : FactAttribute
+public class GeneratedNameTooLongFactAttribute : FactAttribute
+{
+	public GeneratedNameTooLongFactAttribute()
 	{
-		public GeneratedNameTooLongFactAttribute()
-		{
-			Skip = "Generated name in the query is too long.";
-		}
+		Skip = "Generated name in the query is too long.";
 	}
-	public class GeneratedNameTooLongTheoryAttribute : TheoryAttribute
+}
+public class GeneratedNameTooLongTheoryAttribute : TheoryAttribute
+{
+	public GeneratedNameTooLongTheoryAttribute()
 	{
-		public GeneratedNameTooLongTheoryAttribute()
-		{
-			Skip = "Generated name in the query is too long.";
-		}
+		Skip = "Generated name in the query is too long.";
 	}
+}
 
-	public class NotSupportedOnFirebirdFactAttribute : FactAttribute
+public class NotSupportedOnFirebirdFactAttribute : FactAttribute
+{
+	public NotSupportedOnFirebirdFactAttribute()
 	{
-		public NotSupportedOnFirebirdFactAttribute()
-		{
-			Skip = "Not supported on Firebird.";
-		}
+		Skip = "Not supported on Firebird.";
 	}
-	public class NotSupportedOnFirebirdTheoryAttribute : TheoryAttribute
+}
+public class NotSupportedOnFirebirdTheoryAttribute : TheoryAttribute
+{
+	public NotSupportedOnFirebirdTheoryAttribute()
 	{
-		public NotSupportedOnFirebirdTheoryAttribute()
-		{
-			Skip = "Not supported on Firebird.";
-		}
+		Skip = "Not supported on Firebird.";
 	}
+}
 
-	public class DoesNotHaveTheDataFactAttribute : FactAttribute
+public class DoesNotHaveTheDataFactAttribute : FactAttribute
+{
+	public DoesNotHaveTheDataFactAttribute()
 	{
-		public DoesNotHaveTheDataFactAttribute()
-		{
-			Skip = "Does not have the data.";
-		}
+		Skip = "Does not have the data.";
 	}
-	public class DoesNotHaveTheDataTheoryAttribute : TheoryAttribute
+}
+public class DoesNotHaveTheDataTheoryAttribute : TheoryAttribute
+{
+	public DoesNotHaveTheDataTheoryAttribute()
 	{
-		public DoesNotHaveTheDataTheoryAttribute()
-		{
-			Skip = "Does not have the data.";
-		}
+		Skip = "Does not have the data.";
 	}
+}
 
-	public class LongExecutionFactAttribute : FactAttribute
+public class LongExecutionFactAttribute : FactAttribute
+{
+	public LongExecutionFactAttribute()
 	{
-		public LongExecutionFactAttribute()
-		{
-			Skip = "Long execution.";
-		}
+		Skip = "Long execution.";
 	}
-	public class LongExecutionTheoryAttribute : TheoryAttribute
+}
+public class LongExecutionTheoryAttribute : TheoryAttribute
+{
+	public LongExecutionTheoryAttribute()
 	{
-		public LongExecutionTheoryAttribute()
-		{
-			Skip = "Long execution.";
-		}
+		Skip = "Long execution.";
 	}
 }

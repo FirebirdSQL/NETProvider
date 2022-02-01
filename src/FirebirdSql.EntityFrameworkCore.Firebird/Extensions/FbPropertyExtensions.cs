@@ -20,134 +20,133 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Microsoft.EntityFrameworkCore
+namespace Microsoft.EntityFrameworkCore;
+
+public static class FbPropertyExtensions
 {
-	public static class FbPropertyExtensions
+	public static FbValueGenerationStrategy GetValueGenerationStrategy(this IProperty property)
 	{
-		public static FbValueGenerationStrategy GetValueGenerationStrategy(this IProperty property)
+		var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
+		if (annotation != null)
 		{
-			var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
-			if (annotation != null)
-			{
-				return (FbValueGenerationStrategy)annotation;
-			}
+			return (FbValueGenerationStrategy)annotation;
+		}
 
-			if (property.ValueGenerated != ValueGenerated.OnAdd
-				|| property.GetDefaultValue() != null
-				|| property.GetDefaultValueSql() != null
-				|| property.GetComputedColumnSql() != null)
-			{
-				return FbValueGenerationStrategy.None;
-			}
-
-			var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
-
-			if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
-			{
-				return FbValueGenerationStrategy.SequenceTrigger;
-			}
-			if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
-			{
-				return FbValueGenerationStrategy.IdentityColumn;
-			}
-
+		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.GetDefaultValue() != null
+			|| property.GetDefaultValueSql() != null
+			|| property.GetComputedColumnSql() != null)
+		{
 			return FbValueGenerationStrategy.None;
 		}
 
-		public static FbValueGenerationStrategy GetValueGenerationStrategy(this IMutableProperty property)
+		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+
+		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
 		{
-			var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
-			if (annotation != null)
-			{
-				return (FbValueGenerationStrategy)annotation;
-			}
-
-			if (property.ValueGenerated != ValueGenerated.OnAdd
-				|| property.GetDefaultValue() != null
-				|| property.GetDefaultValueSql() != null
-				|| property.GetComputedColumnSql() != null)
-			{
-				return FbValueGenerationStrategy.None;
-			}
-
-			var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
-
-			if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
-			{
-				return FbValueGenerationStrategy.SequenceTrigger;
-			}
-			if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
-			{
-				return FbValueGenerationStrategy.IdentityColumn;
-			}
-
-			return FbValueGenerationStrategy.None;
+			return FbValueGenerationStrategy.SequenceTrigger;
+		}
+		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
+		{
+			return FbValueGenerationStrategy.IdentityColumn;
 		}
 
-		public static FbValueGenerationStrategy GetValueGenerationStrategy(this IConventionProperty property)
-		{
-			var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
-			if (annotation != null)
-			{
-				return (FbValueGenerationStrategy)annotation;
-			}
-
-			if (property.ValueGenerated != ValueGenerated.OnAdd
-				|| property.GetDefaultValue() != null
-				|| property.GetDefaultValueSql() != null
-				|| property.GetComputedColumnSql() != null)
-			{
-				return FbValueGenerationStrategy.None;
-			}
-
-			var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
-
-			if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
-			{
-				return FbValueGenerationStrategy.SequenceTrigger;
-			}
-			if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
-			{
-				return FbValueGenerationStrategy.IdentityColumn;
-			}
-
-			return FbValueGenerationStrategy.None;
-		}
-
-		public static ConfigurationSource? GetValueGenerationStrategyConfigurationSource(this IConventionProperty property)
-			=> property.FindAnnotation(FbAnnotationNames.ValueGenerationStrategy)?.GetConfigurationSource();
-
-		public static void SetValueGenerationStrategy(this IMutableProperty property, FbValueGenerationStrategy? value)
-		{
-			CheckValueGenerationStrategy(property, value);
-			property.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value);
-		}
-
-		public static void SetValueGenerationStrategy(this IConventionProperty property, FbValueGenerationStrategy? value, bool fromDataAnnotation = false)
-		{
-			CheckValueGenerationStrategy(property, value);
-			property.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value, fromDataAnnotation);
-		}
-
-		static void CheckValueGenerationStrategy(IReadOnlyPropertyBase property, FbValueGenerationStrategy? value)
-		{
-			if (value != null)
-			{
-				if (value == FbValueGenerationStrategy.IdentityColumn && !IsCompatibleIdentityColumn(property))
-				{
-					throw new ArgumentException($"Incompatible data type for {nameof(FbValueGenerationStrategy.IdentityColumn)} for '{property.Name}'.");
-				}
-				if (value == FbValueGenerationStrategy.SequenceTrigger && !IsCompatibleSequenceTrigger(property))
-				{
-					throw new ArgumentException($"Incompatible data type for {nameof(FbValueGenerationStrategy.SequenceTrigger)} for '{property.Name}'.");
-				}
-			}
-		}
-
-		static bool IsCompatibleIdentityColumn(IReadOnlyPropertyBase property)
-			=> property.ClrType.IsInteger() || property.ClrType == typeof(decimal);
-
-		static bool IsCompatibleSequenceTrigger(IReadOnlyPropertyBase property)
-			=> true;
+		return FbValueGenerationStrategy.None;
 	}
+
+	public static FbValueGenerationStrategy GetValueGenerationStrategy(this IMutableProperty property)
+	{
+		var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
+		if (annotation != null)
+		{
+			return (FbValueGenerationStrategy)annotation;
+		}
+
+		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.GetDefaultValue() != null
+			|| property.GetDefaultValueSql() != null
+			|| property.GetComputedColumnSql() != null)
+		{
+			return FbValueGenerationStrategy.None;
+		}
+
+		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+
+		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
+		{
+			return FbValueGenerationStrategy.SequenceTrigger;
+		}
+		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
+		{
+			return FbValueGenerationStrategy.IdentityColumn;
+		}
+
+		return FbValueGenerationStrategy.None;
+	}
+
+	public static FbValueGenerationStrategy GetValueGenerationStrategy(this IConventionProperty property)
+	{
+		var annotation = property[FbAnnotationNames.ValueGenerationStrategy];
+		if (annotation != null)
+		{
+			return (FbValueGenerationStrategy)annotation;
+		}
+
+		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.GetDefaultValue() != null
+			|| property.GetDefaultValueSql() != null
+			|| property.GetComputedColumnSql() != null)
+		{
+			return FbValueGenerationStrategy.None;
+		}
+
+		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+
+		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
+		{
+			return FbValueGenerationStrategy.SequenceTrigger;
+		}
+		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn && IsCompatibleIdentityColumn(property))
+		{
+			return FbValueGenerationStrategy.IdentityColumn;
+		}
+
+		return FbValueGenerationStrategy.None;
+	}
+
+	public static ConfigurationSource? GetValueGenerationStrategyConfigurationSource(this IConventionProperty property)
+		=> property.FindAnnotation(FbAnnotationNames.ValueGenerationStrategy)?.GetConfigurationSource();
+
+	public static void SetValueGenerationStrategy(this IMutableProperty property, FbValueGenerationStrategy? value)
+	{
+		CheckValueGenerationStrategy(property, value);
+		property.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value);
+	}
+
+	public static void SetValueGenerationStrategy(this IConventionProperty property, FbValueGenerationStrategy? value, bool fromDataAnnotation = false)
+	{
+		CheckValueGenerationStrategy(property, value);
+		property.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value, fromDataAnnotation);
+	}
+
+	static void CheckValueGenerationStrategy(IReadOnlyPropertyBase property, FbValueGenerationStrategy? value)
+	{
+		if (value != null)
+		{
+			if (value == FbValueGenerationStrategy.IdentityColumn && !IsCompatibleIdentityColumn(property))
+			{
+				throw new ArgumentException($"Incompatible data type for {nameof(FbValueGenerationStrategy.IdentityColumn)} for '{property.Name}'.");
+			}
+			if (value == FbValueGenerationStrategy.SequenceTrigger && !IsCompatibleSequenceTrigger(property))
+			{
+				throw new ArgumentException($"Incompatible data type for {nameof(FbValueGenerationStrategy.SequenceTrigger)} for '{property.Name}'.");
+			}
+		}
+	}
+
+	static bool IsCompatibleIdentityColumn(IReadOnlyPropertyBase property)
+		=> property.ClrType.IsInteger() || property.ClrType == typeof(decimal);
+
+	static bool IsCompatibleSequenceTrigger(IReadOnlyPropertyBase property)
+		=> true;
 }

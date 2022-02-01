@@ -17,51 +17,50 @@
 
 using System.Diagnostics;
 
-namespace EntityFramework.Firebird.SqlGen
+namespace EntityFramework.Firebird.SqlGen;
+
+internal class SymbolPair : ISqlFragment
 {
-	internal class SymbolPair : ISqlFragment
+	#region Fields
+
+	private Symbol _source;
+	private Symbol _column;
+
+	#endregion
+
+	#region Properties
+
+	public Symbol Source
 	{
-		#region Fields
-
-		private Symbol _source;
-		private Symbol _column;
-
-		#endregion
-
-		#region Properties
-
-		public Symbol Source
-		{
-			get { return _source; }
-			set { _source = value; }
-		}
-
-		public Symbol Column
-		{
-			get { return _column; }
-			set { _column = value; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public SymbolPair(Symbol source, Symbol column)
-		{
-			Source = source;
-			Column = column;
-		}
-
-		#endregion
-
-		#region ISqlFragment Members
-
-		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-		{
-			// Symbol pair should never be part of a SqlBuilder.
-			Debug.Assert(false);
-		}
-
-		#endregion
+		get { return _source; }
+		set { _source = value; }
 	}
+
+	public Symbol Column
+	{
+		get { return _column; }
+		set { _column = value; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	public SymbolPair(Symbol source, Symbol column)
+	{
+		Source = source;
+		Column = column;
+	}
+
+	#endregion
+
+	#region ISqlFragment Members
+
+	public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+	{
+		// Symbol pair should never be part of a SqlBuilder.
+		Debug.Assert(false);
+	}
+
+	#endregion
 }

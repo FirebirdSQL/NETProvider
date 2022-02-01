@@ -24,16 +24,15 @@ using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal;
+
+public class FbDesignTimeServices : IDesignTimeServices
 {
-	public class FbDesignTimeServices : IDesignTimeServices
-	{
-		public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
-			=> serviceCollection
-				.AddSingleton<LoggingDefinitions, FbLoggingDefinitions>()
-				.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
-				.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
-				.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
-				.AddSingleton<IAnnotationCodeGenerator, AnnotationCodeGenerator>();
-	}
+	public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
+		=> serviceCollection
+			.AddSingleton<LoggingDefinitions, FbLoggingDefinitions>()
+			.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
+			.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
+			.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
+			.AddSingleton<IAnnotationCodeGenerator, AnnotationCodeGenerator>();
 }

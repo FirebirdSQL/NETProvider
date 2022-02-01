@@ -17,11 +17,10 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal sealed class BlobParameterBuffer : ParameterBuffer
 {
-	internal sealed class BlobParameterBuffer : ParameterBuffer
-	{
-		public BlobParameterBuffer()
-		{ }
-	}
+	public BlobParameterBuffer()
+	{ }
 }

@@ -20,19 +20,19 @@ using System.Data;
 using System.Globalization;
 using System.Text;
 
-namespace FirebirdSql.Data.Schema
+namespace FirebirdSql.Data.Schema;
+
+internal class FbForeignKeyColumns : FbSchema
 {
-	internal class FbForeignKeyColumns : FbSchema
+	#region Protected Methods
+
+	protected override StringBuilder GetCommandText(string[] restrictions)
 	{
-		#region Protected Methods
+		var sql = new StringBuilder();
+		var where = new StringBuilder();
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			var sql = new StringBuilder();
-			var where = new StringBuilder();
-
-			sql.Append(
-				@"SELECT
+		sql.Append(
+			@"SELECT
 					null AS CONSTRAINT_CATALOG,
 					null AS CONSTRAINT_SCHEMA,
 					co.rdb$constraint_name AS CONSTRAINT_NAME,
@@ -52,51 +52,50 @@ namespace FirebirdSql.Data.Schema
 					INNER JOIN rdb$indices refidx ON refidx.rdb$index_name = tempidx.rdb$foreign_key
 					INNER JOIN rdb$index_segments refidxseg ON refidxseg.rdb$index_name = refidx.rdb$index_name AND refidxseg.rdb$field_position = coidxseg.rdb$field_position");
 
-			where.Append("co.rdb$constraint_type = 'FOREIGN KEY'");
+		where.Append("co.rdb$constraint_type = 'FOREIGN KEY'");
 
-			if (restrictions != null)
+		if (restrictions != null)
+		{
+			var index = 0;
+
+			/* TABLE_CATALOG	*/
+			if (restrictions.Length >= 1 && restrictions[0] != null)
 			{
-				var index = 0;
-
-				/* TABLE_CATALOG	*/
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
-
-				/* TABLE_SCHEMA */
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
-
-				/* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(" AND co.rdb$relation_name = @p{0}", index++);
-				}
-
-				/* CONSTRAINT_NAME */
-				if (restrictions.Length >= 4 && restrictions[3] != null)
-				{
-					where.AppendFormat(" AND co.rdb$constraint_name = @p{0}", index++);
-				}
-
-				/* COLUMN_NAME */
-				if (restrictions.Length >= 5 && restrictions[4] != null)
-				{
-					where.AppendFormat(" AND coidxseg.rdb$field_name = @p{0}", index++);
-				}
 			}
 
-			if (where.Length > 0)
+			/* TABLE_SCHEMA */
+			if (restrictions.Length >= 2 && restrictions[1] != null)
 			{
-				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION");
+			/* TABLE_NAME */
+			if (restrictions.Length >= 3 && restrictions[2] != null)
+			{
+				where.AppendFormat(" AND co.rdb$relation_name = @p{0}", index++);
+			}
 
-			return sql;
+			/* CONSTRAINT_NAME */
+			if (restrictions.Length >= 4 && restrictions[3] != null)
+			{
+				where.AppendFormat(" AND co.rdb$constraint_name = @p{0}", index++);
+			}
+
+			/* COLUMN_NAME */
+			if (restrictions.Length >= 5 && restrictions[4] != null)
+			{
+				where.AppendFormat(" AND coidxseg.rdb$field_name = @p{0}", index++);
+			}
 		}
 
-		#endregion
+		if (where.Length > 0)
+		{
+			sql.AppendFormat(" WHERE {0} ", where.ToString());
+		}
+
+		sql.Append(" ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION");
+
+		return sql;
 	}
+
+	#endregion
 }

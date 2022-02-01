@@ -21,24 +21,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.NullSemanticsModel;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class NullSemanticsQueryFbTest : NullSemanticsQueryTestBase<NullSemanticsQueryFbFixture>
-	{
-		public NullSemanticsQueryFbTest(NullSemanticsQueryFbFixture fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		protected override NullSemanticsContext CreateContext(bool useRelationalNulls = false)
+public class NullSemanticsQueryFbTest : NullSemanticsQueryTestBase<NullSemanticsQueryFbFixture>
+{
+	public NullSemanticsQueryFbTest(NullSemanticsQueryFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	protected override NullSemanticsContext CreateContext(bool useRelationalNulls = false)
+	{
+		var options = new DbContextOptionsBuilder(Fixture.CreateOptions());
+		if (useRelationalNulls)
 		{
-			var options = new DbContextOptionsBuilder(Fixture.CreateOptions());
-			if (useRelationalNulls)
-			{
-				new FbDbContextOptionsBuilder(options).UseRelationalNulls();
-			}
-			var context = new NullSemanticsContext(options.Options);
-			context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-			return context;
+			new FbDbContextOptionsBuilder(options).UseRelationalNulls();
 		}
+		var context = new NullSemanticsContext(options.Options);
+		context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+		return context;
 	}
 }

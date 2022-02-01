@@ -21,61 +21,60 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public sealed class FbStatistical : FbService
 {
-	public sealed class FbStatistical : FbService
+	public FbStatisticalFlags Options { get; set; }
+
+	public FbStatistical(string connectionString = null)
+		: base(connectionString)
+	{ }
+
+	public void Execute()
 	{
-		public FbStatisticalFlags Options { get; set; }
+		EnsureDatabase();
 
-		public FbStatistical(string connectionString = null)
-			: base(connectionString)
-		{ }
-
-		public void Execute()
+		try
 		{
-			EnsureDatabase();
-
-			try
-			{
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_db_stats);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				StartTask(startSpb);
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_db_stats);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			StartTask(startSpb);
+			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 		}
-		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			EnsureDatabase();
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
+	}
+	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureDatabase();
 
-			try
-			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_db_stats);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_db_stats);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

@@ -23,19 +23,19 @@ using System.Text;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Schema
+namespace FirebirdSql.Data.Schema;
+
+internal class FbProcedureParameters : FbSchema
 {
-	internal class FbProcedureParameters : FbSchema
+	#region Protected Methods
+
+	protected override StringBuilder GetCommandText(string[] restrictions)
 	{
-		#region Protected Methods
+		var sql = new StringBuilder();
+		var where = new StringBuilder();
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			var sql = new StringBuilder();
-			var where = new StringBuilder();
-
-			sql.AppendFormat(
-				@"SELECT
+		sql.AppendFormat(
+			@"SELECT
 					null AS PROCEDURE_CATALOG,
 					null AS PROCEDURE_SCHEMA,
 					pp.rdb$procedure_name AS PROCEDURE_NAME,
@@ -65,125 +65,124 @@ namespace FirebirdSql.Data.Schema
 					LEFT JOIN rdb$fields fld ON pp.rdb$field_source = fld.rdb$field_name
 					LEFT JOIN rdb$character_sets cs ON cs.rdb$character_set_id = fld.rdb$character_set_id
 					LEFT JOIN rdb$collations coll ON (coll.rdb$collation_id = fld.rdb$collation_id AND coll.rdb$character_set_id = fld.rdb$character_set_id)",
-				MajorVersionNumber >= 3 ? "pp.rdb$package_name" : "null");
+			MajorVersionNumber >= 3 ? "pp.rdb$package_name" : "null");
 
-			if (restrictions != null)
-			{
-				var index = 0;
-
-				/* PROCEDURE_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
-
-				/* PROCEDURE_SCHEMA	*/
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
-
-				/* PROCEDURE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat("pp.rdb$procedure_name = @p{0}", index++);
-				}
-
-				/* PARAMETER_NAME */
-				if (restrictions.Length >= 4 && restrictions[3] != null)
-				{
-					if (where.Length > 0)
-					{
-						where.Append(" AND ");
-					}
-
-					where.AppendFormat("pp.rdb$parameter_name = @p{0}", index++);
-				}
-			}
-
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(" WHERE {0} ", where.ToString());
-			}
-
-			sql.Append(" ORDER BY PACKAGE_NAME, PROCEDURE_NAME, PARAMETER_DIRECTION, ORDINAL_POSITION");
-
-			return sql;
-		}
-
-		protected override void ProcessResult(DataTable schema)
+		if (restrictions != null)
 		{
-			schema.BeginLoadData();
-			schema.Columns.Add("IS_NULLABLE", typeof(bool));
+			var index = 0;
 
-			foreach (DataRow row in schema.Rows)
+			/* PROCEDURE_CATALOG */
+			if (restrictions.Length >= 1 && restrictions[0] != null)
 			{
-				var blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
-
-				var subType = 0;
-				if (row["PARAMETER_SUB_TYPE"] != DBNull.Value)
-				{
-					subType = Convert.ToInt32(row["PARAMETER_SUB_TYPE"], CultureInfo.InvariantCulture);
-				}
-
-				var scale = 0;
-				if (row["NUMERIC_SCALE"] != DBNull.Value)
-				{
-					scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
-				}
-
-				row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
-
-				var dbType = (FbDbType)TypeHelper.GetDbDataTypeFromBlrType(blrType, subType, scale);
-				row["PARAMETER_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLowerInvariant();
-
-				if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
-				{
-					row["PARAMETER_SIZE"] = row["CHARACTER_MAX_LENGTH"];
-				}
-				else
-				{
-					row["CHARACTER_OCTET_LENGTH"] = 0;
-				}
-
-				if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
-				{
-					row["PARAMETER_SIZE"] = Int32.MaxValue;
-				}
-
-				if (row["NUMERIC_PRECISION"] == DBNull.Value)
-				{
-					row["NUMERIC_PRECISION"] = 0;
-				}
-
-				if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
-					(row["NUMERIC_PRECISION"] == DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
-				{
-					row["NUMERIC_PRECISION"] = row["PARAMETER_SIZE"];
-				}
-
-				row["NUMERIC_SCALE"] = (-1) * scale;
-
-				var direction = Convert.ToInt32(row["PARAMETER_DIRECTION"], CultureInfo.InvariantCulture);
-				switch (direction)
-				{
-					case 0:
-						row["PARAMETER_DIRECTION"] = ParameterDirection.Input;
-						break;
-
-					case 1:
-						row["PARAMETER_DIRECTION"] = ParameterDirection.Output;
-						break;
-				}
 			}
 
-			schema.EndLoadData();
-			schema.AcceptChanges();
+			/* PROCEDURE_SCHEMA	*/
+			if (restrictions.Length >= 2 && restrictions[1] != null)
+			{
+			}
 
-			// Remove not more needed columns
-			schema.Columns.Remove("COLUMN_NULLABLE");
-			schema.Columns.Remove("FIELD_TYPE");
-			schema.Columns.Remove("CHARACTER_MAX_LENGTH");
+			/* PROCEDURE_NAME */
+			if (restrictions.Length >= 3 && restrictions[2] != null)
+			{
+				where.AppendFormat("pp.rdb$procedure_name = @p{0}", index++);
+			}
+
+			/* PARAMETER_NAME */
+			if (restrictions.Length >= 4 && restrictions[3] != null)
+			{
+				if (where.Length > 0)
+				{
+					where.Append(" AND ");
+				}
+
+				where.AppendFormat("pp.rdb$parameter_name = @p{0}", index++);
+			}
 		}
 
-		#endregion
+		if (where.Length > 0)
+		{
+			sql.AppendFormat(" WHERE {0} ", where.ToString());
+		}
+
+		sql.Append(" ORDER BY PACKAGE_NAME, PROCEDURE_NAME, PARAMETER_DIRECTION, ORDINAL_POSITION");
+
+		return sql;
 	}
+
+	protected override void ProcessResult(DataTable schema)
+	{
+		schema.BeginLoadData();
+		schema.Columns.Add("IS_NULLABLE", typeof(bool));
+
+		foreach (DataRow row in schema.Rows)
+		{
+			var blrType = Convert.ToInt32(row["FIELD_TYPE"], CultureInfo.InvariantCulture);
+
+			var subType = 0;
+			if (row["PARAMETER_SUB_TYPE"] != DBNull.Value)
+			{
+				subType = Convert.ToInt32(row["PARAMETER_SUB_TYPE"], CultureInfo.InvariantCulture);
+			}
+
+			var scale = 0;
+			if (row["NUMERIC_SCALE"] != DBNull.Value)
+			{
+				scale = Convert.ToInt32(row["NUMERIC_SCALE"], CultureInfo.InvariantCulture);
+			}
+
+			row["IS_NULLABLE"] = (row["COLUMN_NULLABLE"] == DBNull.Value);
+
+			var dbType = (FbDbType)TypeHelper.GetDbDataTypeFromBlrType(blrType, subType, scale);
+			row["PARAMETER_DATA_TYPE"] = TypeHelper.GetDataTypeName((DbDataType)dbType).ToLowerInvariant();
+
+			if (dbType == FbDbType.Char || dbType == FbDbType.VarChar)
+			{
+				row["PARAMETER_SIZE"] = row["CHARACTER_MAX_LENGTH"];
+			}
+			else
+			{
+				row["CHARACTER_OCTET_LENGTH"] = 0;
+			}
+
+			if (dbType == FbDbType.Binary || dbType == FbDbType.Text)
+			{
+				row["PARAMETER_SIZE"] = Int32.MaxValue;
+			}
+
+			if (row["NUMERIC_PRECISION"] == DBNull.Value)
+			{
+				row["NUMERIC_PRECISION"] = 0;
+			}
+
+			if ((dbType == FbDbType.Decimal || dbType == FbDbType.Numeric) &&
+				(row["NUMERIC_PRECISION"] == DBNull.Value || Convert.ToInt32(row["NUMERIC_PRECISION"]) == 0))
+			{
+				row["NUMERIC_PRECISION"] = row["PARAMETER_SIZE"];
+			}
+
+			row["NUMERIC_SCALE"] = (-1) * scale;
+
+			var direction = Convert.ToInt32(row["PARAMETER_DIRECTION"], CultureInfo.InvariantCulture);
+			switch (direction)
+			{
+				case 0:
+					row["PARAMETER_DIRECTION"] = ParameterDirection.Input;
+					break;
+
+				case 1:
+					row["PARAMETER_DIRECTION"] = ParameterDirection.Output;
+					break;
+			}
+		}
+
+		schema.EndLoadData();
+		schema.AcceptChanges();
+
+		// Remove not more needed columns
+		schema.Columns.Remove("COLUMN_NULLABLE");
+		schema.Columns.Remove("FIELD_TYPE");
+		schema.Columns.Remove("CHARACTER_MAX_LENGTH");
+	}
+
+	#endregion
 }

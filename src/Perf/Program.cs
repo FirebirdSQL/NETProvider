@@ -18,13 +18,12 @@
 using System.Reflection;
 using BenchmarkDotNet.Running;
 
-namespace Perf
+namespace Perf;
+
+class Program
 {
-	class Program
+	static void Main(string[] args)
 	{
-		static void Main(string[] args)
-		{
-			BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
-		}
+		BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
 	}
 }

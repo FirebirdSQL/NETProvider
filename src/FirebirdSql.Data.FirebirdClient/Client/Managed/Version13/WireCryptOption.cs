@@ -15,12 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Client.Managed.Version13
+namespace FirebirdSql.Data.Client.Managed.Version13;
+
+internal enum WireCryptOption
 {
-	internal enum WireCryptOption
-	{
-		Disabled,
-		Enabled,
-		Required,
-	}
+	Disabled,
+	Enabled,
+	Required,
 }

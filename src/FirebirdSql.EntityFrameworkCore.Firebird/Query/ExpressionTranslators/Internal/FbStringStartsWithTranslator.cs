@@ -23,33 +23,33 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringStartsWithTranslator : IMethodCallTranslator
 {
-	public class FbStringStartsWithTranslator : IMethodCallTranslator
+	static readonly MethodInfo StartsWithMethod = typeof(string).GetRuntimeMethod(nameof(string.StartsWith), new[] { typeof(string) });
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringStartsWithTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo StartsWithMethod = typeof(string).GetRuntimeMethod(nameof(string.StartsWith), new[] { typeof(string) });
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!method.Equals(StartsWithMethod))
+			return null;
 
-		public FbStringStartsWithTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!method.Equals(StartsWithMethod))
-				return null;
-
-			var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
-			var startsWithExpression = _fbSqlExpressionFactory.AndAlso(
-				_fbSqlExpressionFactory.Like(
-					instance,
-					_fbSqlExpressionFactory.Add(patternExpression, _fbSqlExpressionFactory.Constant("%"))),
-				_fbSqlExpressionFactory.Equal(
-					_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
-						"LEFT",
-						new[] {
+		var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
+		var startsWithExpression = _fbSqlExpressionFactory.AndAlso(
+			_fbSqlExpressionFactory.Like(
+				instance,
+				_fbSqlExpressionFactory.Add(patternExpression, _fbSqlExpressionFactory.Constant("%"))),
+			_fbSqlExpressionFactory.Equal(
+				_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
+					"LEFT",
+					new[] {
 							instance,
 							_fbSqlExpressionFactory.Function(
 								"CHAR_LENGTH",
@@ -57,19 +57,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 								true,
 								new[] { true },
 								typeof(int)) },
-						true,
-						new[] { true, true },
-						instance.Type)),
-					patternExpression));
-			return patternExpression is SqlConstantExpression sqlConstantExpression
-				? (string)sqlConstantExpression.Value == string.Empty
-					? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
-					: startsWithExpression
-				: _fbSqlExpressionFactory.OrElse(
-					startsWithExpression,
-					_fbSqlExpressionFactory.Equal(
-						patternExpression,
-						_fbSqlExpressionFactory.Constant(string.Empty)));
-		}
+					true,
+					new[] { true, true },
+					instance.Type)),
+				patternExpression));
+		return patternExpression is SqlConstantExpression sqlConstantExpression
+			? (string)sqlConstantExpression.Value == string.Empty
+				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
+				: startsWithExpression
+			: _fbSqlExpressionFactory.OrElse(
+				startsWithExpression,
+				_fbSqlExpressionFactory.Equal(
+					patternExpression,
+					_fbSqlExpressionFactory.Constant(string.Empty)));
 	}
 }

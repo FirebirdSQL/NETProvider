@@ -21,16 +21,15 @@ using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Utilities;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
-{
-	public class FbMethodCallTranslatorProvider : RelationalMethodCallTranslatorProvider
-	{
-		static readonly List<Type> Translators = TranslatorsHelper.GetTranslators<IMethodCallTranslator>().ToList();
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
 
-		public FbMethodCallTranslatorProvider(RelationalMethodCallTranslatorProviderDependencies dependencies)
-			: base(dependencies)
-		{
-			AddTranslators(Translators.Select(t => (IMethodCallTranslator)Activator.CreateInstance(t, dependencies.SqlExpressionFactory)));
-		}
+public class FbMethodCallTranslatorProvider : RelationalMethodCallTranslatorProvider
+{
+	static readonly List<Type> Translators = TranslatorsHelper.GetTranslators<IMethodCallTranslator>().ToList();
+
+	public FbMethodCallTranslatorProvider(RelationalMethodCallTranslatorProviderDependencies dependencies)
+		: base(dependencies)
+	{
+		AddTranslators(Translators.Select(t => (IMethodCallTranslator)Activator.CreateInstance(t, dependencies.SqlExpressionFactory)));
 	}
 }

@@ -19,17 +19,16 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class TPTRelationshipsQueryFbTest : TPTRelationshipsQueryTestBase<TPTRelationshipsQueryFbTest.TPTRelationshipsQueryFbFixture>
-	{
-		public TPTRelationshipsQueryFbTest(TPTRelationshipsQueryFbFixture fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		public class TPTRelationshipsQueryFbFixture : TPTRelationshipsQueryRelationalFixture
-		{
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-		}
+public class TPTRelationshipsQueryFbTest : TPTRelationshipsQueryTestBase<TPTRelationshipsQueryFbTest.TPTRelationshipsQueryFbFixture>
+{
+	public TPTRelationshipsQueryFbTest(TPTRelationshipsQueryFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	public class TPTRelationshipsQueryFbFixture : TPTRelationshipsQueryRelationalFixture
+	{
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 	}
 }

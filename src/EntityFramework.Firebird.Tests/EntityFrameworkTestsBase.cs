@@ -21,32 +21,31 @@ using System.Data.Entity.Core.Common;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.TestsBase;
 
-namespace EntityFramework.Firebird.Tests
+namespace EntityFramework.Firebird.Tests;
+
+public abstract class EntityFrameworkTestsBase : FbTestsBase
 {
-	public abstract class EntityFrameworkTestsBase : FbTestsBase
+	static EntityFrameworkTestsBase()
 	{
-		static EntityFrameworkTestsBase()
-		{
 #if NET6_0_OR_GREATER
-			System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
+		System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
 #endif
-			DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());
-		}
+		DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());
+	}
 
-		public EntityFrameworkTestsBase()
-			: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
-		{ }
+	public EntityFrameworkTestsBase()
+		: base(FbServerType.Default, false, FbWireCrypt.Enabled, false)
+	{ }
 
-		public DbProviderServices GetProviderServices()
-		{
-			return FbProviderServices.Instance;
-		}
+	public DbProviderServices GetProviderServices()
+	{
+		return FbProviderServices.Instance;
+	}
 
-		public TContext GetDbContext<TContext>() where TContext : FbTestDbContext
-		{
-			Database.SetInitializer<TContext>(null);
-			Connection.Close();
-			return (TContext)Activator.CreateInstance(typeof(TContext), Connection);
-		}
+	public TContext GetDbContext<TContext>() where TContext : FbTestDbContext
+	{
+		Database.SetInitializer<TContext>(null);
+		Connection.Close();
+		return (TContext)Activator.CreateInstance(typeof(TContext), Connection);
 	}
 }

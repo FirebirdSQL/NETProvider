@@ -17,12 +17,11 @@
 
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class NorthwindQueryFiltersQueryFbTest : NorthwindQueryFiltersQueryTestBase<NorthwindQueryFbFixture<NorthwindQueryFiltersCustomizer>>
 {
-	public class NorthwindQueryFiltersQueryFbTest : NorthwindQueryFiltersQueryTestBase<NorthwindQueryFbFixture<NorthwindQueryFiltersCustomizer>>
-	{
-		public NorthwindQueryFiltersQueryFbTest(NorthwindQueryFbFixture<NorthwindQueryFiltersCustomizer> fixture)
-			: base(fixture)
-		{ }
-	}
+	public NorthwindQueryFiltersQueryFbTest(NorthwindQueryFbFixture<NorthwindQueryFiltersCustomizer> fixture)
+		: base(fixture)
+	{ }
 }

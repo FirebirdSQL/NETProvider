@@ -18,15 +18,14 @@
 using System;
 using FirebirdSql.Data.Client.Managed;
 
-namespace FirebirdSql.Data.Client.Managed.Version11
-{
-	internal class AuthResponse : IResponse
-	{
-		public byte[] Data { get; }
+namespace FirebirdSql.Data.Client.Managed.Version11;
 
-		public AuthResponse(byte[] data)
-		{
-			Data = data;
-		}
+internal class AuthResponse : IResponse
+{
+	public byte[] Data { get; }
+
+	public AuthResponse(byte[] data)
+	{
+		Data = data;
 	}
 }

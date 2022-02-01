@@ -23,28 +23,27 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbDateTimeNowTodayTranslator : IMemberTranslator
 {
-	public class FbDateTimeNowTodayTranslator : IMemberTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbDateTimeNowTodayTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbDateTimeNowTodayTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Now))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("LOCALTIMESTAMP", false, typeof(DateTime)));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+		if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Today))
 		{
-			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Now))
-			{
-				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("LOCALTIMESTAMP", false, typeof(DateTime)));
-			}
-			if (member.DeclaringType == typeof(DateTime) && member.Name == nameof(DateTime.Today))
-			{
-				return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("CURRENT_DATE", false, typeof(DateTime)));
-			}
-			return null;
+			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.NiladicFunction("CURRENT_DATE", false, typeof(DateTime)));
 		}
+		return null;
 	}
 }

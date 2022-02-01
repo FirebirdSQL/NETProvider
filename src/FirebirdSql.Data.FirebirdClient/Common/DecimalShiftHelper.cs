@@ -15,26 +15,25 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Common
-{
-	internal static class DecimalShiftHelper
-	{
-		public static decimal ShiftDecimalLeft(decimal d, int shift)
-		{
-			while (shift-- > 0)
-			{
-				d /= 10;
-			}
-			return d;
-		}
+namespace FirebirdSql.Data.Common;
 
-		public static decimal ShiftDecimalRight(decimal d, int shift)
+internal static class DecimalShiftHelper
+{
+	public static decimal ShiftDecimalLeft(decimal d, int shift)
+	{
+		while (shift-- > 0)
 		{
-			while (shift-- > 0)
-			{
-				d *= 10;
-			}
-			return d;
+			d /= 10;
 		}
+		return d;
+	}
+
+	public static decimal ShiftDecimalRight(decimal d, int shift)
+	{
+		while (shift-- > 0)
+		{
+			d *= 10;
+		}
+		return d;
 	}
 }

@@ -20,51 +20,50 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
+
+public class FbConventionSetBuilder : RelationalConventionSetBuilder
 {
-	public class FbConventionSetBuilder : RelationalConventionSetBuilder
+	public FbConventionSetBuilder(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
+		: base(dependencies, relationalDependencies)
+	{ }
+
+	public override ConventionSet CreateConventionSet()
 	{
-		public FbConventionSetBuilder(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
-			: base(dependencies, relationalDependencies)
-		{ }
+		var conventionSet = base.CreateConventionSet();
 
-		public override ConventionSet CreateConventionSet()
+		var valueGenerationStrategyConvention = new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies);
+		conventionSet.ModelInitializedConventions.Add(valueGenerationStrategyConvention);
+		conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
+
+		var valueGenerationConvention = new FbValueGenerationConvention(Dependencies, RelationalDependencies);
+		ReplaceConvention(conventionSet.EntityTypeBaseTypeChangedConventions, valueGenerationConvention);
+		ReplaceConvention(conventionSet.EntityTypePrimaryKeyChangedConventions, valueGenerationConvention);
+		ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
+		ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
+
+		var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
+		ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
+		ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
+
+		conventionSet.ModelFinalizingConventions.Add(valueGenerationStrategyConvention);
+		ReplaceConvention(conventionSet.ModelFinalizingConventions, storeGenerationConvention);
+
+		return conventionSet;
+	}
+
+	public static ConventionSet Build()
+	{
+		var serviceProvider = new ServiceCollection()
+			.AddEntityFrameworkFirebird()
+			.AddDbContext<DbContext>(o => o.UseFirebird("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"))
+			.BuildServiceProvider();
+
+		using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
 		{
-			var conventionSet = base.CreateConventionSet();
-
-			var valueGenerationStrategyConvention = new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies);
-			conventionSet.ModelInitializedConventions.Add(valueGenerationStrategyConvention);
-			conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
-
-			var valueGenerationConvention = new FbValueGenerationConvention(Dependencies, RelationalDependencies);
-			ReplaceConvention(conventionSet.EntityTypeBaseTypeChangedConventions, valueGenerationConvention);
-			ReplaceConvention(conventionSet.EntityTypePrimaryKeyChangedConventions, valueGenerationConvention);
-			ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
-			ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
-
-			var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
-			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
-			ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
-
-			conventionSet.ModelFinalizingConventions.Add(valueGenerationStrategyConvention);
-			ReplaceConvention(conventionSet.ModelFinalizingConventions, storeGenerationConvention);
-
-			return conventionSet;
-		}
-
-		public static ConventionSet Build()
-		{
-			var serviceProvider = new ServiceCollection()
-				.AddEntityFrameworkFirebird()
-				.AddDbContext<DbContext>(o => o.UseFirebird("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"))
-				.BuildServiceProvider();
-
-			using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+			using (var context = serviceScope.ServiceProvider.GetService<DbContext>())
 			{
-				using (var context = serviceScope.ServiceProvider.GetService<DbContext>())
-				{
-					return ConventionSet.CreateConventionSet(context);
-				}
+				return ConventionSet.CreateConventionSet(context);
 			}
 		}
 	}

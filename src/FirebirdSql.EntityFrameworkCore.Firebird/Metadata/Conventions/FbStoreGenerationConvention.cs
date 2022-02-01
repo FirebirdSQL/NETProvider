@@ -24,96 +24,95 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
+
+public class FbStoreGenerationConvention : StoreGenerationConvention
 {
-	public class FbStoreGenerationConvention : StoreGenerationConvention
+	public FbStoreGenerationConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
+		: base(dependencies, relationalDependencies)
+	{ }
+
+	public override void ProcessPropertyAnnotationChanged(IConventionPropertyBuilder propertyBuilder, string name, IConventionAnnotation annotation, IConventionAnnotation oldAnnotation, IConventionContext<IConventionAnnotation> context)
 	{
-		public FbStoreGenerationConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
-			: base(dependencies, relationalDependencies)
-		{ }
-
-		public override void ProcessPropertyAnnotationChanged(IConventionPropertyBuilder propertyBuilder, string name, IConventionAnnotation annotation, IConventionAnnotation oldAnnotation, IConventionContext<IConventionAnnotation> context)
+		if (annotation == null
+			|| oldAnnotation?.Value != null)
 		{
-			if (annotation == null
-				|| oldAnnotation?.Value != null)
-			{
-				return;
-			}
-
-			var configurationSource = annotation.GetConfigurationSource();
-			var fromDataAnnotation = configurationSource != ConfigurationSource.Convention;
-			switch (name)
-			{
-				case RelationalAnnotationNames.DefaultValue:
-					if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
-						&& propertyBuilder.HasDefaultValue(null, fromDataAnnotation) != null)
-					{
-						context.StopProcessing();
-						return;
-					}
-
-					break;
-				case RelationalAnnotationNames.DefaultValueSql:
-					if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
-						&& propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) != null)
-					{
-						context.StopProcessing();
-						return;
-					}
-
-					break;
-				case RelationalAnnotationNames.ComputedColumnSql:
-					if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
-						&& propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) != null)
-					{
-						context.StopProcessing();
-						return;
-					}
-
-					break;
-				case FbAnnotationNames.ValueGenerationStrategy:
-					if ((propertyBuilder.HasDefaultValue(null, fromDataAnnotation) == null
-						 | propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) == null
-						 | propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) == null)
-						&& propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) != null)
-					{
-						context.StopProcessing();
-						return;
-					}
-
-					break;
-			}
-
-			base.ProcessPropertyAnnotationChanged(propertyBuilder, name, annotation, oldAnnotation, context);
+			return;
 		}
 
-		protected override void Validate(IConventionProperty property, in StoreObjectIdentifier storeObject)
+		var configurationSource = annotation.GetConfigurationSource();
+		var fromDataAnnotation = configurationSource != ConfigurationSource.Convention;
+		switch (name)
 		{
-			if (property.GetValueGenerationStrategyConfigurationSource() != null
-				   && property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
-			{
-				if (property.GetDefaultValue() != null)
+			case RelationalAnnotationNames.DefaultValue:
+				if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
+					&& propertyBuilder.HasDefaultValue(null, fromDataAnnotation) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(
-							nameof(FbValueGenerationStrategy), property.Name, "DefaultValue"));
+					context.StopProcessing();
+					return;
 				}
 
-				if (property.GetDefaultValueSql() != null)
+				break;
+			case RelationalAnnotationNames.DefaultValueSql:
+				if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
+					&& propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(
-							nameof(FbValueGenerationStrategy), property.Name, "DefaultValueSql"));
+					context.StopProcessing();
+					return;
 				}
 
-				if (property.GetComputedColumnSql() != null)
+				break;
+			case RelationalAnnotationNames.ComputedColumnSql:
+				if (propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) == null
+					&& propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) != null)
 				{
-					throw new InvalidOperationException(
-						RelationalStrings.ConflictingColumnServerGeneration(
-							nameof(FbValueGenerationStrategy), property.Name, "ComputedColumnSql"));
+					context.StopProcessing();
+					return;
 				}
-			}
-			base.Validate(property, storeObject);
+
+				break;
+			case FbAnnotationNames.ValueGenerationStrategy:
+				if ((propertyBuilder.HasDefaultValue(null, fromDataAnnotation) == null
+					 | propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) == null
+					 | propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) == null)
+					&& propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) != null)
+				{
+					context.StopProcessing();
+					return;
+				}
+
+				break;
 		}
+
+		base.ProcessPropertyAnnotationChanged(propertyBuilder, name, annotation, oldAnnotation, context);
+	}
+
+	protected override void Validate(IConventionProperty property, in StoreObjectIdentifier storeObject)
+	{
+		if (property.GetValueGenerationStrategyConfigurationSource() != null
+			   && property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
+		{
+			if (property.GetDefaultValue() != null)
+			{
+				throw new InvalidOperationException(
+					RelationalStrings.ConflictingColumnServerGeneration(
+						nameof(FbValueGenerationStrategy), property.Name, "DefaultValue"));
+			}
+
+			if (property.GetDefaultValueSql() != null)
+			{
+				throw new InvalidOperationException(
+					RelationalStrings.ConflictingColumnServerGeneration(
+						nameof(FbValueGenerationStrategy), property.Name, "DefaultValueSql"));
+			}
+
+			if (property.GetComputedColumnSql() != null)
+			{
+				throw new InvalidOperationException(
+					RelationalStrings.ConflictingColumnServerGeneration(
+						nameof(FbValueGenerationStrategy), property.Name, "ComputedColumnSql"));
+			}
+		}
+		base.Validate(property, storeObject);
 	}
 }

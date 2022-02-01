@@ -17,12 +17,11 @@
 
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class GearsOfWarFromSqlQueryFbTest : GearsOfWarFromSqlQueryTestBase<GearsOfWarQueryFbFixture>
 {
-	public class GearsOfWarFromSqlQueryFbTest : GearsOfWarFromSqlQueryTestBase<GearsOfWarQueryFbFixture>
-	{
-		public GearsOfWarFromSqlQueryFbTest(GearsOfWarQueryFbFixture fixture)
-			: base(fixture)
-		{ }
-	}
+	public GearsOfWarFromSqlQueryFbTest(GearsOfWarQueryFbFixture fixture)
+		: base(fixture)
+	{ }
 }

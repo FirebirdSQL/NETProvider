@@ -15,12 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public enum FbTraceVersion
 {
-	public enum FbTraceVersion
-	{
-		Detect,
-		Version1,
-		Version2,
-	}
+	Detect,
+	Version1,
+	Version2,
 }

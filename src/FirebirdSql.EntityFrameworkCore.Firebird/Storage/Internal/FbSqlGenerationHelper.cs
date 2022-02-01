@@ -19,45 +19,44 @@ using System;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenerationHelper
 {
-	public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenerationHelper
+	public FbSqlGenerationHelper(RelationalSqlGenerationHelperDependencies dependencies)
+		: base(dependencies)
+	{ }
+
+	public virtual string StringLiteralQueryType(string s)
 	{
-		public FbSqlGenerationHelper(RelationalSqlGenerationHelperDependencies dependencies)
-			: base(dependencies)
-		{ }
+		var length = MinimumStringQueryTypeLength(s);
+		EnsureStringQueryTypeLength(length);
+		return $"VARCHAR({length}) CHARACTER SET UTF8";
+	}
 
-		public virtual string StringLiteralQueryType(string s)
-		{
-			var length = MinimumStringQueryTypeLength(s);
-			EnsureStringQueryTypeLength(length);
-			return $"VARCHAR({length}) CHARACTER SET UTF8";
-		}
+	public virtual string StringParameterQueryType()
+	{
+		return $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})";
+	}
 
-		public virtual string StringParameterQueryType()
-		{
-			return $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})";
-		}
+	public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
+	{
+		builder.Append(":").Append(name);
+	}
 
-		public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
-		{
-			builder.Append(":").Append(name);
-		}
+	public string AlternativeStatementTerminator => "~";
 
-		public string AlternativeStatementTerminator => "~";
+	static int MinimumStringQueryTypeLength(string s)
+	{
+		var length = s?.Length ?? 0;
+		if (length == 0)
+			length = 1;
+		return length;
+	}
 
-		static int MinimumStringQueryTypeLength(string s)
-		{
-			var length = s?.Length ?? 0;
-			if (length == 0)
-				length = 1;
-			return length;
-		}
-
-		static void EnsureStringQueryTypeLength(int length)
-		{
-			if (length > FbTypeMappingSource.VarcharMaxSize)
-				throw new ArgumentOutOfRangeException(nameof(length));
-		}
+	static void EnsureStringQueryTypeLength(int length)
+	{
+		if (length > FbTypeMappingSource.VarcharMaxSize)
+			throw new ArgumentOutOfRangeException(nameof(length));
 	}
 }

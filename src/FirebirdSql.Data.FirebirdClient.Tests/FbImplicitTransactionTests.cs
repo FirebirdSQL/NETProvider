@@ -22,83 +22,82 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class FbImplicitTransactionTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class FbImplicitTransactionTests : FbTestsBase
+	public FbImplicitTransactionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task DataAdapterFillTest()
 	{
-		public FbImplicitTransactionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
-
-		[Test]
-		public async Task DataAdapterFillTest()
+		await using (var command = new FbCommand("select * from TEST where DATE_FIELD <> ?", Connection))
 		{
-			await using (var command = new FbCommand("select * from TEST where DATE_FIELD <> ?", Connection))
+			using (var adapter = new FbDataAdapter(command))
 			{
-				using (var adapter = new FbDataAdapter(command))
+				adapter.SelectCommand.Parameters.Add("@DATE_FIELD", FbDbType.Date, 4, "DATE_FIELD").Value = new DateTime(2003, 1, 5);
+				using (var ds = new DataSet())
 				{
-					adapter.SelectCommand.Parameters.Add("@DATE_FIELD", FbDbType.Date, 4, "DATE_FIELD").Value = new DateTime(2003, 1, 5);
-					using (var ds = new DataSet())
-					{
-						adapter.Fill(ds, "TEST");
+					adapter.Fill(ds, "TEST");
 
-						Assert.AreEqual(1, ds.Tables.Count);
-						Assert.Greater(ds.Tables[0].Rows.Count, 0);
-						Assert.Greater(ds.Tables[0].Columns.Count, 0);
-					}
+					Assert.AreEqual(1, ds.Tables.Count);
+					Assert.Greater(ds.Tables[0].Rows.Count, 0);
+					Assert.Greater(ds.Tables[0].Columns.Count, 0);
 				}
 			}
 		}
+	}
 
-		[Test]
-		public async Task ExecuteScalarTest()
+	[Test]
+	public async Task ExecuteScalarTest()
+	{
+		await using (var command = new FbCommand("select sum(int_field) from TEST", Connection))
 		{
-			await using (var command = new FbCommand("select sum(int_field) from TEST", Connection))
-			{
-				Assert.DoesNotThrowAsync(command.ExecuteScalarAsync);
-			}
+			Assert.DoesNotThrowAsync(command.ExecuteScalarAsync);
 		}
+	}
 
-		[Test]
-		public async Task UpdatedClobFieldTest()
+	[Test]
+	public async Task UpdatedClobFieldTest()
+	{
+		await using (var command = new FbCommand("update TEST set clob_field = @clob_field where int_field = @int_field", Connection))
 		{
-			await using (var command = new FbCommand("update TEST set clob_field = @clob_field where int_field = @int_field", Connection))
-			{
-				command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-				command.Parameters.Add("@clob_field", FbDbType.Text).Value = "Clob field update with implicit transaction";
-				var i = await command.ExecuteNonQueryAsync();
+			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+			command.Parameters.Add("@clob_field", FbDbType.Text).Value = "Clob field update with implicit transaction";
+			var i = await command.ExecuteNonQueryAsync();
 
-				Assert.AreEqual(i, 1, "Clob field update with implicit transaction failed");
-			}
+			Assert.AreEqual(i, 1, "Clob field update with implicit transaction failed");
 		}
+	}
 
-		[Test]
-		public async Task UpdatedBlobFieldTest()
+	[Test]
+	public async Task UpdatedBlobFieldTest()
+	{
+		await using (var command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection))
 		{
-			await using (var command = new FbCommand("update TEST set blob_field = @blob_field where int_field = @int_field", Connection))
-			{
-				command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-				command.Parameters.Add("@blob_field", FbDbType.Binary).Value = Encoding.UTF8.GetBytes("Blob field update with implicit transaction");
-				var i = await command.ExecuteNonQueryAsync();
+			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+			command.Parameters.Add("@blob_field", FbDbType.Binary).Value = Encoding.UTF8.GetBytes("Blob field update with implicit transaction");
+			var i = await command.ExecuteNonQueryAsync();
 
-				Assert.AreEqual(i, 1, "Blob field update with implicit transaction failed");
-			}
+			Assert.AreEqual(i, 1, "Blob field update with implicit transaction failed");
 		}
+	}
 
-		[Test]
-		public async Task UpdatedArrayFieldTest()
+	[Test]
+	public async Task UpdatedArrayFieldTest()
+	{
+		var values = new int[] { 10, 20, 30, 40 };
+		await using (var command = new FbCommand("update TEST set iarray_field = @iarray_field where int_field = @int_field", Connection))
 		{
-			var values = new int[] { 10, 20, 30, 40 };
-			await using (var command = new FbCommand("update TEST set iarray_field = @iarray_field where int_field = @int_field", Connection))
-			{
-				command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
-				command.Parameters.Add("@iarray_field", FbDbType.Array).Value = values;
-				var i = await command.ExecuteNonQueryAsync();
+			command.Parameters.Add("@int_field", FbDbType.Integer).Value = 1;
+			command.Parameters.Add("@iarray_field", FbDbType.Array).Value = values;
+			var i = await command.ExecuteNonQueryAsync();
 
-				Assert.AreEqual(i, 1, "Array field update with implicit transaction failed");
-			}
+			Assert.AreEqual(i, 1, "Array field update with implicit transaction failed");
 		}
 	}
 }

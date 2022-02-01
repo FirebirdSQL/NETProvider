@@ -20,13 +20,13 @@ using FirebirdSql.Data.TestsBase;
 using FirebirdSql.Data.Types;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbDecFloatTypeTests
 {
-	[NoServerCategory]
-	public class FbDecFloatTypeTests
+	static readonly object[] SimpleEqualityTrueSource = new object[]
 	{
-		static readonly object[] SimpleEqualityTrueSource = new object[]
-		{
 			new object[] { new FbDecFloat(0), new FbDecFloat(0) },
 			new object[] { new FbDecFloat(10, 0), new FbDecFloat(10, 0) },
 			new object[] { new FbDecFloat(6, 3), new FbDecFloat(6, 3) },
@@ -41,15 +41,15 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			new object[] { FbDecFloat.PositiveInfinity, FbDecFloat.PositiveInfinity },
 			new object[] { FbDecFloat.NegativeInfinity, FbDecFloat.NegativeInfinity },
 			new object[] { FbDecFloat.PositiveNaN, FbDecFloat.PositiveNaN },
-		};
-		[TestCaseSource(nameof(SimpleEqualityTrueSource))]
-		public void EqualityTrue(FbDecFloat expected, FbDecFloat actual)
-		{
-			Assert.AreEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void EqualityTrue(FbDecFloat expected, FbDecFloat actual)
+	{
+		Assert.AreEqual(expected, actual);
+	}
 
-		static readonly object[] SimpleEqualityFalseSource = new object[]
-		{
+	static readonly object[] SimpleEqualityFalseSource = new object[]
+	{
 			new object[] { new FbDecFloat(0), new FbDecFloat(BigInteger.Parse("986767875675879890678765756798079808709")) },
 			new object[] { new FbDecFloat(6, 3), new FbDecFloat(-6, 3) },
 			new object[] { new FbDecFloat(6, 3), new FbDecFloat(6, -3) },
@@ -57,11 +57,10 @@ namespace FirebirdSql.Data.FirebirdClient.Tests
 			new object[] { FbDecFloat.PositiveNaN, FbDecFloat.NegativeNaN },
 			new object[] { FbDecFloat.PositiveInfinity, FbDecFloat.PositiveNaN },
 			new object[] { FbDecFloat.NegativeInfinity, FbDecFloat.NegativeNaN },
-		};
-		[TestCaseSource(nameof(SimpleEqualityFalseSource))]
-		public void EqualityFalse(FbDecFloat expected, FbDecFloat actual)
-		{
-			Assert.AreNotEqual(expected, actual);
-		}
+	};
+	[TestCaseSource(nameof(SimpleEqualityFalseSource))]
+	public void EqualityFalse(FbDecFloat expected, FbDecFloat actual)
+	{
+		Assert.AreNotEqual(expected, actual);
 	}
 }

@@ -17,11 +17,11 @@
 
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class SqlStateMapping
 {
-	internal static class SqlStateMapping
-	{
-		static Dictionary<int, string> _mapping = new Dictionary<int, string>()
+	static Dictionary<int, string> _mapping = new Dictionary<int, string>()
 		{
 	{335544321, "22000"}, //   1 arith_except
 	{335544322, "HY000"}, //   2 bad_dbkey
@@ -1468,6 +1468,5 @@ namespace FirebirdSql.Data.Common
 	{337182760, "00000"}, //  40 trace_mandatory_switch_miss
 		};
 
-		public static bool TryGet(int key, out string value) => _mapping.TryGetValue(key, out value);
-	}
+	public static bool TryGet(int key, out string value) => _mapping.TryGetValue(key, out value);
 }

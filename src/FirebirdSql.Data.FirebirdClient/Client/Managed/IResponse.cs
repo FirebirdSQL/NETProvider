@@ -18,32 +18,31 @@
 using System;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
-{
-	interface IResponse
-	{ }
+namespace FirebirdSql.Data.Client.Managed;
 
-	static class IResponseExtensions
+interface IResponse
+{ }
+
+static class IResponseExtensions
+{
+	public static void HandleResponseException(this IResponse response)
 	{
-		public static void HandleResponseException(this IResponse response)
+		if (response is GenericResponse genericResponse)
 		{
-			if (response is GenericResponse genericResponse)
+			if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
 			{
-				if (genericResponse.Exception != null && !genericResponse.Exception.IsWarning)
-				{
-					throw genericResponse.Exception;
-				}
+				throw genericResponse.Exception;
 			}
 		}
+	}
 
-		public static void HandleResponseWarning(this IResponse response, Action<IscException> onWarning)
+	public static void HandleResponseWarning(this IResponse response, Action<IscException> onWarning)
+	{
+		if (response is GenericResponse genericResponse)
 		{
-			if (response is GenericResponse genericResponse)
+			if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
 			{
-				if (genericResponse.Exception != null && genericResponse.Exception.IsWarning)
-				{
-					onWarning?.Invoke(genericResponse.Exception);
-				}
+				onWarning?.Invoke(genericResponse.Exception);
 			}
 		}
 	}

@@ -17,24 +17,23 @@
 
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Native.Marshalers
-{
-	[StructLayout(LayoutKind.Sequential)]
-	internal struct ArrayDescMarshal
-	{
-		public byte DataType;
-		public byte Scale;
-		public short Length;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string FieldName;
-		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-		public string RelationName;
-		public short Dimensions;
-		public short Flags;
+namespace FirebirdSql.Data.Client.Native.Marshalers;
 
-		public static int ComputeLength(int n)
-		{
-			return Marshal.SizeOf<ArrayDescMarshal>() + n * Marshal.SizeOf<ArrayBoundMarshal>();
-		}
+[StructLayout(LayoutKind.Sequential)]
+internal struct ArrayDescMarshal
+{
+	public byte DataType;
+	public byte Scale;
+	public short Length;
+	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+	public string FieldName;
+	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+	public string RelationName;
+	public short Dimensions;
+	public short Flags;
+
+	public static int ComputeLength(int n)
+	{
+		return Marshal.SizeOf<ArrayDescMarshal>() + n * Marshal.SizeOf<ArrayBoundMarshal>();
 	}
 }

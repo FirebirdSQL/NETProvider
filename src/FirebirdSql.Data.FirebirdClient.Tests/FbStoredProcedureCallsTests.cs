@@ -21,93 +21,92 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class FbStoredProcedureCallsTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class FbStoredProcedureCallsTests : FbTestsBase
+	public FbStoredProcedureCallsTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task FirebirdLikeTest00()
 	{
-		public FbStoredProcedureCallsTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
-
-		[Test]
-		public async Task FirebirdLikeTest00()
+		await using (var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection))
 		{
-			await using (var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection))
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
+			command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
+			command.Parameters[0].Value = 1;
+			await command.ExecuteNonQueryAsync();
+			var value = command.Parameters[1].Value;
+			Assert.AreEqual("IRow Number 1", value);
+		}
+	}
+
+	[Test]
+	public async Task FirebirdLikeTest01()
+	{
+		await using (var command = new FbCommand("SELECT * FROM GETVARCHARFIELD(?)", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
+			command.Parameters[0].Value = 1;
+			await using (var reader = command.ExecuteReader())
 			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
-				command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
-				command.Parameters[0].Value = 1;
-				await command.ExecuteNonQueryAsync();
-				var value = command.Parameters[1].Value;
+				await reader.ReadAsync();
+				var value = reader[0];
 				Assert.AreEqual("IRow Number 1", value);
 			}
 		}
 
-		[Test]
-		public async Task FirebirdLikeTest01()
+	}
+
+	[Test]
+	public async Task SqlServerLikeTest00()
+	{
+		await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
 		{
-			await using (var command = new FbCommand("SELECT * FROM GETVARCHARFIELD(?)", Connection))
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
+			command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
+			command.Parameters[0].Value = 1;
+			await command.ExecuteNonQueryAsync();
+			var value = command.Parameters[1].Value;
+			Assert.AreEqual("IRow Number 1", value);
+		}
+	}
+
+	[Test]
+	public async Task SqlServerLikeTest01()
+	{
+		await using (var command = new FbCommand("GETRECORDCOUNT", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("@RECORDCOUNT", FbDbType.Integer).Direction = ParameterDirection.Output;
+			await command.ExecuteNonQueryAsync();
+			var value = command.Parameters[0].Value;
+			Assert.Greater(Convert.ToInt32(value), 0);
+		}
+	}
+
+	[Test]
+	public async Task SqlServerLikeTest02()
+	{
+		await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("@ID", FbDbType.VarChar).Value = 1;
+			await using (var r = await command.ExecuteReaderAsync())
 			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
-				command.Parameters[0].Value = 1;
-				await using (var reader = command.ExecuteReader())
+				var count = 0;
+				while (await r.ReadAsync())
 				{
-					await reader.ReadAsync();
-					var value = reader[0];
-					Assert.AreEqual("IRow Number 1", value);
+					count++;
 				}
-			}
-
-		}
-
-		[Test]
-		public async Task SqlServerLikeTest00()
-		{
-			await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
-			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("@ID", FbDbType.VarChar).Direction = ParameterDirection.Input;
-				command.Parameters.Add("@VARCHAR_FIELD", FbDbType.VarChar).Direction = ParameterDirection.Output;
-				command.Parameters[0].Value = 1;
-				await command.ExecuteNonQueryAsync();
-				var value = command.Parameters[1].Value;
-				Assert.AreEqual("IRow Number 1", value);
-			}
-		}
-
-		[Test]
-		public async Task SqlServerLikeTest01()
-		{
-			await using (var command = new FbCommand("GETRECORDCOUNT", Connection))
-			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("@RECORDCOUNT", FbDbType.Integer).Direction = ParameterDirection.Output;
-				await command.ExecuteNonQueryAsync();
-				var value = command.Parameters[0].Value;
-				Assert.Greater(Convert.ToInt32(value), 0);
-			}
-		}
-
-		[Test]
-		public async Task SqlServerLikeTest02()
-		{
-			await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
-			{
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.Add("@ID", FbDbType.VarChar).Value = 1;
-				await using (var r = await command.ExecuteReaderAsync())
-				{
-					var count = 0;
-					while (await r.ReadAsync())
-					{
-						count++;
-					}
-					Assert.AreEqual(1, count);
-				}
+				Assert.AreEqual(1, count);
 			}
 		}
 	}

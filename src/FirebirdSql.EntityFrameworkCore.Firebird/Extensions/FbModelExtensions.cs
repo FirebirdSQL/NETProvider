@@ -19,23 +19,22 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Microsoft.EntityFrameworkCore
+namespace Microsoft.EntityFrameworkCore;
+
+public static class FbModelExtensions
 {
-	public static class FbModelExtensions
-	{
-		public static void SetValueGenerationStrategy(this IMutableModel model, FbValueGenerationStrategy? value)
-			=> model.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value);
+	public static void SetValueGenerationStrategy(this IMutableModel model, FbValueGenerationStrategy? value)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value);
 
-		public static void SetValueGenerationStrategy(this IConventionModel model, FbValueGenerationStrategy? value, bool fromDataAnnotation = false)
-			=> model.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value, fromDataAnnotation);
+	public static void SetValueGenerationStrategy(this IConventionModel model, FbValueGenerationStrategy? value, bool fromDataAnnotation = false)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value, fromDataAnnotation);
 
-		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IModel model)
-			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
+	public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IModel model)
+		=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
 
-		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IMutableModel model)
-			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
+	public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IMutableModel model)
+		=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
 
-		public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IConventionModel model)
-			=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
-	}
+	public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IConventionModel model)
+		=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
 }

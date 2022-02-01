@@ -18,17 +18,16 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed;
+
+interface IDataProvider
 {
-	interface IDataProvider
-	{
-		int Read(byte[] buffer, int offset, int count);
-		ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
+	int Read(byte[] buffer, int offset, int count);
+	ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
 
-		void Write(byte[] buffer, int offset, int count);
-		ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
+	void Write(byte[] buffer, int offset, int count);
+	ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
 
-		void Flush();
-		ValueTask FlushAsync(CancellationToken cancellationToken = default);
-	}
+	void Flush();
+	ValueTask FlushAsync(CancellationToken cancellationToken = default);
 }

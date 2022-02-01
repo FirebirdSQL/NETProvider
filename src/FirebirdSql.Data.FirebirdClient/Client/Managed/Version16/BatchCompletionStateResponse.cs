@@ -17,23 +17,22 @@
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version16
-{
-	internal class BatchCompletionStateResponse : IResponse
-	{
-		public short StatementHandle { get; }
-		public int ProcessedMessages { get; }
-		public int[] UpdatedRecordsPerMessage { get; }
-		public (int, IscException)[] DetailedErrors { get; }
-		public int[] AdditionalErrorsPerMessage { get; }
+namespace FirebirdSql.Data.Client.Managed.Version16;
 
-		public BatchCompletionStateResponse(short statementHandle, int processedMessages, int[] updatedRecordsPerMessage, (int, IscException)[] detailedErrors, int[] errorsPerMessage)
-		{
-			StatementHandle = statementHandle;
-			ProcessedMessages = processedMessages;
-			UpdatedRecordsPerMessage = updatedRecordsPerMessage;
-			DetailedErrors = detailedErrors;
-			AdditionalErrorsPerMessage = errorsPerMessage;
-		}
+internal class BatchCompletionStateResponse : IResponse
+{
+	public short StatementHandle { get; }
+	public int ProcessedMessages { get; }
+	public int[] UpdatedRecordsPerMessage { get; }
+	public (int, IscException)[] DetailedErrors { get; }
+	public int[] AdditionalErrorsPerMessage { get; }
+
+	public BatchCompletionStateResponse(short statementHandle, int processedMessages, int[] updatedRecordsPerMessage, (int, IscException)[] detailedErrors, int[] errorsPerMessage)
+	{
+		StatementHandle = statementHandle;
+		ProcessedMessages = processedMessages;
+		UpdatedRecordsPerMessage = updatedRecordsPerMessage;
+		DetailedErrors = detailedErrors;
+		AdditionalErrorsPerMessage = errorsPerMessage;
 	}
 }

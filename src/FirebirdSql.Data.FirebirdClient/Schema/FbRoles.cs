@@ -20,43 +20,42 @@ using System.Data;
 using System.Globalization;
 using System.Text;
 
-namespace FirebirdSql.Data.Schema
+namespace FirebirdSql.Data.Schema;
+
+internal class FbRoles : FbSchema
 {
-	internal class FbRoles : FbSchema
+	#region Protected Methods
+
+	protected override StringBuilder GetCommandText(string[] restrictions)
 	{
-		#region Protected Methods
+		var sql = new StringBuilder();
+		var where = new StringBuilder();
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			var sql = new StringBuilder();
-			var where = new StringBuilder();
-
-			sql.Append(
-				@"SELECT
+		sql.Append(
+			@"SELECT
 					rdb$role_name AS ROLE_NAME,
 					rdb$owner_name AS OWNER_NAME
 				FROM rdb$roles");
 
-			if (restrictions != null)
+		if (restrictions != null)
+		{
+			var index = 0;
+
+			if (restrictions.Length >= 1 && restrictions[0] != null)
 			{
-				var index = 0;
-
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-					where.AppendFormat("rdb$role_name = @p{0}", index++);
-				}
+				where.AppendFormat("rdb$role_name = @p{0}", index++);
 			}
-
-			if (where.Length > 0)
-			{
-				sql.AppendFormat(" WHERE {0} ", where.ToString());
-			}
-
-			sql.Append(" ORDER BY ROLE_NAME");
-
-			return sql;
 		}
 
-		#endregion
+		if (where.Length > 0)
+		{
+			sql.AppendFormat(" WHERE {0} ", where.ToString());
+		}
+
+		sql.Append(" ORDER BY ROLE_NAME");
+
+		return sql;
 	}
+
+	#endregion
 }

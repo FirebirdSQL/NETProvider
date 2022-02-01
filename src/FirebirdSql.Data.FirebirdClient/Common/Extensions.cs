@@ -21,46 +21,45 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class Extensions
 {
-	internal static class Extensions
+	public static int AsInt(this IntPtr ptr)
 	{
-		public static int AsInt(this IntPtr ptr)
-		{
-			return (int)ptr.ToInt64();
-		}
+		return (int)ptr.ToInt64();
+	}
 
-		public static IntPtr ReadIntPtr(this BinaryReader self)
+	public static IntPtr ReadIntPtr(this BinaryReader self)
+	{
+		if (IntPtr.Size == sizeof(int))
 		{
-			if (IntPtr.Size == sizeof(int))
-			{
-				return new IntPtr(self.ReadInt32());
-			}
-			else if (IntPtr.Size == sizeof(long))
-			{
-				return new IntPtr(self.ReadInt64());
-			}
-			else
-			{
-				throw new NotSupportedException();
-			}
+			return new IntPtr(self.ReadInt32());
 		}
+		else if (IntPtr.Size == sizeof(long))
+		{
+			return new IntPtr(self.ReadInt64());
+		}
+		else
+		{
+			throw new NotSupportedException();
+		}
+	}
 
-		public static string ToHexString(this byte[] b)
-		{
-			return BitConverter.ToString(b).Replace("-", string.Empty);
-		}
+	public static string ToHexString(this byte[] b)
+	{
+		return BitConverter.ToString(b).Replace("-", string.Empty);
+	}
 
-		public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
+	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
+	{
+		for (var i = 0; i < (float)array.Length / size; i++)
 		{
-			for (var i = 0; i < (float)array.Length / size; i++)
-			{
-				yield return array.Skip(i * size).Take(size);
-			}
+			yield return array.Skip(i * size).Take(size);
 		}
+	}
 
 #if NETSTANDARD2_0
-		public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
+	public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 #endif
-	}
 }

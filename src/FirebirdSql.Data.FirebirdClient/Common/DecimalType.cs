@@ -15,13 +15,12 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+public enum DecimalType
 {
-	public enum DecimalType
-	{
-		Finite,
-		Infinity,
-		NaN,
-		SignalingNaN,
-	}
+	Finite,
+	Infinity,
+	NaN,
+	SignalingNaN,
 }

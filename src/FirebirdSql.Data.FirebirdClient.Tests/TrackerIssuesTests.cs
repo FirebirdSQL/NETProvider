@@ -25,51 +25,51 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class TrackerIssuesTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class TrackerIssuesTests : FbTestsBase
+	public TrackerIssuesTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task DNET217_ReadingALotOfFields()
 	{
-		public TrackerIssuesTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+		var timestampExpression = ServerVersion >= new Version(4, 0, 0, 0) ? "localtimestamp" : "current_timestamp";
 
-		[Test]
-		public async Task DNET217_ReadingALotOfFields()
+		var cols = new StringBuilder();
+		var separator = string.Empty;
+		for (var i = 0; i < 1235; i++)
 		{
-			var timestampExpression = ServerVersion >= new Version(4, 0, 0, 0) ? "localtimestamp" : "current_timestamp";
+			if (i % 2 == 0)
+				cols.AppendFormat("{0}'r' as col{1}", separator, i);
+			else
+				cols.AppendFormat("{0}24 as col{1}", separator, i);
 
-			var cols = new StringBuilder();
-			var separator = string.Empty;
-			for (var i = 0; i < 1235; i++)
+			separator = ",";
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select {cols} from rdb$database where 'x' = @x or 'x' = @x and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y";
+			cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "z" });
+			cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
+			await using (var reader = await cmd.ExecuteReaderAsync())
 			{
-				if (i % 2 == 0)
-					cols.AppendFormat("{0}'r' as col{1}", separator, i);
-				else
-					cols.AppendFormat("{0}24 as col{1}", separator, i);
-
-				separator = ",";
-			}
-			await using (var cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = $"select {cols} from rdb$database where 'x' = @x or 'x' = @x and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y and {timestampExpression} = @y";
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = "z" });
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@y", Value = DateTime.Now });
-				await using (var reader = await cmd.ExecuteReaderAsync())
-				{
-					while (await reader.ReadAsync())
-					{ }
-				}
+				while (await reader.ReadAsync())
+				{ }
 			}
 		}
+	}
 
-		[Test]
-		public async Task DNET260_ProcedureWithALotOfParameters()
+	[Test]
+	public async Task DNET260_ProcedureWithALotOfParameters()
+	{
+		await using (var cmd = Connection.CreateCommand())
 		{
-			await using (var cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = @"
+			cmd.CommandText = @"
 RECREATE PROCEDURE TEST_SP (
   P01 SMALLINT,
   P02 INTEGER,
@@ -180,250 +180,249 @@ BEGIN
   SUSPEND;
 END
 ";
-				await cmd.ExecuteNonQueryAsync();
-			}
-
-			await using (var cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = "TEST_SP";
-				cmd.CommandType = CommandType.StoredProcedure;
-
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = 1 });
-				cmd.Parameters.Add(new FbParameter() { Value = DateTime.Today });
-				cmd.Parameters.Add(new FbParameter() { Value = DateTime.Today });
-
-				await cmd.ExecuteNonQueryAsync();
-			}
+			await cmd.ExecuteNonQueryAsync();
 		}
 
-		[Test]
-		public async Task DNET273_WritingClobAsBinary()
+		await using (var cmd = Connection.CreateCommand())
 		{
-			await using (var cmd = Connection.CreateCommand())
-			{
-				cmd.CommandText = "insert into test (INT_FIELD, CLOB_FIELD) values (@INT_FIELD, @CLOB_FIELD)";
-				cmd.Parameters.Add("@INT_FIELD", FbDbType.Integer).Value = 100;
-				cmd.Parameters.Add("@CLOB_FIELD", FbDbType.Binary).Value = new byte[] { 0x00, 0x001 };
-				await cmd.ExecuteNonQueryAsync();
-			}
+			cmd.CommandText = "TEST_SP";
+			cmd.CommandType = CommandType.StoredProcedure;
+
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = 1 });
+			cmd.Parameters.Add(new FbParameter() { Value = DateTime.Today });
+			cmd.Parameters.Add(new FbParameter() { Value = DateTime.Today });
+
+			await cmd.ExecuteNonQueryAsync();
+		}
+	}
+
+	[Test]
+	public async Task DNET273_WritingClobAsBinary()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "insert into test (INT_FIELD, CLOB_FIELD) values (@INT_FIELD, @CLOB_FIELD)";
+			cmd.Parameters.Add("@INT_FIELD", FbDbType.Integer).Value = 100;
+			cmd.Parameters.Add("@CLOB_FIELD", FbDbType.Binary).Value = new byte[] { 0x00, 0x001 };
+			await cmd.ExecuteNonQueryAsync();
+		}
+	}
+
+	[Test]
+	public async Task DNET595_ProperConnectionPoolConnectionsClosing()
+	{
+		FbConnection.ClearAllPools();
+		const int NumberOfThreads = 15;
+
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.Pooling = true;
+		csb.ConnectionLifeTime = 5;
+		csb.MinPoolSize = 0;
+		var cs = csb.ToString();
+
+		var active = await GetActiveConnections();
+
+		var tasks = new List<Task>();
+		for (var i = 0; i < NumberOfThreads; i++)
+		{
+			tasks.Add(GetSomethingLoopHelper(cs, 50));
+		}
+		await Task.WhenAll(tasks);
+
+		Assert.Greater(await GetActiveConnections(), active);
+
+		var sw = new Stopwatch();
+		sw.Start();
+		while (sw.Elapsed.TotalSeconds < 60)
+		{
+			await GetSomethingHelper(cs);
 		}
 
-		[Test]
-		public async Task DNET595_ProperConnectionPoolConnectionsClosing()
+		Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
+		Assert.AreEqual(active, await GetActiveConnections());
+
+		static async Task GetSomethingHelper(string connectionString)
 		{
-			FbConnection.ClearAllPools();
-			const int NumberOfThreads = 15;
-
-			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
-			csb.Pooling = true;
-			csb.ConnectionLifeTime = 5;
-			csb.MinPoolSize = 0;
-			var cs = csb.ToString();
-
-			var active = await GetActiveConnections();
-
-			var tasks = new List<Task>();
-			for (var i = 0; i < NumberOfThreads; i++)
+			await using (var conn = new FbConnection(connectionString))
 			{
-				tasks.Add(GetSomethingLoopHelper(cs, 50));
-			}
-			await Task.WhenAll(tasks);
-
-			Assert.Greater(await GetActiveConnections(), active);
-
-			var sw = new Stopwatch();
-			sw.Start();
-			while (sw.Elapsed.TotalSeconds < 60)
-			{
-				await GetSomethingHelper(cs);
-			}
-
-			Thread.Sleep(TimeSpan.FromSeconds(csb.ConnectionLifeTime * 2));
-			Assert.AreEqual(active, await GetActiveConnections());
-
-			static async Task GetSomethingHelper(string connectionString)
-			{
-				await using (var conn = new FbConnection(connectionString))
+				await conn.OpenAsync();
+				await using (var command = new FbCommand("select current_timestamp from mon$database", conn))
 				{
-					await conn.OpenAsync();
-					await using (var command = new FbCommand("select current_timestamp from mon$database", conn))
-					{
-						await command.ExecuteScalarAsync();
-					}
-				}
-			}
-
-			static async Task GetSomethingLoopHelper(string connectionString, int loop)
-			{
-				for (var i = 0; i < loop; i++)
-				{
-					await GetSomethingHelper(connectionString);
+					await command.ExecuteScalarAsync();
 				}
 			}
 		}
 
-		[Test]
-		public async Task DNET313_MultiDimensionalArray()
+		static async Task GetSomethingLoopHelper(string connectionString, int loop)
 		{
-			await using (var cmd = Connection.CreateCommand())
+			for (var i = 0; i < loop; i++)
 			{
-				cmd.CommandText = @"
+				await GetSomethingHelper(connectionString);
+			}
+		}
+	}
+
+	[Test]
+	public async Task DNET313_MultiDimensionalArray()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = @"
 CREATE TABLE TABMAT (
     ID INTEGER NOT NULL,
 	MATRIX INTEGER[1:3, 1:4]
 )";
-				await cmd.ExecuteNonQueryAsync();
-			}
-			try
+			await cmd.ExecuteNonQueryAsync();
+		}
+		try
+		{
+			var sql = "INSERT INTO TabMat (Id,Matrix) Values(@ValId,@ValMat)";
+			int[,] mat = { { 1, 2, 3, 4 }, { 10, 20, 30, 40 }, { 101, 102, 103, 104 } };
+			var random = new Random();
+			await using (var tx = await Connection.BeginTransactionAsync())
 			{
-				var sql = "INSERT INTO TabMat (Id,Matrix) Values(@ValId,@ValMat)";
-				int[,] mat = { { 1, 2, 3, 4 }, { 10, 20, 30, 40 }, { 101, 102, 103, 104 } };
-				var random = new Random();
-				await using (var tx = await Connection.BeginTransactionAsync())
+				await using (var cmd = new FbCommand(sql, Connection, tx))
 				{
-					await using (var cmd = new FbCommand(sql, Connection, tx))
-					{
-						cmd.Parameters.Add("@ValId", FbDbType.Integer).Value = random.Next();
-						cmd.Parameters.Add("@ValMat", FbDbType.Array).Value = mat;
-						await cmd.ExecuteNonQueryAsync();
-					}
-					await tx.CommitAsync();
-				}
-				await using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = @"select matrix from tabmat";
-					await using (var reader = await cmd.ExecuteReaderAsync())
-					{
-						if (await reader.ReadAsync())
-						{
-							Assert.AreEqual(mat, reader[0]);
-						}
-						else
-						{
-							Assert.Fail();
-						}
-					}
-				}
-			}
-			finally
-			{
-				await using (var cmd = Connection.CreateCommand())
-				{
-					cmd.CommandText = "drop table tabmat";
+					cmd.Parameters.Add("@ValId", FbDbType.Integer).Value = random.Next();
+					cmd.Parameters.Add("@ValMat", FbDbType.Array).Value = mat;
 					await cmd.ExecuteNonQueryAsync();
 				}
+				await tx.CommitAsync();
 			}
-		}
-
-		[Test]
-		public async Task DNET304_VarcharOctetsParameterRoundtrip()
-		{
-			var data = new byte[] { 10, 20 };
 			await using (var cmd = Connection.CreateCommand())
 			{
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
-				cmd.CommandText = "select cast(@x as varchar(10) character set octets) from rdb$database";
+				cmd.CommandText = @"select matrix from tabmat";
 				await using (var reader = await cmd.ExecuteReaderAsync())
 				{
-					while (await reader.ReadAsync())
+					if (await reader.ReadAsync())
 					{
-						Assert.AreEqual(data, reader[0]);
+						Assert.AreEqual(mat, reader[0]);
+					}
+					else
+					{
+						Assert.Fail();
 					}
 				}
 			}
 		}
-
-		[Test]
-		public async Task DNET304_CharOctetsParameterRoundtrip()
+		finally
 		{
-			var data = new byte[] { 10, 20 };
 			await using (var cmd = Connection.CreateCommand())
 			{
-				cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
-				cmd.CommandText = "select cast(@x as char(10) character set octets) from rdb$database";
-				await using (var reader = await cmd.ExecuteReaderAsync())
+				cmd.CommandText = "drop table tabmat";
+				await cmd.ExecuteNonQueryAsync();
+			}
+		}
+	}
+
+	[Test]
+	public async Task DNET304_VarcharOctetsParameterRoundtrip()
+	{
+		var data = new byte[] { 10, 20 };
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
+			cmd.CommandText = "select cast(@x as varchar(10) character set octets) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				while (await reader.ReadAsync())
 				{
-					while (await reader.ReadAsync())
-					{
-						Assert.AreEqual(new byte[] { data[0], data[1], 32, 32, 32, 32, 32, 32, 32, 32 }, reader[0]);
-					}
+					Assert.AreEqual(data, reader[0]);
 				}
 			}
 		}
+	}
 
-		[Test]
-		public async Task DNET1036_ReadNumericScaleZero()
+	[Test]
+	public async Task DNET304_CharOctetsParameterRoundtrip()
+	{
+		var data = new byte[] { 10, 20 };
+		await using (var cmd = Connection.CreateCommand())
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			cmd.Parameters.Add(new FbParameter() { ParameterName = "@x", Value = data });
+			cmd.CommandText = "select cast(@x as char(10) character set octets) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
 			{
-				await using (var command = new FbCommand("select cast(3 as numeric(18,0)) from rdb$database", Connection, transaction))
+				while (await reader.ReadAsync())
 				{
-					await using (var reader = await command.ExecuteReaderAsync())
-					{
-						await reader.ReadAsync();
-						Assert.AreEqual(3m, reader[0]);
-					}
+					Assert.AreEqual(new byte[] { data[0], data[1], 32, 32, 32, 32, 32, 32, 32, 32 }, reader[0]);
 				}
-				await transaction.RollbackAsync();
 			}
 		}
+	}
 
-		[Test]
-		public async Task DNET1036_ReadDecimalScaleZero()
+	[Test]
+	public async Task DNET1036_ReadNumericScaleZero()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			await using (var command = new FbCommand("select cast(3 as numeric(18,0)) from rdb$database", Connection, transaction))
 			{
-				await using (var command = new FbCommand("select cast(3 as decimal(18,0)) from rdb$database", Connection, transaction))
+				await using (var reader = await command.ExecuteReaderAsync())
 				{
-					await using (var reader = await command.ExecuteReaderAsync())
-					{
-						await reader.ReadAsync();
-						Assert.AreEqual(3m, reader[0]);
-					}
+					await reader.ReadAsync();
+					Assert.AreEqual(3m, reader[0]);
 				}
-				await transaction.RollbackAsync();
 			}
+			await transaction.RollbackAsync();
 		}
+	}
 
-		[Test]
-		public async Task DNET1036_WriteNumericScaleZero()
+	[Test]
+	public async Task DNET1036_ReadDecimalScaleZero()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			await using (var command = new FbCommand("select cast(3 as decimal(18,0)) from rdb$database", Connection, transaction))
 			{
-				await using (var command = new FbCommand("select cast(@value as numeric(18,0)) from rdb$database", Connection, transaction))
+				await using (var reader = await command.ExecuteReaderAsync())
 				{
-					command.Parameters.AddWithValue("value", 3m);
-					await using (var reader = await command.ExecuteReaderAsync())
-					{
-						await reader.ReadAsync();
-						Assert.AreEqual(3m, reader[0]);
-					}
+					await reader.ReadAsync();
+					Assert.AreEqual(3m, reader[0]);
 				}
-				await transaction.RollbackAsync();
 			}
+			await transaction.RollbackAsync();
 		}
+	}
 
-		[Test]
-		public async Task DNET1036_WriteDecimalScaleZero()
+	[Test]
+	public async Task DNET1036_WriteNumericScaleZero()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			await using (var command = new FbCommand("select cast(@value as numeric(18,0)) from rdb$database", Connection, transaction))
 			{
-				await using (var command = new FbCommand("select cast(@value as decimal(18,0)) from rdb$database", Connection, transaction))
+				command.Parameters.AddWithValue("value", 3m);
+				await using (var reader = await command.ExecuteReaderAsync())
 				{
-					command.Parameters.AddWithValue("value", 3m);
-					await using (var reader = await command.ExecuteReaderAsync())
-					{
-						await reader.ReadAsync();
-						Assert.AreEqual(3m, reader[0]);
-					}
+					await reader.ReadAsync();
+					Assert.AreEqual(3m, reader[0]);
 				}
-				await transaction.RollbackAsync();
 			}
+			await transaction.RollbackAsync();
+		}
+	}
+
+	[Test]
+	public async Task DNET1036_WriteDecimalScaleZero()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
+		{
+			await using (var command = new FbCommand("select cast(@value as decimal(18,0)) from rdb$database", Connection, transaction))
+			{
+				command.Parameters.AddWithValue("value", 3m);
+				await using (var reader = await command.ExecuteReaderAsync())
+				{
+					await reader.ReadAsync();
+					Assert.AreEqual(3m, reader[0]);
+				}
+			}
+			await transaction.RollbackAsync();
 		}
 	}
 }

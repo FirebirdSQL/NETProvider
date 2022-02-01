@@ -17,50 +17,49 @@
 
 using System.Data.Entity.Core.Metadata.Edm;
 
-namespace EntityFramework.Firebird
+namespace EntityFramework.Firebird;
+
+internal static class TypeHelpers
 {
-	internal static class TypeHelpers
+	public static bool TryGetPrecision(TypeUsage tu, out byte precision)
 	{
-		public static bool TryGetPrecision(TypeUsage tu, out byte precision)
+		precision = 0;
+		if (tu.Facets.TryGetValue("Precision", false, out var f))
 		{
-			precision = 0;
-			if (tu.Facets.TryGetValue("Precision", false, out var f))
+			if (!f.IsUnbounded && f.Value != null)
 			{
-				if (!f.IsUnbounded && f.Value != null)
-				{
-					precision = (byte)f.Value;
-					return true;
-				}
+				precision = (byte)f.Value;
+				return true;
 			}
-			return false;
 		}
+		return false;
+	}
 
-		public static bool TryGetMaxLength(TypeUsage tu, out int maxLength)
+	public static bool TryGetMaxLength(TypeUsage tu, out int maxLength)
+	{
+		maxLength = 0;
+		if (tu.Facets.TryGetValue("MaxLength", false, out var f))
 		{
-			maxLength = 0;
-			if (tu.Facets.TryGetValue("MaxLength", false, out var f))
+			if (!f.IsUnbounded && f.Value != null)
 			{
-				if (!f.IsUnbounded && f.Value != null)
-				{
-					maxLength = (int)f.Value;
-					return true;
-				}
+				maxLength = (int)f.Value;
+				return true;
 			}
-			return false;
 		}
+		return false;
+	}
 
-		public static bool TryGetScale(TypeUsage tu, out byte scale)
+	public static bool TryGetScale(TypeUsage tu, out byte scale)
+	{
+		scale = 0;
+		if (tu.Facets.TryGetValue("Scale", false, out var f))
 		{
-			scale = 0;
-			if (tu.Facets.TryGetValue("Scale", false, out var f))
+			if (!f.IsUnbounded && f.Value != null)
 			{
-				if (!f.IsUnbounded && f.Value != null)
-				{
-					scale = (byte)f.Value;
-					return true;
-				}
+				scale = (byte)f.Value;
+				return true;
 			}
-			return false;
 		}
+		return false;
 	}
 }

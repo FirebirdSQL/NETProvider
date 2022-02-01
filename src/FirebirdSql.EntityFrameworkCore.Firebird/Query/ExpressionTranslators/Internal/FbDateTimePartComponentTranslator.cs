@@ -25,14 +25,14 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbDateTimePartComponentTranslator : IMemberTranslator
 {
-	public class FbDateTimePartComponentTranslator : IMemberTranslator
-	{
-		const string YearDayPart = "YEARDAY";
-		const string SecondPart = "SECOND";
-		const string MillisecondPart = "MILLISECOND";
-		static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
+	const string YearDayPart = "YEARDAY";
+	const string SecondPart = "SECOND";
+	const string MillisecondPart = "MILLISECOND";
+	static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
 		{
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Year)), "YEAR" },
 			{  typeof(DateTime).GetProperty(nameof(DateTime.Month)), "MONTH" },
@@ -45,33 +45,32 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			{  typeof(DateTime).GetProperty(nameof(DateTime.DayOfWeek)), "WEEKDAY" },
 		};
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
-		public FbDateTimePartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public FbDateTimePartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	{
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
+
+	public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!MemberMapping.TryGetValue(member, out var part))
+			return null;
+
+		var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
+			"EXTRACT",
+			new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
+			true,
+			new[] { false, false, true },
+			typeof(int));
+		if (part == YearDayPart)
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			result = _fbSqlExpressionFactory.Add(result, _fbSqlExpressionFactory.Constant(1));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+		else if (part == SecondPart || part == MillisecondPart)
 		{
-			if (!MemberMapping.TryGetValue(member, out var part))
-				return null;
-
-			var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
-				"EXTRACT",
-				new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
-				true,
-				new[] { false, false, true },
-				typeof(int));
-			if (part == YearDayPart)
-			{
-				result = _fbSqlExpressionFactory.Add(result, _fbSqlExpressionFactory.Constant(1));
-			}
-			else if (part == SecondPart || part == MillisecondPart)
-			{
-				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
-			}
-			return result;
+			result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
 		}
+		return result;
 	}
 }

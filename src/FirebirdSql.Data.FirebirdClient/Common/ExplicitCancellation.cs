@@ -20,43 +20,42 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class ExplicitCancellation
 {
-	internal static class ExplicitCancellation
+	public static ExplicitCancel Enter(CancellationToken cancellationToken, Action explicitCancel)
 	{
-		public static ExplicitCancel Enter(CancellationToken cancellationToken, Action explicitCancel)
+		if (cancellationToken.IsCancellationRequested)
 		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				explicitCancel();
-				throw new OperationCanceledException(cancellationToken);
-			}
-			var ctr = cancellationToken.Register(explicitCancel);
-			return new ExplicitCancel(ctr);
+			explicitCancel();
+			throw new OperationCanceledException(cancellationToken);
+		}
+		var ctr = cancellationToken.Register(explicitCancel);
+		return new ExplicitCancel(ctr);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	static void ExitExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration)
+	{
+		cancellationTokenRegistration.Dispose();
+	}
+
+	[StructLayout(LayoutKind.Auto)]
+	internal readonly struct ExplicitCancel : IDisposable
+	{
+		readonly CancellationTokenRegistration _cancellationTokenRegistration;
+
+		public ExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration)
+		{
+			_cancellationTokenRegistration = cancellationTokenRegistration;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		static void ExitExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration)
+		public void Dispose()
 		{
-			cancellationTokenRegistration.Dispose();
+			ExitExplicitCancel(_cancellationTokenRegistration);
 		}
 
-		[StructLayout(LayoutKind.Auto)]
-		internal readonly struct ExplicitCancel : IDisposable
-		{
-			readonly CancellationTokenRegistration _cancellationTokenRegistration;
-
-			public ExplicitCancel(CancellationTokenRegistration cancellationTokenRegistration)
-			{
-				_cancellationTokenRegistration = cancellationTokenRegistration;
-			}
-
-			public void Dispose()
-			{
-				ExitExplicitCancel(_cancellationTokenRegistration);
-			}
-
-			public readonly CancellationToken CancellationToken => CancellationToken.None;
-		}
+		public readonly CancellationToken CancellationToken => CancellationToken.None;
 	}
 }

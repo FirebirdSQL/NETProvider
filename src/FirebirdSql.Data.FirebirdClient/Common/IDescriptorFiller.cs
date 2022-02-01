@@ -18,11 +18,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal interface IDescriptorFiller
 {
-	internal interface IDescriptorFiller
-	{
-		void Fill(Descriptor descriptor, int index);
-		ValueTask FillAsync(Descriptor descriptor, int index, CancellationToken cancellationToken = default);
-	}
+	void Fill(Descriptor descriptor, int index);
+	ValueTask FillAsync(Descriptor descriptor, int index, CancellationToken cancellationToken = default);
 }

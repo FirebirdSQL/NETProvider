@@ -18,20 +18,19 @@
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
+
+public class FbQuerySqlGeneratorFactory : IQuerySqlGeneratorFactory
 {
-	public class FbQuerySqlGeneratorFactory : IQuerySqlGeneratorFactory
+	readonly QuerySqlGeneratorDependencies _dependencies;
+	readonly IFbOptions _fbOptions;
+
+	public FbQuerySqlGeneratorFactory(QuerySqlGeneratorDependencies dependencies, IFbOptions fbOptions)
 	{
-		readonly QuerySqlGeneratorDependencies _dependencies;
-		readonly IFbOptions _fbOptions;
-
-		public FbQuerySqlGeneratorFactory(QuerySqlGeneratorDependencies dependencies, IFbOptions fbOptions)
-		{
-			_dependencies = dependencies;
-			_fbOptions = fbOptions;
-		}
-
-		public QuerySqlGenerator Create()
-			  => new FbQuerySqlGenerator(_dependencies, _fbOptions);
+		_dependencies = dependencies;
+		_fbOptions = fbOptions;
 	}
+
+	public QuerySqlGenerator Create()
+		  => new FbQuerySqlGenerator(_dependencies, _fbOptions);
 }

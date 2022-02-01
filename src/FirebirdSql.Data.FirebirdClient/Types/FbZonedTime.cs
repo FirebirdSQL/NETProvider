@@ -18,62 +18,61 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Types
+namespace FirebirdSql.Data.Types;
+
+[StructLayout(LayoutKind.Auto)]
+public readonly struct FbZonedTime : IEquatable<FbZonedTime>
 {
-	[StructLayout(LayoutKind.Auto)]
-	public readonly struct FbZonedTime : IEquatable<FbZonedTime>
+	public TimeSpan Time { get; }
+	public string TimeZone { get; }
+	public TimeSpan? Offset { get; }
+
+	internal FbZonedTime(TimeSpan time, string timeZone, TimeSpan? offset)
 	{
-		public TimeSpan Time { get; }
-		public string TimeZone { get; }
-		public TimeSpan? Offset { get; }
+		if (timeZone == null)
+			throw new ArgumentNullException(nameof(timeZone));
+		if (string.IsNullOrWhiteSpace(timeZone))
+			throw new ArgumentException(nameof(timeZone));
 
-		internal FbZonedTime(TimeSpan time, string timeZone, TimeSpan? offset)
-		{
-			if (timeZone == null)
-				throw new ArgumentNullException(nameof(timeZone));
-			if (string.IsNullOrWhiteSpace(timeZone))
-				throw new ArgumentException(nameof(timeZone));
-
-			Time = time;
-			TimeZone = timeZone;
-			Offset = offset;
-		}
-
-		public FbZonedTime(TimeSpan time, string timeZone)
-			: this(time, timeZone, null)
-		{ }
-
-		public override string ToString()
-		{
-			if (Offset != null)
-			{
-				return $"{Time} {TimeZone} ({Offset})";
-			}
-			return $"{Time} {TimeZone}";
-		}
-
-		public override bool Equals(object obj)
-		{
-			return obj is FbZonedTime fbZonedTime && Equals(fbZonedTime);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var hash = (int)2166136261;
-				hash = (hash * 16777619) ^ Time.GetHashCode();
-				hash = (hash * 16777619) ^ TimeZone.GetHashCode();
-				if (Offset != null)
-					hash = (hash * 16777619) ^ Offset.GetHashCode();
-				return hash;
-			}
-		}
-
-		public bool Equals(FbZonedTime other) => Time.Equals(other.Time) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
-
-		public static bool operator ==(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
-
-		public static bool operator !=(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
+		Time = time;
+		TimeZone = timeZone;
+		Offset = offset;
 	}
+
+	public FbZonedTime(TimeSpan time, string timeZone)
+		: this(time, timeZone, null)
+	{ }
+
+	public override string ToString()
+	{
+		if (Offset != null)
+		{
+			return $"{Time} {TimeZone} ({Offset})";
+		}
+		return $"{Time} {TimeZone}";
+	}
+
+	public override bool Equals(object obj)
+	{
+		return obj is FbZonedTime fbZonedTime && Equals(fbZonedTime);
+	}
+
+	public override int GetHashCode()
+	{
+		unchecked
+		{
+			var hash = (int)2166136261;
+			hash = (hash * 16777619) ^ Time.GetHashCode();
+			hash = (hash * 16777619) ^ TimeZone.GetHashCode();
+			if (Offset != null)
+				hash = (hash * 16777619) ^ Offset.GetHashCode();
+			return hash;
+		}
+	}
+
+	public bool Equals(FbZonedTime other) => Time.Equals(other.Time) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
+
+	public static bool operator ==(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
+
+	public static bool operator !=(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
 }

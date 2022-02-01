@@ -22,61 +22,60 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Expressions.Internal;
+
+public class FbSpacedFunctionExpression : SqlFunctionExpression, IEquatable<FbSpacedFunctionExpression>
 {
-	public class FbSpacedFunctionExpression : SqlFunctionExpression, IEquatable<FbSpacedFunctionExpression>
+	public FbSpacedFunctionExpression(string name, IEnumerable<SqlExpression> arguments, bool nullable, IEnumerable<bool> argumentsPropagateNullability, Type type, RelationalTypeMapping typeMapping)
+		: base(name, arguments, nullable, argumentsPropagateNullability, type, typeMapping)
+	{ }
+
+	public override SqlFunctionExpression ApplyTypeMapping(RelationalTypeMapping typeMapping)
 	{
-		public FbSpacedFunctionExpression(string name, IEnumerable<SqlExpression> arguments, bool nullable, IEnumerable<bool> argumentsPropagateNullability, Type type, RelationalTypeMapping typeMapping)
-			: base(name, arguments, nullable, argumentsPropagateNullability, type, typeMapping)
-		{ }
+		return new FbSpacedFunctionExpression(Name, Arguments, IsNullable, ArgumentsPropagateNullability, Type, typeMapping ?? TypeMapping);
+	}
 
-		public override SqlFunctionExpression ApplyTypeMapping(RelationalTypeMapping typeMapping)
+	protected override Expression VisitChildren(ExpressionVisitor visitor)
+	{
+		var changed = false;
+
+		var arguments = new SqlExpression[Arguments.Count];
+		for (var i = 0; i < arguments.Length; i++)
 		{
-			return new FbSpacedFunctionExpression(Name, Arguments, IsNullable, ArgumentsPropagateNullability, Type, typeMapping ?? TypeMapping);
+			arguments[i] = (SqlExpression)visitor.Visit(Arguments[i]);
+			changed |= arguments[i] != Arguments[i];
 		}
 
-		protected override Expression VisitChildren(ExpressionVisitor visitor)
-		{
-			var changed = false;
+		return changed
+			? new FbSpacedFunctionExpression(Name, arguments, IsNullable, ArgumentsPropagateNullability, Type, TypeMapping)
+			: this;
+	}
 
-			var arguments = new SqlExpression[Arguments.Count];
-			for (var i = 0; i < arguments.Length; i++)
-			{
-				arguments[i] = (SqlExpression)visitor.Visit(Arguments[i]);
-				changed |= arguments[i] != Arguments[i];
-			}
+	public override SqlFunctionExpression Update(SqlExpression instance, IReadOnlyList<SqlExpression> arguments)
+	{
+		if (instance != null)
+			throw new ArgumentException("Instance must be null.", nameof(instance));
 
-			return changed
-				? new FbSpacedFunctionExpression(Name, arguments, IsNullable, ArgumentsPropagateNullability, Type, TypeMapping)
-				: this;
-		}
+		return !arguments.SequenceEqual(Arguments)
+			? new FbSpacedFunctionExpression(Name, arguments, IsNullable, ArgumentsPropagateNullability, Type, TypeMapping)
+			: this;
+	}
 
-		public override SqlFunctionExpression Update(SqlExpression instance, IReadOnlyList<SqlExpression> arguments)
-		{
-			if (instance != null)
-				throw new ArgumentException("Instance must be null.", nameof(instance));
+	public override bool Equals(object obj)
+	{
+		return obj != null
+			&& (ReferenceEquals(this, obj)
+				|| obj is FbSpacedFunctionExpression fbExtraFunctionExpression
+				&& Equals(fbExtraFunctionExpression));
+	}
 
-			return !arguments.SequenceEqual(Arguments)
-				? new FbSpacedFunctionExpression(Name, arguments, IsNullable, ArgumentsPropagateNullability, Type, TypeMapping)
-				: this;
-		}
+	public virtual bool Equals(FbSpacedFunctionExpression other)
+	{
+		return base.Equals(other);
+	}
 
-		public override bool Equals(object obj)
-		{
-			return obj != null
-				&& (ReferenceEquals(this, obj)
-					|| obj is FbSpacedFunctionExpression fbExtraFunctionExpression
-					&& Equals(fbExtraFunctionExpression));
-		}
-
-		public virtual bool Equals(FbSpacedFunctionExpression other)
-		{
-			return base.Equals(other);
-		}
-
-		public override int GetHashCode()
-		{
-			return base.GetHashCode();
-		}
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
 	}
 }

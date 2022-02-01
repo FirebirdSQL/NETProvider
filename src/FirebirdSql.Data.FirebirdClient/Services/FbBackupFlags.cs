@@ -19,19 +19,18 @@ using System;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+[Flags]
+public enum FbBackupFlags
 {
-	[Flags]
-	public enum FbBackupFlags
-	{
-		IgnoreChecksums = IscCodes.isc_spb_bkp_ignore_checksums,
-		IgnoreLimbo = IscCodes.isc_spb_bkp_ignore_limbo,
-		MetaDataOnly = IscCodes.isc_spb_bkp_metadata_only,
-		NoGarbageCollect = IscCodes.isc_spb_bkp_no_garbage_collect,
-		OldDescriptions = IscCodes.isc_spb_bkp_old_descriptions,
-		NonTransportable = IscCodes.isc_spb_bkp_non_transportable,
-		Convert = IscCodes.isc_spb_bkp_convert,
-		Expand = IscCodes.isc_spb_bkp_expand,
-		NoDatabaseTriggers = IscCodes.isc_spb_bkp_no_triggers,
-	}
+	IgnoreChecksums = IscCodes.isc_spb_bkp_ignore_checksums,
+	IgnoreLimbo = IscCodes.isc_spb_bkp_ignore_limbo,
+	MetaDataOnly = IscCodes.isc_spb_bkp_metadata_only,
+	NoGarbageCollect = IscCodes.isc_spb_bkp_no_garbage_collect,
+	OldDescriptions = IscCodes.isc_spb_bkp_old_descriptions,
+	NonTransportable = IscCodes.isc_spb_bkp_non_transportable,
+	Convert = IscCodes.isc_spb_bkp_convert,
+	Expand = IscCodes.isc_spb_bkp_expand,
+	NoDatabaseTriggers = IscCodes.isc_spb_bkp_no_triggers,
 }

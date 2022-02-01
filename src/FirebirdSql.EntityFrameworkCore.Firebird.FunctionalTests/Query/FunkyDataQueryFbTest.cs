@@ -23,23 +23,22 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class FunkyDataQueryFbTest : FunkyDataQueryTestBase<FunkyDataQueryFbTest.FunkyDataQueryFbFixture>
 {
-	public class FunkyDataQueryFbTest : FunkyDataQueryTestBase<FunkyDataQueryFbTest.FunkyDataQueryFbFixture>
+	public FunkyDataQueryFbTest(FunkyDataQueryFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase
 	{
-		public FunkyDataQueryFbTest(FunkyDataQueryFbFixture fixture)
-			: base(fixture)
-		{ }
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
-		public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase
+		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-			protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-			{
-				base.OnModelCreating(modelBuilder, context);
-				ModelHelpers.SetStringLengths(modelBuilder);
-			}
+			base.OnModelCreating(modelBuilder, context);
+			ModelHelpers.SetStringLengths(modelBuilder);
 		}
 	}
 }

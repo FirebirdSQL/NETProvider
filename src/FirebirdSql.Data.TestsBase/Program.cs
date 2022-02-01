@@ -19,16 +19,15 @@ using System.Linq;
 using System.Reflection;
 using NUnitLite;
 
-namespace FirebirdSql.Data.TestsBase
+namespace FirebirdSql.Data.TestsBase;
+
+public static class Program
 {
-	public static class Program
+	public static int Main(string[] args)
 	{
-		public static int Main(string[] args)
-		{
-			args = args?.Any() ?? false
-				? args
-				: new[] { "--noresult", "--labels=All" };
-			return new AutoRun(Assembly.GetEntryAssembly()).Execute(args);
-		}
+		args = args?.Any() ?? false
+			? args
+			: new[] { "--noresult", "--labels=All" };
+		return new AutoRun(Assembly.GetEntryAssembly()).Execute(args);
 	}
 }

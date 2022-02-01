@@ -18,21 +18,20 @@
 using System;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
-{
-	internal sealed class GenericResponse : IResponse
-	{
-		public int ObjectHandle { get; }
-		public long BlobId { get; }
-		public byte[] Data { get; }
-		public IscException Exception { get; }
+namespace FirebirdSql.Data.Client.Managed;
 
-		public GenericResponse(int objectHandle, long blobId, byte[] data, IscException exception)
-		{
-			ObjectHandle = objectHandle;
-			BlobId = blobId;
-			Data = data;
-			Exception = exception;
-		}
+internal sealed class GenericResponse : IResponse
+{
+	public int ObjectHandle { get; }
+	public long BlobId { get; }
+	public byte[] Data { get; }
+	public IscException Exception { get; }
+
+	public GenericResponse(int objectHandle, long blobId, byte[] data, IscException exception)
+	{
+		ObjectHandle = objectHandle;
+		BlobId = blobId;
+		Data = data;
+		Exception = exception;
 	}
 }

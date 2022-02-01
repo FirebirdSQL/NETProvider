@@ -24,32 +24,31 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringReplaceTranslator : IMethodCallTranslator
 {
-	public class FbStringReplaceTranslator : IMethodCallTranslator
+	static readonly MethodInfo ReplaceMethod = typeof(string).GetRuntimeMethod(nameof(string.Replace), new[] { typeof(string), typeof(string) });
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringReplaceTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo ReplaceMethod = typeof(string).GetRuntimeMethod(nameof(string.Replace), new[] { typeof(string), typeof(string) });
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!method.Equals(ReplaceMethod))
+			return null;
 
-		public FbStringReplaceTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+		var args = new List<SqlExpression>();
+		args.Add(instance);
+		foreach (var a in arguments)
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!method.Equals(ReplaceMethod))
-				return null;
-
-			var args = new List<SqlExpression>();
-			args.Add(instance);
-			foreach (var a in arguments)
-			{
-				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
-			}
-			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
-				_fbSqlExpressionFactory.Function("REPLACE", args, true, Enumerable.Repeat(true, args.Count), instance.Type));
-		}
+		return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
+			_fbSqlExpressionFactory.Function("REPLACE", args, true, Enumerable.Repeat(true, args.Count), instance.Type));
 	}
 }

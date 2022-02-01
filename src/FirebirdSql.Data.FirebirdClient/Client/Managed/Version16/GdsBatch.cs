@@ -21,196 +21,195 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version16
+namespace FirebirdSql.Data.Client.Managed.Version16;
+
+internal class GdsBatch : BatchBase
 {
-	internal class GdsBatch : BatchBase
+	protected GdsStatement _statement;
+
+	public override StatementBase Statement => _statement;
+
+	public GdsDatabase Database => (GdsDatabase)_statement.Database;
+
+	public GdsBatch(GdsStatement statement)
 	{
-		protected GdsStatement _statement;
+		_statement = statement;
+	}
 
-		public override StatementBase Statement => _statement;
-
-		public GdsDatabase Database => (GdsDatabase)_statement.Database;
-
-		public GdsBatch(GdsStatement statement)
+	public override ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller)
+	{
+		var parametersData = new byte[count][];
+		for (var i = 0; i < parametersData.Length; i++)
 		{
-			_statement = statement;
+			descriptorFiller.Fill(_statement.Parameters, i);
+			// this may throw error, so it needs to be before any writing
+			parametersData[i] = _statement.WriteParameters();
 		}
 
-		public override ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller)
+		Database.Xdr.Write(IscCodes.op_batch_create);
+		Database.Xdr.Write(_statement.Handle); // p_batch_statement
+		var blr = _statement.Parameters.ToBlr();
+		Database.Xdr.WriteBuffer(blr.Data); // p_batch_blr
+		Database.Xdr.Write(blr.Length); // p_batch_msglen
+		var pb = new BatchParameterBuffer();
+		if (_statement.ReturnRecordsAffected)
 		{
-			var parametersData = new byte[count][];
-			for (var i = 0; i < parametersData.Length; i++)
-			{
-				descriptorFiller.Fill(_statement.Parameters, i);
-				// this may throw error, so it needs to be before any writing
-				parametersData[i] = _statement.WriteParameters();
-			}
-
-			Database.Xdr.Write(IscCodes.op_batch_create);
-			Database.Xdr.Write(_statement.Handle); // p_batch_statement
-			var blr = _statement.Parameters.ToBlr();
-			Database.Xdr.WriteBuffer(blr.Data); // p_batch_blr
-			Database.Xdr.Write(blr.Length); // p_batch_msglen
-			var pb = new BatchParameterBuffer();
-			if (_statement.ReturnRecordsAffected)
-			{
-				pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);
-			}
-			if (MultiError)
-			{
-				pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
-			}
-			Database.Xdr.WriteBuffer(pb.ToArray()); // p_batch_pb
-
-			Database.Xdr.Write(IscCodes.op_batch_msg);
-			Database.Xdr.Write(_statement.Handle); // p_batch_statement
-			Database.Xdr.Write(parametersData.Length); // p_batch_messages
-			foreach (var item in parametersData)
-			{
-				Database.Xdr.WriteOpaque(item, item.Length); // p_batch_data
-			}
-
-			Database.Xdr.Write(IscCodes.op_batch_exec);
-			Database.Xdr.Write(_statement.Handle); // p_batch_statement
-			Database.Xdr.Write(_statement.Transaction.Handle); // p_batch_transaction;		
-
-			Database.Xdr.Flush();
-
-			var numberOfResponses = 3;
-			try
-			{
-				numberOfResponses--;
-				var batchCreateResponse = Database.ReadResponse();
-				numberOfResponses--;
-				var batchMsgResponse = Database.ReadResponse();
-				numberOfResponses--;
-				var batchExecResponse = (BatchCompletionStateResponse)Database.ReadResponse();
-
-				return BuildResult(batchExecResponse);
-			}
-			finally
-			{
-				Database.SafeFinishFetching(numberOfResponses);
-			}
+			pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);
 		}
-		public override async ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
+		if (MultiError)
 		{
-			var parametersData = new byte[count][];
-			for (var i = 0; i < parametersData.Length; i++)
-			{
-				await descriptorFiller.FillAsync(_statement.Parameters, i, cancellationToken).ConfigureAwait(false);
-				// this may throw error, so it needs to be before any writing
-				parametersData[i] = await _statement.WriteParametersAsync(cancellationToken).ConfigureAwait(false);
-			}
+			pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
+		}
+		Database.Xdr.WriteBuffer(pb.ToArray()); // p_batch_pb
 
-			await Database.Xdr.WriteAsync(IscCodes.op_batch_create, cancellationToken).ConfigureAwait(false);
-			await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
-			var blr = _statement.Parameters.ToBlr();
-			await Database.Xdr.WriteBufferAsync(blr.Data, cancellationToken).ConfigureAwait(false); // p_batch_blr
-			await Database.Xdr.WriteAsync(blr.Length, cancellationToken).ConfigureAwait(false); // p_batch_msglen
-			var pb = new BatchParameterBuffer();
-			if (_statement.ReturnRecordsAffected)
-			{
-				pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);
-			}
-			if (MultiError)
-			{
-				pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
-			}
-			await Database.Xdr.WriteBufferAsync(pb.ToArray(), cancellationToken).ConfigureAwait(false); // p_batch_pb
-
-			await Database.Xdr.WriteAsync(IscCodes.op_batch_msg, cancellationToken).ConfigureAwait(false);
-			await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
-			await Database.Xdr.WriteAsync(parametersData.Length, cancellationToken).ConfigureAwait(false); // p_batch_messages
-			foreach (var item in parametersData)
-			{
-				await Database.Xdr.WriteOpaqueAsync(item, item.Length, cancellationToken).ConfigureAwait(false); // p_batch_data
-			}
-
-			await Database.Xdr.WriteAsync(IscCodes.op_batch_exec, cancellationToken).ConfigureAwait(false);
-			await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
-			await Database.Xdr.WriteAsync(_statement.Transaction.Handle, cancellationToken).ConfigureAwait(false); // p_batch_transaction;		
-
-			await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-			var numberOfResponses = 3;
-			try
-			{
-				numberOfResponses--;
-				var batchCreateResponse = await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-				numberOfResponses--;
-				var batchMsgResponse = await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-				numberOfResponses--;
-				var batchExecResponse = (BatchCompletionStateResponse)await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				return BuildResult(batchExecResponse);
-			}
-			finally
-			{
-				await Database.SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
-			}
+		Database.Xdr.Write(IscCodes.op_batch_msg);
+		Database.Xdr.Write(_statement.Handle); // p_batch_statement
+		Database.Xdr.Write(parametersData.Length); // p_batch_messages
+		foreach (var item in parametersData)
+		{
+			Database.Xdr.WriteOpaque(item, item.Length); // p_batch_data
 		}
 
-		public override void Dispose2()
+		Database.Xdr.Write(IscCodes.op_batch_exec);
+		Database.Xdr.Write(_statement.Handle); // p_batch_statement
+		Database.Xdr.Write(_statement.Transaction.Handle); // p_batch_transaction;		
+
+		Database.Xdr.Flush();
+
+		var numberOfResponses = 3;
+		try
 		{
-			Database.Xdr.Write(IscCodes.op_batch_rls);
-			Database.Xdr.Write(_statement.Handle);
-			Database.AppendDeferredPacket(ProcessReleaseResponse);
+			numberOfResponses--;
+			var batchCreateResponse = Database.ReadResponse();
+			numberOfResponses--;
+			var batchMsgResponse = Database.ReadResponse();
+			numberOfResponses--;
+			var batchExecResponse = (BatchCompletionStateResponse)Database.ReadResponse();
+
+			return BuildResult(batchExecResponse);
+		}
+		finally
+		{
+			Database.SafeFinishFetching(numberOfResponses);
+		}
+	}
+	public override async ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
+	{
+		var parametersData = new byte[count][];
+		for (var i = 0; i < parametersData.Length; i++)
+		{
+			await descriptorFiller.FillAsync(_statement.Parameters, i, cancellationToken).ConfigureAwait(false);
+			// this may throw error, so it needs to be before any writing
+			parametersData[i] = await _statement.WriteParametersAsync(cancellationToken).ConfigureAwait(false);
 		}
 
-		public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+		await Database.Xdr.WriteAsync(IscCodes.op_batch_create, cancellationToken).ConfigureAwait(false);
+		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
+		var blr = _statement.Parameters.ToBlr();
+		await Database.Xdr.WriteBufferAsync(blr.Data, cancellationToken).ConfigureAwait(false); // p_batch_blr
+		await Database.Xdr.WriteAsync(blr.Length, cancellationToken).ConfigureAwait(false); // p_batch_msglen
+		var pb = new BatchParameterBuffer();
+		if (_statement.ReturnRecordsAffected)
 		{
-			await Database.Xdr.WriteAsync(IscCodes.op_batch_rls, cancellationToken).ConfigureAwait(false);
-			await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false);
-			Database.AppendDeferredPacket(ProcessReleaseResponseAsync);
+			pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);
+		}
+		if (MultiError)
+		{
+			pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
+		}
+		await Database.Xdr.WriteBufferAsync(pb.ToArray(), cancellationToken).ConfigureAwait(false); // p_batch_pb
+
+		await Database.Xdr.WriteAsync(IscCodes.op_batch_msg, cancellationToken).ConfigureAwait(false);
+		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
+		await Database.Xdr.WriteAsync(parametersData.Length, cancellationToken).ConfigureAwait(false); // p_batch_messages
+		foreach (var item in parametersData)
+		{
+			await Database.Xdr.WriteOpaqueAsync(item, item.Length, cancellationToken).ConfigureAwait(false); // p_batch_data
 		}
 
-		protected void ProcessReleaseResponse(IResponse response)
-		{ }
-		protected ValueTask ProcessReleaseResponseAsync(IResponse response, CancellationToken cancellationToken = default)
-		{
-			return ValueTask2.CompletedTask;
-		}
+		await Database.Xdr.WriteAsync(IscCodes.op_batch_exec, cancellationToken).ConfigureAwait(false);
+		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
+		await Database.Xdr.WriteAsync(_statement.Transaction.Handle, cancellationToken).ConfigureAwait(false); // p_batch_transaction;		
 
-		protected ExecuteResultItem[] BuildResult(BatchCompletionStateResponse response)
+		await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+		var numberOfResponses = 3;
+		try
 		{
-			var detailedErrors = response.DetailedErrors.ToDictionary(x => x.Item1, x => x.Item2);
-			var additionalErrorsPerMessage = response.AdditionalErrorsPerMessage.ToHashSet();
-			var result = new ExecuteResultItem[response.ProcessedMessages];
-			for (var i = 0; i < result.Length; i++)
+			numberOfResponses--;
+			var batchCreateResponse = await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+			numberOfResponses--;
+			var batchMsgResponse = await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+			numberOfResponses--;
+			var batchExecResponse = (BatchCompletionStateResponse)await Database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			return BuildResult(batchExecResponse);
+		}
+		finally
+		{
+			await Database.SafeFinishFetchingAsync(numberOfResponses, cancellationToken).ConfigureAwait(false);
+		}
+	}
+
+	public override void Dispose2()
+	{
+		Database.Xdr.Write(IscCodes.op_batch_rls);
+		Database.Xdr.Write(_statement.Handle);
+		Database.AppendDeferredPacket(ProcessReleaseResponse);
+	}
+
+	public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+	{
+		await Database.Xdr.WriteAsync(IscCodes.op_batch_rls, cancellationToken).ConfigureAwait(false);
+		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false);
+		Database.AppendDeferredPacket(ProcessReleaseResponseAsync);
+	}
+
+	protected void ProcessReleaseResponse(IResponse response)
+	{ }
+	protected ValueTask ProcessReleaseResponseAsync(IResponse response, CancellationToken cancellationToken = default)
+	{
+		return ValueTask2.CompletedTask;
+	}
+
+	protected ExecuteResultItem[] BuildResult(BatchCompletionStateResponse response)
+	{
+		var detailedErrors = response.DetailedErrors.ToDictionary(x => x.Item1, x => x.Item2);
+		var additionalErrorsPerMessage = response.AdditionalErrorsPerMessage.ToHashSet();
+		var result = new ExecuteResultItem[response.ProcessedMessages];
+		for (var i = 0; i < result.Length; i++)
+		{
+			var recordsAffected = i < response.UpdatedRecordsPerMessage.Length
+				? response.UpdatedRecordsPerMessage[i]
+				: -1;
+			if (detailedErrors.TryGetValue(i, out var exception))
 			{
-				var recordsAffected = i < response.UpdatedRecordsPerMessage.Length
-					? response.UpdatedRecordsPerMessage[i]
-					: -1;
-				if (detailedErrors.TryGetValue(i, out var exception))
+				result[i] = new ExecuteResultItem()
 				{
-					result[i] = new ExecuteResultItem()
-					{
-						RecordsAffected = recordsAffected,
-						IsError = true,
-						Exception = exception,
-					};
-				}
-				else if (additionalErrorsPerMessage.Contains(i))
-				{
-					result[i] = new ExecuteResultItem()
-					{
-						RecordsAffected = recordsAffected,
-						IsError = true,
-						Exception = null,
-					};
-				}
-				else
-				{
-					result[i] = new ExecuteResultItem()
-					{
-						RecordsAffected = recordsAffected,
-						IsError = false,
-						Exception = null,
-					};
-				}
+					RecordsAffected = recordsAffected,
+					IsError = true,
+					Exception = exception,
+				};
 			}
-			return result;
+			else if (additionalErrorsPerMessage.Contains(i))
+			{
+				result[i] = new ExecuteResultItem()
+				{
+					RecordsAffected = recordsAffected,
+					IsError = true,
+					Exception = null,
+				};
+			}
+			else
+			{
+				result[i] = new ExecuteResultItem()
+				{
+					RecordsAffected = recordsAffected,
+					IsError = false,
+					Exception = null,
+				};
+			}
 		}
+		return result;
 	}
 }

@@ -23,29 +23,29 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+class FbStringEndsWithTranslator : IMethodCallTranslator
 {
-	class FbStringEndsWithTranslator : IMethodCallTranslator
+	static readonly MethodInfo MethodInfo = typeof(string).GetRuntimeMethod(nameof(string.EndsWith), new[] { typeof(string) });
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringEndsWithTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo MethodInfo = typeof(string).GetRuntimeMethod(nameof(string.EndsWith), new[] { typeof(string) });
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!method.Equals(MethodInfo))
+			return null;
 
-		public FbStringEndsWithTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!method.Equals(MethodInfo))
-				return null;
-
-			var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
-			var endsWithExpression = _fbSqlExpressionFactory.Equal(
-				_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
-						"RIGHT",
-						new[] {
+		var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
+		var endsWithExpression = _fbSqlExpressionFactory.Equal(
+			_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
+					"RIGHT",
+					new[] {
 							instance,
 							_fbSqlExpressionFactory.Function(
 								"CHAR_LENGTH",
@@ -53,19 +53,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 								true,
 								new[] { true },
 								typeof(int)) },
-						true,
-						new[] { true, true },
-						instance.Type)),
-				patternExpression);
-			return patternExpression is SqlConstantExpression sqlConstantExpression
-				? (string)sqlConstantExpression.Value == string.Empty
-					? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
-					: endsWithExpression
-				: _fbSqlExpressionFactory.OrElse(
-					endsWithExpression,
-					_fbSqlExpressionFactory.Equal(
-						patternExpression,
-						_fbSqlExpressionFactory.Constant(string.Empty)));
-		}
+					true,
+					new[] { true, true },
+					instance.Type)),
+			patternExpression);
+		return patternExpression is SqlConstantExpression sqlConstantExpression
+			? (string)sqlConstantExpression.Value == string.Empty
+				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
+				: endsWithExpression
+			: _fbSqlExpressionFactory.OrElse(
+				endsWithExpression,
+				_fbSqlExpressionFactory.Equal(
+					patternExpression,
+					_fbSqlExpressionFactory.Constant(string.Empty)));
 	}
 }

@@ -17,15 +17,14 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class ConnectionPoolLifetimeHelper
 {
-	internal static class ConnectionPoolLifetimeHelper
+	internal static bool IsAlive(long connectionLifetime, long created, long now)
 	{
-		internal static bool IsAlive(long connectionLifetime, long created, long now)
-		{
-			if (connectionLifetime == 0)
-				return true;
-			return (now - created) < (connectionLifetime * 1000);
-		}
+		if (connectionLifetime == 0)
+			return true;
+		return (now - created) < (connectionLifetime * 1000);
 	}
 }

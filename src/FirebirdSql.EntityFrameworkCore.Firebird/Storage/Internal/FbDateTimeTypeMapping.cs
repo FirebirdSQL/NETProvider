@@ -20,45 +20,44 @@ using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbDateTimeTypeMapping : DateTimeTypeMapping
 {
-	public class FbDateTimeTypeMapping : DateTimeTypeMapping
+	readonly FbDbType _fbDbType;
+
+	public FbDateTimeTypeMapping(string storeType, FbDbType fbDbType)
+		: base(storeType)
 	{
-		readonly FbDbType _fbDbType;
-
-		public FbDateTimeTypeMapping(string storeType, FbDbType fbDbType)
-			: base(storeType)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected FbDateTimeTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
-			: base(parameters)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected override void ConfigureParameter(DbParameter parameter)
-		{
-			((FbParameter)parameter).FbDbType = _fbDbType;
-		}
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			switch (_fbDbType)
-			{
-				case FbDbType.TimeStamp:
-					return $"CAST('{value:yyyy-MM-dd HH:mm:ss.ffff}' AS TIMESTAMP)";
-				case FbDbType.Date:
-					return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
-				case FbDbType.Time:
-					return $"CAST('{value:HH:mm:ss.ffff}' AS TIME)";
-				default:
-					throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
-			}
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbDateTimeTypeMapping(parameters, _fbDbType);
+		_fbDbType = fbDbType;
 	}
+
+	protected FbDateTimeTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
+		: base(parameters)
+	{
+		_fbDbType = fbDbType;
+	}
+
+	protected override void ConfigureParameter(DbParameter parameter)
+	{
+		((FbParameter)parameter).FbDbType = _fbDbType;
+	}
+
+	protected override string GenerateNonNullSqlLiteral(object value)
+	{
+		switch (_fbDbType)
+		{
+			case FbDbType.TimeStamp:
+				return $"CAST('{value:yyyy-MM-dd HH:mm:ss.ffff}' AS TIMESTAMP)";
+			case FbDbType.Date:
+				return $"CAST('{value:yyyy-MM-dd}' AS DATE)";
+			case FbDbType.Time:
+				return $"CAST('{value:HH:mm:ss.ffff}' AS TIME)";
+			default:
+				throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
+		}
+	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbDateTimeTypeMapping(parameters, _fbDbType);
 }

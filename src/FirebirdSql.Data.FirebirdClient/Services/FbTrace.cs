@@ -21,177 +21,176 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public sealed class FbTrace : FbService
 {
-	public sealed class FbTrace : FbService
+	FbTraceVersion _version;
+
+	public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; }
+	public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
+
+	public FbTrace(FbTraceVersion version = FbTraceVersion.Detect, string connectionString = null)
+		: base(connectionString)
 	{
-		FbTraceVersion _version;
+		_version = version;
+		DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
+	}
 
-		public FbDatabaseTraceConfigurationCollection DatabasesConfigurations { get; }
-		public FbServiceTraceConfiguration ServiceConfiguration { get; set; }
+	public void Start(string sessionName)
+	{
+		var version = _version;
+		if (version == FbTraceVersion.Detect)
+		{
+			version = DetectVersion();
+		}
+		try
+		{
+			var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
-		public FbTrace(FbTraceVersion version = FbTraceVersion.Detect, string connectionString = null)
-			: base(connectionString)
-		{
-			_version = version;
-			DatabasesConfigurations = new FbDatabaseTraceConfigurationCollection();
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_trace_start);
+			if (!string.IsNullOrEmpty(sessionName))
+				startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
+			startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
+			StartTask(startSpb);
+			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
+	}
+	public async Task StartAsync(string sessionName, CancellationToken cancellationToken = default)
+	{
+		var version = _version;
+		if (version == FbTraceVersion.Detect)
+		{
+			version = await DetectVersionAsync(cancellationToken).ConfigureAwait(false);
+		}
+		try
+		{
+			var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
-		public void Start(string sessionName)
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_trace_start);
+			if (!string.IsNullOrEmpty(sessionName))
+				startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
+			startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
 		{
-			var version = _version;
-			if (version == FbTraceVersion.Detect)
-			{
-				version = DetectVersion();
-			}
-			try
-			{
-				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+	}
 
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_trace_start);
-				if (!string.IsNullOrEmpty(sessionName))
-					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
-				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
-				StartTask(startSpb);
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
-		}
-		public async Task StartAsync(string sessionName, CancellationToken cancellationToken = default)
-		{
-			var version = _version;
-			if (version == FbTraceVersion.Detect)
-			{
-				version = await DetectVersionAsync(cancellationToken).ConfigureAwait(false);
-			}
-			try
-			{
-				var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
+	public void Stop(int sessionID)
+	{
+		DoSimpleAction(IscCodes.isc_action_svc_trace_stop, sessionID);
+	}
+	public Task StopAsync(int sessionID, CancellationToken cancellationToken = default)
+	{
+		return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_stop, sessionID, cancellationToken);
+	}
 
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_trace_start);
-				if (!string.IsNullOrEmpty(sessionName))
-					startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
-				startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
-		}
+	public void Suspend(int sessionID)
+	{
+		DoSimpleAction(IscCodes.isc_action_svc_trace_suspend, sessionID);
+	}
+	public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default)
+	{
+		return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_suspend, sessionID, cancellationToken);
+	}
 
-		public void Stop(int sessionID)
-		{
-			DoSimpleAction(IscCodes.isc_action_svc_trace_stop, sessionID);
-		}
-		public Task StopAsync(int sessionID, CancellationToken cancellationToken = default)
-		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_stop, sessionID, cancellationToken);
-		}
+	public void Resume(int sessionID)
+	{
+		DoSimpleAction(IscCodes.isc_action_svc_trace_resume, sessionID);
+	}
+	public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default)
+	{
+		return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_resume, sessionID, cancellationToken);
+	}
 
-		public void Suspend(int sessionID)
-		{
-			DoSimpleAction(IscCodes.isc_action_svc_trace_suspend, sessionID);
-		}
-		public Task SuspendAsync(int sessionID, CancellationToken cancellationToken = default)
-		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_suspend, sessionID, cancellationToken);
-		}
+	public void List()
+	{
+		DoSimpleAction(IscCodes.isc_action_svc_trace_list, null);
+	}
+	public Task ListAsync(CancellationToken cancellationToken = default)
+	{
+		return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_list, null, cancellationToken);
+	}
 
-		public void Resume(int sessionID)
+	void DoSimpleAction(int action, int? sessionID)
+	{
+		try
 		{
-			DoSimpleAction(IscCodes.isc_action_svc_trace_resume, sessionID);
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(action);
+			if (sessionID.HasValue)
+				startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
+			StartTask(startSpb);
+			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 		}
-		public Task ResumeAsync(int sessionID, CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_resume, sessionID, cancellationToken);
+			throw FbException.Create(ex);
 		}
+		finally
+		{
+			Close();
+		}
+	}
+	async Task DoSimpleActionAsync(int action, int? sessionID, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(action);
+			if (sessionID.HasValue)
+				startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+	}
 
-		public void List()
-		{
-			DoSimpleAction(IscCodes.isc_action_svc_trace_list, null);
-		}
-		public Task ListAsync(CancellationToken cancellationToken = default)
-		{
-			return DoSimpleActionAsync(IscCodes.isc_action_svc_trace_list, null, cancellationToken);
-		}
-
-		void DoSimpleAction(int action, int? sessionID)
-		{
-			try
-			{
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(action);
-				if (sessionID.HasValue)
-					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
-				StartTask(startSpb);
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
-		}
-		async Task DoSimpleActionAsync(int action, int? sessionID, CancellationToken cancellationToken = default)
-		{
-			try
-			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(action);
-				if (sessionID.HasValue)
-					startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
-		}
-
-		FbTraceVersion DetectVersion()
-		{
-			var serverProperties = new FbServerProperties(ConnectionString);
-			var serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
-			if (serverVersion < new Version(3, 0, 0, 0))
-				return FbTraceVersion.Version1;
-			else
-				return FbTraceVersion.Version2;
-		}
-		async Task<FbTraceVersion> DetectVersionAsync(CancellationToken cancellationToken = default)
-		{
-			var serverProperties = new FbServerProperties(ConnectionString);
-			var serverVersion = FbServerProperties.ParseServerVersion(await serverProperties.GetServerVersionAsync(cancellationToken).ConfigureAwait(false));
-			if (serverVersion < new Version(3, 0, 0, 0))
-				return FbTraceVersion.Version1;
-			else
-				return FbTraceVersion.Version2;
-		}
+	FbTraceVersion DetectVersion()
+	{
+		var serverProperties = new FbServerProperties(ConnectionString);
+		var serverVersion = FbServerProperties.ParseServerVersion(serverProperties.GetServerVersion());
+		if (serverVersion < new Version(3, 0, 0, 0))
+			return FbTraceVersion.Version1;
+		else
+			return FbTraceVersion.Version2;
+	}
+	async Task<FbTraceVersion> DetectVersionAsync(CancellationToken cancellationToken = default)
+	{
+		var serverProperties = new FbServerProperties(ConnectionString);
+		var serverVersion = FbServerProperties.ParseServerVersion(await serverProperties.GetServerVersionAsync(cancellationToken).ConfigureAwait(false));
+		if (serverVersion < new Version(3, 0, 0, 0))
+			return FbTraceVersion.Version1;
+		else
+			return FbTraceVersion.Version2;
 	}
 }

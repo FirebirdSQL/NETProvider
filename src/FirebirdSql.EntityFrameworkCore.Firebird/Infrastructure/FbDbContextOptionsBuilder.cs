@@ -19,18 +19,17 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
+
+public class FbDbContextOptionsBuilder : RelationalDbContextOptionsBuilder<FbDbContextOptionsBuilder, FbOptionsExtension>
 {
-	public class FbDbContextOptionsBuilder : RelationalDbContextOptionsBuilder<FbDbContextOptionsBuilder, FbOptionsExtension>
-	{
-		public FbDbContextOptionsBuilder(DbContextOptionsBuilder optionsBuilder)
-			: base(optionsBuilder)
-		{ }
+	public FbDbContextOptionsBuilder(DbContextOptionsBuilder optionsBuilder)
+		: base(optionsBuilder)
+	{ }
 
-		public virtual FbDbContextOptionsBuilder WithExplicitParameterTypes(bool explicitParameterTypes = true)
-			=> WithOption(e => e.WithExplicitParameterTypes(explicitParameterTypes));
+	public virtual FbDbContextOptionsBuilder WithExplicitParameterTypes(bool explicitParameterTypes = true)
+		=> WithOption(e => e.WithExplicitParameterTypes(explicitParameterTypes));
 
-		public virtual FbDbContextOptionsBuilder WithExplicitStringLiteralTypes(bool explicitStringLiteralTypes = true)
-			=> WithOption(e => e.WithExplicitStringLiteralTypes(explicitStringLiteralTypes));
-	}
+	public virtual FbDbContextOptionsBuilder WithExplicitStringLiteralTypes(bool explicitStringLiteralTypes = true)
+		=> WithOption(e => e.WithExplicitStringLiteralTypes(explicitStringLiteralTypes));
 }

@@ -19,77 +19,76 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal abstract class ParameterBuffer
 {
-	internal abstract class ParameterBuffer
-	{
 #warning Strictly speaking this should be disposed
-		private MemoryStream _stream;
+	private MemoryStream _stream;
 
-		public short Length => (short)_stream.Length;
+	public short Length => (short)_stream.Length;
 
-		protected ParameterBuffer()
+	protected ParameterBuffer()
+	{
+		_stream = new MemoryStream();
+	}
+
+	public virtual void Append(int type)
+	{
+		WriteByte(type);
+	}
+
+	public byte[] ToArray()
+	{
+		return _stream.ToArray();
+	}
+
+	protected void WriteByte(int value)
+	{
+		WriteByte((byte)value);
+	}
+
+	protected void WriteByte(byte value)
+	{
+		_stream.WriteByte(value);
+	}
+
+	protected void Write(byte value)
+	{
+		WriteByte(value);
+	}
+
+	protected void Write(short value)
+	{
+		if (!BitConverter.IsLittleEndian)
 		{
-			_stream = new MemoryStream();
+			value = IPAddress.NetworkToHostOrder(value);
 		}
 
-		public virtual void Append(int type)
+		var buffer = BitConverter.GetBytes(value);
+
+		_stream.Write(buffer, 0, buffer.Length);
+	}
+
+	protected void Write(int value)
+	{
+		if (!BitConverter.IsLittleEndian)
 		{
-			WriteByte(type);
+			value = IPAddress.NetworkToHostOrder(value);
 		}
 
-		public byte[] ToArray()
-		{
-			return _stream.ToArray();
-		}
+		var buffer = BitConverter.GetBytes(value);
 
-		protected void WriteByte(int value)
-		{
-			WriteByte((byte)value);
-		}
+		_stream.Write(buffer, 0, buffer.Length);
+	}
 
-		protected void WriteByte(byte value)
-		{
-			_stream.WriteByte(value);
-		}
+	protected void Write(byte[] buffer)
+	{
+		Write(buffer, 0, buffer.Length);
+	}
 
-		protected void Write(byte value)
-		{
-			WriteByte(value);
-		}
-
-		protected void Write(short value)
-		{
-			if (!BitConverter.IsLittleEndian)
-			{
-				value = IPAddress.NetworkToHostOrder(value);
-			}
-
-			var buffer = BitConverter.GetBytes(value);
-
-			_stream.Write(buffer, 0, buffer.Length);
-		}
-
-		protected void Write(int value)
-		{
-			if (!BitConverter.IsLittleEndian)
-			{
-				value = IPAddress.NetworkToHostOrder(value);
-			}
-
-			var buffer = BitConverter.GetBytes(value);
-
-			_stream.Write(buffer, 0, buffer.Length);
-		}
-
-		protected void Write(byte[] buffer)
-		{
-			Write(buffer, 0, buffer.Length);
-		}
-
-		protected void Write(byte[] buffer, int offset, int count)
-		{
-			_stream.Write(buffer, offset, count);
-		}
+	protected void Write(byte[] buffer, int offset, int count)
+	{
+		_stream.Write(buffer, offset, count);
 	}
 }

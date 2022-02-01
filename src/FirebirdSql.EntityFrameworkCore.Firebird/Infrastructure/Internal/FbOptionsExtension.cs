@@ -21,65 +21,64 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
-{
-	public class FbOptionsExtension : RelationalOptionsExtension
-	{
-		DbContextOptionsExtensionInfo _info;
-		bool? _explicitParameterTypes;
-		bool? _explicitStringLiteralTypes;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 
-		public FbOptionsExtension()
+public class FbOptionsExtension : RelationalOptionsExtension
+{
+	DbContextOptionsExtensionInfo _info;
+	bool? _explicitParameterTypes;
+	bool? _explicitStringLiteralTypes;
+
+	public FbOptionsExtension()
+	{ }
+
+	public FbOptionsExtension(FbOptionsExtension copyFrom)
+		: base(copyFrom)
+	{
+		_explicitParameterTypes = copyFrom._explicitParameterTypes;
+		_explicitStringLiteralTypes = copyFrom._explicitStringLiteralTypes;
+	}
+
+	protected override RelationalOptionsExtension Clone()
+		=> new FbOptionsExtension(this);
+
+	public override void ApplyServices(IServiceCollection services)
+		=> services.AddEntityFrameworkFirebird();
+
+	public override DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
+	public virtual bool? ExplicitParameterTypes => _explicitParameterTypes;
+	public virtual bool? ExplicitStringLiteralTypes => _explicitStringLiteralTypes;
+
+	public virtual FbOptionsExtension WithExplicitParameterTypes(bool explicitParameterTypes)
+	{
+		var clone = (FbOptionsExtension)Clone();
+		clone._explicitParameterTypes = explicitParameterTypes;
+		return clone;
+	}
+
+	public virtual FbOptionsExtension WithExplicitStringLiteralTypes(bool explicitStringLiteralTypes)
+	{
+		var clone = (FbOptionsExtension)Clone();
+		clone._explicitStringLiteralTypes = explicitStringLiteralTypes;
+		return clone;
+	}
+
+	sealed class ExtensionInfo : RelationalExtensionInfo
+	{
+		int? _serviceProviderHash;
+
+		public ExtensionInfo(IDbContextOptionsExtension extension)
+			: base(extension)
 		{ }
 
-		public FbOptionsExtension(FbOptionsExtension copyFrom)
-			: base(copyFrom)
+		new FbOptionsExtension Extension => (FbOptionsExtension)base.Extension;
+
+		public override int GetServiceProviderHashCode()
 		{
-			_explicitParameterTypes = copyFrom._explicitParameterTypes;
-			_explicitStringLiteralTypes = copyFrom._explicitStringLiteralTypes;
+			return _serviceProviderHash ??= HashCode.Combine(base.GetServiceProviderHashCode(), Extension._explicitParameterTypes, Extension._explicitStringLiteralTypes);
 		}
 
-		protected override RelationalOptionsExtension Clone()
-			=> new FbOptionsExtension(this);
-
-		public override void ApplyServices(IServiceCollection services)
-			=> services.AddEntityFrameworkFirebird();
-
-		public override DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
-		public virtual bool? ExplicitParameterTypes => _explicitParameterTypes;
-		public virtual bool? ExplicitStringLiteralTypes => _explicitStringLiteralTypes;
-
-		public virtual FbOptionsExtension WithExplicitParameterTypes(bool explicitParameterTypes)
-		{
-			var clone = (FbOptionsExtension)Clone();
-			clone._explicitParameterTypes = explicitParameterTypes;
-			return clone;
-		}
-
-		public virtual FbOptionsExtension WithExplicitStringLiteralTypes(bool explicitStringLiteralTypes)
-		{
-			var clone = (FbOptionsExtension)Clone();
-			clone._explicitStringLiteralTypes = explicitStringLiteralTypes;
-			return clone;
-		}
-
-		sealed class ExtensionInfo : RelationalExtensionInfo
-		{
-			int? _serviceProviderHash;
-
-			public ExtensionInfo(IDbContextOptionsExtension extension)
-				: base(extension)
-			{ }
-
-			new FbOptionsExtension Extension => (FbOptionsExtension)base.Extension;
-
-			public override int GetServiceProviderHashCode()
-			{
-				return _serviceProviderHash ??= HashCode.Combine(base.GetServiceProviderHashCode(), Extension._explicitParameterTypes, Extension._explicitStringLiteralTypes);
-			}
-
-			public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
-			{ }
-		}
+		public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
+		{ }
 	}
 }

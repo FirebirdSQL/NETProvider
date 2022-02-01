@@ -17,69 +17,68 @@
 
 using System.Globalization;
 
-namespace EntityFramework.Firebird.SqlGen
+namespace EntityFramework.Firebird.SqlGen;
+
+internal class FirstClause : ISqlFragment
 {
-	internal class FirstClause : ISqlFragment
+	#region Fields
+
+	private ISqlFragment _firstCount;
+
+	#endregion
+
+	#region Internal Properties
+
+	/// <summary>
+	/// How many first rows should be selected.
+	/// </summary>
+	internal ISqlFragment FirstCount
 	{
-		#region Fields
-
-		private ISqlFragment _firstCount;
-
-		#endregion
-
-		#region Internal Properties
-
-		/// <summary>
-		/// How many first rows should be selected.
-		/// </summary>
-		internal ISqlFragment FirstCount
-		{
-			get { return _firstCount; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		/// <summary>
-		/// Creates a FirstClause with the given topCount and withTies.
-		/// </summary>
-		/// <param name="topCount"></param>
-		internal FirstClause(ISqlFragment firstCount)
-		{
-			_firstCount = firstCount;
-		}
-
-		/// <summary>
-		/// Creates a TopClause with the given topCount and withTies.
-		/// </summary>
-		/// <param name="topCount"></param>
-		internal FirstClause(int firstCount)
-		{
-			var sqlBuilder = new SqlBuilder();
-			sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
-			_firstCount = sqlBuilder;
-		}
-
-		#endregion
-
-		#region ISqlFragment Members
-
-		/// <summary>
-		/// Write out the FIRST part of sql select statement
-		/// It basically writes FIRST (X).
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="sqlGenerator"></param>
-		public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
-		{
-			writer.Write("FIRST (");
-			FirstCount.WriteSql(writer, sqlGenerator);
-			writer.Write(")");
-
-			writer.Write(" ");
-		}
-
-		#endregion
+		get { return _firstCount; }
 	}
+
+	#endregion
+
+	#region Constructors
+
+	/// <summary>
+	/// Creates a FirstClause with the given topCount and withTies.
+	/// </summary>
+	/// <param name="topCount"></param>
+	internal FirstClause(ISqlFragment firstCount)
+	{
+		_firstCount = firstCount;
+	}
+
+	/// <summary>
+	/// Creates a TopClause with the given topCount and withTies.
+	/// </summary>
+	/// <param name="topCount"></param>
+	internal FirstClause(int firstCount)
+	{
+		var sqlBuilder = new SqlBuilder();
+		sqlBuilder.Append(firstCount.ToString(CultureInfo.InvariantCulture));
+		_firstCount = sqlBuilder;
+	}
+
+	#endregion
+
+	#region ISqlFragment Members
+
+	/// <summary>
+	/// Write out the FIRST part of sql select statement
+	/// It basically writes FIRST (X).
+	/// </summary>
+	/// <param name="writer"></param>
+	/// <param name="sqlGenerator"></param>
+	public void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator)
+	{
+		writer.Write("FIRST (");
+		FirstCount.WriteSql(writer, sqlGenerator);
+		writer.Write(")");
+
+		writer.Write(" ");
+	}
+
+	#endregion
 }

@@ -21,32 +21,31 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
+
+public class FbRelationalAnnotationProvider : RelationalAnnotationProvider
 {
-	public class FbRelationalAnnotationProvider : RelationalAnnotationProvider
-	{
 #pragma warning disable EF1001
-		public FbRelationalAnnotationProvider(RelationalAnnotationProviderDependencies dependencies)
+	public FbRelationalAnnotationProvider(RelationalAnnotationProviderDependencies dependencies)
 #pragma warning restore EF1001
 			: base(dependencies)
-		{ }
+	{ }
 
-		public override IEnumerable<IAnnotation> For(IColumn column, bool designTime)
+	public override IEnumerable<IAnnotation> For(IColumn column, bool designTime)
+	{
+		if (!designTime)
 		{
-			if (!designTime)
-			{
-				yield break;
-			}
+			yield break;
+		}
 
-			var property = column.PropertyMappings.Select(x => x.Property)
-				.FirstOrDefault(x => x.GetValueGenerationStrategy() != FbValueGenerationStrategy.None);
-			if (property != null)
+		var property = column.PropertyMappings.Select(x => x.Property)
+			.FirstOrDefault(x => x.GetValueGenerationStrategy() != FbValueGenerationStrategy.None);
+		if (property != null)
+		{
+			var valueGenerationStrategy = property.GetValueGenerationStrategy();
+			if (valueGenerationStrategy != FbValueGenerationStrategy.None)
 			{
-				var valueGenerationStrategy = property.GetValueGenerationStrategy();
-				if (valueGenerationStrategy != FbValueGenerationStrategy.None)
-				{
-					yield return new Annotation(FbAnnotationNames.ValueGenerationStrategy, valueGenerationStrategy);
-				}
+				yield return new Annotation(FbAnnotationNames.ValueGenerationStrategy, valueGenerationStrategy);
 			}
 		}
 	}

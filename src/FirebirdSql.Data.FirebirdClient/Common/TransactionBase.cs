@@ -19,52 +19,51 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal abstract class TransactionBase
 {
-	internal abstract class TransactionBase
+	public abstract int Handle { get; }
+
+	public TransactionState State { get; protected set; }
+	public event EventHandler Update;
+
+	public abstract void BeginTransaction(TransactionParameterBuffer tpb);
+	public abstract ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default);
+
+	public abstract void Commit();
+	public abstract ValueTask CommitAsync(CancellationToken cancellationToken = default);
+
+	public abstract void CommitRetaining();
+	public abstract ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default);
+
+	public abstract void Rollback();
+	public abstract ValueTask RollbackAsync(CancellationToken cancellationToken = default);
+
+	public abstract void RollbackRetaining();
+	public abstract ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default);
+
+	public abstract void Prepare();
+	public abstract ValueTask PrepareAsync(CancellationToken cancellationToken = default);
+
+	public abstract void Prepare(byte[] buffer);
+	public abstract ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default);
+
+	public virtual void Dispose2()
+	{ }
+	public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
 	{
-		public abstract int Handle { get; }
+		return ValueTask2.CompletedTask;
+	}
 
-		public TransactionState State { get; protected set; }
-		public event EventHandler Update;
+	protected void EnsureActiveTransactionState()
+	{
+		if (State != TransactionState.Active)
+			throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
+	}
 
-		public abstract void BeginTransaction(TransactionParameterBuffer tpb);
-		public abstract ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default);
-
-		public abstract void Commit();
-		public abstract ValueTask CommitAsync(CancellationToken cancellationToken = default);
-
-		public abstract void CommitRetaining();
-		public abstract ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default);
-
-		public abstract void Rollback();
-		public abstract ValueTask RollbackAsync(CancellationToken cancellationToken = default);
-
-		public abstract void RollbackRetaining();
-		public abstract ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default);
-
-		public abstract void Prepare();
-		public abstract ValueTask PrepareAsync(CancellationToken cancellationToken = default);
-
-		public abstract void Prepare(byte[] buffer);
-		public abstract ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default);
-
-		public virtual void Dispose2()
-		{ }
-		public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
-		{
-			return ValueTask2.CompletedTask;
-		}
-
-		protected void EnsureActiveTransactionState()
-		{
-			if (State != TransactionState.Active)
-				throw IscException.ForTypeErrorCodeIntParamStrParam(IscCodes.isc_arg_gds, IscCodes.isc_tra_state, Handle, "no valid");
-		}
-
-		protected void OnUpdate(EventArgs e)
-		{
-			Update?.Invoke(this, e);
-		}
+	protected void OnUpdate(EventArgs e)
+	{
+		Update?.Invoke(this, e);
 	}
 }

@@ -18,26 +18,26 @@
 using System.Collections.Generic;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed;
+
+internal static class ProtocolsSupported
 {
-	internal static class ProtocolsSupported
+	internal class Protocol
 	{
-		internal class Protocol
-		{
-			public int Version { get; }
-			public int MaxPType { get; }
+		public int Version { get; }
+		public int MaxPType { get; }
 
-			public Protocol(int version, int maxPType)
-			{
-				Version = version;
-				MaxPType = maxPType;
-			}
+		public Protocol(int version, int maxPType)
+		{
+			Version = version;
+			MaxPType = maxPType;
 		}
+	}
 
-		public static ICollection<Protocol> Get(bool compression)
+	public static ICollection<Protocol> Get(bool compression)
+	{
+		return new[]
 		{
-			return new[]
-			{
 				new Protocol(IscCodes.PROTOCOL_VERSION10, IscCodes.ptype_batch_send),
 				new Protocol(IscCodes.PROTOCOL_VERSION11, IscCodes.ptype_lazy_send),
 				new Protocol(IscCodes.PROTOCOL_VERSION12, IscCodes.ptype_lazy_send),
@@ -45,6 +45,5 @@ namespace FirebirdSql.Data.Client.Managed
 				new Protocol(IscCodes.PROTOCOL_VERSION15, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
 				new Protocol(IscCodes.PROTOCOL_VERSION16, IscCodes.ptype_lazy_send | (compression ? IscCodes.pflag_compress : 0)),
 			};
-		}
 	}
 }

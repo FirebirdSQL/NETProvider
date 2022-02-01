@@ -20,30 +20,29 @@ using FirebirdSql.Data.Client.Managed;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class AuthBlockTests
 {
-	[NoServerCategory]
-	public class AuthBlockTests
+	static IEnumerable<TestCaseData> NormalizeLoginTestSource()
 	{
-		static IEnumerable<TestCaseData> NormalizeLoginTestSource()
-		{
-			yield return new TestCaseData("sysdba").Returns("SYSDBA");
-			yield return new TestCaseData("s").Returns("S");
-			yield return new TestCaseData("\"CaseSensitive\"").Returns("CaseSensitive");
-			yield return new TestCaseData("\"s\"").Returns("s");
-			yield return new TestCaseData("\"With\"\"EscapedQuote\"").Returns("With\"EscapedQuote");
-			yield return new TestCaseData("\"Invalid\"Escape\"").Returns("Invalid");
-			yield return new TestCaseData("\"DanglingInvalidEscape\"\"").Returns("DanglingInvalidEscape");
-			yield return new TestCaseData("\"EscapedQuoteAtEnd\"\"\"").Returns("EscapedQuoteAtEnd\"");
-			yield return new TestCaseData("\"StartNoEndQuote").Returns("\"STARTNOENDQUOTE");
-			yield return new TestCaseData("\"\"").Returns("\"\"");
-			yield return new TestCaseData("").Returns("");
-			yield return new TestCaseData(null).Returns(null);
-		}
-		[TestCaseSource(nameof(NormalizeLoginTestSource))]
-		public string NormalizeLoginTest(string login)
-		{
-			return AuthBlock.NormalizeLogin(login);
-		}
+		yield return new TestCaseData("sysdba").Returns("SYSDBA");
+		yield return new TestCaseData("s").Returns("S");
+		yield return new TestCaseData("\"CaseSensitive\"").Returns("CaseSensitive");
+		yield return new TestCaseData("\"s\"").Returns("s");
+		yield return new TestCaseData("\"With\"\"EscapedQuote\"").Returns("With\"EscapedQuote");
+		yield return new TestCaseData("\"Invalid\"Escape\"").Returns("Invalid");
+		yield return new TestCaseData("\"DanglingInvalidEscape\"\"").Returns("DanglingInvalidEscape");
+		yield return new TestCaseData("\"EscapedQuoteAtEnd\"\"\"").Returns("EscapedQuoteAtEnd\"");
+		yield return new TestCaseData("\"StartNoEndQuote").Returns("\"STARTNOENDQUOTE");
+		yield return new TestCaseData("\"\"").Returns("\"\"");
+		yield return new TestCaseData("").Returns("");
+		yield return new TestCaseData(null).Returns(null);
+	}
+	[TestCaseSource(nameof(NormalizeLoginTestSource))]
+	public string NormalizeLoginTest(string login)
+	{
+		return AuthBlock.NormalizeLogin(login);
 	}
 }

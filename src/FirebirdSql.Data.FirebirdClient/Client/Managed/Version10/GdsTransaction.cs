@@ -21,396 +21,395 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version10
+namespace FirebirdSql.Data.Client.Managed.Version10;
+
+internal class GdsTransaction : TransactionBase
 {
-	internal class GdsTransaction : TransactionBase
+	#region Fields
+
+	private int _handle;
+	private bool _disposed;
+	private GdsDatabase _database;
+
+	#endregion
+
+	#region Properties
+
+	public override int Handle
 	{
-		#region Fields
+		get { return _handle; }
+	}
 
-		private int _handle;
-		private bool _disposed;
-		private GdsDatabase _database;
+	#endregion
 
-		#endregion
+	#region Constructors
 
-		#region Properties
-
-		public override int Handle
+	public GdsTransaction(DatabaseBase db)
+	{
+		if (!(db is GdsDatabase))
 		{
-			get { return _handle; }
+			throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
 		}
 
-		#endregion
+		_database = (GdsDatabase)db;
+		State = TransactionState.NoTransaction;
+	}
 
-		#region Constructors
+	#endregion
 
-		public GdsTransaction(DatabaseBase db)
+	#region Dispose2
+
+	public override void Dispose2()
+	{
+		if (!_disposed)
 		{
-			if (!(db is GdsDatabase))
+			_disposed = true;
+			if (State != TransactionState.NoTransaction)
 			{
-				throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
+				Rollback();
 			}
+			_database = null;
+			_handle = 0;
+			State = TransactionState.NoTransaction;
+			base.Dispose2();
+		}
+	}
+	public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+	{
+		if (!_disposed)
+		{
+			_disposed = true;
+			if (State != TransactionState.NoTransaction)
+			{
+				await RollbackAsync(cancellationToken).ConfigureAwait(false);
+			}
+			_database = null;
+			_handle = 0;
+			State = TransactionState.NoTransaction;
+			await base.Dispose2Async(cancellationToken).ConfigureAwait(false);
+		}
+	}
 
-			_database = (GdsDatabase)db;
+	#endregion
+
+	#region Methods
+
+	public override void BeginTransaction(TransactionParameterBuffer tpb)
+	{
+		if (State != TransactionState.NoTransaction)
+		{
+			throw new InvalidOperationException();
+		}
+
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_transaction);
+			_database.Xdr.Write(_database.Handle);
+			_database.Xdr.WriteBuffer(tpb.ToArray());
+			_database.Xdr.Flush();
+
+			var response = (GenericResponse)_database.ReadResponse();
+
+			_database.TransactionCount++;
+
+			_handle = response.ObjectHandle;
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default)
+	{
+		if (State != TransactionState.NoTransaction)
+		{
+			throw new InvalidOperationException();
+		}
+
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_transaction, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_database.Handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBufferAsync(tpb.ToArray(), cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			_database.TransactionCount++;
+
+			_handle = response.ObjectHandle;
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override void Commit()
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_commit);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			_database.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
 			State = TransactionState.NoTransaction;
 		}
-
-		#endregion
-
-		#region Dispose2
-
-		public override void Dispose2()
+		catch (IOException ex)
 		{
-			if (!_disposed)
-			{
-				_disposed = true;
-				if (State != TransactionState.NoTransaction)
-				{
-					Rollback();
-				}
-				_database = null;
-				_handle = 0;
-				State = TransactionState.NoTransaction;
-				base.Dispose2();
-			}
+			throw IscException.ForIOException(ex);
 		}
-		public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
-		{
-			if (!_disposed)
-			{
-				_disposed = true;
-				if (State != TransactionState.NoTransaction)
-				{
-					await RollbackAsync(cancellationToken).ConfigureAwait(false);
-				}
-				_database = null;
-				_handle = 0;
-				State = TransactionState.NoTransaction;
-				await base.Dispose2Async(cancellationToken).ConfigureAwait(false);
-			}
-		}
-
-		#endregion
-
-		#region Methods
-
-		public override void BeginTransaction(TransactionParameterBuffer tpb)
-		{
-			if (State != TransactionState.NoTransaction)
-			{
-				throw new InvalidOperationException();
-			}
-
-			try
-			{
-				_database.Xdr.Write(IscCodes.op_transaction);
-				_database.Xdr.Write(_database.Handle);
-				_database.Xdr.WriteBuffer(tpb.ToArray());
-				_database.Xdr.Flush();
-
-				var response = (GenericResponse)_database.ReadResponse();
-
-				_database.TransactionCount++;
-
-				_handle = response.ObjectHandle;
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask BeginTransactionAsync(TransactionParameterBuffer tpb, CancellationToken cancellationToken = default)
-		{
-			if (State != TransactionState.NoTransaction)
-			{
-				throw new InvalidOperationException();
-			}
-
-			try
-			{
-				await _database.Xdr.WriteAsync(IscCodes.op_transaction, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_database.Handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteBufferAsync(tpb.ToArray(), cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				_database.TransactionCount++;
-
-				_handle = response.ObjectHandle;
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		public override void Commit()
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				_database.Xdr.Write(IscCodes.op_commit);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				_database.TransactionCount--;
-
-				OnUpdate(EventArgs.Empty);
-
-				State = TransactionState.NoTransaction;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask CommitAsync(CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				await _database.Xdr.WriteAsync(IscCodes.op_commit, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				_database.TransactionCount--;
-
-				OnUpdate(EventArgs.Empty);
-
-				State = TransactionState.NoTransaction;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		public override void Rollback()
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				_database.Xdr.Write(IscCodes.op_rollback);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				_database.TransactionCount--;
-
-				OnUpdate(EventArgs.Empty);
-
-				State = TransactionState.NoTransaction;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask RollbackAsync(CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				await _database.Xdr.WriteAsync(IscCodes.op_rollback, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				_database.TransactionCount--;
-
-				OnUpdate(EventArgs.Empty);
-
-				State = TransactionState.NoTransaction;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		public override void CommitRetaining()
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				_database.Xdr.Write(IscCodes.op_commit_retaining);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				await _database.Xdr.WriteAsync(IscCodes.op_commit_retaining, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		public override void RollbackRetaining()
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				_database.Xdr.Write(IscCodes.op_rollback_retaining);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				await _database.Xdr.WriteAsync(IscCodes.op_rollback_retaining, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				State = TransactionState.Active;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		#endregion
-
-		#region Two Phase Commit Methods
-
-		public override void Prepare()
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				State = TransactionState.NoTransaction;
-
-				_database.Xdr.Write(IscCodes.op_prepare);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				State = TransactionState.Prepared;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask PrepareAsync(CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				State = TransactionState.NoTransaction;
-
-				await _database.Xdr.WriteAsync(IscCodes.op_prepare, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				State = TransactionState.Prepared;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		public override void Prepare(byte[] buffer)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				State = TransactionState.NoTransaction;
-
-				_database.Xdr.Write(IscCodes.op_prepare2);
-				_database.Xdr.Write(_handle);
-				_database.Xdr.WriteBuffer(buffer, buffer.Length);
-				_database.Xdr.Flush();
-
-				_database.ReadResponse();
-
-				State = TransactionState.Prepared;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default)
-		{
-			EnsureActiveTransactionState();
-
-			try
-			{
-				State = TransactionState.NoTransaction;
-
-				await _database.Xdr.WriteAsync(IscCodes.op_prepare2, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteBufferAsync(buffer, buffer.Length, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-				await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-
-				State = TransactionState.Prepared;
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-
-		#endregion
 	}
+	public override async ValueTask CommitAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_commit, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			_database.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
+			State = TransactionState.NoTransaction;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override void Rollback()
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_rollback);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			_database.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
+			State = TransactionState.NoTransaction;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask RollbackAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_rollback, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			_database.TransactionCount--;
+
+			OnUpdate(EventArgs.Empty);
+
+			State = TransactionState.NoTransaction;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override void CommitRetaining()
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_commit_retaining);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask CommitRetainingAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_commit_retaining, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override void RollbackRetaining()
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_rollback_retaining);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask RollbackRetainingAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_rollback_retaining, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			State = TransactionState.Active;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	#endregion
+
+	#region Two Phase Commit Methods
+
+	public override void Prepare()
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			State = TransactionState.NoTransaction;
+
+			_database.Xdr.Write(IscCodes.op_prepare);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			State = TransactionState.Prepared;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask PrepareAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			State = TransactionState.NoTransaction;
+
+			await _database.Xdr.WriteAsync(IscCodes.op_prepare, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			State = TransactionState.Prepared;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override void Prepare(byte[] buffer)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			State = TransactionState.NoTransaction;
+
+			_database.Xdr.Write(IscCodes.op_prepare2);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.WriteBuffer(buffer, buffer.Length);
+			_database.Xdr.Flush();
+
+			_database.ReadResponse();
+
+			State = TransactionState.Prepared;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default)
+	{
+		EnsureActiveTransactionState();
+
+		try
+		{
+			State = TransactionState.NoTransaction;
+
+			await _database.Xdr.WriteAsync(IscCodes.op_prepare2, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBufferAsync(buffer, buffer.Length, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			State = TransactionState.Prepared;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	#endregion
 }

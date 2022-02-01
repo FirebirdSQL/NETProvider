@@ -20,17 +20,16 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class NorthwindChangeTrackingQueryFbTest : NorthwindChangeTrackingQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
-	{
-		public NorthwindChangeTrackingQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		protected override NorthwindContext CreateNoTrackingContext()
-			=> new NorthwindRelationalContext(
-				new DbContextOptionsBuilder(Fixture.CreateOptions())
-					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking).Options);
-	}
+public class NorthwindChangeTrackingQueryFbTest : NorthwindChangeTrackingQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+{
+	public NorthwindChangeTrackingQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
+
+	protected override NorthwindContext CreateNoTrackingContext()
+		=> new NorthwindRelationalContext(
+			new DbContextOptionsBuilder(Fixture.CreateOptions())
+				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking).Options);
 }

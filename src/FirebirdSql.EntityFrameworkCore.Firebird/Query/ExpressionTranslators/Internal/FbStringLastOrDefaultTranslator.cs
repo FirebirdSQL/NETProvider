@@ -24,33 +24,32 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringLastOrDefaultTranslator : IMethodCallTranslator
 {
-	public class FbStringLastOrDefaultTranslator : IMethodCallTranslator
+	static readonly MethodInfo MethodInfo = typeof(Enumerable).GetRuntimeMethods()
+		.Single(m => m.Name == nameof(Enumerable.LastOrDefault) && m.GetParameters().Length == 1)
+		.MakeGenericMethod(typeof(char));
+
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringLastOrDefaultTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		static readonly MethodInfo MethodInfo = typeof(Enumerable).GetRuntimeMethods()
-			.Single(m => m.Name == nameof(Enumerable.LastOrDefault) && m.GetParameters().Length == 1)
-			.MakeGenericMethod(typeof(char));
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!method.Equals(MethodInfo))
+			return null;
 
-		public FbStringLastOrDefaultTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!method.Equals(MethodInfo))
-				return null;
-
-			var argument = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
-			return _fbSqlExpressionFactory.Function(
-				"RIGHT",
-				new[] { argument, _fbSqlExpressionFactory.Constant(1) },
-				true,
-				new[] { true, false },
-				typeof(string));
-		}
+		var argument = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
+		return _fbSqlExpressionFactory.Function(
+			"RIGHT",
+			new[] { argument, _fbSqlExpressionFactory.Constant(1) },
+			true,
+			new[] { true, false },
+			typeof(string));
 	}
 }

@@ -17,54 +17,53 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public sealed class FbUserData
 {
-	public sealed class FbUserData
+	private string _userName;
+	public string UserName
 	{
-		private string _userName;
-		public string UserName
+		get { return _userName; }
+		set
 		{
-			get { return _userName; }
-			set
-			{
-				if (value == null)
-					throw new InvalidOperationException("The user name cannot be null.");
-				if (value.Length > 31)
-					throw new InvalidOperationException("The user name cannot have more than 31 characters.");
-				_userName = value;
-			}
+			if (value == null)
+				throw new InvalidOperationException("The user name cannot be null.");
+			if (value.Length > 31)
+				throw new InvalidOperationException("The user name cannot have more than 31 characters.");
+			_userName = value;
 		}
+	}
 
-		private string _userPassword;
-		public string UserPassword
+	private string _userPassword;
+	public string UserPassword
+	{
+		get { return _userPassword; }
+		set
 		{
-			get { return _userPassword; }
-			set
-			{
-				if (value == null)
-					throw new InvalidOperationException("The user password cannot be null.");
-				if (value.Length > 31)
-					throw new InvalidOperationException("The user password cannot have more than 31 characters.");
-				_userPassword = value;
-			}
+			if (value == null)
+				throw new InvalidOperationException("The user password cannot be null.");
+			if (value.Length > 31)
+				throw new InvalidOperationException("The user password cannot have more than 31 characters.");
+			_userPassword = value;
 		}
+	}
 
-		public string FirstName { get; set; }
-		public string LastName { get; set; }
-		public string MiddleName { get; set; }
-		public int UserID { get; set; }
-		public int GroupID { get; set; }
-		public string GroupName { get; set; }
-		public string RoleName { get; set; }
+	public string FirstName { get; set; }
+	public string LastName { get; set; }
+	public string MiddleName { get; set; }
+	public int UserID { get; set; }
+	public int GroupID { get; set; }
+	public string GroupName { get; set; }
+	public string RoleName { get; set; }
 
-		public FbUserData()
-		{
-			UserName = string.Empty;
-			UserPassword = string.Empty;
-			FirstName = string.Empty;
-			LastName = string.Empty;
-			MiddleName = string.Empty;
-			RoleName = string.Empty;
-		}
+	public FbUserData()
+	{
+		UserName = string.Empty;
+		UserPassword = string.Empty;
+		FirstName = string.Empty;
+		LastName = string.Empty;
+		MiddleName = string.Empty;
+		RoleName = string.Empty;
 	}
 }

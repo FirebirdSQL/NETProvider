@@ -17,18 +17,17 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal static class NativeHelpers
 {
-	internal static class NativeHelpers
+	public static void CallIfExists(Action action)
 	{
-		public static void CallIfExists(Action action)
+		try
 		{
-			try
-			{
-				action();
-			}
-			catch (EntryPointNotFoundException)
-			{ }
+			action();
 		}
+		catch (EntryPointNotFoundException)
+		{ }
 	}
 }

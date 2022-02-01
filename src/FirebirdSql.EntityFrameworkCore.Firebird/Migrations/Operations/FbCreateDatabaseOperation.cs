@@ -17,10 +17,9 @@
 
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
+
+public class FbCreateDatabaseOperation : MigrationOperation
 {
-	public class FbCreateDatabaseOperation : MigrationOperation
-	{
-		public virtual string ConnectionString { get; set; }
-	}
+	public virtual string ConnectionString { get; set; }
 }

@@ -19,86 +19,85 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace EntityFramework.Firebird.SqlGen
+namespace EntityFramework.Firebird.SqlGen;
+
+internal class SqlWriter : StringWriter
 {
-	internal class SqlWriter : StringWriter
+	#region Fields
+
+	// We start at -1, since the first select statement will increment it to 0.
+	private int _indent = -1;
+	private bool _atBeginningOfLine = true;
+
+	#endregion
+
+	#region Properties
+
+	/// <summary>
+	/// The number of tabs to be added at the beginning of each new line.
+	/// </summary>
+	internal int Indent
 	{
-		#region Fields
+		get { return _indent; }
+		set { _indent = value; }
+	}
 
-		// We start at -1, since the first select statement will increment it to 0.
-		private int _indent = -1;
-		private bool _atBeginningOfLine = true;
+	#endregion
 
-		#endregion
+	#region Constructors
 
-		#region Properties
+	/// <summary>
+	///
+	/// </summary>
+	/// <param name="b"></param>
+	public SqlWriter(StringBuilder b)
+		: base(b, System.Globalization.CultureInfo.InvariantCulture)
+	{
+	}
 
-		/// <summary>
-		/// The number of tabs to be added at the beginning of each new line.
-		/// </summary>
-		internal int Indent
-		{
-			get { return _indent; }
-			set { _indent = value; }
-		}
+	#endregion
 
-		#endregion
+	#region Methods
 
-		#region Constructors
-
-		/// <summary>
-		///
-		/// </summary>
-		/// <param name="b"></param>
-		public SqlWriter(StringBuilder b)
-			: base(b, System.Globalization.CultureInfo.InvariantCulture)
-		{
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Reset atBeginningofLine if we detect the newline string.
-		/// <see cref="SqlBuilder.AppendLine"/>
-		/// Add as many tabs as the value of indent if we are at the
-		/// beginning of a line.
-		/// </summary>
-		/// <param name="value"></param>
-		public override void Write(string value)
-		{
-			if (value == Environment.NewLine)
-			{
-				base.WriteLine();
-				_atBeginningOfLine = true;
-			}
-			else
-			{
-				if (_atBeginningOfLine)
-				{
-					if (_indent > 0)
-					{
-						base.Write(new string('\t', _indent));
-					}
-					_atBeginningOfLine = false;
-				}
-				base.Write(value);
-			}
-		}
-
-		public override void WriteLine()
+	/// <summary>
+	/// Reset atBeginningofLine if we detect the newline string.
+	/// <see cref="SqlBuilder.AppendLine"/>
+	/// Add as many tabs as the value of indent if we are at the
+	/// beginning of a line.
+	/// </summary>
+	/// <param name="value"></param>
+	public override void Write(string value)
+	{
+		if (value == Environment.NewLine)
 		{
 			base.WriteLine();
 			_atBeginningOfLine = true;
 		}
-
-		public override void WriteLine(string value)
+		else
 		{
-			Write(value);
-			WriteLine();
+			if (_atBeginningOfLine)
+			{
+				if (_indent > 0)
+				{
+					base.Write(new string('\t', _indent));
+				}
+				_atBeginningOfLine = false;
+			}
+			base.Write(value);
 		}
-
-		#endregion
 	}
+
+	public override void WriteLine()
+	{
+		base.WriteLine();
+		_atBeginningOfLine = true;
+	}
+
+	public override void WriteLine(string value)
+	{
+		Write(value);
+		WriteLine();
+	}
+
+	#endregion
 }

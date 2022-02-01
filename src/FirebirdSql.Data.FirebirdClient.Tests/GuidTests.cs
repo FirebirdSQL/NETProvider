@@ -21,65 +21,64 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class GuidTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class GuidTests : FbTestsBase
+	public GuidTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task InsertGuidTest()
 	{
-		public GuidTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+		var newGuid = Guid.Empty;
+		var guidValue = Guid.NewGuid();
 
-		[Test]
-		public async Task InsertGuidTest()
+		await using (var insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection))
 		{
-			var newGuid = Guid.Empty;
-			var guidValue = Guid.NewGuid();
-
-			await using (var insert = new FbCommand("INSERT INTO GUID_TEST (GUID_FIELD) VALUES (@GuidValue)", Connection))
-			{
-				insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = guidValue;
-				await insert.ExecuteNonQueryAsync();
-			}
-
-			await using (var select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
-			{
-				await using (var r = await select.ExecuteReaderAsync())
-				{
-					if (await r.ReadAsync())
-					{
-						newGuid = r.GetGuid(1);
-					}
-				}
-			}
-
-			Assert.AreEqual(guidValue, newGuid);
+			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = guidValue;
+			await insert.ExecuteNonQueryAsync();
 		}
 
-		[Test]
-		public async Task InsertNullGuidTest()
+		await using (var select = new FbCommand("SELECT * FROM GUID_TEST", Connection))
 		{
-			var id = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
-
-			await using (var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection))
+			await using (var r = await select.ExecuteReaderAsync())
 			{
-				insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
-				insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
-				await insert.ExecuteNonQueryAsync();
-			}
-
-			await using (var select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
-			{
-				select.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
-				await using (var r = await select.ExecuteReaderAsync())
+				if (await r.ReadAsync())
 				{
-					if (await r.ReadAsync())
+					newGuid = r.GetGuid(1);
+				}
+			}
+		}
+
+		Assert.AreEqual(guidValue, newGuid);
+	}
+
+	[Test]
+	public async Task InsertNullGuidTest()
+	{
+		var id = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+
+		await using (var insert = new FbCommand("INSERT INTO GUID_TEST (INT_FIELD, GUID_FIELD) VALUES (@IntField, @GuidValue)", Connection))
+		{
+			insert.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
+			insert.Parameters.Add("@GuidValue", FbDbType.Guid).Value = DBNull.Value;
+			await insert.ExecuteNonQueryAsync();
+		}
+
+		await using (var select = new FbCommand("SELECT * FROM GUID_TEST WHERE INT_FIELD = @IntField", Connection))
+		{
+			select.Parameters.Add("@IntField", FbDbType.Integer).Value = id;
+			await using (var r = await select.ExecuteReaderAsync())
+			{
+				if (await r.ReadAsync())
+				{
+					if (!await r.IsDBNullAsync(1))
 					{
-						if (!await r.IsDBNullAsync(1))
-						{
-							Assert.Fail();
-						}
+						Assert.Fail();
 					}
 				}
 			}

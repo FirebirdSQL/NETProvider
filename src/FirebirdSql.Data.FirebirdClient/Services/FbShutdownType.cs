@@ -17,12 +17,11 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public enum FbShutdownType
 {
-	public enum FbShutdownType
-	{
-		ForceShutdown,
-		AttachmentsShutdown,
-		TransactionsShutdown,
-	}
+	ForceShutdown,
+	AttachmentsShutdown,
+	TransactionsShutdown,
 }

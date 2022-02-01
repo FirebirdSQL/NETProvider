@@ -20,23 +20,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class NorthwindDbFunctionsQueryFbTest : NorthwindDbFunctionsQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
-	{
-		public NorthwindDbFunctionsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		public override Task Like_literal(bool async)
-		{
-			// fix wrong assumptions on collate
-			return AssertCount(
-				async,
-				ss => ss.Set<Microsoft.EntityFrameworkCore.TestModels.Northwind.Customer>(),
-				ss => ss.Set<Microsoft.EntityFrameworkCore.TestModels.Northwind.Customer>(),
-				c => EF.Functions.Like(c.ContactName, "%M%"),
-				c => c.ContactName.Contains("M"));
-		}
+public class NorthwindDbFunctionsQueryFbTest : NorthwindDbFunctionsQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+{
+	public NorthwindDbFunctionsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
+
+	public override Task Like_literal(bool async)
+	{
+		// fix wrong assumptions on collate
+		return AssertCount(
+			async,
+			ss => ss.Set<Microsoft.EntityFrameworkCore.TestModels.Northwind.Customer>(),
+			ss => ss.Set<Microsoft.EntityFrameworkCore.TestModels.Northwind.Customer>(),
+			c => EF.Functions.Like(c.ContactName, "%M%"),
+			c => c.ContactName.Contains("M"));
 	}
 }

@@ -22,87 +22,86 @@ using System.Runtime.Serialization;
 
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+public sealed class FbException : DbException
 {
-	[Serializable]
-	public sealed class FbException : DbException
+	#region Fields
+
+	private FbErrorCollection _errors;
+
+	#endregion
+
+	#region Properties
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+	public FbErrorCollection Errors => _errors ??= new FbErrorCollection();
+
+	public override int ErrorCode => (InnerException as IscException)?.ErrorCode ?? 0;
+
+	public string SQLSTATE => (InnerException as IscException)?.SQLSTATE;
+
+	#endregion
+
+	#region Constructors
+
+	private FbException(string message, Exception innerException)
+		: base(message, innerException)
+	{ }
+
+	private FbException(SerializationInfo info, StreamingContext context)
+		: base(info, context)
 	{
-		#region Fields
+		_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
+	}
 
-		private FbErrorCollection _errors;
+	#endregion
 
-		#endregion
+	#region Methods
 
-		#region Properties
+	public override void GetObjectData(SerializationInfo info, StreamingContext context)
+	{
+		base.GetObjectData(info, context);
 
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public FbErrorCollection Errors => _errors ??= new FbErrorCollection();
+		info.AddValue("errors", _errors);
+	}
 
-		public override int ErrorCode => (InnerException as IscException)?.ErrorCode ?? 0;
+	#endregion
 
-		public string SQLSTATE => (InnerException as IscException)?.SQLSTATE;
+	#region Private Methods
 
-		#endregion
-
-		#region Constructors
-
-		private FbException(string message, Exception innerException)
-			: base(message, innerException)
-		{ }
-
-		private FbException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
+	private void ProcessIscExceptionErrors(IscException innerException)
+	{
+		foreach (var error in innerException.Errors)
 		{
-			_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
+			Errors.Add(error.Message, error.ErrorCode);
 		}
+	}
 
-		#endregion
+	#endregion
 
-		#region Methods
-
-		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+	internal static Exception Create(string message) => Create(message, null);
+	internal static Exception Create(Exception innerException) => Create(null, innerException);
+	internal static Exception Create(string message, Exception innerException)
+	{
+		message ??= innerException?.Message;
+		if (innerException is IscException iscException)
 		{
-			base.GetObjectData(info, context);
-
-			info.AddValue("errors", _errors);
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		private void ProcessIscExceptionErrors(IscException innerException)
-		{
-			foreach (var error in innerException.Errors)
+			if (iscException.ErrorCode == IscCodes.isc_cancelled)
 			{
-				Errors.Add(error.Message, error.ErrorCode);
-			}
-		}
-
-		#endregion
-
-		internal static Exception Create(string message) => Create(message, null);
-		internal static Exception Create(Exception innerException) => Create(null, innerException);
-		internal static Exception Create(string message, Exception innerException)
-		{
-			message ??= innerException?.Message;
-			if (innerException is IscException iscException)
-			{
-				if (iscException.ErrorCode == IscCodes.isc_cancelled)
-				{
-					return new OperationCanceledException(message, innerException);
-				}
-				else
-				{
-					var result = new FbException(message, innerException);
-					result.ProcessIscExceptionErrors(iscException);
-					return result;
-				}
+				return new OperationCanceledException(message, innerException);
 			}
 			else
 			{
-				return new FbException(message, innerException);
+				var result = new FbException(message, innerException);
+				result.ProcessIscExceptionErrors(iscException);
+				return result;
 			}
+		}
+		else
+		{
+			return new FbException(message, innerException);
 		}
 	}
 }

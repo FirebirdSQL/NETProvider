@@ -18,27 +18,26 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal abstract class BatchBase
 {
-	internal abstract class BatchBase
+	public abstract StatementBase Statement { get; }
+	public bool MultiError { get; set; }
+
+	public class ExecuteResultItem
 	{
-		public abstract StatementBase Statement { get; }
-		public bool MultiError { get; set; }
+		public int RecordsAffected { get; set; }
+		public bool IsError { get; set; }
+		public IscException Exception { get; set; }
+	}
+	public abstract ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller);
+	public abstract ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default);
 
-		public class ExecuteResultItem
-		{
-			public int RecordsAffected { get; set; }
-			public bool IsError { get; set; }
-			public IscException Exception { get; set; }
-		}
-		public abstract ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller);
-		public abstract ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default);
-
-		public virtual void Dispose2()
-		{ }
-		public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
-		{
-			return ValueTask2.CompletedTask;
-		}
+	public virtual void Dispose2()
+	{ }
+	public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+	{
+		return ValueTask2.CompletedTask;
 	}
 }

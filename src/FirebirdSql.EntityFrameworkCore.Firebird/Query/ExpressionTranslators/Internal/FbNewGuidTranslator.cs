@@ -24,24 +24,23 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbNewGuidTranslator : IMethodCallTranslator
 {
-	public class FbNewGuidTranslator : IMethodCallTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbNewGuidTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbNewGuidTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (method.DeclaringType == typeof(Guid) && method.Name == nameof(Guid.NewGuid))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			return _fbSqlExpressionFactory.Function("GEN_UUID", Array.Empty<SqlExpression>(), false, Array.Empty<bool>(), typeof(Guid));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (method.DeclaringType == typeof(Guid) && method.Name == nameof(Guid.NewGuid))
-			{
-				return _fbSqlExpressionFactory.Function("GEN_UUID", Array.Empty<SqlExpression>(), false, Array.Empty<bool>(), typeof(Guid));
-			}
-			return null;
-		}
+		return null;
 	}
 }

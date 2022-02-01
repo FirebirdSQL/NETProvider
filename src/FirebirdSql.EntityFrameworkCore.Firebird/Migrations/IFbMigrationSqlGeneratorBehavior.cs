@@ -17,11 +17,10 @@
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird
+namespace FirebirdSql.EntityFrameworkCore.Firebird;
+
+public interface IFbMigrationSqlGeneratorBehavior
 {
-	public interface IFbMigrationSqlGeneratorBehavior
-	{
-		void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
-		void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
-	}
+	void CreateSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
+	void DropSequenceTriggerForColumn(string columnName, string tableName, string schemaName, MigrationsSqlGenerationOptions options, MigrationCommandListBuilder builder);
 }

@@ -18,43 +18,42 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests;
+
+public class FbTestDbContext : DbContext
 {
-	public class FbTestDbContext : DbContext
+	readonly string _connectionString;
+
+	public FbTestDbContext(string connectionString)
+		: base()
 	{
-		readonly string _connectionString;
+		_connectionString = connectionString;
+	}
 
-		public FbTestDbContext(string connectionString)
-			: base()
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		base.OnConfiguring(optionsBuilder);
+
+		optionsBuilder.UseFirebird(_connectionString);
+	}
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		base.OnModelCreating(modelBuilder);
+		OnTestModelCreating(modelBuilder);
+		AfterModelCreated(modelBuilder);
+	}
+
+	protected virtual void OnTestModelCreating(ModelBuilder modelBuilder)
+	{ }
+
+	protected virtual void AfterModelCreated(ModelBuilder modelBuilder)
+	{
+		foreach (var entity in modelBuilder.Model.GetEntityTypes())
 		{
-			_connectionString = connectionString;
-		}
-
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			base.OnConfiguring(optionsBuilder);
-
-			optionsBuilder.UseFirebird(_connectionString);
-		}
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-			base.OnModelCreating(modelBuilder);
-			OnTestModelCreating(modelBuilder);
-			AfterModelCreated(modelBuilder);
-		}
-
-		protected virtual void OnTestModelCreating(ModelBuilder modelBuilder)
-		{ }
-
-		protected virtual void AfterModelCreated(ModelBuilder modelBuilder)
-		{
-			foreach (var entity in modelBuilder.Model.GetEntityTypes())
+			foreach (var property in entity.GetProperties().Where(x => x.ClrType == typeof(string)))
 			{
-				foreach (var property in entity.GetProperties().Where(x => x.ClrType == typeof(string)))
-				{
-					property.SetMaxLength(100);
-				}
+				property.SetMaxLength(100);
 			}
 		}
 	}

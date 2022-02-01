@@ -18,41 +18,40 @@
 using System;
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public class FbTransactionOptions
 {
-	public class FbTransactionOptions
+	private TimeSpan? _waitTimeout;
+	public TimeSpan? WaitTimeout
 	{
-		private TimeSpan? _waitTimeout;
-		public TimeSpan? WaitTimeout
+		get { return _waitTimeout; }
+		set
 		{
-			get { return _waitTimeout; }
-			set
+			if (value.HasValue)
 			{
-				if (value.HasValue)
-				{
-					var secs = ((TimeSpan)value).TotalSeconds;
-					if (secs < 1 || secs > short.MaxValue)
-						throw new ArgumentException($"The value must be between 1 and {short.MaxValue}.");
-				}
-
-				_waitTimeout = value;
+				var secs = ((TimeSpan)value).TotalSeconds;
+				if (secs < 1 || secs > short.MaxValue)
+					throw new ArgumentException($"The value must be between 1 and {short.MaxValue}.");
 			}
+
+			_waitTimeout = value;
 		}
-		internal short? WaitTimeoutTPBValue => (short?)_waitTimeout?.TotalSeconds;
+	}
+	internal short? WaitTimeoutTPBValue => (short?)_waitTimeout?.TotalSeconds;
 
-		public FbTransactionBehavior TransactionBehavior { get; set; }
+	public FbTransactionBehavior TransactionBehavior { get; set; }
 
-		private IDictionary<string, FbTransactionBehavior> _lockTables;
-		public IDictionary<string, FbTransactionBehavior> LockTables
+	private IDictionary<string, FbTransactionBehavior> _lockTables;
+	public IDictionary<string, FbTransactionBehavior> LockTables
+	{
+		get
 		{
-			get
-			{
-				return _lockTables ??= new Dictionary<string, FbTransactionBehavior>();
-			}
-			set
-			{
-				_lockTables = value ?? throw new ArgumentNullException($"{nameof(LockTables)} cannot be null.");
-			}
+			return _lockTables ??= new Dictionary<string, FbTransactionBehavior>();
+		}
+		set
+		{
+			_lockTables = value ?? throw new ArgumentNullException($"{nameof(LockTables)} cannot be null.");
 		}
 	}
 }

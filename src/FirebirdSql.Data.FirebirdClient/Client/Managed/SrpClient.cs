@@ -18,18 +18,17 @@
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace FirebirdSql.Data.Client.Managed
-{
-	internal sealed class SrpClient : SrpClientBase
-	{
-		public override string Name => "Srp";
+namespace FirebirdSql.Data.Client.Managed;
 
-		protected override byte[] ComputeHash(params byte[][] ba)
+internal sealed class SrpClient : SrpClientBase
+{
+	public override string Name => "Srp";
+
+	protected override byte[] ComputeHash(params byte[][] ba)
+	{
+		using (var hash = SHA1.Create())
 		{
-			using (var hash = SHA1.Create())
-			{
-				return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
-			}
+			return hash.ComputeHash(ba.SelectMany(x => x).ToArray());
 		}
 	}
 }

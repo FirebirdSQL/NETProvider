@@ -24,11 +24,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbObjectToStringTranslator : IMethodCallTranslator
 {
-	public class FbObjectToStringTranslator : IMethodCallTranslator
-	{
-		static readonly HashSet<Type> SupportedTypes = new HashSet<Type>
+	static readonly HashSet<Type> SupportedTypes = new HashSet<Type>
 		{
 			typeof(int),
 			typeof(long),
@@ -50,28 +50,27 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(TimeOnly),
 		};
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
-		public FbObjectToStringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
+	public FbObjectToStringTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	{
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (method.Name == nameof(ToString) && method.GetParameters().Length == 0)
 		{
-			if (method.Name == nameof(ToString) && method.GetParameters().Length == 0)
+			var type = instance.Type.UnwrapNullableType();
+			if (SupportedTypes.Contains(type))
 			{
-				var type = instance.Type.UnwrapNullableType();
-				if (SupportedTypes.Contains(type))
-				{
-					return _fbSqlExpressionFactory.Convert(instance, typeof(string));
-				}
-				else if (type == typeof(Guid))
-				{
-					return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, true, new[] { true }, typeof(string));
-				}
+				return _fbSqlExpressionFactory.Convert(instance, typeof(string));
 			}
-			return null;
+			else if (type == typeof(Guid))
+			{
+				return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, true, new[] { true }, typeof(string));
+			}
 		}
+		return null;
 	}
 }

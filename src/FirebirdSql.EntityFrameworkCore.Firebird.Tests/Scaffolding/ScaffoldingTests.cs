@@ -19,22 +19,19 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using NUnit.Framework;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Scaffolding
-{
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Tests.Scaffolding;
 #pragma warning disable EF1001
-	public class ScaffoldingTests : EntityFrameworkCoreTestsBase
+public class ScaffoldingTests : EntityFrameworkCoreTestsBase
+{
+	[Test]
+	public void JustCanRun()
 	{
-		[Test]
-		public void JustCanRun()
-		{
-			var modelFactory = GetModelFactory();
-			Assert.DoesNotThrow(() => modelFactory.Create(Connection, new DatabaseModelFactoryOptions()));
-		}
-
-		static IDatabaseModelFactory GetModelFactory()
-		{
-			return new FbDatabaseModelFactory();
-		}
+		var modelFactory = GetModelFactory();
+		Assert.DoesNotThrow(() => modelFactory.Create(Connection, new DatabaseModelFactoryOptions()));
 	}
-#pragma warning restore EF1001
+
+	static IDatabaseModelFactory GetModelFactory()
+	{
+		return new FbDatabaseModelFactory();
+	}
 }

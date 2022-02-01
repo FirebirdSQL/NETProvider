@@ -18,12 +18,11 @@
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class NorthwindAsTrackingQueryFbTest : NorthwindAsTrackingQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
-	public class NorthwindAsTrackingQueryFbTest : NorthwindAsTrackingQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
-	{
-		public NorthwindAsTrackingQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
-	}
+	public NorthwindAsTrackingQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
 }

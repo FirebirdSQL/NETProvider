@@ -15,11 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
+
+public static class FbAnnotationNames
 {
-	public static class FbAnnotationNames
-	{
-		public const string Prefix = "Fb:";
-		public const string ValueGenerationStrategy = Prefix + nameof(ValueGenerationStrategy);
-	}
+	public const string Prefix = "Fb:";
+	public const string ValueGenerationStrategy = Prefix + nameof(ValueGenerationStrategy);
 }

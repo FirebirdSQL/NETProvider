@@ -17,65 +17,64 @@
 
 using System.Data.Common;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public class FirebirdClientFactory : DbProviderFactory
 {
-	public class FirebirdClientFactory : DbProviderFactory
+	#region Static Properties
+
+	public static readonly FirebirdClientFactory Instance = new FirebirdClientFactory();
+
+	#endregion
+
+	#region Properties
+
+	public override bool CanCreateDataSourceEnumerator
 	{
-		#region Static Properties
-
-		public static readonly FirebirdClientFactory Instance = new FirebirdClientFactory();
-
-		#endregion
-
-		#region Properties
-
-		public override bool CanCreateDataSourceEnumerator
-		{
-			get { return false; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		private FirebirdClientFactory()
-			: base()
-		{ }
-
-		#endregion
-
-		#region Methods
-
-		public override DbCommand CreateCommand()
-		{
-			return new FbCommand();
-		}
-
-		public override DbCommandBuilder CreateCommandBuilder()
-		{
-			return new FbCommandBuilder();
-		}
-
-		public override DbConnection CreateConnection()
-		{
-			return new FbConnection();
-		}
-
-		public override DbConnectionStringBuilder CreateConnectionStringBuilder()
-		{
-			return new FbConnectionStringBuilder();
-		}
-
-		public override DbDataAdapter CreateDataAdapter()
-		{
-			return new FbDataAdapter();
-		}
-
-		public override DbParameter CreateParameter()
-		{
-			return new FbParameter();
-		}
-
-		#endregion
+		get { return false; }
 	}
+
+	#endregion
+
+	#region Constructors
+
+	private FirebirdClientFactory()
+		: base()
+	{ }
+
+	#endregion
+
+	#region Methods
+
+	public override DbCommand CreateCommand()
+	{
+		return new FbCommand();
+	}
+
+	public override DbCommandBuilder CreateCommandBuilder()
+	{
+		return new FbCommandBuilder();
+	}
+
+	public override DbConnection CreateConnection()
+	{
+		return new FbConnection();
+	}
+
+	public override DbConnectionStringBuilder CreateConnectionStringBuilder()
+	{
+		return new FbConnectionStringBuilder();
+	}
+
+	public override DbDataAdapter CreateDataAdapter()
+	{
+		return new FbDataAdapter();
+	}
+
+	public override DbParameter CreateParameter()
+	{
+		return new FbParameter();
+	}
+
+	#endregion
 }

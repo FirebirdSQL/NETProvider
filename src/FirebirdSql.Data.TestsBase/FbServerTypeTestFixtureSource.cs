@@ -21,31 +21,30 @@ using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace FirebirdSql.Data.TestsBase
+namespace FirebirdSql.Data.TestsBase;
+
+class FbServerTypeTestFixtureSource
 {
-	class FbServerTypeTestFixtureSource
+	public static IEnumerable Default()
 	{
-		public static IEnumerable Default()
-		{
-			yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Disabled);
-			yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Required);
-			yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Disabled);
-			yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Required);
+		yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Disabled);
+		yield return CreateTestFixtureData(FbServerType.Default, false, FbWireCrypt.Required);
+		yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Disabled);
+		yield return CreateTestFixtureData(FbServerType.Default, true, FbWireCrypt.Required);
 
-		}
+	}
 
-		public static IEnumerable Embedded()
-		{
-			yield return CreateTestFixtureData(FbServerType.Embedded, false, FbWireCrypt.Disabled);
-		}
+	public static IEnumerable Embedded()
+	{
+		yield return CreateTestFixtureData(FbServerType.Embedded, false, FbWireCrypt.Disabled);
+	}
 
-		static TestFixtureData CreateTestFixtureData(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-		{
-			var result = new TestFixtureData(serverType, compression, wireCrypt);
-			result.Properties.Set(nameof(FbTestsBase.ServerType), serverType.ToString());
-			result.Properties.Set(nameof(FbTestsBase.Compression), compression.ToString());
-			result.Properties.Set(nameof(FbTestsBase.WireCrypt), wireCrypt.ToString());
-			return result;
-		}
+	static TestFixtureData CreateTestFixtureData(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+	{
+		var result = new TestFixtureData(serverType, compression, wireCrypt);
+		result.Properties.Set(nameof(FbTestsBase.ServerType), serverType.ToString());
+		result.Properties.Set(nameof(FbTestsBase.Compression), compression.ToString());
+		result.Properties.Set(nameof(FbTestsBase.WireCrypt), wireCrypt.ToString());
+		return result;
 	}
 }

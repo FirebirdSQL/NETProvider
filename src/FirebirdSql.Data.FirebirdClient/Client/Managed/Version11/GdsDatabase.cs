@@ -22,237 +22,236 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version11
+namespace FirebirdSql.Data.Client.Managed.Version11;
+
+internal class GdsDatabase : Version10.GdsDatabase
 {
-	internal class GdsDatabase : Version10.GdsDatabase
+	private readonly Queue<(Action<IResponse>, Func<IResponse, CancellationToken, ValueTask>)> _deferredPackets;
+
+	public GdsDatabase(GdsConnection connection)
+		: base(connection)
 	{
-		private readonly Queue<(Action<IResponse>, Func<IResponse, CancellationToken, ValueTask>)> _deferredPackets;
+		_deferredPackets = new Queue<(Action<IResponse>, Func<IResponse, CancellationToken, ValueTask>)>();
+	}
 
-		public GdsDatabase(GdsConnection connection)
-			: base(connection)
-		{
-			_deferredPackets = new Queue<(Action<IResponse>, Func<IResponse, CancellationToken, ValueTask>)>();
-		}
+	public override StatementBase CreateStatement()
+	{
+		return new GdsStatement(this);
+	}
 
-		public override StatementBase CreateStatement()
-		{
-			return new GdsStatement(this);
-		}
+	public override StatementBase CreateStatement(TransactionBase transaction)
+	{
+		return new GdsStatement(this, transaction);
+	}
 
-		public override StatementBase CreateStatement(TransactionBase transaction)
-		{
-			return new GdsStatement(this, transaction);
-		}
-
-		public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
-		{
-			try
-			{
-				using (var sspiHelper = new SspiHelper())
-				{
-					var authData = sspiHelper.InitializeClientSecurity();
-					SendTrustedAuthToBuffer(dpb, authData);
-					SendAttachToBuffer(dpb, database);
-					Xdr.Flush();
-
-					var response = ReadResponse();
-					response = ProcessTrustedAuthResponse(sspiHelper, response);
-					ProcessAttachResponse((GenericResponse)response);
-				}
-			}
-			catch (IscException)
-			{
-				SafelyDetach();
-				throw;
-			}
-			catch (IOException ex)
-			{
-				SafelyDetach();
-				throw IscException.ForIOException(ex);
-			}
-
-			AfterAttachActions();
-		}
-		public override async ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
-		{
-			try
-			{
-				using (var sspiHelper = new SspiHelper())
-				{
-					var authData = sspiHelper.InitializeClientSecurity();
-					await SendTrustedAuthToBufferAsync(dpb, authData, cancellationToken).ConfigureAwait(false);
-					await SendAttachToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
-					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-					var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-					response = await ProcessTrustedAuthResponseAsync(sspiHelper, response, cancellationToken).ConfigureAwait(false);
-					await ProcessAttachResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
-				}
-			}
-			catch (IscException)
-			{
-				await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
-				throw;
-			}
-			catch (IOException ex)
-			{
-				await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
-				throw IscException.ForIOException(ex);
-			}
-
-			await AfterAttachActionsAsync(cancellationToken).ConfigureAwait(false);
-		}
-
-		protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData)
-		{
-			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
-		}
-		protected virtual ValueTask SendTrustedAuthToBufferAsync(DatabaseParameterBufferBase dpb, byte[] authData, CancellationToken cancellationToken = default)
-		{
-			dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
-			return ValueTask2.CompletedTask;
-		}
-
-		protected IResponse ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response)
-		{
-			while (response is AuthResponse)
-			{
-				var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				Xdr.Write(IscCodes.op_trusted_auth);
-				Xdr.WriteBuffer(authData);
-				Xdr.Flush();
-				response = ReadResponse();
-			}
-			return response;
-		}
-		protected async ValueTask<IResponse> ProcessTrustedAuthResponseAsync(SspiHelper sspiHelper, IResponse response, CancellationToken cancellationToken = default)
-		{
-			while (response is AuthResponse)
-			{
-				var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
-				await Xdr.WriteAsync(IscCodes.op_trusted_auth, cancellationToken).ConfigureAwait(false);
-				await Xdr.WriteBufferAsync(authData, cancellationToken).ConfigureAwait(false);
-				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-			}
-			return response;
-		}
-
-		public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	{
+		try
 		{
 			using (var sspiHelper = new SspiHelper())
 			{
 				var authData = sspiHelper.InitializeClientSecurity();
 				SendTrustedAuthToBuffer(dpb, authData);
-				SendCreateToBuffer(dpb, database);
+				SendAttachToBuffer(dpb, database);
 				Xdr.Flush();
 
 				var response = ReadResponse();
 				response = ProcessTrustedAuthResponse(sspiHelper, response);
-				ProcessCreateResponse((GenericResponse)response);
+				ProcessAttachResponse((GenericResponse)response);
 			}
 		}
-		public override async ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+		catch (IscException)
+		{
+			SafelyDetach();
+			throw;
+		}
+		catch (IOException ex)
+		{
+			SafelyDetach();
+			throw IscException.ForIOException(ex);
+		}
+
+		AfterAttachActions();
+	}
+	public override async ValueTask AttachWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		try
 		{
 			using (var sspiHelper = new SspiHelper())
 			{
 				var authData = sspiHelper.InitializeClientSecurity();
 				await SendTrustedAuthToBufferAsync(dpb, authData, cancellationToken).ConfigureAwait(false);
-				await SendCreateToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
+				await SendAttachToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
 				await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
 				var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 				response = await ProcessTrustedAuthResponseAsync(sspiHelper, response, cancellationToken).ConfigureAwait(false);
-				await ProcessCreateResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
+				await ProcessAttachResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
 			}
+		}
+		catch (IscException)
+		{
+			await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
+			throw;
+		}
+		catch (IOException ex)
+		{
+			await SafelyDetachAsync(cancellationToken).ConfigureAwait(false);
+			throw IscException.ForIOException(ex);
 		}
 
-		public override void ReleaseObject(int op, int id)
-		{
-			try
-			{
-				SendReleaseObjectToBuffer(op, id);
-				AppendDeferredPacket(ProcessReleaseObjectResponse);
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-		public override async ValueTask ReleaseObjectAsync(int op, int id, CancellationToken cancellationToken = default)
-		{
-			try
-			{
-				await SendReleaseObjectToBufferAsync(op, id, cancellationToken).ConfigureAwait(false);
-				AppendDeferredPacket(ProcessReleaseObjectResponseAsync);
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
+		await AfterAttachActionsAsync(cancellationToken).ConfigureAwait(false);
+	}
 
-		public override async ValueTask<int> ReadOperationAsync(CancellationToken cancellationToken = default)
-		{
-			await ProcessDeferredPacketsAsync(cancellationToken).ConfigureAwait(false);
-			return await base.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
-		}
-		public override int ReadOperation()
-		{
-			ProcessDeferredPackets();
-			return base.ReadOperation();
-		}
+	protected virtual void SendTrustedAuthToBuffer(DatabaseParameterBufferBase dpb, byte[] authData)
+	{
+		dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
+	}
+	protected virtual ValueTask SendTrustedAuthToBufferAsync(DatabaseParameterBufferBase dpb, byte[] authData, CancellationToken cancellationToken = default)
+	{
+		dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
+		return ValueTask2.CompletedTask;
+	}
 
-		public void AppendDeferredPacket(Action<IResponse> packet)
+	protected IResponse ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response)
+	{
+		while (response is AuthResponse)
 		{
-			_deferredPackets.Enqueue((packet, null));
+			var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
+			Xdr.Write(IscCodes.op_trusted_auth);
+			Xdr.WriteBuffer(authData);
+			Xdr.Flush();
+			response = ReadResponse();
 		}
-		public void AppendDeferredPacket(Func<IResponse, CancellationToken, ValueTask> packet)
+		return response;
+	}
+	protected async ValueTask<IResponse> ProcessTrustedAuthResponseAsync(SspiHelper sspiHelper, IResponse response, CancellationToken cancellationToken = default)
+	{
+		while (response is AuthResponse)
 		{
-			_deferredPackets.Enqueue((null, packet));
+			var authData = sspiHelper.GetClientSecurity(((AuthResponse)response).Data);
+			await Xdr.WriteAsync(IscCodes.op_trusted_auth, cancellationToken).ConfigureAwait(false);
+			await Xdr.WriteBufferAsync(authData, cancellationToken).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 		}
+		return response;
+	}
 
-		private void ProcessDeferredPackets()
+	public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	{
+		using (var sspiHelper = new SspiHelper())
 		{
-			if (_deferredPackets.Count > 0)
+			var authData = sspiHelper.InitializeClientSecurity();
+			SendTrustedAuthToBuffer(dpb, authData);
+			SendCreateToBuffer(dpb, database);
+			Xdr.Flush();
+
+			var response = ReadResponse();
+			response = ProcessTrustedAuthResponse(sspiHelper, response);
+			ProcessCreateResponse((GenericResponse)response);
+		}
+	}
+	public override async ValueTask CreateDatabaseWithTrustedAuthAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
+	{
+		using (var sspiHelper = new SspiHelper())
+		{
+			var authData = sspiHelper.InitializeClientSecurity();
+			await SendTrustedAuthToBufferAsync(dpb, authData, cancellationToken).ConfigureAwait(false);
+			await SendCreateToBufferAsync(dpb, database, cancellationToken).ConfigureAwait(false);
+			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			var response = await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+			response = await ProcessTrustedAuthResponseAsync(sspiHelper, response, cancellationToken).ConfigureAwait(false);
+			await ProcessCreateResponseAsync((GenericResponse)response, cancellationToken).ConfigureAwait(false);
+		}
+	}
+
+	public override void ReleaseObject(int op, int id)
+	{
+		try
+		{
+			SendReleaseObjectToBuffer(op, id);
+			AppendDeferredPacket(ProcessReleaseObjectResponse);
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	public override async ValueTask ReleaseObjectAsync(int op, int id, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await SendReleaseObjectToBufferAsync(op, id, cancellationToken).ConfigureAwait(false);
+			AppendDeferredPacket(ProcessReleaseObjectResponseAsync);
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override async ValueTask<int> ReadOperationAsync(CancellationToken cancellationToken = default)
+	{
+		await ProcessDeferredPacketsAsync(cancellationToken).ConfigureAwait(false);
+		return await base.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
+	}
+	public override int ReadOperation()
+	{
+		ProcessDeferredPackets();
+		return base.ReadOperation();
+	}
+
+	public void AppendDeferredPacket(Action<IResponse> packet)
+	{
+		_deferredPackets.Enqueue((packet, null));
+	}
+	public void AppendDeferredPacket(Func<IResponse, CancellationToken, ValueTask> packet)
+	{
+		_deferredPackets.Enqueue((null, packet));
+	}
+
+	private void ProcessDeferredPackets()
+	{
+		if (_deferredPackets.Count > 0)
+		{
+			// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
+			var methods = _deferredPackets.ToArray();
+			_deferredPackets.Clear();
+			foreach (var (method, methodAsync) in methods)
 			{
-				// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
-				var methods = _deferredPackets.ToArray();
-				_deferredPackets.Clear();
-				foreach (var (method, methodAsync) in methods)
+				var response = ReadSingleResponse();
+				if (method != null)
 				{
-					var response = ReadSingleResponse();
-					if (method != null)
-					{
-						method(response);
-						continue;
-					}
-					if (methodAsync != null)
-					{
-						methodAsync(response, CancellationToken.None).GetAwaiter().GetResult();
-					}
+					method(response);
+					continue;
+				}
+				if (methodAsync != null)
+				{
+					methodAsync(response, CancellationToken.None).GetAwaiter().GetResult();
 				}
 			}
 		}
-		private async ValueTask ProcessDeferredPacketsAsync(CancellationToken cancellationToken = default)
+	}
+	private async ValueTask ProcessDeferredPacketsAsync(CancellationToken cancellationToken = default)
+	{
+		if (_deferredPackets.Count > 0)
 		{
-			if (_deferredPackets.Count > 0)
+			// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
+			var methods = _deferredPackets.ToArray();
+			_deferredPackets.Clear();
+			foreach (var (method, methodAsync) in methods)
 			{
-				// copy it to local collection and clear to not get same processing when the method is hit again from ReadSingleResponse
-				var methods = _deferredPackets.ToArray();
-				_deferredPackets.Clear();
-				foreach (var (method, methodAsync) in methods)
+				var response = await ReadSingleResponseAsync(cancellationToken).ConfigureAwait(false);
+				if (method != null)
 				{
-					var response = await ReadSingleResponseAsync(cancellationToken).ConfigureAwait(false);
-					if (method != null)
-					{
-						method(response);
-						continue;
-					}
-					if (methodAsync != null)
-					{
-						await methodAsync(response, cancellationToken).ConfigureAwait(false);
-					}
+					method(response);
+					continue;
+				}
+				if (methodAsync != null)
+				{
+					await methodAsync(response, cancellationToken).ConfigureAwait(false);
 				}
 			}
 		}

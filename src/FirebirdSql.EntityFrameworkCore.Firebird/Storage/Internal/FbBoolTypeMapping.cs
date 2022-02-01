@@ -17,24 +17,23 @@
 
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbBoolTypeMapping : BoolTypeMapping
 {
-	public class FbBoolTypeMapping : BoolTypeMapping
+	public FbBoolTypeMapping()
+		: base("BOOLEAN", System.Data.DbType.Boolean)
+	{ }
+
+	protected FbBoolTypeMapping(RelationalTypeMappingParameters parameters)
+		: base(parameters)
+	{ }
+
+	protected override string GenerateNonNullSqlLiteral(object value)
 	{
-		public FbBoolTypeMapping()
-			: base("BOOLEAN", System.Data.DbType.Boolean)
-		{ }
-
-		protected FbBoolTypeMapping(RelationalTypeMappingParameters parameters)
-			: base(parameters)
-		{ }
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			return (bool)value ? "TRUE" : "FALSE";
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbBoolTypeMapping(parameters);
+		return (bool)value ? "TRUE" : "FALSE";
 	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbBoolTypeMapping(parameters);
 }

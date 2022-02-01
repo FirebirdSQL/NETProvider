@@ -24,254 +24,254 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.Fb>
 {
-	public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.Fb>
+	public UdfDbFunctionFbTests(Fb fixture)
+		: base(fixture)
+	{ }
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_CrossApply_Correlated_Select_Anonymous()
 	{
-		public UdfDbFunctionFbTests(Fb fixture)
-			: base(fixture)
+		base.QF_CrossApply_Correlated_Select_Anonymous();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_OuterApply_Correlated_Select_QF()
+	{
+		base.QF_OuterApply_Correlated_Select_QF();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void Udf_with_argument_being_comparison_of_nullable_columns()
+	{
+		base.Udf_with_argument_being_comparison_of_nullable_columns();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections()
+	{
+		base.QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_CrossApply_Correlated_Select_Result()
+	{
+		base.QF_CrossApply_Correlated_Select_Result();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Select_Correlated_Subquery_In_Anonymous()
+	{
+		base.QF_Select_Correlated_Subquery_In_Anonymous();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Correlated_Func_Call_With_Navigation()
+	{
+		base.QF_Correlated_Func_Call_With_Navigation();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous()
+	{
+		base.QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_OuterApply_Correlated_Select_Entity()
+	{
+		base.QF_OuterApply_Correlated_Select_Entity();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Correlated_Nested_Func_Call()
+	{
+		base.QF_Correlated_Nested_Func_Call();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_OuterApply_Correlated_Select_Anonymous()
+	{
+		base.QF_OuterApply_Correlated_Select_Anonymous();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF()
+	{
+		base.QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_Correlated_Select_In_Anonymous()
+	{
+		base.QF_Correlated_Select_In_Anonymous();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void QF_CrossApply_Correlated_Select_QF_Type()
+	{
+		base.QF_CrossApply_Correlated_Select_QF_Type();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override void Udf_with_argument_being_comparison_to_null_parameter()
+	{
+		base.Udf_with_argument_being_comparison_to_null_parameter();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_CrossJoin_Not_Correlated()
+	{
+		base.QF_CrossJoin_Not_Correlated();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void DbSet_mapped_to_function()
+	{
+		base.DbSet_mapped_to_function();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_LeftJoin_Select_Result()
+	{
+		base.QF_LeftJoin_Select_Result();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_Join()
+	{
+		base.QF_Join();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_LeftJoin_Select_Anonymous()
+	{
+		base.QF_LeftJoin_Select_Anonymous();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_Stand_Alone_Parameter()
+	{
+		base.QF_Stand_Alone_Parameter();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_Stand_Alone()
+	{
+		base.QF_Stand_Alone();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_Nested()
+	{
+		base.QF_Nested();
+	}
+
+	[DoesNotHaveTheDataFact]
+	public override void QF_CrossJoin_Parameter()
+	{
+		base.QF_CrossJoin_Parameter();
+	}
+
+	[Fact(Skip = "efcore#24228")]
+	public override void Nullable_navigation_property_access_preserves_schema_for_sql_function()
+	{
+		base.Nullable_navigation_property_access_preserves_schema_for_sql_function();
+	}
+
+	[Fact(Skip = "efcore#24228")]
+	public override void Compare_function_without_null_propagation_to_null()
+	{
+		base.Compare_function_without_null_propagation_to_null();
+	}
+
+	protected class FbUDFSqlContext : UDFSqlContext
+	{
+		public FbUDFSqlContext(DbContextOptions options)
+			: base(options)
 		{ }
 
-		[NotSupportedOnFirebirdFact]
-		public override void QF_CrossApply_Correlated_Select_Anonymous()
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			base.QF_CrossApply_Correlated_Select_Anonymous();
+			base.OnModelCreating(modelBuilder);
+
+			var isDateMethodInfo = typeof(UDFSqlContext).GetMethod(nameof(IsDateStatic));
+			modelBuilder.HasDbFunction(isDateMethodInfo)
+				.HasTranslation(args => new SqlFunctionExpression(null, "IsDate", args, true, new[] { true }, isDateMethodInfo.ReturnType, null));
+			var isDateMethodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(IsDateInstance));
+			modelBuilder.HasDbFunction(isDateMethodInfo2)
+				.HasTranslation(args => new SqlFunctionExpression(null, "IsDate", args, true, new[] { true }, isDateMethodInfo2.ReturnType, null));
+
+			var methodInfo = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthStatic));
+			modelBuilder.HasDbFunction(methodInfo)
+				.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo.ReturnType, null));
+			var methodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthInstance));
+			modelBuilder.HasDbFunction(methodInfo2)
+				.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo2.ReturnType, null));
+			var methodInfo3 = typeof(UDFSqlContext).GetMethod(nameof(StringLength));
+			modelBuilder.HasDbFunction(methodInfo3)
+				.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo3.ReturnType, null));
+
+			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerWithMostOrdersAfterDateStatic)))
+				.HasName("GetCustWithMostOrdersAfterDate");
+			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerWithMostOrdersAfterDateInstance)))
+				.HasName("GetCustWithMostOrdersAfterDate");
+
+			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(IdentityString)))
+				.HasSchema(null);
+
+			ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
 		}
+	}
 
-		[NotSupportedOnFirebirdFact]
-		public override void QF_OuterApply_Correlated_Select_QF()
+
+	public class Fb : UdfFixtureBase
+	{
+		protected override string StoreName { get; } = nameof(UdfDbFunctionFbTests);
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+		protected override Type ContextType { get; } = typeof(FbUDFSqlContext);
+
+		protected override void Seed(DbContext context)
 		{
-			base.QF_OuterApply_Correlated_Select_QF();
-		}
+			base.Seed(context);
 
-		[NotSupportedOnFirebirdFact]
-		public override void Udf_with_argument_being_comparison_of_nullable_columns()
-		{
-			base.Udf_with_argument_being_comparison_of_nullable_columns();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections()
-		{
-			base.QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_CrossApply_Correlated_Select_Result()
-		{
-			base.QF_CrossApply_Correlated_Select_Result();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Select_Correlated_Subquery_In_Anonymous()
-		{
-			base.QF_Select_Correlated_Subquery_In_Anonymous();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Correlated_Func_Call_With_Navigation()
-		{
-			base.QF_Correlated_Func_Call_With_Navigation();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous()
-		{
-			base.QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_OuterApply_Correlated_Select_Entity()
-		{
-			base.QF_OuterApply_Correlated_Select_Entity();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Correlated_Nested_Func_Call()
-		{
-			base.QF_Correlated_Nested_Func_Call();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_OuterApply_Correlated_Select_Anonymous()
-		{
-			base.QF_OuterApply_Correlated_Select_Anonymous();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF()
-		{
-			base.QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_Correlated_Select_In_Anonymous()
-		{
-			base.QF_Correlated_Select_In_Anonymous();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void QF_CrossApply_Correlated_Select_QF_Type()
-		{
-			base.QF_CrossApply_Correlated_Select_QF_Type();
-		}
-
-		[NotSupportedOnFirebirdFact]
-		public override void Udf_with_argument_being_comparison_to_null_parameter()
-		{
-			base.Udf_with_argument_being_comparison_to_null_parameter();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_CrossJoin_Not_Correlated()
-		{
-			base.QF_CrossJoin_Not_Correlated();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void DbSet_mapped_to_function()
-		{
-			base.DbSet_mapped_to_function();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_LeftJoin_Select_Result()
-		{
-			base.QF_LeftJoin_Select_Result();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_Join()
-		{
-			base.QF_Join();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_LeftJoin_Select_Anonymous()
-		{
-			base.QF_LeftJoin_Select_Anonymous();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_Stand_Alone_Parameter()
-		{
-			base.QF_Stand_Alone_Parameter();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_Stand_Alone()
-		{
-			base.QF_Stand_Alone();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_Nested()
-		{
-			base.QF_Nested();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void QF_CrossJoin_Parameter()
-		{
-			base.QF_CrossJoin_Parameter();
-		}
-
-		[Fact(Skip = "efcore#24228")]
-		public override void Nullable_navigation_property_access_preserves_schema_for_sql_function()
-		{
-			base.Nullable_navigation_property_access_preserves_schema_for_sql_function();
-		}
-
-		[Fact(Skip = "efcore#24228")]
-		public override void Compare_function_without_null_propagation_to_null()
-		{
-			base.Compare_function_without_null_propagation_to_null();
-		}
-
-		protected class FbUDFSqlContext : UDFSqlContext
-		{
-			public FbUDFSqlContext(DbContextOptions options)
-				: base(options)
-			{ }
-
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-
-				var isDateMethodInfo = typeof(UDFSqlContext).GetMethod(nameof(IsDateStatic));
-				modelBuilder.HasDbFunction(isDateMethodInfo)
-					.HasTranslation(args => new SqlFunctionExpression(null, "IsDate", args, true, new[] { true }, isDateMethodInfo.ReturnType, null));
-				var isDateMethodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(IsDateInstance));
-				modelBuilder.HasDbFunction(isDateMethodInfo2)
-					.HasTranslation(args => new SqlFunctionExpression(null, "IsDate", args, true, new[] { true }, isDateMethodInfo2.ReturnType, null));
-
-				var methodInfo = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthStatic));
-				modelBuilder.HasDbFunction(methodInfo)
-					.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo.ReturnType, null));
-				var methodInfo2 = typeof(UDFSqlContext).GetMethod(nameof(MyCustomLengthInstance));
-				modelBuilder.HasDbFunction(methodInfo2)
-					.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo2.ReturnType, null));
-				var methodInfo3 = typeof(UDFSqlContext).GetMethod(nameof(StringLength));
-				modelBuilder.HasDbFunction(methodInfo3)
-					.HasTranslation(args => new SqlFunctionExpression("char_length", args, true, new[] { true }, methodInfo3.ReturnType, null));
-
-				modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerWithMostOrdersAfterDateStatic)))
-					.HasName("GetCustWithMostOrdersAfterDate");
-				modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerWithMostOrdersAfterDateInstance)))
-					.HasName("GetCustWithMostOrdersAfterDate");
-
-				modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(IdentityString)))
-					.HasSchema(null);
-
-				ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
-			}
-		}
-
-
-		public class Fb : UdfFixtureBase
-		{
-			protected override string StoreName { get; } = nameof(UdfDbFunctionFbTests);
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-			protected override Type ContextType { get; } = typeof(FbUDFSqlContext);
-
-			protected override void Seed(DbContext context)
-			{
-				base.Seed(context);
-
-				context.Database.ExecuteSqlRaw(
-					@"create function ""CustomerOrderCount"" (customerId int)
+			context.Database.ExecuteSqlRaw(
+				@"create function ""CustomerOrderCount"" (customerId int)
                                                     returns int
                                                     as
                                                     begin
                                                         return (select count(""Id"") from ""Orders"" where ""CustomerId"" = :customerId);
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""StarValue"" (starCount int, val varchar(1000))
+			context.Database.ExecuteSqlRaw(
+				@"create function ""StarValue"" (starCount int, val varchar(1000))
                                                     returns varchar(1000)
                                                     as
                                                     begin
                                                         return rpad('', :starCount, '*') || :val;
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""DollarValue"" (starCount int, val varchar(1000))
+			context.Database.ExecuteSqlRaw(
+				@"create function ""DollarValue"" (starCount int, val varchar(1000))
                                                     returns varchar(1000)
                                                     as
                                                     begin
                                                         return rpad('', :starCount, '$') || :val;
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""GetReportingPeriodStartDate"" (period int)
+			context.Database.ExecuteSqlRaw(
+				@"create function ""GetReportingPeriodStartDate"" (period int)
                                                     returns timestamp
                                                     as
                                                     begin
                                                         return cast('1998-01-01' as timestamp);
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""GetCustWithMostOrdersAfterDate"" (searchDate Date)
+			context.Database.ExecuteSqlRaw(
+				@"create function ""GetCustWithMostOrdersAfterDate"" (searchDate Date)
                                                     returns int
                                                     as
                                                     begin
@@ -282,8 +282,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
                                                                 order by count(""Id"") desc);
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""IsTopCustomer"" (customerId int)
+			context.Database.ExecuteSqlRaw(
+				@"create function ""IsTopCustomer"" (customerId int)
                                                     returns boolean
                                                     as
                                                     begin
@@ -293,16 +293,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
                                                         return false;
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""IdentityString"" (customerName varchar(1000))
+			context.Database.ExecuteSqlRaw(
+				@"create function ""IdentityString"" (customerName varchar(1000))
                                                     returns varchar(1000)
                                                     as
                                                     begin
                                                         return :customerName;
                                                     end");
 
-				context.Database.ExecuteSqlRaw(
-					@"create function ""IsDate"" (val varchar(1000))
+			context.Database.ExecuteSqlRaw(
+				@"create function ""IsDate"" (val varchar(1000))
                                                     returns boolean
                                                     as
                                                     declare dummy date;
@@ -319,8 +319,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
                                                         return true;
                                                     end");
 
-				context.SaveChanges();
-			}
+			context.SaveChanges();
 		}
 	}
 }

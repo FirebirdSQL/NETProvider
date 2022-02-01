@@ -18,31 +18,30 @@
 using System;
 using System.Text;
 
-namespace FirebirdSql.Data.Services
-{
-	[Flags]
-	public enum FbBackupRestoreStatistics
-	{
-		TotalTime = 0b0001,
-		TimeDelta = 0b0010,
-		PageReads = 0b0100,
-		PageWrites = 0b1000,
-	}
+namespace FirebirdSql.Data.Services;
 
-	internal static class FbBackupRestoreStatisticsExtensions
+[Flags]
+public enum FbBackupRestoreStatistics
+{
+	TotalTime = 0b0001,
+	TimeDelta = 0b0010,
+	PageReads = 0b0100,
+	PageWrites = 0b1000,
+}
+
+internal static class FbBackupRestoreStatisticsExtensions
+{
+	public static string BuildConfiguration(this FbBackupRestoreStatistics statistics)
 	{
-		public static string BuildConfiguration(this FbBackupRestoreStatistics statistics)
-		{
-			var sb = new StringBuilder();
-			if (statistics.HasFlag(FbBackupRestoreStatistics.TotalTime))
-				sb.Append("T");
-			if (statistics.HasFlag(FbBackupRestoreStatistics.TimeDelta))
-				sb.Append("D");
-			if (statistics.HasFlag(FbBackupRestoreStatistics.PageReads))
-				sb.Append("R");
-			if (statistics.HasFlag(FbBackupRestoreStatistics.PageWrites))
-				sb.Append("W");
-			return sb.ToString();
-		}
+		var sb = new StringBuilder();
+		if (statistics.HasFlag(FbBackupRestoreStatistics.TotalTime))
+			sb.Append("T");
+		if (statistics.HasFlag(FbBackupRestoreStatistics.TimeDelta))
+			sb.Append("D");
+		if (statistics.HasFlag(FbBackupRestoreStatistics.PageReads))
+			sb.Append("R");
+		if (statistics.HasFlag(FbBackupRestoreStatistics.PageWrites))
+			sb.Append("W");
+		return sb.ToString();
 	}
 }

@@ -21,148 +21,147 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class FbCommandBuilderTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class FbCommandBuilderTests : FbTestsBase
+	private FbDataAdapter _adapter;
+
+	public FbCommandBuilderTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[SetUp]
+	public override async Task SetUp()
 	{
-		private FbDataAdapter _adapter;
+		await base.SetUp();
+		_adapter = new FbDataAdapter(new FbCommand("select * from TEST where VARCHAR_FIELD = ?", Connection));
+	}
 
-		public FbCommandBuilderTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+	[TearDown]
+	public override async Task TearDown()
+	{
+		_adapter.Dispose();
+		await base.TearDown();
+	}
 
-		[SetUp]
-		public override async Task SetUp()
+	[Test]
+	public void GetInsertCommandTest()
+	{
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			await base.SetUp();
-			_adapter = new FbDataAdapter(new FbCommand("select * from TEST where VARCHAR_FIELD = ?", Connection));
+			StringAssert.StartsWith("INSERT", builder.GetInsertCommand().CommandText);
 		}
+	}
 
-		[TearDown]
-		public override async Task TearDown()
+	[Test]
+	public void GetUpdateCommandTest()
+	{
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			_adapter.Dispose();
-			await base.TearDown();
+			StringAssert.StartsWith("UPDATE", builder.GetUpdateCommand().CommandText);
 		}
+	}
 
-		[Test]
-		public void GetInsertCommandTest()
+	[Test]
+	public void GetDeleteCommandTest()
+	{
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				StringAssert.StartsWith("INSERT", builder.GetInsertCommand().CommandText);
-			}
+			StringAssert.StartsWith("DELETE", builder.GetDeleteCommand().CommandText);
 		}
+	}
 
-		[Test]
-		public void GetUpdateCommandTest()
+	[Test]
+	public void RefreshSchemaTest()
+	{
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				StringAssert.StartsWith("UPDATE", builder.GetUpdateCommand().CommandText);
-			}
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
+
+			_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
+
+			builder.RefreshSchema();
+
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 		}
+	}
 
-		[Test]
-		public void GetDeleteCommandTest()
+	[Test]
+	public void CommandBuilderWithExpressionFieldTest()
+	{
+		_adapter.SelectCommand.CommandText = "select TEST.*, 0 AS VALOR from TEST";
+
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				StringAssert.StartsWith("DELETE", builder.GetDeleteCommand().CommandText);
-			}
+			StringAssert.DoesNotContain("VALOR", builder.GetUpdateCommand().CommandText);
 		}
+	}
 
-		[Test]
-		public void RefreshSchemaTest()
+	[Test]
+	public async Task DeriveParameters()
+	{
+		await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
 		{
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				Assert.DoesNotThrow(() => builder.GetInsertCommand());
-				Assert.DoesNotThrow(() => builder.GetUpdateCommand());
-				Assert.DoesNotThrow(() => builder.GetDeleteCommand());
-
-				_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
-
-				builder.RefreshSchema();
-
-				Assert.DoesNotThrow(() => builder.GetInsertCommand());
-				Assert.DoesNotThrow(() => builder.GetUpdateCommand());
-				Assert.DoesNotThrow(() => builder.GetDeleteCommand());
-			}
+			command.CommandType = CommandType.StoredProcedure;
+			FbCommandBuilder.DeriveParameters(command);
+			Assert.AreEqual(2, command.Parameters.Count);
 		}
+	}
 
-		[Test]
-		public void CommandBuilderWithExpressionFieldTest()
+	[Test]
+	public async Task DeriveParameters2()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			_adapter.SelectCommand.CommandText = "select TEST.*, 0 AS VALOR from TEST";
-
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				StringAssert.DoesNotContain("VALOR", builder.GetUpdateCommand().CommandText);
-			}
-		}
-
-		[Test]
-		public async Task DeriveParameters()
-		{
-			await using (var command = new FbCommand("GETVARCHARFIELD", Connection))
+			await using (var command = new FbCommand("GETVARCHARFIELD", Connection, transaction))
 			{
 				command.CommandType = CommandType.StoredProcedure;
 				FbCommandBuilder.DeriveParameters(command);
 				Assert.AreEqual(2, command.Parameters.Count);
 			}
+			await transaction.CommitAsync();
 		}
+	}
 
-		[Test]
-		public async Task DeriveParameters2()
+	[Test]
+	public async Task DeriveParametersNonExistingSP()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			await using (var command = new FbCommand("BlaBlaBla", Connection, transaction))
 			{
-				await using (var command = new FbCommand("GETVARCHARFIELD", Connection, transaction))
-				{
-					command.CommandType = CommandType.StoredProcedure;
-					FbCommandBuilder.DeriveParameters(command);
-					Assert.AreEqual(2, command.Parameters.Count);
-				}
-				await transaction.CommitAsync();
+				command.CommandType = CommandType.StoredProcedure;
+				Assert.Throws<InvalidOperationException>(() => FbCommandBuilder.DeriveParameters(command));
 			}
+			await transaction.CommitAsync();
 		}
+	}
 
-		[Test]
-		public async Task DeriveParametersNonExistingSP()
+	[Test]
+	public async Task TestWithClosedConnection()
+	{
+		await Connection.CloseAsync();
+
+		using (var builder = new FbCommandBuilder(_adapter))
 		{
-			await using (var transaction = await Connection.BeginTransactionAsync())
-			{
-				await using (var command = new FbCommand("BlaBlaBla", Connection, transaction))
-				{
-					command.CommandType = CommandType.StoredProcedure;
-					Assert.Throws<InvalidOperationException>(() => FbCommandBuilder.DeriveParameters(command));
-				}
-				await transaction.CommitAsync();
-			}
-		}
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 
-		[Test]
-		public async Task TestWithClosedConnection()
-		{
-			await Connection.CloseAsync();
+			_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
 
-			using (var builder = new FbCommandBuilder(_adapter))
-			{
-				Assert.DoesNotThrow(() => builder.GetInsertCommand());
-				Assert.DoesNotThrow(() => builder.GetUpdateCommand());
-				Assert.DoesNotThrow(() => builder.GetDeleteCommand());
+			builder.RefreshSchema();
 
-				_adapter.SelectCommand.CommandText = "select * from TEST where BIGINT_FIELD = ?";
-
-				builder.RefreshSchema();
-
-				Assert.DoesNotThrow(() => builder.GetInsertCommand());
-				Assert.DoesNotThrow(() => builder.GetUpdateCommand());
-				Assert.DoesNotThrow(() => builder.GetDeleteCommand());
-			}
+			Assert.DoesNotThrow(() => builder.GetInsertCommand());
+			Assert.DoesNotThrow(() => builder.GetUpdateCommand());
+			Assert.DoesNotThrow(() => builder.GetDeleteCommand());
 		}
 	}
 }

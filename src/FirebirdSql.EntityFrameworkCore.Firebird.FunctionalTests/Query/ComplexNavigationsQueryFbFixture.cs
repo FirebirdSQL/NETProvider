@@ -21,17 +21,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class ComplexNavigationsQueryFbFixture : ComplexNavigationsQueryRelationalFixtureBase
-    {
-        protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SimpleTableNames(modelBuilder);
-			ModelHelpers.SetStringLengths(modelBuilder);
-		}
+public class ComplexNavigationsQueryFbFixture : ComplexNavigationsQueryRelationalFixtureBase
+{
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	{
+		base.OnModelCreating(modelBuilder, context);
+		ModelHelpers.SimpleTableNames(modelBuilder);
+		ModelHelpers.SetStringLengths(modelBuilder);
 	}
 }

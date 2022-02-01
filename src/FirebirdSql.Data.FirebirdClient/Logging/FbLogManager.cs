@@ -17,36 +17,35 @@
 
 using System;
 
-namespace FirebirdSql.Data.Logging
+namespace FirebirdSql.Data.Logging;
+
+public static class FbLogManager
 {
-	public static class FbLogManager
+	public static IFbLoggingProvider Provider
 	{
-		public static IFbLoggingProvider Provider
+		get
 		{
-			get
-			{
-				_providerRetrieved = true;
-				return _provider;
-			}
-			set
-			{
-				if (_providerRetrieved)
-					throw new InvalidOperationException("The logging provider must be set before any action is taken");
-
-				_provider = value ?? throw new ArgumentNullException(nameof(value));
-			}
+			_providerRetrieved = true;
+			return _provider;
 		}
-
-		public static bool IsParameterLoggingEnabled { get; set; }
-
-		static IFbLoggingProvider _provider;
-		static bool _providerRetrieved;
-
-		static FbLogManager()
+		set
 		{
-			_provider = new NullLoggingProvider();
-		}
+			if (_providerRetrieved)
+				throw new InvalidOperationException("The logging provider must be set before any action is taken");
 
-		internal static IFbLogger CreateLogger(string name) => Provider.CreateLogger("FirebirdClient." + name);
+			_provider = value ?? throw new ArgumentNullException(nameof(value));
+		}
 	}
+
+	public static bool IsParameterLoggingEnabled { get; set; }
+
+	static IFbLoggingProvider _provider;
+	static bool _providerRetrieved;
+
+	static FbLogManager()
+	{
+		_provider = new NullLoggingProvider();
+	}
+
+	internal static IFbLogger CreateLogger(string name) => Provider.CreateLogger("FirebirdClient." + name);
 }

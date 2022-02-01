@@ -15,10 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Logging
+namespace FirebirdSql.Data.Logging;
+
+public interface IFbLoggingProvider
 {
-	public interface IFbLoggingProvider
-	{
-		IFbLogger CreateLogger(string name);
-	}
+	IFbLogger CreateLogger(string name);
 }

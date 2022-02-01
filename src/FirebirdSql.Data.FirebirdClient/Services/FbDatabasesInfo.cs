@@ -18,29 +18,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public class FbDatabasesInfo
 {
-	public class FbDatabasesInfo
+	public int ConnectionCount { get; internal set; }
+
+	private List<string> _databases;
+	public IReadOnlyList<string> Databases
 	{
-		public int ConnectionCount { get; internal set; }
-
-		private List<string> _databases;
-		public IReadOnlyList<string> Databases
+		get
 		{
-			get
-			{
-				return _databases.AsReadOnly();
-			}
+			return _databases.AsReadOnly();
 		}
+	}
 
-		internal FbDatabasesInfo()
-		{
-			_databases = new List<string>();
-		}
+	internal FbDatabasesInfo()
+	{
+		_databases = new List<string>();
+	}
 
-		internal void AddDatabase(string database)
-		{
-			_databases.Add(database);
-		}
+	internal void AddDatabase(string database)
+	{
+		_databases.Add(database);
 	}
 }

@@ -21,22 +21,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version15
+namespace FirebirdSql.Data.Client.Managed.Version15;
+
+internal class GdsServiceManager : Version13.GdsServiceManager
 {
-	internal class GdsServiceManager : Version13.GdsServiceManager
+	public GdsServiceManager(GdsConnection connection)
+		: base(connection)
+	{ }
+
+	public override ServiceParameterBufferBase CreateServiceParameterBuffer()
 	{
-		public GdsServiceManager(GdsConnection connection)
-			: base(connection)
-		{ }
+		return new ServiceParameterBuffer3();
+	}
 
-		public override ServiceParameterBufferBase CreateServiceParameterBuffer()
-		{
-			return new ServiceParameterBuffer3();
-		}
-
-		protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)
-		{
-			return new GdsDatabase(connection);
-		}
+	protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)
+	{
+		return new GdsDatabase(connection);
 	}
 }

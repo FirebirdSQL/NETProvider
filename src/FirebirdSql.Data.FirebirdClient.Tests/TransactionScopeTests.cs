@@ -21,71 +21,70 @@ using System.Transactions;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class TransactionScopeTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class TransactionScopeTests : FbTestsBase
+	public TransactionScopeTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task SimpleSelectTest()
 	{
-		public TransactionScopeTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
 
-		[Test]
-		public async Task SimpleSelectTest()
+		csb.Enlist = true;
+
+		using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
 		{
-			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
-
-			csb.Enlist = true;
-
-			using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+			await using (var c = new FbConnection(csb.ToString()))
 			{
-				await using (var c = new FbConnection(csb.ToString()))
-				{
-					c.Open();
+				c.Open();
 
-					await using (var command = new FbCommand("select * from TEST where (0=1)", c))
+				await using (var command = new FbCommand("select * from TEST where (0=1)", c))
+				{
+					await using (var r = await command.ExecuteReaderAsync())
 					{
-						await using (var r = await command.ExecuteReaderAsync())
+						while (await r.ReadAsync())
 						{
-							while (await r.ReadAsync())
-							{
-							}
 						}
 					}
 				}
-
-				scope.Complete();
 			}
+
+			scope.Complete();
 		}
+	}
 
-		[Test]
-		public async Task InsertTest()
+	[Test]
+	public async Task InsertTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+
+		csb.Enlist = true;
+
+		using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
 		{
-			var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
-
-			csb.Enlist = true;
-
-			using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+			await using (var c = new FbConnection(csb.ToString()))
 			{
-				await using (var c = new FbConnection(csb.ToString()))
+				await c.OpenAsync();
+
+				var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
+
+				await using (var command = new FbCommand(sql, c))
 				{
-					await c.OpenAsync();
+					command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 
-					var sql = "insert into TEST (int_field, date_field) values (1002, @date)";
+					var ra = await command.ExecuteNonQueryAsync();
 
-					await using (var command = new FbCommand(sql, c))
-					{
-						command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
-
-						var ra = await command.ExecuteNonQueryAsync();
-
-						Assert.AreEqual(ra, 1);
-					}
+					Assert.AreEqual(ra, 1);
 				}
-
-				scope.Complete();
 			}
+
+			scope.Complete();
 		}
 	}
 }

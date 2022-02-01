@@ -17,12 +17,11 @@
 
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.TestsBase
+namespace FirebirdSql.Data.TestsBase;
+
+class NoServerCategoryAttribute : CategoryAttribute
 {
-	class NoServerCategoryAttribute : CategoryAttribute
-	{
-		public NoServerCategoryAttribute()
-			: base("NoServer")
-		{ }
-	}
+	public NoServerCategoryAttribute()
+		: base("NoServer")
+	{ }
 }

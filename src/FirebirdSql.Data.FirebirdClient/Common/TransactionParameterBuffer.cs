@@ -18,30 +18,29 @@
 using System;
 using System.Text;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal sealed class TransactionParameterBuffer : ParameterBuffer
 {
-	internal sealed class TransactionParameterBuffer : ParameterBuffer
+	public TransactionParameterBuffer()
+	{ }
+
+	public void Append(int type, short value)
 	{
-		public TransactionParameterBuffer()
-		{ }
+		WriteByte(type);
+		WriteByte(2);
+		Write(value);
+	}
 
-		public void Append(int type, short value)
-		{
-			WriteByte(type);
-			WriteByte(2);
-			Write(value);
-		}
+	public void Append(int type, string content)
+	{
+		Append(type, Encoding2.Default.GetBytes(content));
+	}
 
-		public void Append(int type, string content)
-		{
-			Append(type, Encoding2.Default.GetBytes(content));
-		}
-
-		public void Append(int type, byte[] buffer)
-		{
-			WriteByte(type);
-			WriteByte(buffer.Length);
-			Write(buffer);
-		}
+	public void Append(int type, byte[] buffer)
+	{
+		WriteByte(type);
+		WriteByte(buffer.Length);
+		Write(buffer);
 	}
 }

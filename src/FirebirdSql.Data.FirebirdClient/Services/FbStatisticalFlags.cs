@@ -17,15 +17,14 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+[Flags]
+public enum FbStatisticalFlags
 {
-	[Flags]
-	public enum FbStatisticalFlags
-	{
-		DataPages = 0x01,
-		DatabaseLog = 0x02,
-		HeaderPages = 0x04,
-		IndexPages = 0x08,
-		SystemTablesRelations = 0x10,
-	}
+	DataPages = 0x01,
+	DatabaseLog = 0x02,
+	HeaderPages = 0x04,
+	IndexPages = 0x08,
+	SystemTablesRelations = 0x10,
 }

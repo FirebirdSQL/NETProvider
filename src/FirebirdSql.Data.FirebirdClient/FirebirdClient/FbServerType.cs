@@ -17,12 +17,11 @@
 
 using System;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+public enum FbServerType
 {
-	[Serializable]
-	public enum FbServerType
-	{
-		Default = 0,
-		Embedded = 1,
-	}
+	Default = 0,
+	Embedded = 1,
 }

@@ -26,22 +26,22 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
-{
-	public class FbConvertTranslator : IMethodCallTranslator
-	{
-		static readonly Dictionary<string, string> TypeMappings = new Dictionary<string, string>
-		{
-			[nameof(Convert.ToByte)] = "SMALLINT",
-			[nameof(Convert.ToDecimal)] = $"DECIMAL({FbTypeMappingSource.DefaultDecimalPrecision},{FbTypeMappingSource.DefaultDecimalScale})",
-			[nameof(Convert.ToDouble)] = "DOUBLE PRECISION",
-			[nameof(Convert.ToInt16)] = "SMALLINT",
-			[nameof(Convert.ToInt32)] = "INTEGER",
-			[nameof(Convert.ToInt64)] = "BIGINT",
-			[nameof(Convert.ToString)] = $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})"
-		};
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
 
-		static readonly HashSet<Type> SupportedTypes = new HashSet<Type>
+public class FbConvertTranslator : IMethodCallTranslator
+{
+	static readonly Dictionary<string, string> TypeMappings = new Dictionary<string, string>
+	{
+		[nameof(Convert.ToByte)] = "SMALLINT",
+		[nameof(Convert.ToDecimal)] = $"DECIMAL({FbTypeMappingSource.DefaultDecimalPrecision},{FbTypeMappingSource.DefaultDecimalScale})",
+		[nameof(Convert.ToDouble)] = "DOUBLE PRECISION",
+		[nameof(Convert.ToInt16)] = "SMALLINT",
+		[nameof(Convert.ToInt32)] = "INTEGER",
+		[nameof(Convert.ToInt64)] = "BIGINT",
+		[nameof(Convert.ToString)] = $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})"
+	};
+
+	static readonly HashSet<Type> SupportedTypes = new HashSet<Type>
 		{
 			typeof(bool),
 			typeof(byte),
@@ -55,25 +55,24 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			typeof(DateTime),
 		};
 
-		static readonly IEnumerable<MethodInfo> SupportedMethods
-			= TypeMappings.Keys
-				.SelectMany(t => typeof(Convert).GetTypeInfo().GetDeclaredMethods(t)
-					.Where(m => m.GetParameters().Length == 1 && SupportedTypes.Contains(m.GetParameters().First().ParameterType)));
+	static readonly IEnumerable<MethodInfo> SupportedMethods
+		= TypeMappings.Keys
+			.SelectMany(t => typeof(Convert).GetTypeInfo().GetDeclaredMethods(t)
+				.Where(m => m.GetParameters().Length == 1 && SupportedTypes.Contains(m.GetParameters().First().ParameterType)));
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
-		public FbConvertTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
-		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
+	public FbConvertTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	{
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!SupportedMethods.Contains(method))
-				return null;
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!SupportedMethods.Contains(method))
+			return null;
 
-			return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
-				_fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), method.ReturnType));
-		}
+		return _fbSqlExpressionFactory.ApplyDefaultTypeMapping(
+			_fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]), method.ReturnType));
 	}
 }

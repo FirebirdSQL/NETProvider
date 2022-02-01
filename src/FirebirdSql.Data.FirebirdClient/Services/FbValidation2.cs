@@ -21,83 +21,82 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public sealed class FbValidation2 : FbService
 {
-	public sealed class FbValidation2 : FbService
+	public string TablesInclude { get; set; }
+	public string TablesExclude { get; set; }
+	public string IndicesInclude { get; set; }
+	public string IndicesExclude { get; set; }
+	public int? LockTimeout { get; set; }
+
+	public FbValidation2(string connectionString = null)
+		: base(connectionString)
+	{ }
+
+	public void Execute()
 	{
-		public string TablesInclude { get; set; }
-		public string TablesExclude { get; set; }
-		public string IndicesInclude { get; set; }
-		public string IndicesExclude { get; set; }
-		public int? LockTimeout { get; set; }
+		EnsureDatabase();
 
-		public FbValidation2(string connectionString = null)
-			: base(connectionString)
-		{ }
-
-		public void Execute()
+		try
 		{
-			EnsureDatabase();
-
-			try
-			{
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_validate);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				if (!string.IsNullOrEmpty(TablesInclude))
-					startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
-				if (!string.IsNullOrEmpty(TablesExclude))
-					startSpb.Append2(IscCodes.isc_spb_val_tab_excl, TablesExclude);
-				if (!string.IsNullOrEmpty(IndicesInclude))
-					startSpb.Append2(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
-				if (!string.IsNullOrEmpty(IndicesExclude))
-					startSpb.Append2(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
-				if (LockTimeout.HasValue)
-					startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
-				StartTask(startSpb);
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_validate);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (!string.IsNullOrEmpty(TablesInclude))
+				startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
+			if (!string.IsNullOrEmpty(TablesExclude))
+				startSpb.Append2(IscCodes.isc_spb_val_tab_excl, TablesExclude);
+			if (!string.IsNullOrEmpty(IndicesInclude))
+				startSpb.Append2(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
+			if (!string.IsNullOrEmpty(IndicesExclude))
+				startSpb.Append2(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
+			if (LockTimeout.HasValue)
+				startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
+			StartTask(startSpb);
+			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
 		}
-		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			EnsureDatabase();
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
+	}
+	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureDatabase();
 
-			try
-			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_validate);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				if (!string.IsNullOrEmpty(TablesInclude))
-					startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
-				if (!string.IsNullOrEmpty(TablesExclude))
-					startSpb.Append2(IscCodes.isc_spb_val_tab_excl, TablesExclude);
-				if (!string.IsNullOrEmpty(IndicesInclude))
-					startSpb.Append2(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
-				if (!string.IsNullOrEmpty(IndicesExclude))
-					startSpb.Append2(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
-				if (LockTimeout.HasValue)
-					startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_validate);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (!string.IsNullOrEmpty(TablesInclude))
+				startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
+			if (!string.IsNullOrEmpty(TablesExclude))
+				startSpb.Append2(IscCodes.isc_spb_val_tab_excl, TablesExclude);
+			if (!string.IsNullOrEmpty(IndicesInclude))
+				startSpb.Append2(IscCodes.isc_spb_val_idx_incl, IndicesInclude);
+			if (!string.IsNullOrEmpty(IndicesExclude))
+				startSpb.Append2(IscCodes.isc_spb_val_idx_excl, IndicesExclude);
+			if (LockTimeout.HasValue)
+				startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

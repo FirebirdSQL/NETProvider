@@ -23,902 +23,901 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[DefaultEvent("InfoMessage")]
+public sealed class FbConnection : DbConnection, ICloneable
 {
-	[DefaultEvent("InfoMessage")]
-	public sealed class FbConnection : DbConnection, ICloneable
+	#region Static Pool Handling Methods
+
+	public static void ClearAllPools()
 	{
-		#region Static Pool Handling Methods
+		FbConnectionPoolManager.Instance.ClearAllPools();
+	}
 
-		public static void ClearAllPools()
+	public static void ClearPool(FbConnection connection)
+	{
+		if (connection == null)
+			throw new ArgumentNullException(nameof(connection));
+
+		FbConnectionPoolManager.Instance.ClearPool(connection.ConnectionOptions);
+	}
+
+	public static void ClearPool(string connectionString)
+	{
+		if (connectionString == null)
+			throw new ArgumentNullException(nameof(connectionString));
+
+		FbConnectionPoolManager.Instance.ClearPool(new ConnectionString(connectionString));
+	}
+
+	#endregion
+
+	#region Static Database Creation/Drop methods
+
+	public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
+	{
+		var options = new ConnectionString(connectionString);
+		options.Validate();
+
+		try
 		{
-			FbConnectionPoolManager.Instance.ClearAllPools();
-		}
-
-		public static void ClearPool(FbConnection connection)
-		{
-			if (connection == null)
-				throw new ArgumentNullException(nameof(connection));
-
-			FbConnectionPoolManager.Instance.ClearPool(connection.ConnectionOptions);
-		}
-
-		public static void ClearPool(string connectionString)
-		{
-			if (connectionString == null)
-				throw new ArgumentNullException(nameof(connectionString));
-
-			FbConnectionPoolManager.Instance.ClearPool(new ConnectionString(connectionString));
-		}
-
-		#endregion
-
-		#region Static Database Creation/Drop methods
-
-		public static void CreateDatabase(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false)
-		{
-			var options = new ConnectionString(connectionString);
-			options.Validate();
-
+			var db = new FbConnectionInternal(options);
 			try
 			{
-				var db = new FbConnectionInternal(options);
-				try
-				{
-					db.CreateDatabase(pageSize, forcedWrites, overwrite);
-				}
-				finally
-				{
-					db.Disconnect();
-				}
+				db.CreateDatabase(pageSize, forcedWrites, overwrite);
 			}
-			catch (IscException ex)
+			finally
 			{
-				throw FbException.Create(ex);
+				db.Disconnect();
 			}
 		}
-		public static async Task CreateDatabaseAsync(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false, CancellationToken cancellationToken = default)
+		catch (IscException ex)
 		{
-			var options = new ConnectionString(connectionString);
-			options.Validate();
+			throw FbException.Create(ex);
+		}
+	}
+	public static async Task CreateDatabaseAsync(string connectionString, int pageSize = 4096, bool forcedWrites = true, bool overwrite = false, CancellationToken cancellationToken = default)
+	{
+		var options = new ConnectionString(connectionString);
+		options.Validate();
 
+		try
+		{
+			var db = new FbConnectionInternal(options);
 			try
 			{
-				var db = new FbConnectionInternal(options);
-				try
-				{
-					await db.CreateDatabaseAsync(pageSize, forcedWrites, overwrite, cancellationToken).ConfigureAwait(false);
-				}
-				finally
-				{
-					await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
-				}
+				await db.CreateDatabaseAsync(pageSize, forcedWrites, overwrite, cancellationToken).ConfigureAwait(false);
 			}
-			catch (IscException ex)
+			finally
 			{
-				throw FbException.Create(ex);
+				await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
-
-		public static void DropDatabase(string connectionString)
+		catch (IscException ex)
 		{
-			var options = new ConnectionString(connectionString);
-			options.Validate();
+			throw FbException.Create(ex);
+		}
+	}
 
+	public static void DropDatabase(string connectionString)
+	{
+		var options = new ConnectionString(connectionString);
+		options.Validate();
+
+		try
+		{
+			var db = new FbConnectionInternal(options);
 			try
 			{
-				var db = new FbConnectionInternal(options);
-				try
-				{
-					db.DropDatabase();
-				}
-				finally
-				{
-					db.Disconnect();
-				}
+				db.DropDatabase();
 			}
-			catch (IscException ex)
+			finally
 			{
-				throw FbException.Create(ex);
+				db.Disconnect();
 			}
 		}
-		public static async Task DropDatabaseAsync(string connectionString, CancellationToken cancellationToken = default)
+		catch (IscException ex)
 		{
-			var options = new ConnectionString(connectionString);
-			options.Validate();
+			throw FbException.Create(ex);
+		}
+	}
+	public static async Task DropDatabaseAsync(string connectionString, CancellationToken cancellationToken = default)
+	{
+		var options = new ConnectionString(connectionString);
+		options.Validate();
 
+		try
+		{
+			var db = new FbConnectionInternal(options);
 			try
 			{
-				var db = new FbConnectionInternal(options);
-				try
-				{
-					await db.DropDatabaseAsync(cancellationToken).ConfigureAwait(false);
-				}
-				finally
-				{
-					await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
-				}
+				await db.DropDatabaseAsync(cancellationToken).ConfigureAwait(false);
 			}
-			catch (IscException ex)
+			finally
 			{
-				throw FbException.Create(ex);
+				await db.DisconnectAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
-
-		#endregion
-
-		#region Events
-
-		public override event StateChangeEventHandler StateChange;
-
-		public event EventHandler<FbInfoMessageEventArgs> InfoMessage;
-
-		#endregion
-
-		#region Fields
-
-		private FbConnectionInternal _innerConnection;
-		private ConnectionState _state;
-		private ConnectionString _options;
-		private bool _disposed;
-		private string _connectionString;
-
-		#endregion
-
-		#region Properties
-
-		[Category("Data")]
-		[SettingsBindable(true)]
-		[RefreshProperties(RefreshProperties.All)]
-		[DefaultValue("")]
-		public override string ConnectionString
+		catch (IscException ex)
 		{
-			get { return _connectionString; }
-			set
+			throw FbException.Create(ex);
+		}
+	}
+
+	#endregion
+
+	#region Events
+
+	public override event StateChangeEventHandler StateChange;
+
+	public event EventHandler<FbInfoMessageEventArgs> InfoMessage;
+
+	#endregion
+
+	#region Fields
+
+	private FbConnectionInternal _innerConnection;
+	private ConnectionState _state;
+	private ConnectionString _options;
+	private bool _disposed;
+	private string _connectionString;
+
+	#endregion
+
+	#region Properties
+
+	[Category("Data")]
+	[SettingsBindable(true)]
+	[RefreshProperties(RefreshProperties.All)]
+	[DefaultValue("")]
+	public override string ConnectionString
+	{
+		get { return _connectionString; }
+		set
+		{
+			if (_state == ConnectionState.Closed)
 			{
-				if (_state == ConnectionState.Closed)
+				if (value == null)
 				{
-					if (value == null)
-					{
-						value = string.Empty;
-					}
-
-					_options = new ConnectionString(value);
-					_options.Validate();
-					_connectionString = value;
-				}
-			}
-		}
-
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override int ConnectionTimeout
-		{
-			get { return _options.ConnectionTimeout; }
-		}
-
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override string Database
-		{
-			get { return _options.Database; }
-		}
-
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override string DataSource
-		{
-			get { return _options.DataSource; }
-		}
-
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override string ServerVersion
-		{
-			get
-			{
-				if (_state == ConnectionState.Closed)
-				{
-					throw new InvalidOperationException("The connection is closed.");
+					value = string.Empty;
 				}
 
-				if (_innerConnection != null)
-				{
-					return _innerConnection.Database.ServerVersion;
-				}
-
-				return string.Empty;
+				_options = new ConnectionString(value);
+				_options.Validate();
+				_connectionString = value;
 			}
 		}
+	}
 
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override ConnectionState State
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public override int ConnectionTimeout
+	{
+		get { return _options.ConnectionTimeout; }
+	}
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public override string Database
+	{
+		get { return _options.Database; }
+	}
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public override string DataSource
+	{
+		get { return _options.DataSource; }
+	}
+
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public override string ServerVersion
+	{
+		get
 		{
-			get { return _state; }
-		}
-
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public int PacketSize
-		{
-			get { return _options.PacketSize; }
-		}
-
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public int CommandTimeout
-		{
-			get { return _options.CommandTimeout; }
-		}
-
-		#endregion
-
-		#region Internal Properties
-
-		internal FbConnectionInternal InnerConnection
-		{
-			get { return _innerConnection; }
-		}
-
-		internal ConnectionString ConnectionOptions
-		{
-			get { return _options; }
-		}
-
-		internal bool IsClosed
-		{
-			get { return _state == ConnectionState.Closed; }
-		}
-
-		#endregion
-
-		#region Protected Properties
-
-		protected override DbProviderFactory DbProviderFactory
-		{
-			get { return FirebirdClientFactory.Instance; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public FbConnection()
-		{
-			_options = new ConnectionString();
-			_state = ConnectionState.Closed;
-			_connectionString = string.Empty;
-		}
-
-		public FbConnection(string connectionString)
-			: this()
-		{
-			if (!string.IsNullOrEmpty(connectionString))
+			if (_state == ConnectionState.Closed)
 			{
-				ConnectionString = connectionString;
+				throw new InvalidOperationException("The connection is closed.");
 			}
-		}
 
-		#endregion
-
-		#region IDisposable, IAsyncDisposable methods
-
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing)
+			if (_innerConnection != null)
 			{
-				if (!_disposed)
-				{
-					_disposed = true;
-					Close();
-					_innerConnection = null;
-					_options = null;
-					_connectionString = null;
-				}
+				return _innerConnection.Database.ServerVersion;
 			}
-			base.Dispose(disposing);
+
+			return string.Empty;
 		}
-#if !(NET48 || NETSTANDARD2_0)
-		public override async ValueTask DisposeAsync()
+	}
+
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public override ConnectionState State
+	{
+		get { return _state; }
+	}
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public int PacketSize
+	{
+		get { return _options.PacketSize; }
+	}
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public int CommandTimeout
+	{
+		get { return _options.CommandTimeout; }
+	}
+
+	#endregion
+
+	#region Internal Properties
+
+	internal FbConnectionInternal InnerConnection
+	{
+		get { return _innerConnection; }
+	}
+
+	internal ConnectionString ConnectionOptions
+	{
+		get { return _options; }
+	}
+
+	internal bool IsClosed
+	{
+		get { return _state == ConnectionState.Closed; }
+	}
+
+	#endregion
+
+	#region Protected Properties
+
+	protected override DbProviderFactory DbProviderFactory
+	{
+		get { return FirebirdClientFactory.Instance; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	public FbConnection()
+	{
+		_options = new ConnectionString();
+		_state = ConnectionState.Closed;
+		_connectionString = string.Empty;
+	}
+
+	public FbConnection(string connectionString)
+		: this()
+	{
+		if (!string.IsNullOrEmpty(connectionString))
+		{
+			ConnectionString = connectionString;
+		}
+	}
+
+	#endregion
+
+	#region IDisposable, IAsyncDisposable methods
+
+	protected override void Dispose(bool disposing)
+	{
+		if (disposing)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
-				await CloseAsync().ConfigureAwait(false);
+				Close();
 				_innerConnection = null;
 				_options = null;
 				_connectionString = null;
 			}
-			await base.DisposeAsync().ConfigureAwait(false);
 		}
+		base.Dispose(disposing);
+	}
+#if !(NET48 || NETSTANDARD2_0)
+	public override async ValueTask DisposeAsync()
+	{
+		if (!_disposed)
+		{
+			_disposed = true;
+			await CloseAsync().ConfigureAwait(false);
+			_innerConnection = null;
+			_options = null;
+			_connectionString = null;
+		}
+		await base.DisposeAsync().ConfigureAwait(false);
+	}
 #endif
 
-		#endregion
+	#endregion
 
-		#region ICloneable Methods
+	#region ICloneable Methods
 
-		object ICloneable.Clone()
-		{
-			return new FbConnection(ConnectionString);
-		}
+	object ICloneable.Clone()
+	{
+		return new FbConnection(ConnectionString);
+	}
 
-		#endregion
+	#endregion
 
-		#region Transaction Handling Methods
+	#region Transaction Handling Methods
 
-		public new FbTransaction BeginTransaction() => BeginTransaction(FbTransaction.DefaultIsolationLevel, null);
+	public new FbTransaction BeginTransaction() => BeginTransaction(FbTransaction.DefaultIsolationLevel, null);
 #if NET48 || NETSTANDARD2_0
-		public Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+	public Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
 #else
-		public new Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+	public new Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
 #endif
 			=> BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, null, cancellationToken);
 
-		public new FbTransaction BeginTransaction(IsolationLevel level) => BeginTransaction(level, null);
+	public new FbTransaction BeginTransaction(IsolationLevel level) => BeginTransaction(level, null);
 #if NET48 || NETSTANDARD2_0
-		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+	public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
 #else
-		public new Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+	public new Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
 #endif
 			=> BeginTransactionAsync(level, null, cancellationToken);
 
-		public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(FbTransaction.DefaultIsolationLevel, transactionName);
-		public Task<FbTransaction> BeginTransactionAsync(string transactionName, CancellationToken cancellationToken = default) => BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, transactionName, cancellationToken);
+	public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(FbTransaction.DefaultIsolationLevel, transactionName);
+	public Task<FbTransaction> BeginTransactionAsync(string transactionName, CancellationToken cancellationToken = default) => BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, transactionName, cancellationToken);
 
-		public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
-		{
-			CheckClosed();
+	public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
+	{
+		CheckClosed();
 
-			return _innerConnection.BeginTransaction(level, transactionName);
-		}
-		public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default)
-		{
-			CheckClosed();
+		return _innerConnection.BeginTransaction(level, transactionName);
+	}
+	public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default)
+	{
+		CheckClosed();
 
-			return _innerConnection.BeginTransactionAsync(level, transactionName, cancellationToken);
-		}
+		return _innerConnection.BeginTransactionAsync(level, transactionName, cancellationToken);
+	}
 
-		public FbTransaction BeginTransaction(FbTransactionOptions options) => BeginTransaction(options, null);
-		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, CancellationToken cancellationToken = default) => BeginTransactionAsync(options, null, cancellationToken);
+	public FbTransaction BeginTransaction(FbTransactionOptions options) => BeginTransaction(options, null);
+	public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, CancellationToken cancellationToken = default) => BeginTransactionAsync(options, null, cancellationToken);
 
-		public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
-		{
-			CheckClosed();
+	public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
+	{
+		CheckClosed();
 
-			return _innerConnection.BeginTransaction(options, transactionName);
-		}
-		public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default)
-		{
-			CheckClosed();
+		return _innerConnection.BeginTransaction(options, transactionName);
+	}
+	public Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default)
+	{
+		CheckClosed();
 
-			return _innerConnection.BeginTransactionAsync(options, transactionName, cancellationToken);
-		}
+		return _innerConnection.BeginTransactionAsync(options, transactionName, cancellationToken);
+	}
 
-		protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => BeginTransaction(isolationLevel);
+	protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => BeginTransaction(isolationLevel);
 #if !(NET48 || NETSTANDARD2_0)
-		protected override async ValueTask<DbTransaction> BeginDbTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken) => await BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+	protected override async ValueTask<DbTransaction> BeginDbTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken) => await BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
 #endif
 
-		#endregion
+	#endregion
 
-		#region Transaction Enlistement
+	#region Transaction Enlistement
 
-		public override void EnlistTransaction(System.Transactions.Transaction transaction)
-		{
-			CheckClosed();
+	public override void EnlistTransaction(System.Transactions.Transaction transaction)
+	{
+		CheckClosed();
 
-			if (transaction == null)
-				return;
+		if (transaction == null)
+			return;
 
-			_innerConnection.EnlistTransaction(transaction);
-		}
+		_innerConnection.EnlistTransaction(transaction);
+	}
 
-		#endregion
+	#endregion
 
-		#region Database Schema Methods
+	#region Database Schema Methods
 
-		public override DataTable GetSchema()
-		{
-			return GetSchema("MetaDataCollections");
-		}
+	public override DataTable GetSchema()
+	{
+		return GetSchema("MetaDataCollections");
+	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-		public Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
+	public Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
 #else
-		public override Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
+	public override Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
 #endif
-		{
-			return GetSchemaAsync("MetaDataCollections", cancellationToken);
-		}
+	{
+		return GetSchemaAsync("MetaDataCollections", cancellationToken);
+	}
 
-		public override DataTable GetSchema(string collectionName)
-		{
-			return GetSchema(collectionName, null);
-		}
+	public override DataTable GetSchema(string collectionName)
+	{
+		return GetSchema(collectionName, null);
+	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-		public Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
+	public Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
 #else
-		public override Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
+	public override Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
 #endif
-		{
-			return GetSchemaAsync(collectionName, null, cancellationToken);
-		}
-		public override DataTable GetSchema(string collectionName, string[] restrictions)
-		{
-			CheckClosed();
+	{
+		return GetSchemaAsync(collectionName, null, cancellationToken);
+	}
+	public override DataTable GetSchema(string collectionName, string[] restrictions)
+	{
+		CheckClosed();
 
-			return _innerConnection.GetSchema(collectionName, restrictions);
-		}
+		return _innerConnection.GetSchema(collectionName, restrictions);
+	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-		public Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
+	public Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
 #else
-		public override Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
+	public override Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
 #endif
-		{
-			CheckClosed();
+	{
+		CheckClosed();
 
-			return _innerConnection.GetSchemaAsync(collectionName, restrictions, cancellationToken);
-		}
+		return _innerConnection.GetSchemaAsync(collectionName, restrictions, cancellationToken);
+	}
 
-		#endregion
+	#endregion
 
-		#region Methods
+	#region Methods
 
-		public new FbCommand CreateCommand()
-		{
-			return (FbCommand)CreateDbCommand();
-		}
+	public new FbCommand CreateCommand()
+	{
+		return (FbCommand)CreateDbCommand();
+	}
 
-		protected override DbCommand CreateDbCommand()
-		{
-			return new FbCommand(null, this);
-		}
+	protected override DbCommand CreateDbCommand()
+	{
+		return new FbCommand(null, this);
+	}
 
 #if NET6_0_OR_GREATER
-		public new DbBatch CreateBatch()
-		{
-			throw new NotSupportedException("DbBatch is currently not supported. Use FbBatchCommand instead.");
-		}
+	public new DbBatch CreateBatch()
+	{
+		throw new NotSupportedException("DbBatch is currently not supported. Use FbBatchCommand instead.");
+	}
 
-		protected override DbBatch CreateDbBatch()
-		{
-			return CreateBatch();
-		}
+	protected override DbBatch CreateDbBatch()
+	{
+		return CreateBatch();
+	}
 #endif
 
-		public FbBatchCommand CreateBatchCommand()
+	public FbBatchCommand CreateBatchCommand()
+	{
+		return new FbBatchCommand(null, this);
+	}
+
+	public override void ChangeDatabase(string db)
+	{
+		CheckClosed();
+
+		if (string.IsNullOrEmpty(db))
 		{
-			return new FbBatchCommand(null, this);
+			throw new InvalidOperationException("Database name is not valid.");
 		}
 
-		public override void ChangeDatabase(string db)
+		var oldConnectionString = _connectionString;
+		try
 		{
-			CheckClosed();
+			var csb = new FbConnectionStringBuilder(_connectionString);
 
-			if (string.IsNullOrEmpty(db))
-			{
-				throw new InvalidOperationException("Database name is not valid.");
-			}
+			/* Close current connection	*/
+			Close();
 
-			var oldConnectionString = _connectionString;
-			try
-			{
-				var csb = new FbConnectionStringBuilder(_connectionString);
+			/* Set up the new Database	*/
+			csb.Database = db;
+			ConnectionString = csb.ToString();
 
-				/* Close current connection	*/
-				Close();
-
-				/* Set up the new Database	*/
-				csb.Database = db;
-				ConnectionString = csb.ToString();
-
-				/* Open	new	connection	*/
-				Open();
-			}
-			catch (IscException ex)
-			{
-				ConnectionString = oldConnectionString;
-				throw FbException.Create(ex);
-			}
+			/* Open	new	connection	*/
+			Open();
 		}
+		catch (IscException ex)
+		{
+			ConnectionString = oldConnectionString;
+			throw FbException.Create(ex);
+		}
+	}
 #if NET48 || NETSTANDARD2_0
-		public async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+	public async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
 #else
-		public override async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+	public override async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
 #endif
+	{
+		CheckClosed();
+
+		if (string.IsNullOrEmpty(db))
 		{
-			CheckClosed();
-
-			if (string.IsNullOrEmpty(db))
-			{
-				throw new InvalidOperationException("Database name is not valid.");
-			}
-
-			var oldConnectionString = _connectionString;
-			try
-			{
-				var csb = new FbConnectionStringBuilder(_connectionString);
-
-				/* Close current connection	*/
-				await CloseAsync().ConfigureAwait(false);
-
-				/* Set up the new Database	*/
-				csb.Database = db;
-				ConnectionString = csb.ToString();
-
-				/* Open	new	connection	*/
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-			}
-			catch (IscException ex)
-			{
-				ConnectionString = oldConnectionString;
-				throw FbException.Create(ex);
-			}
+			throw new InvalidOperationException("Database name is not valid.");
 		}
 
-		public override void Open()
+		var oldConnectionString = _connectionString;
+		try
 		{
-			if (string.IsNullOrEmpty(_connectionString))
-			{
-				throw new InvalidOperationException("Connection String is not initialized.");
-			}
-			if (!IsClosed && _state != ConnectionState.Connecting)
-			{
-				throw new InvalidOperationException("Connection already Open.");
-			}
+			var csb = new FbConnectionStringBuilder(_connectionString);
 
-			try
-			{
-				OnStateChange(_state, ConnectionState.Connecting);
+			/* Close current connection	*/
+			await CloseAsync().ConfigureAwait(false);
 
-				var createdNew = default(bool);
-				if (_options.Pooling)
-				{
-					_innerConnection = FbConnectionPoolManager.Instance.Get(_options, out createdNew);
-				}
-				else
-				{
-					_innerConnection = new FbConnectionInternal(_options);
-					createdNew = true;
-				}
-				if (createdNew)
-				{
-					try
-					{
-						_innerConnection.Connect();
-					}
-					catch (OperationCanceledException ex)
-					{
-						//cancellationToken.ThrowIfCancellationRequested();
-						throw new TimeoutException("Timeout while connecting.", ex);
-					}
-					catch
-					{
-						if (_options.Pooling)
-						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection, false);
-						}
-						throw;
-					}
-				}
-				_innerConnection.SetOwningConnection(this);
+			/* Set up the new Database	*/
+			csb.Database = db;
+			ConnectionString = csb.ToString();
 
-				if (_options.Enlist)
-				{
-					try
-					{
-						EnlistTransaction(System.Transactions.Transaction.Current);
-					}
-					catch
-					{
-						// if enlistment fails clean up innerConnection
-						_innerConnection.DisposeTransaction();
-
-						if (_options.Pooling)
-						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection, true);
-						}
-						else
-						{
-							_innerConnection.Disconnect();
-							_innerConnection = null;
-						}
-
-						throw;
-					}
-				}
-
-				// Bind	Warning	messages event
-				_innerConnection.Database.WarningMessage = OnWarningMessage;
-
-				// Update the connection state
-				OnStateChange(_state, ConnectionState.Open);
-			}
-			catch (IscException ex)
-			{
-				OnStateChange(_state, ConnectionState.Closed);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				OnStateChange(_state, ConnectionState.Closed);
-				throw;
-			}
+			/* Open	new	connection	*/
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
 		}
-		public override async Task OpenAsync(CancellationToken cancellationToken)
+		catch (IscException ex)
 		{
-			if (string.IsNullOrEmpty(_connectionString))
-			{
-				throw new InvalidOperationException("Connection String is not initialized.");
-			}
-			if (!IsClosed && _state != ConnectionState.Connecting)
-			{
-				throw new InvalidOperationException("Connection already Open.");
-			}
+			ConnectionString = oldConnectionString;
+			throw FbException.Create(ex);
+		}
+	}
 
-			try
-			{
-				OnStateChange(_state, ConnectionState.Connecting);
-
-				var createdNew = default(bool);
-				if (_options.Pooling)
-				{
-					_innerConnection = FbConnectionPoolManager.Instance.Get(_options, out createdNew);
-				}
-				else
-				{
-					_innerConnection = new FbConnectionInternal(_options);
-					createdNew = true;
-				}
-				if (createdNew)
-				{
-					try
-					{
-						await _innerConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
-					}
-					catch (OperationCanceledException ex)
-					{
-						cancellationToken.ThrowIfCancellationRequested();
-						throw new TimeoutException("Timeout while connecting.", ex);
-					}
-					catch
-					{
-						if (_options.Pooling)
-						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection, false);
-						}
-						throw;
-					}
-				}
-				_innerConnection.SetOwningConnection(this);
-
-				if (_options.Enlist)
-				{
-					try
-					{
-						EnlistTransaction(System.Transactions.Transaction.Current);
-					}
-					catch
-					{
-						// if enlistment fails clean up innerConnection
-						await _innerConnection.DisposeTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-						if (_options.Pooling)
-						{
-							FbConnectionPoolManager.Instance.Release(_innerConnection, true);
-						}
-						else
-						{
-							await _innerConnection.DisconnectAsync(cancellationToken).ConfigureAwait(false);
-							_innerConnection = null;
-						}
-
-						throw;
-					}
-				}
-
-				// Bind	Warning	messages event
-				_innerConnection.Database.WarningMessage = OnWarningMessage;
-
-				// Update the connection state
-				OnStateChange(_state, ConnectionState.Open);
-			}
-			catch (IscException ex)
-			{
-				OnStateChange(_state, ConnectionState.Closed);
-				throw FbException.Create(ex);
-			}
-			catch
-			{
-				OnStateChange(_state, ConnectionState.Closed);
-				throw;
-			}
+	public override void Open()
+	{
+		if (string.IsNullOrEmpty(_connectionString))
+		{
+			throw new InvalidOperationException("Connection String is not initialized.");
+		}
+		if (!IsClosed && _state != ConnectionState.Connecting)
+		{
+			throw new InvalidOperationException("Connection already Open.");
 		}
 
-		public override void Close()
+		try
 		{
-			if (!IsClosed && _innerConnection != null)
+			OnStateChange(_state, ConnectionState.Connecting);
+
+			var createdNew = default(bool);
+			if (_options.Pooling)
+			{
+				_innerConnection = FbConnectionPoolManager.Instance.Get(_options, out createdNew);
+			}
+			else
+			{
+				_innerConnection = new FbConnectionInternal(_options);
+				createdNew = true;
+			}
+			if (createdNew)
 			{
 				try
 				{
-					_innerConnection.CloseEventManager();
-
-					if (_innerConnection.Database != null)
+					_innerConnection.Connect();
+				}
+				catch (OperationCanceledException ex)
+				{
+					//cancellationToken.ThrowIfCancellationRequested();
+					throw new TimeoutException("Timeout while connecting.", ex);
+				}
+				catch
+				{
+					if (_options.Pooling)
 					{
-						_innerConnection.Database.WarningMessage = null;
+						FbConnectionPoolManager.Instance.Release(_innerConnection, false);
 					}
+					throw;
+				}
+			}
+			_innerConnection.SetOwningConnection(this);
 
+			if (_options.Enlist)
+			{
+				try
+				{
+					EnlistTransaction(System.Transactions.Transaction.Current);
+				}
+				catch
+				{
+					// if enlistment fails clean up innerConnection
 					_innerConnection.DisposeTransaction();
-
-					_innerConnection.ReleasePreparedCommands();
 
 					if (_options.Pooling)
 					{
-						if (_innerConnection.CancelDisabled)
-						{
-							_innerConnection.EnableCancel();
-						}
-
-						var broken = _innerConnection.Database.ConnectionBroken;
-						FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
-						if (broken)
-						{
-							DisconnectEnlistedHelper();
-						}
+						FbConnectionPoolManager.Instance.Release(_innerConnection, true);
 					}
 					else
+					{
+						_innerConnection.Disconnect();
+						_innerConnection = null;
+					}
+
+					throw;
+				}
+			}
+
+			// Bind	Warning	messages event
+			_innerConnection.Database.WarningMessage = OnWarningMessage;
+
+			// Update the connection state
+			OnStateChange(_state, ConnectionState.Open);
+		}
+		catch (IscException ex)
+		{
+			OnStateChange(_state, ConnectionState.Closed);
+			throw FbException.Create(ex);
+		}
+		catch
+		{
+			OnStateChange(_state, ConnectionState.Closed);
+			throw;
+		}
+	}
+	public override async Task OpenAsync(CancellationToken cancellationToken)
+	{
+		if (string.IsNullOrEmpty(_connectionString))
+		{
+			throw new InvalidOperationException("Connection String is not initialized.");
+		}
+		if (!IsClosed && _state != ConnectionState.Connecting)
+		{
+			throw new InvalidOperationException("Connection already Open.");
+		}
+
+		try
+		{
+			OnStateChange(_state, ConnectionState.Connecting);
+
+			var createdNew = default(bool);
+			if (_options.Pooling)
+			{
+				_innerConnection = FbConnectionPoolManager.Instance.Get(_options, out createdNew);
+			}
+			else
+			{
+				_innerConnection = new FbConnectionInternal(_options);
+				createdNew = true;
+			}
+			if (createdNew)
+			{
+				try
+				{
+					await _innerConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
+				}
+				catch (OperationCanceledException ex)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					throw new TimeoutException("Timeout while connecting.", ex);
+				}
+				catch
+				{
+					if (_options.Pooling)
+					{
+						FbConnectionPoolManager.Instance.Release(_innerConnection, false);
+					}
+					throw;
+				}
+			}
+			_innerConnection.SetOwningConnection(this);
+
+			if (_options.Enlist)
+			{
+				try
+				{
+					EnlistTransaction(System.Transactions.Transaction.Current);
+				}
+				catch
+				{
+					// if enlistment fails clean up innerConnection
+					await _innerConnection.DisposeTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+					if (_options.Pooling)
+					{
+						FbConnectionPoolManager.Instance.Release(_innerConnection, true);
+					}
+					else
+					{
+						await _innerConnection.DisconnectAsync(cancellationToken).ConfigureAwait(false);
+						_innerConnection = null;
+					}
+
+					throw;
+				}
+			}
+
+			// Bind	Warning	messages event
+			_innerConnection.Database.WarningMessage = OnWarningMessage;
+
+			// Update the connection state
+			OnStateChange(_state, ConnectionState.Open);
+		}
+		catch (IscException ex)
+		{
+			OnStateChange(_state, ConnectionState.Closed);
+			throw FbException.Create(ex);
+		}
+		catch
+		{
+			OnStateChange(_state, ConnectionState.Closed);
+			throw;
+		}
+	}
+
+	public override void Close()
+	{
+		if (!IsClosed && _innerConnection != null)
+		{
+			try
+			{
+				_innerConnection.CloseEventManager();
+
+				if (_innerConnection.Database != null)
+				{
+					_innerConnection.Database.WarningMessage = null;
+				}
+
+				_innerConnection.DisposeTransaction();
+
+				_innerConnection.ReleasePreparedCommands();
+
+				if (_options.Pooling)
+				{
+					if (_innerConnection.CancelDisabled)
+					{
+						_innerConnection.EnableCancel();
+					}
+
+					var broken = _innerConnection.Database.ConnectionBroken;
+					FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
+					if (broken)
 					{
 						DisconnectEnlistedHelper();
 					}
 				}
-				catch
-				{ }
-				finally
+				else
 				{
-					OnStateChange(_state, ConnectionState.Closed);
+					DisconnectEnlistedHelper();
 				}
 			}
-
-			void DisconnectEnlistedHelper()
+			catch
+			{ }
+			finally
 			{
-				if (!_innerConnection.IsEnlisted)
-				{
-					_innerConnection.Disconnect();
-				}
-				_innerConnection = null;
+				OnStateChange(_state, ConnectionState.Closed);
 			}
 		}
-#if NET48 || NETSTANDARD2_0
-		public async Task CloseAsync()
-#else
-		public override async Task CloseAsync()
-#endif
+
+		void DisconnectEnlistedHelper()
 		{
-			if (!IsClosed && _innerConnection != null)
+			if (!_innerConnection.IsEnlisted)
 			{
-				try
+				_innerConnection.Disconnect();
+			}
+			_innerConnection = null;
+		}
+	}
+#if NET48 || NETSTANDARD2_0
+	public async Task CloseAsync()
+#else
+	public override async Task CloseAsync()
+#endif
+	{
+		if (!IsClosed && _innerConnection != null)
+		{
+			try
+			{
+				await _innerConnection.CloseEventManagerAsync(CancellationToken.None).ConfigureAwait(false);
+
+				if (_innerConnection.Database != null)
 				{
-					await _innerConnection.CloseEventManagerAsync(CancellationToken.None).ConfigureAwait(false);
+					_innerConnection.Database.WarningMessage = null;
+				}
 
-					if (_innerConnection.Database != null)
+				await _innerConnection.DisposeTransactionAsync(CancellationToken.None).ConfigureAwait(false);
+
+				await _innerConnection.ReleasePreparedCommandsAsync(CancellationToken.None).ConfigureAwait(false);
+
+				if (_options.Pooling)
+				{
+					if (_innerConnection.CancelDisabled)
 					{
-						_innerConnection.Database.WarningMessage = null;
+						await _innerConnection.EnableCancelAsync(CancellationToken.None).ConfigureAwait(false);
 					}
 
-					await _innerConnection.DisposeTransactionAsync(CancellationToken.None).ConfigureAwait(false);
-
-					await _innerConnection.ReleasePreparedCommandsAsync(CancellationToken.None).ConfigureAwait(false);
-
-					if (_options.Pooling)
-					{
-						if (_innerConnection.CancelDisabled)
-						{
-							await _innerConnection.EnableCancelAsync(CancellationToken.None).ConfigureAwait(false);
-						}
-
-						var broken = _innerConnection.Database.ConnectionBroken;
-						FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
-						if (broken)
-						{
-							await DisconnectEnlistedHelper().ConfigureAwait(false);
-						}
-					}
-					else
+					var broken = _innerConnection.Database.ConnectionBroken;
+					FbConnectionPoolManager.Instance.Release(_innerConnection, !broken);
+					if (broken)
 					{
 						await DisconnectEnlistedHelper().ConfigureAwait(false);
 					}
 				}
-				catch
-				{ }
-				finally
+				else
 				{
-					OnStateChange(_state, ConnectionState.Closed);
+					await DisconnectEnlistedHelper().ConfigureAwait(false);
 				}
 			}
-
-			async Task DisconnectEnlistedHelper()
+			catch
+			{ }
+			finally
 			{
-				if (!_innerConnection.IsEnlisted)
-				{
-					await _innerConnection.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
-				}
-				_innerConnection = null;
+				OnStateChange(_state, ConnectionState.Closed);
 			}
 		}
 
-#endregion
-
-#region Private Methods
-
-		private void CheckClosed()
+		async Task DisconnectEnlistedHelper()
 		{
-			if (IsClosed)
+			if (!_innerConnection.IsEnlisted)
 			{
-				throw new InvalidOperationException("Operation requires an open and available connection.");
+				await _innerConnection.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
 			}
+			_innerConnection = null;
 		}
-
-#endregion
-
-#region Event Handlers
-
-		private void OnWarningMessage(IscException warning)
-		{
-			InfoMessage?.Invoke(this, new FbInfoMessageEventArgs(warning));
-		}
-
-		private void OnStateChange(ConnectionState originalState, ConnectionState currentState)
-		{
-			_state = currentState;
-			StateChange?.Invoke(this, new StateChangeEventArgs(originalState, currentState));
-		}
-
-#endregion
-
-#region Cancelation
-		public void EnableCancel()
-		{
-			CheckClosed();
-
-			_innerConnection.EnableCancel();
-		}
-		public Task EnableCancelAsync(CancellationToken cancellationToken = default)
-		{
-			CheckClosed();
-
-			return _innerConnection.EnableCancelAsync(cancellationToken);
-		}
-
-		public void DisableCancel()
-		{
-			CheckClosed();
-
-			_innerConnection.DisableCancel();
-		}
-		public Task DisableCancelAsync(CancellationToken cancellationToken = default)
-		{
-			CheckClosed();
-
-			return _innerConnection.DisableCancelAsync(cancellationToken);
-		}
-
-		public void CancelCommand()
-		{
-			CheckClosed();
-
-			_innerConnection.CancelCommand();
-		}
-		public Task CancelCommandAsync(CancellationToken cancellationToken = default)
-		{
-			CheckClosed();
-
-			return _innerConnection.CancelCommandAsync(cancellationToken);
-		}
-#endregion
-
-#region Internal Methods
-
-		internal static void EnsureOpen(FbConnection connection)
-		{
-			if (connection == null || connection.State != ConnectionState.Open)
-				throw new InvalidOperationException("Connection must be valid and open.");
-		}
-
-#endregion
 	}
+
+	#endregion
+
+	#region Private Methods
+
+	private void CheckClosed()
+	{
+		if (IsClosed)
+		{
+			throw new InvalidOperationException("Operation requires an open and available connection.");
+		}
+	}
+
+	#endregion
+
+	#region Event Handlers
+
+	private void OnWarningMessage(IscException warning)
+	{
+		InfoMessage?.Invoke(this, new FbInfoMessageEventArgs(warning));
+	}
+
+	private void OnStateChange(ConnectionState originalState, ConnectionState currentState)
+	{
+		_state = currentState;
+		StateChange?.Invoke(this, new StateChangeEventArgs(originalState, currentState));
+	}
+
+	#endregion
+
+	#region Cancelation
+	public void EnableCancel()
+	{
+		CheckClosed();
+
+		_innerConnection.EnableCancel();
+	}
+	public Task EnableCancelAsync(CancellationToken cancellationToken = default)
+	{
+		CheckClosed();
+
+		return _innerConnection.EnableCancelAsync(cancellationToken);
+	}
+
+	public void DisableCancel()
+	{
+		CheckClosed();
+
+		_innerConnection.DisableCancel();
+	}
+	public Task DisableCancelAsync(CancellationToken cancellationToken = default)
+	{
+		CheckClosed();
+
+		return _innerConnection.DisableCancelAsync(cancellationToken);
+	}
+
+	public void CancelCommand()
+	{
+		CheckClosed();
+
+		_innerConnection.CancelCommand();
+	}
+	public Task CancelCommandAsync(CancellationToken cancellationToken = default)
+	{
+		CheckClosed();
+
+		return _innerConnection.CancelCommandAsync(cancellationToken);
+	}
+	#endregion
+
+	#region Internal Methods
+
+	internal static void EnsureOpen(FbConnection connection)
+	{
+		if (connection == null || connection.State != ConnectionState.Open)
+			throw new InvalidOperationException("Connection must be valid and open.");
+	}
+
+	#endregion
 }

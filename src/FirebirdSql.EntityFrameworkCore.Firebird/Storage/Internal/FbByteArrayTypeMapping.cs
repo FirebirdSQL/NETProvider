@@ -18,25 +18,24 @@
 using FirebirdSql.Data.Common;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbByteArrayTypeMapping : ByteArrayTypeMapping
 {
-	public class FbByteArrayTypeMapping : ByteArrayTypeMapping
+	public FbByteArrayTypeMapping()
+		: base("BLOB SUB_TYPE BINARY", System.Data.DbType.Binary)
+	{ }
+
+	protected FbByteArrayTypeMapping(RelationalTypeMappingParameters parameters)
+		: base(parameters)
+	{ }
+
+	protected override string GenerateNonNullSqlLiteral(object value)
 	{
-		public FbByteArrayTypeMapping()
-			: base("BLOB SUB_TYPE BINARY", System.Data.DbType.Binary)
-		{ }
-
-		protected FbByteArrayTypeMapping(RelationalTypeMappingParameters parameters)
-			: base(parameters)
-		{ }
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			var hex = ((byte[])value).ToHexString();
-			return $"x'{hex}'";
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbByteArrayTypeMapping(parameters);
+		var hex = ((byte[])value).ToHexString();
+		return $"x'{hex}'";
 	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbByteArrayTypeMapping(parameters);
 }

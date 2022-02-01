@@ -17,8 +17,7 @@
 
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal
-{
-	public class FbLoggingDefinitions : RelationalLoggingDefinitions
-	{ }
-}
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal;
+
+public class FbLoggingDefinitions : RelationalLoggingDefinitions
+{ }

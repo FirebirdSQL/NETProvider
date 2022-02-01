@@ -19,17 +19,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class NorthwindNavigationsQueryFbTest : NorthwindNavigationsQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
-	{
-		public NorthwindNavigationsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		public override Task Where_subquery_on_navigation_client_eval(bool async)
-		{
-			return AssertTranslationFailed(() => base.Where_subquery_on_navigation_client_eval(async));
-		}
+public class NorthwindNavigationsQueryFbTest : NorthwindNavigationsQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+{
+	public NorthwindNavigationsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
+
+	public override Task Where_subquery_on_navigation_client_eval(bool async)
+	{
+		return AssertTranslationFailed(() => base.Where_subquery_on_navigation_client_eval(async));
 	}
 }

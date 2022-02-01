@@ -18,20 +18,19 @@
 using System.Data.Entity;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace EntityFramework.Firebird.Tests
-{
-	public class FbTestDbContext : DbContext
-	{
-		public class Conf : DbConfiguration
-		{
-			public Conf()
-			{
-				SetProviderServices(FbProviderServices.ProviderInvariantName, FbProviderServices.Instance);
-			}
-		}
+namespace EntityFramework.Firebird.Tests;
 
-		public FbTestDbContext(FbConnection conn)
-			: base(conn, false)
-		{ }
+public class FbTestDbContext : DbContext
+{
+	public class Conf : DbConfiguration
+	{
+		public Conf()
+		{
+			SetProviderServices(FbProviderServices.ProviderInvariantName, FbProviderServices.Instance);
+		}
 	}
+
+	public FbTestDbContext(FbConnection conn)
+		: base(conn, false)
+	{ }
 }

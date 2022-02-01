@@ -23,55 +23,54 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class SqlExecutorFbTest : SqlExecutorTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
-	public class SqlExecutorFbTest : SqlExecutorTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+	public SqlExecutorFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+		: base(fixture)
+	{ }
+
+	protected override DbParameter CreateDbParameter(string name, object value)
+		=> new FbParameter { ParameterName = name, Value = value };
+
+	protected override string TenMostExpensiveProductsSproc => throw new NotSupportedException();
+	protected override string CustomerOrderHistorySproc => throw new NotSupportedException();
+	protected override string CustomerOrderHistoryWithGeneratedParameterSproc => throw new NotSupportedException();
+
+	[DoesNotHaveTheDataFact]
+	public override void Executes_stored_procedure()
 	{
-		public SqlExecutorFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
-			: base(fixture)
-		{ }
+		base.Executes_stored_procedure();
+	}
 
-		protected override DbParameter CreateDbParameter(string name, object value)
-			=> new FbParameter { ParameterName = name, Value = value };
+	[DoesNotHaveTheDataFact]
+	public override Task Executes_stored_procedure_async()
+	{
+		return base.Executes_stored_procedure_async();
+	}
 
-		protected override string TenMostExpensiveProductsSproc => throw new NotSupportedException();
-		protected override string CustomerOrderHistorySproc => throw new NotSupportedException();
-		protected override string CustomerOrderHistoryWithGeneratedParameterSproc => throw new NotSupportedException();
+	[DoesNotHaveTheDataFact]
+	public override void Executes_stored_procedure_with_generated_parameter()
+	{
+		base.Executes_stored_procedure_with_generated_parameter();
+	}
 
-		[DoesNotHaveTheDataFact]
-		public override void Executes_stored_procedure()
-		{
-			base.Executes_stored_procedure();
-		}
+	[DoesNotHaveTheDataFact]
+	public override Task Executes_stored_procedure_with_generated_parameter_async()
+	{
+		return base.Executes_stored_procedure_with_generated_parameter_async();
+	}
 
-		[DoesNotHaveTheDataFact]
-		public override Task Executes_stored_procedure_async()
-		{
-			return base.Executes_stored_procedure_async();
-		}
+	[DoesNotHaveTheDataFact]
+	public override void Executes_stored_procedure_with_parameter()
+	{
+		base.Executes_stored_procedure_with_parameter();
+	}
 
-		[DoesNotHaveTheDataFact]
-		public override void Executes_stored_procedure_with_generated_parameter()
-		{
-			base.Executes_stored_procedure_with_generated_parameter();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override Task Executes_stored_procedure_with_generated_parameter_async()
-		{
-			return base.Executes_stored_procedure_with_generated_parameter_async();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override void Executes_stored_procedure_with_parameter()
-		{
-			base.Executes_stored_procedure_with_parameter();
-		}
-
-		[DoesNotHaveTheDataFact]
-		public override Task Executes_stored_procedure_with_parameter_async()
-		{
-			return base.Executes_stored_procedure_with_parameter_async();
-		}
+	[DoesNotHaveTheDataFact]
+	public override Task Executes_stored_procedure_with_parameter_async()
+	{
+		return base.Executes_stored_procedure_with_parameter_async();
 	}
 }

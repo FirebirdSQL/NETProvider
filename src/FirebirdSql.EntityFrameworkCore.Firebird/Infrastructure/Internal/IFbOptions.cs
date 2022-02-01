@@ -17,11 +17,10 @@
 
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
+
+public interface IFbOptions : ISingletonOptions
 {
-	public interface IFbOptions : ISingletonOptions
-	{
-		bool ExplicitParameterTypes { get; }
-		bool ExplicitStringLiteralTypes { get; }
-	}
+	bool ExplicitParameterTypes { get; }
+	bool ExplicitStringLiteralTypes { get; }
 }

@@ -18,13 +18,12 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 {
-	public interface IFbSqlGenerationHelper : ISqlGenerationHelper
-	{
-		string StringLiteralQueryType(string s);
-		string StringParameterQueryType();
-		void GenerateBlockParameterName(StringBuilder builder, string name);
-		string AlternativeStatementTerminator { get; }
-	}
+	string StringLiteralQueryType(string s);
+	string StringParameterQueryType();
+	void GenerateBlockParameterName(StringBuilder builder, string name);
+	string AlternativeStatementTerminator { get; }
 }

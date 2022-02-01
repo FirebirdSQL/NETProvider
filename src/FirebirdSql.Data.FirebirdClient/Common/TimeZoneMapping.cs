@@ -17,12 +17,12 @@
 
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal class TimeZoneMapping
 {
-	internal class TimeZoneMapping
-	{
-		// select '{ ' || rdb$time_zone_id || ', "' || trim(rdb$time_zone_name) || '" },' from rdb$time_zones order by rdb$time_zone_id desc;
-		static Dictionary<ushort, string> _idToName = new Dictionary<ushort, string>()
+	// select '{ ' || rdb$time_zone_id || ', "' || trim(rdb$time_zone_name) || '" },' from rdb$time_zones order by rdb$time_zone_id desc;
+	static Dictionary<ushort, string> _idToName = new Dictionary<ushort, string>()
 		{
 { 65535, "GMT" },
 { 65534, "ACT" },
@@ -660,8 +660,8 @@ namespace FirebirdSql.Data.Common
 { 64902, "Asia/Qostanay" },
 		};
 
-		// select '{ "' || trim(rdb$time_zone_name) || '", ' || rdb$time_zone_id || ' },' from rdb$time_zones order by rdb$time_zone_id desc;
-		static Dictionary<string, ushort> _nameToId = new Dictionary<string, ushort>()
+	// select '{ "' || trim(rdb$time_zone_name) || '", ' || rdb$time_zone_id || ' },' from rdb$time_zones order by rdb$time_zone_id desc;
+	static Dictionary<string, ushort> _nameToId = new Dictionary<string, ushort>()
 		{
 { "GMT", 65535 },
 { "ACT", 65534 },
@@ -1299,10 +1299,9 @@ namespace FirebirdSql.Data.Common
 { "Asia/Qostanay", 64902 },
 		};
 
-		public static readonly string DefaultTimeZoneName = "GMT";
+	public static readonly string DefaultTimeZoneName = "GMT";
 
-		public static bool TryGetByName(string name, out ushort id) => _nameToId.TryGetValue(name, out id);
+	public static bool TryGetByName(string name, out ushort id) => _nameToId.TryGetValue(name, out id);
 
-		public static bool TryGetById(ushort id, out string name) => _idToName.TryGetValue(id, out name);
-	}
+	public static bool TryGetById(ushort id, out string name) => _idToName.TryGetValue(id, out name);
 }

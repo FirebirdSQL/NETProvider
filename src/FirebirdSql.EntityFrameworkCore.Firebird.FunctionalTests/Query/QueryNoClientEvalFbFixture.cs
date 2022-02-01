@@ -17,8 +17,7 @@
 
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class QueryNoClientEvalFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
-	{ }
-}
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class QueryNoClientEvalFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
+{ }

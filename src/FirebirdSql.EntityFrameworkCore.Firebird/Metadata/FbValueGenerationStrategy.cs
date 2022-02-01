@@ -15,12 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
+
+public enum FbValueGenerationStrategy
 {
-	public enum FbValueGenerationStrategy
-	{
-		None,
-		SequenceTrigger,
-		IdentityColumn,
-	}
+	None,
+	SequenceTrigger,
+	IdentityColumn,
 }

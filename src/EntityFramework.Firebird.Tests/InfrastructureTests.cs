@@ -18,36 +18,35 @@
 using System;
 using NUnit.Framework;
 
-namespace EntityFramework.Firebird.Tests
+namespace EntityFramework.Firebird.Tests;
+
+public class InfrastructureTests : EntityFrameworkTestsBase
 {
-	public class InfrastructureTests : EntityFrameworkTestsBase
+	[Test]
+	public void DbProviderServicesTest()
 	{
-		[Test]
-		public void DbProviderServicesTest()
-		{
-			object dbproviderservices = GetProviderServices();
-			Assert.IsNotNull(dbproviderservices);
-			Assert.IsInstanceOf<FbProviderServices>(dbproviderservices);
-		}
+		object dbproviderservices = GetProviderServices();
+		Assert.IsNotNull(dbproviderservices);
+		Assert.IsInstanceOf<FbProviderServices>(dbproviderservices);
+	}
 
-		[Test]
-		public void ProviderManifestTest()
-		{
-			var manifest = GetProviderServices().GetProviderManifest("foobar");
-			Assert.IsNotNull(manifest);
-		}
+	[Test]
+	public void ProviderManifestTest()
+	{
+		var manifest = GetProviderServices().GetProviderManifest("foobar");
+		Assert.IsNotNull(manifest);
+	}
 
-		[Test]
-		public void ProviderManifestTokenTest()
-		{
-			var token = GetProviderServices().GetProviderManifestToken(Connection);
-			Assert.IsNotNull(token);
-			Assert.IsNotEmpty(token);
-			var v = new Version(token);
-			Assert.Greater(v.Major, 0);
-			Assert.GreaterOrEqual(v.Minor, 0);
-			Assert.AreEqual(v.Build, -1);
-			Assert.AreEqual(v.Revision, -1);
-		}
+	[Test]
+	public void ProviderManifestTokenTest()
+	{
+		var token = GetProviderServices().GetProviderManifestToken(Connection);
+		Assert.IsNotNull(token);
+		Assert.IsNotEmpty(token);
+		var v = new Version(token);
+		Assert.Greater(v.Major, 0);
+		Assert.GreaterOrEqual(v.Minor, 0);
+		Assert.AreEqual(v.Build, -1);
+		Assert.AreEqual(v.Revision, -1);
 	}
 }

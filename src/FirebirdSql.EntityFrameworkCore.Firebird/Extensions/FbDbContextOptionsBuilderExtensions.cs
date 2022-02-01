@@ -21,40 +21,39 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Microsoft.EntityFrameworkCore
+namespace Microsoft.EntityFrameworkCore;
+
+public static class FbDbContextOptionsBuilderExtensions
 {
-	public static class FbDbContextOptionsBuilderExtensions
+	public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
 	{
-		public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
-		{
-			var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
-			((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
-			fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
-			return optionsBuilder;
-		}
-
-		public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, DbConnection connection, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
-		{
-			var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection);
-			((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
-			fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
-			return optionsBuilder;
-		}
-
-		public static DbContextOptionsBuilder<TContext> UseFirebird<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
-			where TContext : DbContext
-		{
-			return (DbContextOptionsBuilder<TContext>)UseFirebird((DbContextOptionsBuilder)optionsBuilder, connectionString, fbOptionsAction);
-		}
-
-		public static DbContextOptionsBuilder<TContext> UseFirebird<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, DbConnection connection, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
-			where TContext : DbContext
-		{
-			return (DbContextOptionsBuilder<TContext>)UseFirebird((DbContextOptionsBuilder)optionsBuilder, connection, fbOptionsAction);
-		}
-
-		static FbOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder optionsBuilder)
-			=> optionsBuilder.Options.FindExtension<FbOptionsExtension>()
-				?? new FbOptionsExtension();
+		var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
+		((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+		fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
+		return optionsBuilder;
 	}
+
+	public static DbContextOptionsBuilder UseFirebird(this DbContextOptionsBuilder optionsBuilder, DbConnection connection, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
+	{
+		var extension = (FbOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection);
+		((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+		fbOptionsAction?.Invoke(new FbDbContextOptionsBuilder(optionsBuilder));
+		return optionsBuilder;
+	}
+
+	public static DbContextOptionsBuilder<TContext> UseFirebird<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, string connectionString, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
+		where TContext : DbContext
+	{
+		return (DbContextOptionsBuilder<TContext>)UseFirebird((DbContextOptionsBuilder)optionsBuilder, connectionString, fbOptionsAction);
+	}
+
+	public static DbContextOptionsBuilder<TContext> UseFirebird<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, DbConnection connection, Action<FbDbContextOptionsBuilder> fbOptionsAction = null)
+		where TContext : DbContext
+	{
+		return (DbContextOptionsBuilder<TContext>)UseFirebird((DbContextOptionsBuilder)optionsBuilder, connection, fbOptionsAction);
+	}
+
+	static FbOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder optionsBuilder)
+		=> optionsBuilder.Options.FindExtension<FbOptionsExtension>()
+			?? new FbOptionsExtension();
 }

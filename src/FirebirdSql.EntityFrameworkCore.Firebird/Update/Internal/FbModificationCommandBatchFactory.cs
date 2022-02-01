@@ -17,20 +17,19 @@
 
 using Microsoft.EntityFrameworkCore.Update;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal;
+
+public class FbModificationCommandBatchFactory : IModificationCommandBatchFactory
 {
-	public class FbModificationCommandBatchFactory : IModificationCommandBatchFactory
+	readonly ModificationCommandBatchFactoryDependencies _dependencies;
+
+	public FbModificationCommandBatchFactory(ModificationCommandBatchFactoryDependencies dependencies)
 	{
-		readonly ModificationCommandBatchFactoryDependencies _dependencies;
+		_dependencies = dependencies;
+	}
 
-		public FbModificationCommandBatchFactory(ModificationCommandBatchFactoryDependencies dependencies)
-		{
-			_dependencies = dependencies;
-		}
-
-		public ModificationCommandBatch Create()
-		{
-			return new SingularModificationCommandBatch(_dependencies);
-		}
+	public ModificationCommandBatch Create()
+	{
+		return new SingularModificationCommandBatch(_dependencies);
 	}
 }

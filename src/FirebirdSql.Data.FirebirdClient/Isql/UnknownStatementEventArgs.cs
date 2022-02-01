@@ -17,20 +17,19 @@
 
 using System;
 
-namespace FirebirdSql.Data.Isql
-{
-	public class UnknownStatementEventArgs : EventArgs
-	{
-		public FbStatement Statement { get; private set; }
-		public bool Handled { get; set; }
-		public bool Ignore { get; set; }
-		public SqlStatementType NewStatementType { get; set; }
+namespace FirebirdSql.Data.Isql;
 
-		public UnknownStatementEventArgs(FbStatement statement)
-		{
-			Statement = statement;
-			Handled = false;
-			Ignore = false;
-		}
+public class UnknownStatementEventArgs : EventArgs
+{
+	public FbStatement Statement { get; private set; }
+	public bool Handled { get; set; }
+	public bool Ignore { get; set; }
+	public SqlStatementType NewStatementType { get; set; }
+
+	public UnknownStatementEventArgs(FbStatement statement)
+	{
+		Statement = statement;
+		Handled = false;
+		Ignore = false;
 	}
 }

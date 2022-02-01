@@ -24,33 +24,32 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbStringIndexOfTranslator : IMethodCallTranslator
 {
-	public class FbStringIndexOfTranslator : IMethodCallTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbStringIndexOfTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbStringIndexOfTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (method.DeclaringType == typeof(string) && method.Name == nameof(string.IndexOf))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
-
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (method.DeclaringType == typeof(string) && method.Name == nameof(string.IndexOf))
+			var args = new List<SqlExpression>();
+			args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]));
+			args.Add(instance);
+			foreach (var a in arguments.Skip(1))
 			{
-				var args = new List<SqlExpression>();
-				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]));
-				args.Add(instance);
-				foreach (var a in arguments.Skip(1))
-				{
-					args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
-				}
-				return _fbSqlExpressionFactory.Subtract(
-					_fbSqlExpressionFactory.Function("POSITION", args, true, Enumerable.Repeat(true, args.Count), typeof(int)),
-					_fbSqlExpressionFactory.Constant(1));
+				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
 			}
-			return null;
+			return _fbSqlExpressionFactory.Subtract(
+				_fbSqlExpressionFactory.Function("POSITION", args, true, Enumerable.Repeat(true, args.Count), typeof(int)),
+				_fbSqlExpressionFactory.Constant(1));
 		}
+		return null;
 	}
 }

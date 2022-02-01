@@ -17,8 +17,7 @@
 
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
-{
-	public interface IFbRelationalTransaction
-	{ }
-}
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public interface IFbRelationalTransaction
+{ }

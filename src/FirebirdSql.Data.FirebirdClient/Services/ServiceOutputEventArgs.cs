@@ -17,15 +17,14 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
-{
-	public sealed class ServiceOutputEventArgs : EventArgs
-	{
-		public string Message { get; }
+namespace FirebirdSql.Data.Services;
 
-		public ServiceOutputEventArgs(string message)
-		{
-			Message = message;
-		}
+public sealed class ServiceOutputEventArgs : EventArgs
+{
+	public string Message { get; }
+
+	public ServiceOutputEventArgs(string message)
+	{
+		Message = message;
 	}
 }

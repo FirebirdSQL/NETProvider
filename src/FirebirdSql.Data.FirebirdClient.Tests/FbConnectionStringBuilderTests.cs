@@ -20,53 +20,52 @@ using FirebirdSql.Data.Common;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbConnectionStringBuilderTests
 {
-	[NoServerCategory]
-	public class FbConnectionStringBuilderTests
+	[Test]
+	public void EmptyCtorGeneratesEmptyString()
 	{
-		[Test]
-		public void EmptyCtorGeneratesEmptyString()
-		{
-			var b = new FbConnectionStringBuilder();
-			Assert.IsEmpty(b.ToString());
-		}
+		var b = new FbConnectionStringBuilder();
+		Assert.IsEmpty(b.ToString());
+	}
 
-		[Test]
-		public void NoValueProvidedReturnsDefault()
-		{
-			var b = new FbConnectionStringBuilder();
-			Assert.AreEqual(b.MaxPoolSize, ConnectionString.DefaultValueMaxPoolSize);
-		}
+	[Test]
+	public void NoValueProvidedReturnsDefault()
+	{
+		var b = new FbConnectionStringBuilder();
+		Assert.AreEqual(b.MaxPoolSize, ConnectionString.DefaultValueMaxPoolSize);
+	}
 
-		[Test]
-		public void CryptKeyValueSetter()
-		{
-			var b = new FbConnectionStringBuilder();
-			b.CryptKey = Encoding.ASCII.GetBytes("test");
-			Assert.AreEqual("crypt key=\"dGVzdA==\"", b.ToString());
-		}
+	[Test]
+	public void CryptKeyValueSetter()
+	{
+		var b = new FbConnectionStringBuilder();
+		b.CryptKey = Encoding.ASCII.GetBytes("test");
+		Assert.AreEqual("crypt key=\"dGVzdA==\"", b.ToString());
+	}
 
-		[Test]
-		public void CryptKeyValueGetter()
-		{
-			var b = new FbConnectionStringBuilder("CryptKey=dGVzdA==");
-			Assert.AreEqual("test", Encoding.ASCII.GetString(b.CryptKey));
-		}
+	[Test]
+	public void CryptKeyValueGetter()
+	{
+		var b = new FbConnectionStringBuilder("CryptKey=dGVzdA==");
+		Assert.AreEqual("test", Encoding.ASCII.GetString(b.CryptKey));
+	}
 
-		[Test]
-		public void WireCryptSetter()
-		{
-			var b = new FbConnectionStringBuilder();
-			b.WireCrypt = FbWireCrypt.Disabled;
-			Assert.AreEqual("wire crypt=Disabled", b.ToString());
-		}
+	[Test]
+	public void WireCryptSetter()
+	{
+		var b = new FbConnectionStringBuilder();
+		b.WireCrypt = FbWireCrypt.Disabled;
+		Assert.AreEqual("wire crypt=Disabled", b.ToString());
+	}
 
-		[Test]
-		public void WireCryptGetter()
-		{
-			var b = new FbConnectionStringBuilder("wire crypt=required");
-			Assert.AreEqual(FbWireCrypt.Required, b.WireCrypt);
-		}
+	[Test]
+	public void WireCryptGetter()
+	{
+		var b = new FbConnectionStringBuilder("wire crypt=required");
+		Assert.AreEqual(FbWireCrypt.Required, b.WireCrypt);
 	}
 }

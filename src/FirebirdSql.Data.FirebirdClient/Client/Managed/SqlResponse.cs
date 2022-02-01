@@ -18,15 +18,14 @@
 using System;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed
-{
-	internal class SqlResponse : IResponse
-	{
-		public int Count { get; }
+namespace FirebirdSql.Data.Client.Managed;
 
-		public SqlResponse(int count)
-		{
-			Count = count;
-		}
+internal class SqlResponse : IResponse
+{
+	public int Count { get; }
+
+	public SqlResponse(int count)
+	{
+		Count = count;
 	}
 }

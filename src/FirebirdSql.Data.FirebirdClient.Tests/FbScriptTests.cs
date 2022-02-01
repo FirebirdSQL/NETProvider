@@ -21,283 +21,282 @@ using FirebirdSql.Data.Isql;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[NoServerCategory]
+public class FbScriptTests
 {
-	[NoServerCategory]
-	public class FbScriptTests
+	[Test]
+	public void NullScript()
 	{
-		[Test]
-		public void NullScript()
-		{
-			Assert.Throws<ArgumentNullException>(() => new FbScript(null));
-		}
+		Assert.Throws<ArgumentNullException>(() => new FbScript(null));
+	}
 
-		[Test]
-		public void EmptyScript()
-		{
-			var script = new FbScript(string.Empty);
-			script.Parse();
-			Assert.AreEqual(0, script.Results.Count());
-		}
+	[Test]
+	public void EmptyScript()
+	{
+		var script = new FbScript(string.Empty);
+		script.Parse();
+		Assert.AreEqual(0, script.Results.Count());
+	}
 
-		[Test]
-		public void WhiteSpacesScript()
-		{
-			var script = new FbScript("\t    \t ");
-			script.Parse();
-			Assert.AreEqual(0, script.Results.Count());
-		}
+	[Test]
+	public void WhiteSpacesScript()
+	{
+		var script = new FbScript("\t    \t ");
+		script.Parse();
+		Assert.AreEqual(0, script.Results.Count());
+	}
 
-		[Test]
-		public void SimpleStatementNoSemicolonWithLiteral()
-		{
-			const string text =
+	[Test]
+	public void SimpleStatementNoSemicolonWithLiteral()
+	{
+		const string text =
 @"select * from foo where x = 'foobar'";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void SimpleStatementWithSemicolonWithLiteral()
-		{
-			const string text =
+	[Test]
+	public void SimpleStatementWithSemicolonWithLiteral()
+	{
+		const string text =
 @"select * from foo where x = 'foobar';";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+	}
 
-		[Test]
-		public void SimpleStatementNoSemicolonWithSemicolonInLiteral()
-		{
-			const string text =
+	[Test]
+	public void SimpleStatementNoSemicolonWithSemicolonInLiteral()
+	{
+		const string text =
 @"select * from foo where x = 'foo;bar'";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void SimpleStatementNoSemicolonWithEscapedSingleQuoteInLiteral()
-		{
-			const string text =
+	[Test]
+	public void SimpleStatementNoSemicolonWithEscapedSingleQuoteInLiteral()
+	{
+		const string text =
 @"select * from foo where x = 'foo''bar'";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void TwoStatements()
-		{
-			const string text =
+	[Test]
+	public void TwoStatements()
+	{
+		const string text =
 @"select * from foo;select * from bar";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(2, script.Results.Count());
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(2, script.Results.Count());
+	}
 
-		[Test]
-		public void OneStatementNoSemicolonOneAfterSingleLineComment()
-		{
-			const string text =
+	[Test]
+	public void OneStatementNoSemicolonOneAfterSingleLineComment()
+	{
+		const string text =
 @"select * from foo--;select * from bar";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void OneStatementWithMultilineCommentNoSemicolon()
-		{
-			const string text =
+	[Test]
+	public void OneStatementWithMultilineCommentNoSemicolon()
+	{
+		const string text =
 @"select * from foo /* foo */";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void OneStatementWithMultilineCommentSeparatedBySemicolon()
-		{
-			const string text =
+	[Test]
+	public void OneStatementWithMultilineCommentSeparatedBySemicolon()
+	{
+		const string text =
 @"select * from foo /* foo */;";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+	}
 
-		[Test]
-		public void OneStatementWithMultilineCommentWithSemicolon()
-		{
-			const string text =
+	[Test]
+	public void OneStatementWithMultilineCommentWithSemicolon()
+	{
+		const string text =
 @"select * from foo /* ;foo */";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text, script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text, script.Results[0].Text);
+	}
 
-		[Test]
-		public void OneStatementWithMultilineCommentWithSemicolonWithSemicolonAtTheEnd()
-		{
-			const string text =
+	[Test]
+	public void OneStatementWithMultilineCommentWithSemicolonWithSemicolonAtTheEnd()
+	{
+		const string text =
 @"select * from foo /* ;foo */;";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(text.Substring(0, text.Length - 1), script.Results[0].Text);
+	}
 
-		[Test]
-		public void SemicolonOnly()
-		{
-			const string text =
+	[Test]
+	public void SemicolonOnly()
+	{
+		const string text =
 @";";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(0, script.Results.Count());
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(0, script.Results.Count());
+	}
 
-		[Test]
-		public void MultilineCommentSeparatedBySemicolon()
-		{
-			const string text =
+	[Test]
+	public void MultilineCommentSeparatedBySemicolon()
+	{
+		const string text =
 @"/*
 foo
 */;";
-			var script = new FbScript(text);
-			script.UnknownStatement += (sender, e) =>
-			{
-				if (e.Statement.Text == text.Substring(0, text.Length - 1))
-				{
-					e.Ignore = true;
-				}
-			};
-			script.Parse();
-			Assert.AreEqual(0, script.Results.Count());
-		}
-
-		[Test]
-		public void OneStatementWithSemicolonOneAfterSingleLineComment()
+		var script = new FbScript(text);
+		script.UnknownStatement += (sender, e) =>
 		{
-			const string text =
+			if (e.Statement.Text == text.Substring(0, text.Length - 1))
+			{
+				e.Ignore = true;
+			}
+		};
+		script.Parse();
+		Assert.AreEqual(0, script.Results.Count());
+	}
+
+	[Test]
+	public void OneStatementWithSemicolonOneAfterSingleLineComment()
+	{
+		const string text =
 @"select * from foo;--select * from bar";
-			var script = new FbScript(text);
-			script.UnknownStatement += (sender, e) =>
-			{
-				if (e.Statement.Text == "--select * from bar")
-				{
-					e.Ignore = true;
-				}
-			};
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual("select * from foo", script.Results[0].Text);
-		}
-
-		[Test]
-		public void ManuallySettingStatementType()
+		var script = new FbScript(text);
+		script.UnknownStatement += (sender, e) =>
 		{
-			const string text =
+			if (e.Statement.Text == "--select * from bar")
+			{
+				e.Ignore = true;
+			}
+		};
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual("select * from foo", script.Results[0].Text);
+	}
+
+	[Test]
+	public void ManuallySettingStatementType()
+	{
+		const string text =
 @"create db 'foobar'";
-			var script = new FbScript(text);
-			script.UnknownStatement += (sender, e) =>
+		var script = new FbScript(text);
+		script.UnknownStatement += (sender, e) =>
+		{
+			if (e.Statement.Text == text)
 			{
-				if (e.Statement.Text == text)
-				{
-					e.NewStatementType = SqlStatementType.CreateDatabase;
-					e.Handled = true;
-				}
-			};
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.CreateDatabase, script.Results[0].StatementType);
-		}
+				e.NewStatementType = SqlStatementType.CreateDatabase;
+				e.Handled = true;
+			}
+		};
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.CreateDatabase, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void CreatePackage()
-		{
-			const string text =
+	[Test]
+	public void CreatePackage()
+	{
+		const string text =
 @"create package p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.CreatePackage, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.CreatePackage, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void RecreatePackage()
-		{
-			const string text =
+	[Test]
+	public void RecreatePackage()
+	{
+		const string text =
 @"recreate package p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.RecreatePackage, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.RecreatePackage, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void CreatePackageBody()
-		{
-			const string text =
+	[Test]
+	public void CreatePackageBody()
+	{
+		const string text =
 @"create package body p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.CreatePackageBody, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.CreatePackageBody, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void RecreatePackageBody()
-		{
-			const string text =
+	[Test]
+	public void RecreatePackageBody()
+	{
+		const string text =
 @"recreate package body p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.RecreatePackageBody, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.RecreatePackageBody, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void DropPackage()
-		{
-			const string text =
+	[Test]
+	public void DropPackage()
+	{
+		const string text =
 @"drop package p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.DropPackage, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.DropPackage, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void DropPackageBody()
-		{
-			const string text =
+	[Test]
+	public void DropPackageBody()
+	{
+		const string text =
 @"drop package body p as begin end";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.DropPackageBody, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.DropPackageBody, script.Results[0].StatementType);
+	}
 
-		[Test]
-		public void Merge()
-		{
-			const string text =
+	[Test]
+	public void Merge()
+	{
+		const string text =
 @"merge into table t using foo f on f.id = t.id when ";
-			var script = new FbScript(text);
-			script.Parse();
-			Assert.AreEqual(1, script.Results.Count());
-			Assert.AreEqual(SqlStatementType.Merge, script.Results[0].StatementType);
-		}
+		var script = new FbScript(text);
+		script.Parse();
+		Assert.AreEqual(1, script.Results.Count());
+		Assert.AreEqual(SqlStatementType.Merge, script.Results[0].StatementType);
 	}
 }

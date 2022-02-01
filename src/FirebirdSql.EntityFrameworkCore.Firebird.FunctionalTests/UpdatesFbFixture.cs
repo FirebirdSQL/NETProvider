@@ -20,16 +20,15 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests
-{
-	public class UpdatesFbFixture : UpdatesRelationalFixture
-	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests;
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder);
-		}
+public class UpdatesFbFixture : UpdatesRelationalFixture
+{
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	{
+		base.OnModelCreating(modelBuilder, context);
+		ModelHelpers.SetStringLengths(modelBuilder);
 	}
 }

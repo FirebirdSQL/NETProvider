@@ -20,41 +20,40 @@ using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbTimeSpanTypeMapping : TimeSpanTypeMapping
 {
-	public class FbTimeSpanTypeMapping : TimeSpanTypeMapping
+	readonly FbDbType _fbDbType;
+
+	public FbTimeSpanTypeMapping(string storeType, FbDbType fbDbType)
+		: base(storeType)
 	{
-		readonly FbDbType _fbDbType;
-
-		public FbTimeSpanTypeMapping(string storeType, FbDbType fbDbType)
-			: base(storeType)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected FbTimeSpanTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
-			: base(parameters)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected override void ConfigureParameter(DbParameter parameter)
-		{
-			((FbParameter)parameter).FbDbType = _fbDbType;
-		}
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			switch (_fbDbType)
-			{
-				case FbDbType.Time:
-					return $"CAST('{value:hh\\:mm\\:ss\\.ffff}' AS TIME)";
-				default:
-					throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
-			}
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbTimeSpanTypeMapping(parameters, _fbDbType);
+		_fbDbType = fbDbType;
 	}
+
+	protected FbTimeSpanTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
+		: base(parameters)
+	{
+		_fbDbType = fbDbType;
+	}
+
+	protected override void ConfigureParameter(DbParameter parameter)
+	{
+		((FbParameter)parameter).FbDbType = _fbDbType;
+	}
+
+	protected override string GenerateNonNullSqlLiteral(object value)
+	{
+		switch (_fbDbType)
+		{
+			case FbDbType.Time:
+				return $"CAST('{value:hh\\:mm\\:ss\\.ffff}' AS TIME)";
+			default:
+				throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
+		}
+	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbTimeSpanTypeMapping(parameters, _fbDbType);
 }

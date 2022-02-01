@@ -22,95 +22,94 @@ using System.Collections.Generic;
 using FirebirdSql.Data.Common;
 using System.Collections;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+[Serializable]
+[ListBindable(false)]
+public sealed class FbErrorCollection : ICollection<FbError>
 {
-	[Serializable]
-	[ListBindable(false)]
-	public sealed class FbErrorCollection : ICollection<FbError>
+	#region Fields
+
+	private List<FbError> _errors;
+
+	#endregion
+
+	#region Constructors
+
+	internal FbErrorCollection()
 	{
-		#region Fields
-
-		private List<FbError> _errors;
-
-		#endregion
-
-		#region Constructors
-
-		internal FbErrorCollection()
-		{
-			_errors = new List<FbError>();
-		}
-
-		#endregion
-
-		#region Properties
-
-		public int Count
-		{
-			get { return _errors.Count; }
-		}
-
-		public bool IsReadOnly
-		{
-			get { return true; }
-		}
-
-		#endregion
-
-		#region Methods
-
-		internal int IndexOf(string errorMessage)
-		{
-			return _errors.FindIndex(x => string.Equals(x.Message, errorMessage, StringComparison.CurrentCultureIgnoreCase));
-		}
-
-		internal FbError Add(FbError error)
-		{
-			_errors.Add(error);
-
-			return error;
-		}
-
-		internal FbError Add(string errorMessage, int number)
-		{
-			return Add(new FbError(errorMessage, number));
-		}
-
-		void ICollection<FbError>.Add(FbError item)
-		{
-			throw new NotSupportedException();
-		}
-
-		void ICollection<FbError>.Clear()
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool Contains(FbError item)
-		{
-			return _errors.Contains(item);
-		}
-
-		public void CopyTo(FbError[] array, int arrayIndex)
-		{
-			_errors.CopyTo(array, arrayIndex);
-		}
-
-		bool ICollection<FbError>.Remove(FbError item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public IEnumerator<FbError> GetEnumerator()
-		{
-			return _errors.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		#endregion
+		_errors = new List<FbError>();
 	}
+
+	#endregion
+
+	#region Properties
+
+	public int Count
+	{
+		get { return _errors.Count; }
+	}
+
+	public bool IsReadOnly
+	{
+		get { return true; }
+	}
+
+	#endregion
+
+	#region Methods
+
+	internal int IndexOf(string errorMessage)
+	{
+		return _errors.FindIndex(x => string.Equals(x.Message, errorMessage, StringComparison.CurrentCultureIgnoreCase));
+	}
+
+	internal FbError Add(FbError error)
+	{
+		_errors.Add(error);
+
+		return error;
+	}
+
+	internal FbError Add(string errorMessage, int number)
+	{
+		return Add(new FbError(errorMessage, number));
+	}
+
+	void ICollection<FbError>.Add(FbError item)
+	{
+		throw new NotSupportedException();
+	}
+
+	void ICollection<FbError>.Clear()
+	{
+		throw new NotSupportedException();
+	}
+
+	public bool Contains(FbError item)
+	{
+		return _errors.Contains(item);
+	}
+
+	public void CopyTo(FbError[] array, int arrayIndex)
+	{
+		_errors.CopyTo(array, arrayIndex);
+	}
+
+	bool ICollection<FbError>.Remove(FbError item)
+	{
+		throw new NotSupportedException();
+	}
+
+	public IEnumerator<FbError> GetEnumerator()
+	{
+		return _errors.GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return GetEnumerator();
+	}
+
+	#endregion
 }

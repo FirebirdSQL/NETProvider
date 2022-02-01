@@ -19,81 +19,80 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Metadata.Edm;
 
-namespace EntityFramework.Firebird.SqlGen
+namespace EntityFramework.Firebird.SqlGen;
+
+internal sealed class JoinSymbol : Symbol
 {
-	internal sealed class JoinSymbol : Symbol
+	#region Fields
+
+	private List<Symbol> _columnList;
+	private List<Symbol> _extentList;
+	private List<Symbol> _flattenedExtentList;
+	private Dictionary<string, Symbol> _nameToExtent;
+	private bool _isNestedJoin;
+
+	#endregion
+
+	#region Properties
+
+	internal List<Symbol> ColumnList
 	{
-		#region Fields
-
-		private List<Symbol> _columnList;
-		private List<Symbol> _extentList;
-		private List<Symbol> _flattenedExtentList;
-		private Dictionary<string, Symbol> _nameToExtent;
-		private bool _isNestedJoin;
-
-		#endregion
-
-		#region Properties
-
-		internal List<Symbol> ColumnList
+		get
 		{
-			get
+			if (null == _columnList)
 			{
-				if (null == _columnList)
-				{
-					_columnList = new List<Symbol>();
-				}
-				return _columnList;
+				_columnList = new List<Symbol>();
 			}
-			set { _columnList = value; }
+			return _columnList;
 		}
-
-		internal List<Symbol> ExtentList
-		{
-			get { return _extentList; }
-		}
-
-		internal List<Symbol> FlattenedExtentList
-		{
-			get
-			{
-				if (null == _flattenedExtentList)
-				{
-					_flattenedExtentList = new List<Symbol>();
-				}
-				return _flattenedExtentList;
-			}
-			set { _flattenedExtentList = value; }
-		}
-
-		internal Dictionary<string, Symbol> NameToExtent
-		{
-			get { return _nameToExtent; }
-		}
-
-		internal bool IsNestedJoin
-		{
-			get { return _isNestedJoin; }
-			set { _isNestedJoin = value; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public JoinSymbol(string name, TypeUsage type, List<Symbol> extents)
-			: base(name, type)
-		{
-			_extentList = new List<Symbol>(extents.Count);
-			_nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
-
-			foreach (var symbol in extents)
-			{
-				_nameToExtent[symbol.Name] = symbol;
-				ExtentList.Add(symbol);
-			}
-		}
-
-		#endregion
+		set { _columnList = value; }
 	}
+
+	internal List<Symbol> ExtentList
+	{
+		get { return _extentList; }
+	}
+
+	internal List<Symbol> FlattenedExtentList
+	{
+		get
+		{
+			if (null == _flattenedExtentList)
+			{
+				_flattenedExtentList = new List<Symbol>();
+			}
+			return _flattenedExtentList;
+		}
+		set { _flattenedExtentList = value; }
+	}
+
+	internal Dictionary<string, Symbol> NameToExtent
+	{
+		get { return _nameToExtent; }
+	}
+
+	internal bool IsNestedJoin
+	{
+		get { return _isNestedJoin; }
+		set { _isNestedJoin = value; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	public JoinSymbol(string name, TypeUsage type, List<Symbol> extents)
+		: base(name, type)
+	{
+		_extentList = new List<Symbol>(extents.Count);
+		_nameToExtent = new Dictionary<string, Symbol>(extents.Count, StringComparer.OrdinalIgnoreCase);
+
+		foreach (var symbol in extents)
+		{
+			_nameToExtent[symbol.Name] = symbol;
+			ExtentList.Add(symbol);
+		}
+	}
+
+	#endregion
 }

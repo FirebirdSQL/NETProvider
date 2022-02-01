@@ -26,177 +26,176 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public class FbStreamingRestore : FbService
 {
-	public class FbStreamingRestore : FbService
+	private int? _pageSize;
+	public int? PageSize
 	{
-		private int? _pageSize;
-		public int? PageSize
+		get { return _pageSize; }
+		set
 		{
-			get { return _pageSize; }
-			set
-			{
-				if (value is int v && !PageSizeHelper.IsValidPageSize(v))
-					throw new InvalidOperationException("Invalid page size.");
+			if (value is int v && !PageSizeHelper.IsValidPageSize(v))
+				throw new InvalidOperationException("Invalid page size.");
 
-				_pageSize = value;
-			}
+			_pageSize = value;
 		}
+	}
 
-		public Stream InputStream { get; set; }
-		public bool Verbose { get; set; }
-		public int? PageBuffers { get; set; }
-		public bool ReadOnly { get; set; }
-		public string SkipData { get; set; }
-		public FbRestoreFlags Options { get; set; }
+	public Stream InputStream { get; set; }
+	public bool Verbose { get; set; }
+	public int? PageBuffers { get; set; }
+	public bool ReadOnly { get; set; }
+	public string SkipData { get; set; }
+	public FbRestoreFlags Options { get; set; }
 
-		public FbStreamingRestore(string connectionString = null)
-			: base(connectionString)
-		{ }
+	public FbStreamingRestore(string connectionString = null)
+		: base(connectionString)
+	{ }
 
-		public void Execute()
+	public void Execute()
+	{
+		EnsureDatabase();
+
+		try
 		{
-			EnsureDatabase();
-
-			try
+			Open();
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_restore);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (Verbose)
 			{
-				Open();
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_restore);
-				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				if (Verbose)
-				{
-					startSpb.Append(IscCodes.isc_spb_verbose);
-				}
-				if (PageBuffers.HasValue)
-					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
-				if (_pageSize.HasValue)
-					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
-				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
-				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				StartTask(startSpb);
-				ReadInput();
+				startSpb.Append(IscCodes.isc_spb_verbose);
 			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				Close();
-			}
+			if (PageBuffers.HasValue)
+				startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+			if (_pageSize.HasValue)
+				startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+			startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+			if (!string.IsNullOrEmpty(SkipData))
+				startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			StartTask(startSpb);
+			ReadInput();
 		}
-		public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+		catch (Exception ex)
 		{
-			EnsureDatabase();
-
-			try
-			{
-				await OpenAsync(cancellationToken).ConfigureAwait(false);
-				var startSpb = new ServiceParameterBuffer2();
-				startSpb.Append(IscCodes.isc_action_svc_restore);
-				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-				if (Verbose)
-				{
-					startSpb.Append(IscCodes.isc_spb_verbose);
-				}
-				if (PageBuffers.HasValue)
-					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
-				if (_pageSize.HasValue)
-					startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
-				startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
-				if (!string.IsNullOrEmpty(SkipData))
-					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
-				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				await ReadInputAsync(cancellationToken).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				throw FbException.Create(ex);
-			}
-			finally
-			{
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
+			throw FbException.Create(ex);
 		}
-
-		void ReadInput()
+		finally
 		{
-			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
-			var spb = ServiceParameterBufferBase.Empty;
-			var response = Query(items, spb);
-			var requestedLength = GetLength(response);
-			while (true)
-			{
-				if (requestedLength > 0)
-				{
-					var data = new byte[requestedLength];
-					var read = InputStream.Read(data, 0, requestedLength);
-					if (read > 0)
-					{
-						Array.Resize(ref data, read);
-						var dataSpb = new ServiceParameterBuffer2();
-						dataSpb.Append2(IscCodes.isc_info_svc_line, data);
-						spb = dataSpb;
-					}
-				}
-				response = Query(items, spb);
-				if (response.Count == 1)
-				{
-					break;
-				}
-				if (response[1] is string message)
-				{
-					OnServiceOutput(message);
-				}
-				requestedLength = GetLength(response);
-				spb = ServiceParameterBufferBase.Empty;
-			}
+			Close();
 		}
-		async Task ReadInputAsync(CancellationToken cancellationToken = default)
-		{
-			var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
-			var spb = ServiceParameterBufferBase.Empty;
-			var response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
-			var requestedLength = GetLength(response);
-			while (true)
-			{
-				if (requestedLength > 0)
-				{
-					var data = new byte[requestedLength];
-					var read = InputStream.Read(data, 0, requestedLength);
-					if (read > 0)
-					{
-						Array.Resize(ref data, read);
-						var dataSpb = new ServiceParameterBuffer2();
-						dataSpb.Append2(IscCodes.isc_info_svc_line, data);
-						spb = dataSpb;
-					}
-				}
-				response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
-				if (response.Count == 1)
-				{
-					break;
-				}
-				if (response[1] is string message)
-				{
-					OnServiceOutput(message);
-				}
-				requestedLength = GetLength(response);
-				spb = ServiceParameterBufferBase.Empty;
-			}
-		}
+	}
+	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+	{
+		EnsureDatabase();
 
-		static int GetLength(IList<object> items)
+		try
 		{
-			// minus the size of isc code
-			const int MaxLength = IscCodes.BUFFER_SIZE_32K - 4;
-			return Math.Min((int)items[0], MaxLength);
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			var startSpb = new ServiceParameterBuffer2();
+			startSpb.Append(IscCodes.isc_action_svc_restore);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			if (Verbose)
+			{
+				startSpb.Append(IscCodes.isc_spb_verbose);
+			}
+			if (PageBuffers.HasValue)
+				startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
+			if (_pageSize.HasValue)
+				startSpb.Append(IscCodes.isc_spb_res_page_size, (int)_pageSize);
+			startSpb.Append(IscCodes.isc_spb_res_access_mode, (byte)(ReadOnly ? IscCodes.isc_spb_res_am_readonly : IscCodes.isc_spb_res_am_readwrite));
+			if (!string.IsNullOrEmpty(SkipData))
+				startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
+			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+			await ReadInputAsync(cancellationToken).ConfigureAwait(false);
 		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
+	}
+
+	void ReadInput()
+	{
+		var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
+		var spb = ServiceParameterBufferBase.Empty;
+		var response = Query(items, spb);
+		var requestedLength = GetLength(response);
+		while (true)
+		{
+			if (requestedLength > 0)
+			{
+				var data = new byte[requestedLength];
+				var read = InputStream.Read(data, 0, requestedLength);
+				if (read > 0)
+				{
+					Array.Resize(ref data, read);
+					var dataSpb = new ServiceParameterBuffer2();
+					dataSpb.Append2(IscCodes.isc_info_svc_line, data);
+					spb = dataSpb;
+				}
+			}
+			response = Query(items, spb);
+			if (response.Count == 1)
+			{
+				break;
+			}
+			if (response[1] is string message)
+			{
+				OnServiceOutput(message);
+			}
+			requestedLength = GetLength(response);
+			spb = ServiceParameterBufferBase.Empty;
+		}
+	}
+	async Task ReadInputAsync(CancellationToken cancellationToken = default)
+	{
+		var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
+		var spb = ServiceParameterBufferBase.Empty;
+		var response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
+		var requestedLength = GetLength(response);
+		while (true)
+		{
+			if (requestedLength > 0)
+			{
+				var data = new byte[requestedLength];
+				var read = InputStream.Read(data, 0, requestedLength);
+				if (read > 0)
+				{
+					Array.Resize(ref data, read);
+					var dataSpb = new ServiceParameterBuffer2();
+					dataSpb.Append2(IscCodes.isc_info_svc_line, data);
+					spb = dataSpb;
+				}
+			}
+			response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
+			if (response.Count == 1)
+			{
+				break;
+			}
+			if (response[1] is string message)
+			{
+				OnServiceOutput(message);
+			}
+			requestedLength = GetLength(response);
+			spb = ServiceParameterBufferBase.Empty;
+		}
+	}
+
+	static int GetLength(IList<object> items)
+	{
+		// minus the size of isc code
+		const int MaxLength = IscCodes.BUFFER_SIZE_32K - 4;
+		return Math.Min((int)items[0], MaxLength);
 	}
 }

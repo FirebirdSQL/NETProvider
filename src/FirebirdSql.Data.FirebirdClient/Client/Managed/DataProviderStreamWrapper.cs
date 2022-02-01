@@ -20,48 +20,47 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FirebirdSql.Data.Client.Managed
+namespace FirebirdSql.Data.Client.Managed;
+
+sealed class DataProviderStreamWrapper : IDataProvider
 {
-	sealed class DataProviderStreamWrapper : IDataProvider
+	readonly Stream _stream;
+
+	public DataProviderStreamWrapper(Stream stream)
 	{
-		readonly Stream _stream;
+		_stream = stream;
+	}
 
-		public DataProviderStreamWrapper(Stream stream)
-		{
-			_stream = stream;
-		}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public int Read(byte[] buffer, int offset, int count)
+	{
+		return _stream.Read(buffer, offset, count);
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+	{
+		return new ValueTask<int>(_stream.ReadAsync(buffer, offset, count));
+	}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public int Read(byte[] buffer, int offset, int count)
-		{
-			return _stream.Read(buffer, offset, count);
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
-		{
-			return new ValueTask<int>(_stream.ReadAsync(buffer, offset, count));
-		}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void Write(byte[] buffer, int offset, int count)
+	{
+		_stream.Write(buffer, offset, count);
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+	{
+		return new ValueTask(_stream.WriteAsync(buffer, offset, count));
+	}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Write(byte[] buffer, int offset, int count)
-		{
-			_stream.Write(buffer, offset, count);
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
-		{
-			return new ValueTask(_stream.WriteAsync(buffer, offset, count));
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Flush()
-		{
-			_stream.Flush();
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ValueTask FlushAsync(CancellationToken cancellationToken = default)
-		{
-			return new ValueTask(_stream.FlushAsync());
-		}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void Flush()
+	{
+		_stream.Flush();
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public ValueTask FlushAsync(CancellationToken cancellationToken = default)
+	{
+		return new ValueTask(_stream.FlushAsync());
 	}
 }

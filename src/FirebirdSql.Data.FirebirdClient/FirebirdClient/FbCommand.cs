@@ -26,359 +26,331 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller, ICloneable
 {
-	public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller, ICloneable
+	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbCommand));
+
+	#region Fields
+
+	private CommandType _commandType;
+	private UpdateRowSource _updatedRowSource;
+	private FbConnection _connection;
+	private FbTransaction _transaction;
+	private FbParameterCollection _parameters;
+	private StatementBase _statement;
+	private FbDataReader _activeReader;
+	private IReadOnlyList<string> _namedParameters;
+	private string _commandText;
+	private bool _disposed;
+	private bool _designTimeVisible;
+	private bool _implicitTransaction;
+	private int _commandTimeout;
+	private int _fetchSize;
+	private Type[] _expectedColumnTypes;
+
+	#endregion
+
+	#region Properties
+
+	[Category("Data")]
+	[DefaultValue("")]
+	[RefreshProperties(RefreshProperties.All)]
+	public override string CommandText
 	{
-		static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbCommand));
-
-		#region Fields
-
-		private CommandType _commandType;
-		private UpdateRowSource _updatedRowSource;
-		private FbConnection _connection;
-		private FbTransaction _transaction;
-		private FbParameterCollection _parameters;
-		private StatementBase _statement;
-		private FbDataReader _activeReader;
-		private IReadOnlyList<string> _namedParameters;
-		private string _commandText;
-		private bool _disposed;
-		private bool _designTimeVisible;
-		private bool _implicitTransaction;
-		private int _commandTimeout;
-		private int _fetchSize;
-		private Type[] _expectedColumnTypes;
-
-		#endregion
-
-		#region Properties
-
-		[Category("Data")]
-		[DefaultValue("")]
-		[RefreshProperties(RefreshProperties.All)]
-		public override string CommandText
+		get { return _commandText; }
+		set
 		{
-			get { return _commandText; }
-			set
+			if (_commandText != value && _statement != null)
 			{
-				if (_commandText != value && _statement != null)
-				{
-					Release();
-				}
-
-				_commandText = value;
+				Release();
 			}
-		}
 
-		[Category("Data")]
-		[DefaultValue(CommandType.Text), RefreshProperties(RefreshProperties.All)]
-		public override CommandType CommandType
-		{
-			get { return _commandType; }
-			set { _commandType = value; }
+			_commandText = value;
 		}
+	}
 
-		public override int CommandTimeout
+	[Category("Data")]
+	[DefaultValue(CommandType.Text), RefreshProperties(RefreshProperties.All)]
+	public override CommandType CommandType
+	{
+		get { return _commandType; }
+		set { _commandType = value; }
+	}
+
+	public override int CommandTimeout
+	{
+		get
 		{
-			get
+			if (_commandTimeout > 0)
+				return _commandTimeout;
+			if (_connection?.ConnectionOptions.CommandTimeout > 0)
+				return (int)_connection?.ConnectionOptions.CommandTimeout;
+			return 30;
+		}
+		set
+		{
+			if (value < 0)
 			{
-				if (_commandTimeout > 0)
-					return _commandTimeout;
-				if (_connection?.ConnectionOptions.CommandTimeout > 0)
-					return (int)_connection?.ConnectionOptions.CommandTimeout;
-				return 30;
+				throw new ArgumentException("The property value assigned is less than 0.");
 			}
-			set
-			{
-				if (value < 0)
-				{
-					throw new ArgumentException("The property value assigned is less than 0.");
-				}
 
-				_commandTimeout = value;
-			}
+			_commandTimeout = value;
 		}
+	}
 
-		[Category("Behavior")]
-		[DefaultValue(null)]
-		public new FbConnection Connection
+	[Category("Behavior")]
+	[DefaultValue(null)]
+	public new FbConnection Connection
+	{
+		get { return _connection; }
+		set
 		{
-			get { return _connection; }
-			set
+			if (_activeReader != null)
 			{
-				if (_activeReader != null)
-				{
-					throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
-				}
-
-				if (_transaction != null && _transaction.IsCompleted)
-				{
-					_transaction = null;
-				}
-
-				if (_connection != null &&
-					_connection != value &&
-					_connection.State == ConnectionState.Open)
-				{
-					Release();
-				}
-
-				_connection = value;
+				throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
 			}
-		}
 
-		[Category("Data")]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public new FbParameterCollection Parameters
-		{
-			get
+			if (_transaction != null && _transaction.IsCompleted)
 			{
-				if (_parameters == null)
-				{
-					_parameters = new FbParameterCollection();
-				}
-				return _parameters;
+				_transaction = null;
 			}
-		}
 
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public new FbTransaction Transaction
-		{
-			get { return _implicitTransaction ? null : _transaction; }
-			set
+			if (_connection != null &&
+				_connection != value &&
+				_connection.State == ConnectionState.Open)
 			{
-				if (_activeReader != null)
+				Release();
+			}
+
+			_connection = value;
+		}
+	}
+
+	[Category("Data")]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+	public new FbParameterCollection Parameters
+	{
+		get
+		{
+			if (_parameters == null)
+			{
+				_parameters = new FbParameterCollection();
+			}
+			return _parameters;
+		}
+	}
+
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public new FbTransaction Transaction
+	{
+		get { return _implicitTransaction ? null : _transaction; }
+		set
+		{
+			if (_activeReader != null)
+			{
+				throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
+			}
+
+			RollbackImplicitTransaction();
+
+			_transaction = value;
+
+			if (_statement != null)
+			{
+				if (_transaction != null)
 				{
-					throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
+					_statement.Transaction = _transaction.Transaction;
 				}
-
-				RollbackImplicitTransaction();
-
-				_transaction = value;
-
-				if (_statement != null)
+				else
 				{
-					if (_transaction != null)
-					{
-						_statement.Transaction = _transaction.Transaction;
-					}
-					else
-					{
-						_statement.Transaction = null;
-					}
+					_statement.Transaction = null;
 				}
 			}
 		}
+	}
 
-		[Category("Behavior")]
-		[DefaultValue(UpdateRowSource.Both)]
-		public override UpdateRowSource UpdatedRowSource
-		{
-			get { return _updatedRowSource; }
-			set { _updatedRowSource = value; }
-		}
+	[Category("Behavior")]
+	[DefaultValue(UpdateRowSource.Both)]
+	public override UpdateRowSource UpdatedRowSource
+	{
+		get { return _updatedRowSource; }
+		set { _updatedRowSource = value; }
+	}
 
-		[Category("Behavior")]
-		[DefaultValue(200)]
-		public int FetchSize
+	[Category("Behavior")]
+	[DefaultValue(200)]
+	public int FetchSize
+	{
+		get { return _fetchSize; }
+		set
 		{
-			get { return _fetchSize; }
-			set
+			if (_activeReader != null)
 			{
-				if (_activeReader != null)
-				{
-					throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
-				}
-				_fetchSize = value;
+				throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
 			}
+			_fetchSize = value;
 		}
+	}
 
-		#endregion
+	#endregion
 
-		#region Protected DbCommand Properties
+	#region Protected DbCommand Properties
 
-		protected override DbConnection DbConnection
+	protected override DbConnection DbConnection
+	{
+		get { return Connection; }
+		set { Connection = (FbConnection)value; }
+	}
+
+	protected override DbTransaction DbTransaction
+	{
+		get { return Transaction; }
+		set { Transaction = (FbTransaction)value; }
+	}
+
+	protected override DbParameterCollection DbParameterCollection
+	{
+		get { return Parameters; }
+	}
+
+	#endregion
+
+	#region Design-Time properties
+
+	[Browsable(false)]
+	[DesignOnly(true)]
+	[DefaultValue(true)]
+	public override bool DesignTimeVisible
+	{
+		get { return _designTimeVisible; }
+		set
 		{
-			get { return Connection; }
-			set { Connection = (FbConnection)value; }
+			_designTimeVisible = value;
+			TypeDescriptor.Refresh(this);
 		}
+	}
 
-		protected override DbTransaction DbTransaction
+	#endregion
+
+	#region Internal Properties
+
+	internal int RecordsAffected
+	{
+		get
 		{
-			get { return Transaction; }
-			set { Transaction = (FbTransaction)value; }
-		}
-
-		protected override DbParameterCollection DbParameterCollection
-		{
-			get { return Parameters; }
-		}
-
-		#endregion
-
-		#region Design-Time properties
-
-		[Browsable(false)]
-		[DesignOnly(true)]
-		[DefaultValue(true)]
-		public override bool DesignTimeVisible
-		{
-			get { return _designTimeVisible; }
-			set
+			if (_statement != null && CommandType != CommandType.StoredProcedure)
 			{
-				_designTimeVisible = value;
-				TypeDescriptor.Refresh(this);
+				return _statement.RecordsAffected;
 			}
+			return -1;
 		}
+	}
 
-		#endregion
+	internal bool IsDisposed
+	{
+		get { return _disposed; }
+	}
 
-		#region Internal Properties
+	internal FbDataReader ActiveReader
+	{
+		get { return _activeReader; }
+		set { _activeReader = value; }
+	}
 
-		internal int RecordsAffected
+	internal FbTransaction ActiveTransaction
+	{
+		get { return _transaction; }
+	}
+
+	internal bool HasImplicitTransaction
+	{
+		get { return _implicitTransaction; }
+	}
+
+	internal bool HasFields
+	{
+		get { return _statement?.Fields?.Count > 0; }
+	}
+
+	internal bool HasParameters
+	{
+		get { return _parameters != null && _parameters.Count > 0; }
+	}
+
+	internal bool IsDDLCommand
+	{
+		get { return _statement?.StatementType == DbStatementType.DDL; }
+	}
+
+	internal Type[] ExpectedColumnTypes
+	{
+		get { return _expectedColumnTypes; }
+	}
+
+	#endregion
+
+	#region Constructors
+
+	public FbCommand()
+		: this(null, null, null)
+	{ }
+
+	public FbCommand(string cmdText)
+		: this(cmdText, null, null)
+	{ }
+
+	public FbCommand(string cmdText, FbConnection connection)
+		: this(cmdText, connection, null)
+	{ }
+
+	public FbCommand(string cmdText, FbConnection connection, FbTransaction transaction)
+	{
+		_namedParameters = Array.Empty<string>();
+		_updatedRowSource = UpdateRowSource.Both;
+		_commandType = CommandType.Text;
+		_designTimeVisible = true;
+		_commandTimeout = 0;
+		_fetchSize = 200;
+		_commandText = string.Empty;
+
+		if (connection != null)
 		{
-			get
-			{
-				if (_statement != null && CommandType != CommandType.StoredProcedure)
-				{
-					return _statement.RecordsAffected;
-				}
-				return -1;
-			}
+			_fetchSize = connection.ConnectionOptions.FetchSize;
 		}
 
-		internal bool IsDisposed
+		if (cmdText != null)
 		{
-			get { return _disposed; }
+			CommandText = cmdText;
 		}
 
-		internal FbDataReader ActiveReader
-		{
-			get { return _activeReader; }
-			set { _activeReader = value; }
-		}
+		Connection = connection;
+		_transaction = transaction;
+	}
 
-		internal FbTransaction ActiveTransaction
-		{
-			get { return _transaction; }
-		}
+	public static FbCommand CreateWithTypeCoercions(Type[] expectedColumnTypes)
+	{
+		var result = new FbCommand();
+		result._expectedColumnTypes = expectedColumnTypes;
+		return result;
+	}
 
-		internal bool HasImplicitTransaction
-		{
-			get { return _implicitTransaction; }
-		}
+	#endregion
 
-		internal bool HasFields
-		{
-			get { return _statement?.Fields?.Count > 0; }
-		}
+	#region IDisposable, IAsyncDisposable methods
 
-		internal bool HasParameters
-		{
-			get { return _parameters != null && _parameters.Count > 0; }
-		}
-
-		internal bool IsDDLCommand
-		{
-			get { return _statement?.StatementType == DbStatementType.DDL; }
-		}
-
-		internal Type[] ExpectedColumnTypes
-		{
-			get { return _expectedColumnTypes; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public FbCommand()
-			: this(null, null, null)
-		{ }
-
-		public FbCommand(string cmdText)
-			: this(cmdText, null, null)
-		{ }
-
-		public FbCommand(string cmdText, FbConnection connection)
-			: this(cmdText, connection, null)
-		{ }
-
-		public FbCommand(string cmdText, FbConnection connection, FbTransaction transaction)
-		{
-			_namedParameters = Array.Empty<string>();
-			_updatedRowSource = UpdateRowSource.Both;
-			_commandType = CommandType.Text;
-			_designTimeVisible = true;
-			_commandTimeout = 0;
-			_fetchSize = 200;
-			_commandText = string.Empty;
-
-			if (connection != null)
-			{
-				_fetchSize = connection.ConnectionOptions.FetchSize;
-			}
-
-			if (cmdText != null)
-			{
-				CommandText = cmdText;
-			}
-
-			Connection = connection;
-			_transaction = transaction;
-		}
-
-		public static FbCommand CreateWithTypeCoercions(Type[] expectedColumnTypes)
-		{
-			var result = new FbCommand();
-			result._expectedColumnTypes = expectedColumnTypes;
-			return result;
-		}
-
-		#endregion
-
-		#region IDisposable, IAsyncDisposable methods
-
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				if (!_disposed)
-				{
-					_disposed = true;
-					try
-					{
-						Release();
-					}
-					catch (IscException ex)
-					{
-						throw FbException.Create(ex);
-					}
-					_commandTimeout = 0;
-					_fetchSize = 0;
-					_implicitTransaction = false;
-					_commandText = null;
-					_connection = null;
-					_transaction = null;
-					_parameters = null;
-					_statement = null;
-					_activeReader = null;
-					_namedParameters = null;
-				}
-			}
-			base.Dispose(disposing);
-		}
-#if !(NET48 || NETSTANDARD2_0)
-		public override async ValueTask DisposeAsync()
+	protected override void Dispose(bool disposing)
+	{
+		if (disposing)
 		{
 			if (!_disposed)
 			{
 				_disposed = true;
 				try
 				{
-					await ReleaseAsync(CancellationToken.None).ConfigureAwait(false);
+					Release();
 				}
 				catch (IscException ex)
 				{
@@ -395,608 +367,566 @@ namespace FirebirdSql.Data.FirebirdClient
 				_activeReader = null;
 				_namedParameters = null;
 			}
-			await base.DisposeAsync().ConfigureAwait(false);
 		}
+		base.Dispose(disposing);
+	}
+#if !(NET48 || NETSTANDARD2_0)
+	public override async ValueTask DisposeAsync()
+	{
+		if (!_disposed)
+		{
+			_disposed = true;
+			try
+			{
+				await ReleaseAsync(CancellationToken.None).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+			_commandTimeout = 0;
+			_fetchSize = 0;
+			_implicitTransaction = false;
+			_commandText = null;
+			_connection = null;
+			_transaction = null;
+			_parameters = null;
+			_statement = null;
+			_activeReader = null;
+			_namedParameters = null;
+		}
+		await base.DisposeAsync().ConfigureAwait(false);
+	}
 #endif
 
-		#endregion
+	#endregion
 
-		#region ICloneable Methods
+	#region ICloneable Methods
 
-		object ICloneable.Clone()
+	object ICloneable.Clone()
+	{
+		var command = new FbCommand();
+
+		command.CommandText = CommandText;
+		command.Connection = Connection;
+		command.Transaction = Transaction;
+		command.CommandType = CommandType;
+		command.UpdatedRowSource = UpdatedRowSource;
+		command.CommandTimeout = CommandTimeout;
+		command.FetchSize = FetchSize;
+		command.UpdatedRowSource = UpdatedRowSource;
+
+		if (_expectedColumnTypes != null)
 		{
-			var command = new FbCommand();
+			command._expectedColumnTypes = (Type[])_expectedColumnTypes.Clone();
+		}
 
-			command.CommandText = CommandText;
-			command.Connection = Connection;
-			command.Transaction = Transaction;
-			command.CommandType = CommandType;
-			command.UpdatedRowSource = UpdatedRowSource;
-			command.CommandTimeout = CommandTimeout;
-			command.FetchSize = FetchSize;
-			command.UpdatedRowSource = UpdatedRowSource;
+		for (var i = 0; i < Parameters.Count; i++)
+		{
+			command.Parameters.Add(((ICloneable)Parameters[i]).Clone());
+		}
 
-			if (_expectedColumnTypes != null)
+		return command;
+	}
+
+	#endregion
+
+	#region Methods
+
+	public override void Cancel()
+	{
+		_connection.CancelCommand();
+	}
+
+	public new FbParameter CreateParameter()
+	{
+		return new FbParameter();
+	}
+
+	public override void Prepare()
+	{
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+		{
+			try
 			{
-				command._expectedColumnTypes = (Type[])_expectedColumnTypes.Clone();
+				Prepare(false);
 			}
-
-			for (var i = 0; i < Parameters.Count; i++)
+			catch (IscException ex)
 			{
-				command.Parameters.Add(((ICloneable)Parameters[i]).Clone());
+				RollbackImplicitTransaction();
+				throw FbException.Create(ex);
 			}
-
-			return command;
-		}
-
-		#endregion
-
-		#region Methods
-
-		public override void Cancel()
-		{
-			_connection.CancelCommand();
-		}
-
-		public new FbParameter CreateParameter()
-		{
-			return new FbParameter();
-		}
-
-		public override void Prepare()
-		{
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+			catch
 			{
-				try
-				{
-					Prepare(false);
-				}
-				catch (IscException ex)
-				{
-					RollbackImplicitTransaction();
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					RollbackImplicitTransaction();
-					throw;
-				}
+				RollbackImplicitTransaction();
+				throw;
 			}
 		}
+	}
 #if NET48 || NETSTANDARD2_0
-		public async Task PrepareAsync(CancellationToken cancellationToken = default)
+	public async Task PrepareAsync(CancellationToken cancellationToken = default)
 #else
-		public override async Task PrepareAsync(CancellationToken cancellationToken = default)
+	public override async Task PrepareAsync(CancellationToken cancellationToken = default)
 #endif
-		{
-			CheckCommand();
+	{
+		CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+		using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+		{
+			try
 			{
-				try
+				await PrepareAsync(false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw;
+			}
+		}
+	}
+
+	public override int ExecuteNonQuery()
+	{
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+		{
+			try
+			{
+				ExecuteCommand(CommandBehavior.Default, false);
+
+				if (_statement.StatementType == DbStatementType.StoredProcedure)
 				{
-					await PrepareAsync(false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+					SetOutputParameters();
 				}
-				catch (IscException ex)
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw;
-				}
+
+				CommitImplicitTransaction();
+			}
+			catch (IscException ex)
+			{
+				RollbackImplicitTransaction();
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				RollbackImplicitTransaction();
+				throw;
 			}
 		}
 
-		public override int ExecuteNonQuery()
+		return _statement.StatementType switch
 		{
-			CheckCommand();
+			DbStatementType.Insert => RecordsAffected,
+			DbStatementType.Update => RecordsAffected,
+			DbStatementType.Delete => RecordsAffected,
+			_ => -1,
+		};
+	}
+	public override async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
+	{
+		CheckCommand();
 
-			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+		using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+		{
+			try
 			{
-				try
-				{
-					ExecuteCommand(CommandBehavior.Default, false);
+				await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
 
-					if (_statement.StatementType == DbStatementType.StoredProcedure)
-					{
-						SetOutputParameters();
-					}
+				if (_statement.StatementType == DbStatementType.StoredProcedure)
+				{
+					await SetOutputParametersAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
 
-					CommitImplicitTransaction();
-				}
-				catch (IscException ex)
-				{
-					RollbackImplicitTransaction();
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					RollbackImplicitTransaction();
-					throw;
-				}
+				await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
 			}
-
-			return _statement.StatementType switch
+			catch (IscException ex)
 			{
-				DbStatementType.Insert => RecordsAffected,
-				DbStatementType.Update => RecordsAffected,
-				DbStatementType.Delete => RecordsAffected,
-				_ => -1,
-			};
-		}
-		public override async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
-		{
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
-			{
-				try
-				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
-
-					if (_statement.StatementType == DbStatementType.StoredProcedure)
-					{
-						await SetOutputParametersAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					}
-
-					await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-				}
-				catch (IscException ex)
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw;
-				}
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw FbException.Create(ex);
 			}
-
-			return _statement.StatementType switch
+			catch
 			{
-				DbStatementType.Insert => RecordsAffected,
-				DbStatementType.Update => RecordsAffected,
-				DbStatementType.Delete => RecordsAffected,
-				_ => -1,
-			};
-		}
-
-		public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
-		public new Task<FbDataReader> ExecuteReaderAsync() => ExecuteReaderAsync(CommandBehavior.Default);
-		public new Task<FbDataReader> ExecuteReaderAsync(CancellationToken cancellationToken) => ExecuteReaderAsync(CommandBehavior.Default, cancellationToken);
-
-		public new FbDataReader ExecuteReader(CommandBehavior behavior)
-		{
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
-			{
-				try
-				{
-					ExecuteCommand(behavior, true);
-				}
-				catch (IscException ex)
-				{
-					RollbackImplicitTransaction();
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					RollbackImplicitTransaction();
-					throw;
-				}
-			}
-
-			_activeReader = new FbDataReader(this, _connection, behavior);
-			return _activeReader;
-		}
-		public new Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior) => ExecuteReaderAsync(behavior, CancellationToken.None);
-		public new async Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
-		{
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
-			{
-				try
-				{
-					await ExecuteCommandAsync(behavior, true, explicitCancellation.CancellationToken).ConfigureAwait(false);
-				}
-				catch (IscException ex)
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw;
-				}
-			}
-
-			_activeReader = new FbDataReader(this, _connection, behavior);
-			return _activeReader;
-		}
-
-		public override object ExecuteScalar()
-		{
-			DbValue[] values = null;
-			object val = null;
-
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
-			{
-				try
-				{
-					ExecuteCommand(CommandBehavior.Default, false);
-
-					// Gets	only the values	of the first row or
-					// the output parameters values if command is an Stored Procedure
-					if (_statement.StatementType == DbStatementType.StoredProcedure)
-					{
-						values = _statement.GetOutputParameters();
-						SetOutputParameters(values);
-					}
-					else
-					{
-						values = _statement.Fetch();
-					}
-
-					// Get the return value
-					if (values != null && values.Length > 0)
-					{
-						val = values[0].GetValue();
-					}
-
-					CommitImplicitTransaction();
-				}
-				catch (IscException ex)
-				{
-					RollbackImplicitTransaction();
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					RollbackImplicitTransaction();
-					throw;
-				}
-			}
-
-			return val;
-		}
-		public override async Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
-		{
-			DbValue[] values = null;
-			object val = null;
-
-			CheckCommand();
-
-			using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
-			{
-				try
-				{
-					await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
-
-					// Gets	only the values	of the first row or
-					// the output parameters values if command is an Stored Procedure
-					if (_statement.StatementType == DbStatementType.StoredProcedure)
-					{
-						values = _statement.GetOutputParameters();
-						await SetOutputParametersAsync(values, explicitCancellation.CancellationToken).ConfigureAwait(false);
-					}
-					else
-					{
-						values = await _statement.FetchAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					}
-
-					// Get the return value
-					if (values != null && values.Length > 0)
-					{
-						val = await values[0].GetValueAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					}
-
-					await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-				}
-				catch (IscException ex)
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw FbException.Create(ex);
-				}
-				catch
-				{
-					await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
-					throw;
-				}
-			}
-
-			return val;
-		}
-
-		public string GetCommandPlan()
-		{
-			if (_statement == null)
-			{
-				return null;
-			}
-			return _statement.GetExecutionPlan();
-		}
-		public Task<string> GetCommandPlanAsync(CancellationToken cancellationToken = default)
-		{
-			if (_statement == null)
-			{
-				return Task.FromResult<string>(null);
-			}
-			return _statement.GetExecutionPlanAsync(cancellationToken).AsTask();
-		}
-
-		public string GetCommandExplainedPlan()
-		{
-			if (_statement == null)
-			{
-				return null;
-			}
-			return _statement.GetExecutionExplainedPlan();
-		}
-		public Task<string> GetCommandExplainedPlanAsync(CancellationToken cancellationToken = default)
-		{
-			if (_statement == null)
-			{
-				return Task.FromResult<string>(null);
-			}
-			return _statement.GetExecutionExplainedPlanAsync(cancellationToken).AsTask();
-		}
-
-		#endregion
-
-		#region DbCommand Protected Methods
-
-		protected override DbParameter CreateDbParameter()
-		{
-			return CreateParameter();
-		}
-
-		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
-		{
-			return ExecuteReader(behavior);
-		}
-		protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
-		{
-			return await ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
-		}
-
-		#endregion
-
-		#region Internal Methods
-
-		internal void DisposeReader()
-		{
-			if (_activeReader != null)
-			{
-#if NET48 || NETSTANDARD2_0
-				_activeReader.Dispose();
-#else
-				_activeReader.Dispose();
-#endif
-				_activeReader = null;
-			}
-		}
-		internal async Task DisposeReaderAsync(CancellationToken cancellationToken = default)
-		{
-			if (_activeReader != null)
-			{
-#if NET48 || NETSTANDARD2_0
-				_activeReader.Dispose();
-				await Task.CompletedTask.ConfigureAwait(false);
-#else
-				await _activeReader.DisposeAsync().ConfigureAwait(false);
-#endif
-				_activeReader = null;
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw;
 			}
 		}
 
-		internal DbValue[] Fetch()
+		return _statement.StatementType switch
 		{
-			if (_statement != null)
+			DbStatementType.Insert => RecordsAffected,
+			DbStatementType.Update => RecordsAffected,
+			DbStatementType.Delete => RecordsAffected,
+			_ => -1,
+		};
+	}
+
+	public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
+	public new Task<FbDataReader> ExecuteReaderAsync() => ExecuteReaderAsync(CommandBehavior.Default);
+	public new Task<FbDataReader> ExecuteReaderAsync(CancellationToken cancellationToken) => ExecuteReaderAsync(CommandBehavior.Default, cancellationToken);
+
+	public new FbDataReader ExecuteReader(CommandBehavior behavior)
+	{
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+		{
+			try
 			{
-				try
-				{
-					return _statement.Fetch();
-				}
-				catch (IscException ex)
-				{
-					throw FbException.Create(ex);
-				}
+				ExecuteCommand(behavior, true);
 			}
+			catch (IscException ex)
+			{
+				RollbackImplicitTransaction();
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				RollbackImplicitTransaction();
+				throw;
+			}
+		}
+
+		_activeReader = new FbDataReader(this, _connection, behavior);
+		return _activeReader;
+	}
+	public new Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior) => ExecuteReaderAsync(behavior, CancellationToken.None);
+	public new async Task<FbDataReader> ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+	{
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+		{
+			try
+			{
+				await ExecuteCommandAsync(behavior, true, explicitCancellation.CancellationToken).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw;
+			}
+		}
+
+		_activeReader = new FbDataReader(this, _connection, behavior);
+		return _activeReader;
+	}
+
+	public override object ExecuteScalar()
+	{
+		DbValue[] values = null;
+		object val = null;
+
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(CancellationToken.None, Cancel))
+		{
+			try
+			{
+				ExecuteCommand(CommandBehavior.Default, false);
+
+				// Gets	only the values	of the first row or
+				// the output parameters values if command is an Stored Procedure
+				if (_statement.StatementType == DbStatementType.StoredProcedure)
+				{
+					values = _statement.GetOutputParameters();
+					SetOutputParameters(values);
+				}
+				else
+				{
+					values = _statement.Fetch();
+				}
+
+				// Get the return value
+				if (values != null && values.Length > 0)
+				{
+					val = values[0].GetValue();
+				}
+
+				CommitImplicitTransaction();
+			}
+			catch (IscException ex)
+			{
+				RollbackImplicitTransaction();
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				RollbackImplicitTransaction();
+				throw;
+			}
+		}
+
+		return val;
+	}
+	public override async Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
+	{
+		DbValue[] values = null;
+		object val = null;
+
+		CheckCommand();
+
+		using (var explicitCancellation = ExplicitCancellation.Enter(cancellationToken, Cancel))
+		{
+			try
+			{
+				await ExecuteCommandAsync(CommandBehavior.Default, false, explicitCancellation.CancellationToken).ConfigureAwait(false);
+
+				// Gets	only the values	of the first row or
+				// the output parameters values if command is an Stored Procedure
+				if (_statement.StatementType == DbStatementType.StoredProcedure)
+				{
+					values = _statement.GetOutputParameters();
+					await SetOutputParametersAsync(values, explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+				else
+				{
+					values = await _statement.FetchAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+
+				// Get the return value
+				if (values != null && values.Length > 0)
+				{
+					val = await values[0].GetValueAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				}
+
+				await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw FbException.Create(ex);
+			}
+			catch
+			{
+				await RollbackImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+				throw;
+			}
+		}
+
+		return val;
+	}
+
+	public string GetCommandPlan()
+	{
+		if (_statement == null)
+		{
 			return null;
 		}
-		internal async Task<DbValue[]> FetchAsync(CancellationToken cancellationToken = default)
+		return _statement.GetExecutionPlan();
+	}
+	public Task<string> GetCommandPlanAsync(CancellationToken cancellationToken = default)
+	{
+		if (_statement == null)
 		{
-			if (_statement != null)
-			{
-				try
-				{
-					return await _statement.FetchAsync(cancellationToken).ConfigureAwait(false);
-				}
-				catch (IscException ex)
-				{
-					throw FbException.Create(ex);
-				}
-			}
+			return Task.FromResult<string>(null);
+		}
+		return _statement.GetExecutionPlanAsync(cancellationToken).AsTask();
+	}
+
+	public string GetCommandExplainedPlan()
+	{
+		if (_statement == null)
+		{
 			return null;
 		}
-
-		internal Descriptor GetFieldsDescriptor()
+		return _statement.GetExecutionExplainedPlan();
+	}
+	public Task<string> GetCommandExplainedPlanAsync(CancellationToken cancellationToken = default)
+	{
+		if (_statement == null)
 		{
-			if (_statement != null)
+			return Task.FromResult<string>(null);
+		}
+		return _statement.GetExecutionExplainedPlanAsync(cancellationToken).AsTask();
+	}
+
+	#endregion
+
+	#region DbCommand Protected Methods
+
+	protected override DbParameter CreateDbParameter()
+	{
+		return CreateParameter();
+	}
+
+	protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+	{
+		return ExecuteReader(behavior);
+	}
+	protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+	{
+		return await ExecuteReaderAsync(behavior, cancellationToken).ConfigureAwait(false);
+	}
+
+	#endregion
+
+	#region Internal Methods
+
+	internal void DisposeReader()
+	{
+		if (_activeReader != null)
+		{
+#if NET48 || NETSTANDARD2_0
+			_activeReader.Dispose();
+#else
+			_activeReader.Dispose();
+#endif
+			_activeReader = null;
+		}
+	}
+	internal async Task DisposeReaderAsync(CancellationToken cancellationToken = default)
+	{
+		if (_activeReader != null)
+		{
+#if NET48 || NETSTANDARD2_0
+			_activeReader.Dispose();
+			await Task.CompletedTask.ConfigureAwait(false);
+#else
+			await _activeReader.DisposeAsync().ConfigureAwait(false);
+#endif
+			_activeReader = null;
+		}
+	}
+
+	internal DbValue[] Fetch()
+	{
+		if (_statement != null)
+		{
+			try
 			{
-				return _statement.Fields;
+				return _statement.Fetch();
 			}
-			return null;
-		}
-
-		internal void SetOutputParameters()
-		{
-			SetOutputParameters(null);
-		}
-		internal Task SetOutputParametersAsync(CancellationToken cancellationToken = default)
-		{
-			return SetOutputParametersAsync(null, cancellationToken);
-		}
-
-		internal void SetOutputParameters(DbValue[] outputParameterValues)
-		{
-			if (Parameters.Count > 0 && _statement != null)
+			catch (IscException ex)
 			{
-				if (_statement != null &&
-					_statement.StatementType == DbStatementType.StoredProcedure)
-				{
-					var values = outputParameterValues;
-					if (outputParameterValues == null)
-					{
-						values = _statement.GetOutputParameters();
-					}
+				throw FbException.Create(ex);
+			}
+		}
+		return null;
+	}
+	internal async Task<DbValue[]> FetchAsync(CancellationToken cancellationToken = default)
+	{
+		if (_statement != null)
+		{
+			try
+			{
+				return await _statement.FetchAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch (IscException ex)
+			{
+				throw FbException.Create(ex);
+			}
+		}
+		return null;
+	}
 
-					if (values != null && values.Length > 0)
+	internal Descriptor GetFieldsDescriptor()
+	{
+		if (_statement != null)
+		{
+			return _statement.Fields;
+		}
+		return null;
+	}
+
+	internal void SetOutputParameters()
+	{
+		SetOutputParameters(null);
+	}
+	internal Task SetOutputParametersAsync(CancellationToken cancellationToken = default)
+	{
+		return SetOutputParametersAsync(null, cancellationToken);
+	}
+
+	internal void SetOutputParameters(DbValue[] outputParameterValues)
+	{
+		if (Parameters.Count > 0 && _statement != null)
+		{
+			if (_statement != null &&
+				_statement.StatementType == DbStatementType.StoredProcedure)
+			{
+				var values = outputParameterValues;
+				if (outputParameterValues == null)
+				{
+					values = _statement.GetOutputParameters();
+				}
+
+				if (values != null && values.Length > 0)
+				{
+					var i = 0;
+					foreach (FbParameter parameter in Parameters)
 					{
-						var i = 0;
-						foreach (FbParameter parameter in Parameters)
+						if (parameter.Direction == ParameterDirection.Output ||
+							parameter.Direction == ParameterDirection.InputOutput ||
+							parameter.Direction == ParameterDirection.ReturnValue)
 						{
-							if (parameter.Direction == ParameterDirection.Output ||
-								parameter.Direction == ParameterDirection.InputOutput ||
-								parameter.Direction == ParameterDirection.ReturnValue)
-							{
-								parameter.Value = values[i].GetValue();
-								i++;
-							}
+							parameter.Value = values[i].GetValue();
+							i++;
 						}
 					}
 				}
 			}
 		}
-		internal async Task SetOutputParametersAsync(DbValue[] outputParameterValues, CancellationToken cancellationToken = default)
+	}
+	internal async Task SetOutputParametersAsync(DbValue[] outputParameterValues, CancellationToken cancellationToken = default)
+	{
+		if (Parameters.Count > 0 && _statement != null)
 		{
-			if (Parameters.Count > 0 && _statement != null)
+			if (_statement != null &&
+				_statement.StatementType == DbStatementType.StoredProcedure)
 			{
-				if (_statement != null &&
-					_statement.StatementType == DbStatementType.StoredProcedure)
+				var values = outputParameterValues;
+				if (outputParameterValues == null)
 				{
-					var values = outputParameterValues;
-					if (outputParameterValues == null)
-					{
-						values = _statement.GetOutputParameters();
-					}
+					values = _statement.GetOutputParameters();
+				}
 
-					if (values != null && values.Length > 0)
+				if (values != null && values.Length > 0)
+				{
+					var i = 0;
+					foreach (FbParameter parameter in Parameters)
 					{
-						var i = 0;
-						foreach (FbParameter parameter in Parameters)
+						if (parameter.Direction == ParameterDirection.Output ||
+							parameter.Direction == ParameterDirection.InputOutput ||
+							parameter.Direction == ParameterDirection.ReturnValue)
 						{
-							if (parameter.Direction == ParameterDirection.Output ||
-								parameter.Direction == ParameterDirection.InputOutput ||
-								parameter.Direction == ParameterDirection.ReturnValue)
-							{
-								parameter.Value = await values[i].GetValueAsync(cancellationToken).ConfigureAwait(false);
-								i++;
-							}
+							parameter.Value = await values[i].GetValueAsync(cancellationToken).ConfigureAwait(false);
+							i++;
 						}
 					}
 				}
 			}
 		}
+	}
 
-		internal void CommitImplicitTransaction()
+	internal void CommitImplicitTransaction()
+	{
+		if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 		{
-			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			try
 			{
-				try
-				{
-					_transaction.Commit();
-				}
-				catch
-				{
-					RollbackImplicitTransaction();
-
-					throw;
-				}
-				finally
-				{
-					if (_transaction != null)
-					{
-#if NET48 || NETSTANDARD2_0
-						_transaction.Dispose();
-#else
-						_transaction.Dispose();
-#endif
-						_transaction = null;
-						_implicitTransaction = false;
-					}
-
-					if (_statement != null)
-					{
-						_statement.Transaction = null;
-					}
-				}
+				_transaction.Commit();
 			}
-		}
-		internal async Task CommitImplicitTransactionAsync(CancellationToken cancellationToken = default)
-		{
-			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			catch
 			{
-				try
-				{
-					await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-				}
-				catch
-				{
-					await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
+				RollbackImplicitTransaction();
 
-					throw;
-				}
-				finally
-				{
-					if (_transaction != null)
-					{
-#if NET48 || NETSTANDARD2_0
-						_transaction.Dispose();
-#else
-						await _transaction.DisposeAsync().ConfigureAwait(false);
-#endif
-						_transaction = null;
-						_implicitTransaction = false;
-					}
-
-					if (_statement != null)
-					{
-						_statement.Transaction = null;
-					}
-				}
+				throw;
 			}
-		}
-
-		internal void RollbackImplicitTransaction()
-		{
-			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			finally
 			{
-				var transactionCount = Connection.InnerConnection.Database.TransactionCount;
-
-				try
-				{
-					_transaction.Rollback();
-				}
-				catch
-				{
-					if (Connection.InnerConnection.Database.TransactionCount == transactionCount)
-					{
-						Connection.InnerConnection.Database.TransactionCount--;
-					}
-				}
-				finally
+				if (_transaction != null)
 				{
 #if NET48 || NETSTANDARD2_0
 					_transaction.Dispose();
@@ -1005,32 +935,32 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 					_transaction = null;
 					_implicitTransaction = false;
+				}
 
-					if (_statement != null)
-					{
-						_statement.Transaction = null;
-					}
+				if (_statement != null)
+				{
+					_statement.Transaction = null;
 				}
 			}
 		}
-		internal async Task RollbackImplicitTransactionAsync(CancellationToken cancellationToken = default)
+	}
+	internal async Task CommitImplicitTransactionAsync(CancellationToken cancellationToken = default)
+	{
+		if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
 		{
-			if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+			try
 			{
-				var transactionCount = Connection.InnerConnection.Database.TransactionCount;
+				await _transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch
+			{
+				await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
-				try
-				{
-					await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-				}
-				catch
-				{
-					if (Connection.InnerConnection.Database.TransactionCount == transactionCount)
-					{
-						Connection.InnerConnection.Database.TransactionCount--;
-					}
-				}
-				finally
+				throw;
+			}
+			finally
+			{
+				if (_transaction != null)
 				{
 #if NET48 || NETSTANDARD2_0
 					_transaction.Dispose();
@@ -1039,594 +969,663 @@ namespace FirebirdSql.Data.FirebirdClient
 #endif
 					_transaction = null;
 					_implicitTransaction = false;
+				}
 
-					if (_statement != null)
+				if (_statement != null)
+				{
+					_statement.Transaction = null;
+				}
+			}
+		}
+	}
+
+	internal void RollbackImplicitTransaction()
+	{
+		if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+		{
+			var transactionCount = Connection.InnerConnection.Database.TransactionCount;
+
+			try
+			{
+				_transaction.Rollback();
+			}
+			catch
+			{
+				if (Connection.InnerConnection.Database.TransactionCount == transactionCount)
+				{
+					Connection.InnerConnection.Database.TransactionCount--;
+				}
+			}
+			finally
+			{
+#if NET48 || NETSTANDARD2_0
+				_transaction.Dispose();
+#else
+				_transaction.Dispose();
+#endif
+				_transaction = null;
+				_implicitTransaction = false;
+
+				if (_statement != null)
+				{
+					_statement.Transaction = null;
+				}
+			}
+		}
+	}
+	internal async Task RollbackImplicitTransactionAsync(CancellationToken cancellationToken = default)
+	{
+		if (HasImplicitTransaction && _transaction != null && _transaction.Transaction != null)
+		{
+			var transactionCount = Connection.InnerConnection.Database.TransactionCount;
+
+			try
+			{
+				await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch
+			{
+				if (Connection.InnerConnection.Database.TransactionCount == transactionCount)
+				{
+					Connection.InnerConnection.Database.TransactionCount--;
+				}
+			}
+			finally
+			{
+#if NET48 || NETSTANDARD2_0
+				_transaction.Dispose();
+#else
+				await _transaction.DisposeAsync().ConfigureAwait(false);
+#endif
+				_transaction = null;
+				_implicitTransaction = false;
+
+				if (_statement != null)
+				{
+					_statement.Transaction = null;
+				}
+			}
+		}
+	}
+
+	internal void Close()
+	{
+		if (_statement != null)
+		{
+			_statement.Close();
+		}
+	}
+	internal Task CloseAsync(CancellationToken cancellationToken = default)
+	{
+		if (_statement != null)
+		{
+			return _statement.CloseAsync(cancellationToken).AsTask();
+		}
+		return Task.CompletedTask;
+	}
+
+	void IFbPreparedCommand.Release() => Release();
+	internal void Release()
+	{
+		RollbackImplicitTransaction();
+
+		DisposeReader();
+
+		if (_connection != null && _connection.State == ConnectionState.Open)
+		{
+			_connection.InnerConnection.RemovePreparedCommand(this);
+		}
+
+		if (_statement != null)
+		{
+			_statement.Dispose2();
+			_statement = null;
+		}
+	}
+	Task IFbPreparedCommand.ReleaseAsync(CancellationToken cancellationToken) => ReleaseAsync(cancellationToken);
+	internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
+	{
+		await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+		await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
+
+		if (_connection != null && _connection.State == ConnectionState.Open)
+		{
+			_connection.InnerConnection.RemovePreparedCommand(this);
+		}
+
+		if (_statement != null)
+		{
+			await _statement.Dispose2Async(cancellationToken).ConfigureAwait(false);
+			_statement = null;
+		}
+	}
+
+	void IFbPreparedCommand.TransactionCompleted() => TransactionCompleted();
+	internal void TransactionCompleted()
+	{
+		if (Transaction != null)
+		{
+			DisposeReader();
+			Transaction = null;
+		}
+	}
+	Task IFbPreparedCommand.TransactionCompletedAsync(CancellationToken cancellationToken) => TransactionCompletedAsync(cancellationToken);
+	internal async Task TransactionCompletedAsync(CancellationToken cancellationToken = default)
+	{
+		if (Transaction != null)
+		{
+			await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
+			Transaction = null;
+		}
+	}
+
+	#endregion
+
+	#region IDescriptorFiller
+
+	void IDescriptorFiller.Fill(Descriptor descriptor, int index) => UpdateParameterValues(descriptor);
+	private void UpdateParameterValues(Descriptor descriptor)
+	{
+		if (!HasParameters)
+			return;
+
+		for (var i = 0; i < descriptor.Count; i++)
+		{
+			var parameter = descriptor[i];
+			var index = i;
+
+			if (_namedParameters.Count > 0)
+			{
+				index = _parameters.IndexOf(_namedParameters[i], i);
+				if (index == -1)
+				{
+					throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
+				}
+			}
+
+			if (index != -1)
+			{
+				var commandParameter = _parameters[index];
+				if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
+				{
+					parameter.NullFlag = -1;
+					parameter.DbValue.SetValue(DBNull.Value);
+
+					if (!parameter.AllowDBNull())
 					{
-						_statement.Transaction = null;
+						parameter.DataType++;
+					}
+				}
+				else
+				{
+					parameter.NullFlag = 0;
+
+					switch (parameter.DbDataType)
+					{
+						case DbDataType.Binary:
+							{
+								var blob = _statement.CreateBlob();
+								blob.Write((byte[])commandParameter.InternalValue);
+								parameter.DbValue.SetValue(blob.Id);
+							}
+							break;
+
+						case DbDataType.Text:
+							{
+								var blob = _statement.CreateBlob();
+								if (commandParameter.InternalValue is byte[])
+								{
+									blob.Write((byte[])commandParameter.InternalValue);
+								}
+								else
+								{
+									blob.Write((string)commandParameter.InternalValue);
+								}
+								parameter.DbValue.SetValue(blob.Id);
+							}
+							break;
+
+						case DbDataType.Array:
+							{
+								if (parameter.ArrayHandle == null)
+								{
+									parameter.ArrayHandle = _statement.CreateArray(parameter.Relation, parameter.Name);
+								}
+								else
+								{
+									parameter.ArrayHandle.Database = _statement.Database;
+									parameter.ArrayHandle.Transaction = _statement.Transaction;
+								}
+
+								parameter.ArrayHandle.Handle = 0;
+								parameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
+								parameter.DbValue.SetValue(parameter.ArrayHandle.Handle);
+							}
+							break;
+
+						case DbDataType.Guid:
+							if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
+							{
+								throw new InvalidOperationException("Incorrect Guid value.");
+							}
+							parameter.DbValue.SetValue(commandParameter.InternalValue);
+							break;
+
+						default:
+							parameter.DbValue.SetValue(commandParameter.InternalValue);
+							break;
 					}
 				}
 			}
 		}
+	}
+	ValueTask IDescriptorFiller.FillAsync(Descriptor descriptor, int index, CancellationToken cancellationToken) => UpdateParameterValuesAsync(descriptor, cancellationToken);
+	private async ValueTask UpdateParameterValuesAsync(Descriptor descriptor, CancellationToken cancellationToken = default)
+	{
+		if (!HasParameters)
+			return;
 
-		internal void Close()
+		for (var i = 0; i < descriptor.Count; i++)
 		{
-			if (_statement != null)
+			var statementParameter = descriptor[i];
+			var index = i;
+
+			if (_namedParameters.Count > 0)
 			{
-				_statement.Close();
+				index = _parameters.IndexOf(_namedParameters[i], i);
+				if (index == -1)
+				{
+					throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
+				}
+			}
+
+			if (index != -1)
+			{
+				var commandParameter = _parameters[index];
+				if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
+				{
+					statementParameter.NullFlag = -1;
+					statementParameter.DbValue.SetValue(DBNull.Value);
+
+					if (!statementParameter.AllowDBNull())
+					{
+						statementParameter.DataType++;
+					}
+				}
+				else
+				{
+					statementParameter.NullFlag = 0;
+
+					switch (statementParameter.DbDataType)
+					{
+						case DbDataType.Binary:
+							{
+								var blob = _statement.CreateBlob();
+								await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								statementParameter.DbValue.SetValue(blob.Id);
+							}
+							break;
+
+						case DbDataType.Text:
+							{
+								var blob = _statement.CreateBlob();
+								if (commandParameter.InternalValue is byte[])
+								{
+									await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								}
+								else
+								{
+									await blob.WriteAsync((string)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								}
+								statementParameter.DbValue.SetValue(blob.Id);
+							}
+							break;
+
+						case DbDataType.Array:
+							{
+								if (statementParameter.ArrayHandle == null)
+								{
+									statementParameter.ArrayHandle = await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, cancellationToken).ConfigureAwait(false);
+								}
+								else
+								{
+									statementParameter.ArrayHandle.Database = _statement.Database;
+									statementParameter.ArrayHandle.Transaction = _statement.Transaction;
+								}
+
+								statementParameter.ArrayHandle.Handle = 0;
+								await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
+							}
+							break;
+
+						case DbDataType.Guid:
+							if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
+							{
+								throw new InvalidOperationException("Incorrect Guid value.");
+							}
+							statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+							break;
+
+						default:
+							statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+							break;
+					}
+				}
 			}
 		}
-		internal Task CloseAsync(CancellationToken cancellationToken = default)
+	}
+
+	#endregion
+
+	#region Private Methods
+
+	private void Prepare(bool returnsSet)
+	{
+		var innerConn = _connection.InnerConnection;
+
+		// Check if	we have	a valid	transaction
+		if (_transaction == null)
 		{
-			if (_statement != null)
+			if (innerConn.IsEnlisted)
 			{
-				return _statement.CloseAsync(cancellationToken).AsTask();
+				_transaction = innerConn.ActiveTransaction;
 			}
-			return Task.CompletedTask;
+			else
+			{
+				_implicitTransaction = true;
+				_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
+				_transaction.BeginTransaction();
+
+				// Update Statement	transaction
+				if (_statement != null)
+				{
+					_statement.Transaction = _transaction.Transaction;
+				}
+			}
 		}
 
-		void IFbPreparedCommand.Release() => Release();
-		internal void Release()
+		// Check if	we have	a valid	statement handle
+		if (_statement == null)
 		{
-			RollbackImplicitTransaction();
+			_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
+		}
 
+		// Prepare the statement if	needed
+		if (!_statement.IsPrepared)
+		{
+			// Close the inner DataReader if needed
 			DisposeReader();
 
-			if (_connection != null && _connection.State == ConnectionState.Open)
+			// Reformat the SQL statement if needed
+			var sql = _commandText;
+
+			if (_commandType == CommandType.StoredProcedure)
 			{
-				_connection.InnerConnection.RemovePreparedCommand(this);
+				sql = BuildStoredProcedureSql(sql, returnsSet);
 			}
 
-			if (_statement != null)
+			try
 			{
-				_statement.Dispose2();
+				(sql, _namedParameters) = NamedParametersParser.Parse(sql);
+				// Try to prepare the command
+				_statement.Prepare(sql);
+			}
+			catch
+			{
+				// Release the statement and rethrow the exception
+				_statement.Release();
 				_statement = null;
+
+				throw;
+			}
+
+			// Add this	command	to the active command list
+			innerConn.AddPreparedCommand(this);
+		}
+		else
+		{
+			// Close statement for subsequently	executions
+			Close();
+		}
+	}
+	private async Task PrepareAsync(bool returnsSet, CancellationToken cancellationToken = default)
+	{
+		var innerConn = _connection.InnerConnection;
+
+		// Check if	we have	a valid	transaction
+		if (_transaction == null)
+		{
+			if (innerConn.IsEnlisted)
+			{
+				_transaction = innerConn.ActiveTransaction;
+			}
+			else
+			{
+				_implicitTransaction = true;
+				_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
+				await _transaction.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+				// Update Statement	transaction
+				if (_statement != null)
+				{
+					_statement.Transaction = _transaction.Transaction;
+				}
 			}
 		}
-		Task IFbPreparedCommand.ReleaseAsync(CancellationToken cancellationToken) => ReleaseAsync(cancellationToken);
-		internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
-		{
-			await RollbackImplicitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
+		// Check if	we have	a valid	statement handle
+		if (_statement == null)
+		{
+			_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
+		}
+
+		// Prepare the statement if	needed
+		if (!_statement.IsPrepared)
+		{
+			// Close the inner DataReader if needed
 			await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
 
-			if (_connection != null && _connection.State == ConnectionState.Open)
+			// Reformat the SQL statement if needed
+			var sql = _commandText;
+
+			if (_commandType == CommandType.StoredProcedure)
 			{
-				_connection.InnerConnection.RemovePreparedCommand(this);
+				sql = BuildStoredProcedureSql(sql, returnsSet);
 			}
 
-			if (_statement != null)
+			try
 			{
-				await _statement.Dispose2Async(cancellationToken).ConfigureAwait(false);
+				(sql, _namedParameters) = NamedParametersParser.Parse(sql);
+				// Try to prepare the command
+				await _statement.PrepareAsync(sql, cancellationToken).ConfigureAwait(false);
+			}
+			catch
+			{
+				// Release the statement and rethrow the exception
+				await _statement.ReleaseAsync(cancellationToken).ConfigureAwait(false);
 				_statement = null;
-			}
-		}
 
-		void IFbPreparedCommand.TransactionCompleted() => TransactionCompleted();
-		internal void TransactionCompleted()
+				throw;
+			}
+
+			// Add this	command	to the active command list
+			innerConn.AddPreparedCommand(this);
+		}
+		else
 		{
-			if (Transaction != null)
-			{
-				DisposeReader();
-				Transaction = null;
-			}
+			// Close statement for subsequently	executions
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
-		Task IFbPreparedCommand.TransactionCompletedAsync(CancellationToken cancellationToken) => TransactionCompletedAsync(cancellationToken);
-		internal async Task TransactionCompletedAsync(CancellationToken cancellationToken = default)
-		{
-			if (Transaction != null)
-			{
-				await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
-				Transaction = null;
-			}
-		}
-
-		#endregion
-
-		#region IDescriptorFiller
-
-		void IDescriptorFiller.Fill(Descriptor descriptor, int index) => UpdateParameterValues(descriptor);
-		private void UpdateParameterValues(Descriptor descriptor)
-		{
-			if (!HasParameters)
-				return;
-
-			for (var i = 0; i < descriptor.Count; i++)
-			{
-				var parameter = descriptor[i];
-				var index = i;
-
-				if (_namedParameters.Count > 0)
-				{
-					index = _parameters.IndexOf(_namedParameters[i], i);
-					if (index == -1)
-					{
-						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
-					}
-				}
-
-				if (index != -1)
-				{
-					var commandParameter = _parameters[index];
-					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
-					{
-						parameter.NullFlag = -1;
-						parameter.DbValue.SetValue(DBNull.Value);
-
-						if (!parameter.AllowDBNull())
-						{
-							parameter.DataType++;
-						}
-					}
-					else
-					{
-						parameter.NullFlag = 0;
-
-						switch (parameter.DbDataType)
-						{
-							case DbDataType.Binary:
-								{
-									var blob = _statement.CreateBlob();
-									blob.Write((byte[])commandParameter.InternalValue);
-									parameter.DbValue.SetValue(blob.Id);
-								}
-								break;
-
-							case DbDataType.Text:
-								{
-									var blob = _statement.CreateBlob();
-									if (commandParameter.InternalValue is byte[])
-									{
-										blob.Write((byte[])commandParameter.InternalValue);
-									}
-									else
-									{
-										blob.Write((string)commandParameter.InternalValue);
-									}
-									parameter.DbValue.SetValue(blob.Id);
-								}
-								break;
-
-							case DbDataType.Array:
-								{
-									if (parameter.ArrayHandle == null)
-									{
-										parameter.ArrayHandle = _statement.CreateArray(parameter.Relation, parameter.Name);
-									}
-									else
-									{
-										parameter.ArrayHandle.Database = _statement.Database;
-										parameter.ArrayHandle.Transaction = _statement.Transaction;
-									}
-
-									parameter.ArrayHandle.Handle = 0;
-									parameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
-									parameter.DbValue.SetValue(parameter.ArrayHandle.Handle);
-								}
-								break;
-
-							case DbDataType.Guid:
-								if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
-								{
-									throw new InvalidOperationException("Incorrect Guid value.");
-								}
-								parameter.DbValue.SetValue(commandParameter.InternalValue);
-								break;
-
-							default:
-								parameter.DbValue.SetValue(commandParameter.InternalValue);
-								break;
-						}
-					}
-				}
-			}
-		}
-		ValueTask IDescriptorFiller.FillAsync(Descriptor descriptor, int index, CancellationToken cancellationToken) => UpdateParameterValuesAsync(descriptor, cancellationToken);
-		private async ValueTask UpdateParameterValuesAsync(Descriptor descriptor, CancellationToken cancellationToken = default)
-		{
-			if (!HasParameters)
-				return;
-
-			for (var i = 0; i < descriptor.Count; i++)
-			{
-				var statementParameter = descriptor[i];
-				var index = i;
-
-				if (_namedParameters.Count > 0)
-				{
-					index = _parameters.IndexOf(_namedParameters[i], i);
-					if (index == -1)
-					{
-						throw FbException.Create($"Must declare the variable '{_namedParameters[i]}'.");
-					}
-				}
-
-				if (index != -1)
-				{
-					var commandParameter = _parameters[index];
-					if (commandParameter.InternalValue == DBNull.Value || commandParameter.InternalValue == null)
-					{
-						statementParameter.NullFlag = -1;
-						statementParameter.DbValue.SetValue(DBNull.Value);
-
-						if (!statementParameter.AllowDBNull())
-						{
-							statementParameter.DataType++;
-						}
-					}
-					else
-					{
-						statementParameter.NullFlag = 0;
-
-						switch (statementParameter.DbDataType)
-						{
-							case DbDataType.Binary:
-								{
-									var blob = _statement.CreateBlob();
-									await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
-									statementParameter.DbValue.SetValue(blob.Id);
-								}
-								break;
-
-							case DbDataType.Text:
-								{
-									var blob = _statement.CreateBlob();
-									if (commandParameter.InternalValue is byte[])
-									{
-										await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
-									}
-									else
-									{
-										await blob.WriteAsync((string)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
-									}
-									statementParameter.DbValue.SetValue(blob.Id);
-								}
-								break;
-
-							case DbDataType.Array:
-								{
-									if (statementParameter.ArrayHandle == null)
-									{
-										statementParameter.ArrayHandle = await _statement.CreateArrayAsync(statementParameter.Relation, statementParameter.Name, cancellationToken).ConfigureAwait(false);
-									}
-									else
-									{
-										statementParameter.ArrayHandle.Database = _statement.Database;
-										statementParameter.ArrayHandle.Transaction = _statement.Transaction;
-									}
-
-									statementParameter.ArrayHandle.Handle = 0;
-									await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
-									statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
-								}
-								break;
-
-							case DbDataType.Guid:
-								if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
-								{
-									throw new InvalidOperationException("Incorrect Guid value.");
-								}
-								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
-								break;
-
-							default:
-								statementParameter.DbValue.SetValue(commandParameter.InternalValue);
-								break;
-						}
-					}
-				}
-			}
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		private void Prepare(bool returnsSet)
-		{
-			var innerConn = _connection.InnerConnection;
-
-			// Check if	we have	a valid	transaction
-			if (_transaction == null)
-			{
-				if (innerConn.IsEnlisted)
-				{
-					_transaction = innerConn.ActiveTransaction;
-				}
-				else
-				{
-					_implicitTransaction = true;
-					_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
-					_transaction.BeginTransaction();
-
-					// Update Statement	transaction
-					if (_statement != null)
-					{
-						_statement.Transaction = _transaction.Transaction;
-					}
-				}
-			}
-
-			// Check if	we have	a valid	statement handle
-			if (_statement == null)
-			{
-				_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
-			}
-
-			// Prepare the statement if	needed
-			if (!_statement.IsPrepared)
-			{
-				// Close the inner DataReader if needed
-				DisposeReader();
-
-				// Reformat the SQL statement if needed
-				var sql = _commandText;
-
-				if (_commandType == CommandType.StoredProcedure)
-				{
-					sql = BuildStoredProcedureSql(sql, returnsSet);
-				}
-
-				try
-				{
-					(sql, _namedParameters) = NamedParametersParser.Parse(sql);
-					// Try to prepare the command
-					_statement.Prepare(sql);
-				}
-				catch
-				{
-					// Release the statement and rethrow the exception
-					_statement.Release();
-					_statement = null;
-
-					throw;
-				}
-
-				// Add this	command	to the active command list
-				innerConn.AddPreparedCommand(this);
-			}
-			else
-			{
-				// Close statement for subsequently	executions
-				Close();
-			}
-		}
-		private async Task PrepareAsync(bool returnsSet, CancellationToken cancellationToken = default)
-		{
-			var innerConn = _connection.InnerConnection;
-
-			// Check if	we have	a valid	transaction
-			if (_transaction == null)
-			{
-				if (innerConn.IsEnlisted)
-				{
-					_transaction = innerConn.ActiveTransaction;
-				}
-				else
-				{
-					_implicitTransaction = true;
-					_transaction = new FbTransaction(_connection, _connection.ConnectionOptions.IsolationLevel);
-					await _transaction.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-					// Update Statement	transaction
-					if (_statement != null)
-					{
-						_statement.Transaction = _transaction.Transaction;
-					}
-				}
-			}
-
-			// Check if	we have	a valid	statement handle
-			if (_statement == null)
-			{
-				_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
-			}
-
-			// Prepare the statement if	needed
-			if (!_statement.IsPrepared)
-			{
-				// Close the inner DataReader if needed
-				await DisposeReaderAsync(cancellationToken).ConfigureAwait(false);
-
-				// Reformat the SQL statement if needed
-				var sql = _commandText;
-
-				if (_commandType == CommandType.StoredProcedure)
-				{
-					sql = BuildStoredProcedureSql(sql, returnsSet);
-				}
-
-				try
-				{
-					(sql, _namedParameters) = NamedParametersParser.Parse(sql);
-					// Try to prepare the command
-					await _statement.PrepareAsync(sql, cancellationToken).ConfigureAwait(false);
-				}
-				catch
-				{
-					// Release the statement and rethrow the exception
-					await _statement.ReleaseAsync(cancellationToken).ConfigureAwait(false);
-					_statement = null;
-
-					throw;
-				}
-
-				// Add this	command	to the active command list
-				innerConn.AddPreparedCommand(this);
-			}
-			else
-			{
-				// Close statement for subsequently	executions
-				await CloseAsync(cancellationToken).ConfigureAwait(false);
-			}
-		}
-
-		private void ExecuteCommand(CommandBehavior behavior, bool returnsSet)
-		{
-			LogCommandExecutionIfEnabled();
-
-			Prepare(returnsSet);
-
-			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
-				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
-				(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
-				(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
-				behavior == CommandBehavior.Default)
-			{
-				// Set the fetch size
-				_statement.FetchSize = _fetchSize;
-
-				// Set if it's needed the Records Affected information
-				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
-
-				// Validate input parameter count
-				if (_namedParameters.Count > 0 && !HasParameters)
-				{
-					throw FbException.Create("Must declare command parameters.");
-				}
-
-				// Execute
-				_statement.Execute(CommandTimeout * 1000, this);
-			}
-		}
-		private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
-		{
-			LogCommandExecutionIfEnabled();
-
-			await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
-
-			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
-				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
-				(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
-				(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
-				behavior == CommandBehavior.Default)
-			{
-				// Set the fetch size
-				_statement.FetchSize = _fetchSize;
-
-				// Set if it's needed the Records Affected information
-				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
-
-				// Validate input parameter count
-				if (_namedParameters.Count > 0 && !HasParameters)
-				{
-					throw FbException.Create("Must declare command parameters.");
-				}
-
-				// Execute
-				await _statement.ExecuteAsync(CommandTimeout * 1000, this, cancellationToken).ConfigureAwait(false);
-			}
-		}
-
-		private string BuildStoredProcedureSql(string spName, bool returnsSet)
-		{
-			var sql = spName == null ? string.Empty : spName.Trim();
-
-			if (sql.Length > 0 &&
-				!sql.StartsWith("EXECUTE PROCEDURE ", StringComparison.InvariantCultureIgnoreCase) &&
-				!sql.StartsWith("SELECT ", StringComparison.InvariantCultureIgnoreCase))
-			{
-				var paramsText = new StringBuilder();
-
-				// Append the stored proc parameter	name
-				paramsText.Append(sql);
-				if (Parameters.Count > 0)
-				{
-					paramsText.Append("(");
-					for (var i = 0; i < Parameters.Count; i++)
-					{
-						if (Parameters[i].Direction == ParameterDirection.Input ||
-							Parameters[i].Direction == ParameterDirection.InputOutput)
-						{
-							// Append parameter	name to parameter list
-							paramsText.Append(Parameters[i].InternalParameterName);
-							if (i != Parameters.Count - 1)
-							{
-								paramsText = paramsText.Append(",");
-							}
-						}
-					}
-					paramsText.Append(")");
-					paramsText.Replace(",)", ")");
-					paramsText.Replace("()", string.Empty);
-				}
-
-				if (returnsSet)
-				{
-					sql = "select * from " + paramsText.ToString();
-				}
-				else
-				{
-					sql = "execute procedure " + paramsText.ToString();
-				}
-			}
-
-			return sql;
-		}
-
-		private void CheckCommand()
-		{
-			if (_transaction != null && _transaction.IsCompleted)
-			{
-				_transaction = null;
-			}
-
-			FbConnection.EnsureOpen(_connection);
-
-			if (_activeReader != null)
-			{
-				throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
-			}
-
-			if (_transaction == null &&
-				_connection.InnerConnection.HasActiveTransaction &&
-				!_connection.InnerConnection.IsEnlisted)
-			{
-				throw new InvalidOperationException("Execute requires the Command object to have a Transaction object when the Connection object assigned to the command is in a pending local transaction. The Transaction property of the Command has not been initialized.");
-			}
-
-			if (_transaction != null && !_transaction.IsCompleted &&
-				!_connection.Equals(_transaction.Connection))
-			{
-				throw new InvalidOperationException("Command Connection is not equal to Transaction Connection.");
-			}
-
-			if (_commandText == null || _commandText.Length == 0)
-			{
-				throw new InvalidOperationException("The command text for this Command has not been set.");
-			}
-		}
-
-		private void LogCommandExecutionIfEnabled()
-		{
-			if (Log.IsEnabled(FbLogLevel.Debug))
-			{
-				var sb = new StringBuilder();
-				sb.AppendLine("Executing command:");
-				sb.AppendLine(_commandText);
-				if (FbLogManager.IsParameterLoggingEnabled)
-				{
-					sb.AppendLine("Parameters:");
-					if (!HasParameters)
-					{
-						sb.AppendLine("<no parameters>");
-					}
-					else
-					{
-						foreach (FbParameter parameter in _parameters)
-						{
-							sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", parameter.ParameterName, parameter.FbDbType, (!IsNullParameterValue(parameter.InternalValue) ? parameter.InternalValue : "<null>")));
-						}
-					}
-				}
-				Log.Debug(sb.ToString());
-			}
-		}
-
-		private static bool IsNullParameterValue(object value)
-		{
-			return (value == DBNull.Value || value == null);
-		}
-
-		#endregion
 	}
+
+	private void ExecuteCommand(CommandBehavior behavior, bool returnsSet)
+	{
+		LogCommandExecutionIfEnabled();
+
+		Prepare(returnsSet);
+
+		if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
+			(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
+			(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
+			(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
+			behavior == CommandBehavior.Default)
+		{
+			// Set the fetch size
+			_statement.FetchSize = _fetchSize;
+
+			// Set if it's needed the Records Affected information
+			_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
+
+			// Validate input parameter count
+			if (_namedParameters.Count > 0 && !HasParameters)
+			{
+				throw FbException.Create("Must declare command parameters.");
+			}
+
+			// Execute
+			_statement.Execute(CommandTimeout * 1000, this);
+		}
+	}
+	private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
+	{
+		LogCommandExecutionIfEnabled();
+
+		await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
+
+		if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
+			(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
+			(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
+			(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
+			behavior == CommandBehavior.Default)
+		{
+			// Set the fetch size
+			_statement.FetchSize = _fetchSize;
+
+			// Set if it's needed the Records Affected information
+			_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
+
+			// Validate input parameter count
+			if (_namedParameters.Count > 0 && !HasParameters)
+			{
+				throw FbException.Create("Must declare command parameters.");
+			}
+
+			// Execute
+			await _statement.ExecuteAsync(CommandTimeout * 1000, this, cancellationToken).ConfigureAwait(false);
+		}
+	}
+
+	private string BuildStoredProcedureSql(string spName, bool returnsSet)
+	{
+		var sql = spName == null ? string.Empty : spName.Trim();
+
+		if (sql.Length > 0 &&
+			!sql.StartsWith("EXECUTE PROCEDURE ", StringComparison.InvariantCultureIgnoreCase) &&
+			!sql.StartsWith("SELECT ", StringComparison.InvariantCultureIgnoreCase))
+		{
+			var paramsText = new StringBuilder();
+
+			// Append the stored proc parameter	name
+			paramsText.Append(sql);
+			if (Parameters.Count > 0)
+			{
+				paramsText.Append("(");
+				for (var i = 0; i < Parameters.Count; i++)
+				{
+					if (Parameters[i].Direction == ParameterDirection.Input ||
+						Parameters[i].Direction == ParameterDirection.InputOutput)
+					{
+						// Append parameter	name to parameter list
+						paramsText.Append(Parameters[i].InternalParameterName);
+						if (i != Parameters.Count - 1)
+						{
+							paramsText = paramsText.Append(",");
+						}
+					}
+				}
+				paramsText.Append(")");
+				paramsText.Replace(",)", ")");
+				paramsText.Replace("()", string.Empty);
+			}
+
+			if (returnsSet)
+			{
+				sql = "select * from " + paramsText.ToString();
+			}
+			else
+			{
+				sql = "execute procedure " + paramsText.ToString();
+			}
+		}
+
+		return sql;
+	}
+
+	private void CheckCommand()
+	{
+		if (_transaction != null && _transaction.IsCompleted)
+		{
+			_transaction = null;
+		}
+
+		FbConnection.EnsureOpen(_connection);
+
+		if (_activeReader != null)
+		{
+			throw new InvalidOperationException("There is already an open DataReader associated with this Command which must be closed first.");
+		}
+
+		if (_transaction == null &&
+			_connection.InnerConnection.HasActiveTransaction &&
+			!_connection.InnerConnection.IsEnlisted)
+		{
+			throw new InvalidOperationException("Execute requires the Command object to have a Transaction object when the Connection object assigned to the command is in a pending local transaction. The Transaction property of the Command has not been initialized.");
+		}
+
+		if (_transaction != null && !_transaction.IsCompleted &&
+			!_connection.Equals(_transaction.Connection))
+		{
+			throw new InvalidOperationException("Command Connection is not equal to Transaction Connection.");
+		}
+
+		if (_commandText == null || _commandText.Length == 0)
+		{
+			throw new InvalidOperationException("The command text for this Command has not been set.");
+		}
+	}
+
+	private void LogCommandExecutionIfEnabled()
+	{
+		if (Log.IsEnabled(FbLogLevel.Debug))
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine("Executing command:");
+			sb.AppendLine(_commandText);
+			if (FbLogManager.IsParameterLoggingEnabled)
+			{
+				sb.AppendLine("Parameters:");
+				if (!HasParameters)
+				{
+					sb.AppendLine("<no parameters>");
+				}
+				else
+				{
+					foreach (FbParameter parameter in _parameters)
+					{
+						sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", parameter.ParameterName, parameter.FbDbType, (!IsNullParameterValue(parameter.InternalValue) ? parameter.InternalValue : "<null>")));
+					}
+				}
+			}
+			Log.Debug(sb.ToString());
+		}
+	}
+
+	private static bool IsNullParameterValue(object value)
+	{
+		return (value == DBNull.Value || value == null);
+	}
+
+	#endregion
 }

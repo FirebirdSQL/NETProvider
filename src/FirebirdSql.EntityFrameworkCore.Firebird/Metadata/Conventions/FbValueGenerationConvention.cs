@@ -22,28 +22,27 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Conventions;
+
+public class FbValueGenerationConvention : RelationalValueGenerationConvention
 {
-	public class FbValueGenerationConvention : RelationalValueGenerationConvention
+	public FbValueGenerationConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
+		: base(dependencies, relationalDependencies)
+	{ }
+
+	public override void ProcessPropertyAnnotationChanged(IConventionPropertyBuilder propertyBuilder, string name, IConventionAnnotation annotation, IConventionAnnotation oldAnnotation, IConventionContext<IConventionAnnotation> context)
 	{
-		public FbValueGenerationConvention(ProviderConventionSetBuilderDependencies dependencies, RelationalConventionSetBuilderDependencies relationalDependencies)
-			: base(dependencies, relationalDependencies)
-		{ }
-
-		public override void ProcessPropertyAnnotationChanged(IConventionPropertyBuilder propertyBuilder, string name, IConventionAnnotation annotation, IConventionAnnotation oldAnnotation, IConventionContext<IConventionAnnotation> context)
+		if (name == FbAnnotationNames.ValueGenerationStrategy)
 		{
-			if (name == FbAnnotationNames.ValueGenerationStrategy)
-			{
-				propertyBuilder.ValueGenerated(GetValueGenerated(propertyBuilder.Metadata));
-				return;
-			}
-			base.ProcessPropertyAnnotationChanged(propertyBuilder, name, annotation, oldAnnotation, context);
+			propertyBuilder.ValueGenerated(GetValueGenerated(propertyBuilder.Metadata));
+			return;
 		}
-
-		protected override ValueGenerated? GetValueGenerated(IConventionProperty property)
-			=> RelationalValueGenerationConvention.GetValueGenerated(property)
-				?? (property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None
-					? ValueGenerated.OnAdd
-					: (ValueGenerated?)null);
+		base.ProcessPropertyAnnotationChanged(propertyBuilder, name, annotation, oldAnnotation, context);
 	}
+
+	protected override ValueGenerated? GetValueGenerated(IConventionProperty property)
+		=> RelationalValueGenerationConvention.GetValueGenerated(property)
+			?? (property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None
+				? ValueGenerated.OnAdd
+				: (ValueGenerated?)null);
 }

@@ -19,26 +19,25 @@ using System;
 using System.Diagnostics.Contracts;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Native.Handle
+namespace FirebirdSql.Data.Client.Native.Handle;
+
+// public visibility added, because auto-generated assembly can't work with internal types
+public class TransactionHandle : FirebirdHandle
 {
-	// public visibility added, because auto-generated assembly can't work with internal types
-	public class TransactionHandle : FirebirdHandle
+	protected override bool ReleaseHandle()
 	{
-		protected override bool ReleaseHandle()
+		Contract.Requires(FbClient != null);
+
+		if (IsClosed)
 		{
-			Contract.Requires(FbClient != null);
-
-			if (IsClosed)
-			{
-				return true;
-			}
-
-			var statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
-			var @ref = this;
-			FbClient.isc_rollback_transaction(statusVector, ref @ref);
-			handle = @ref.handle;
-			var exception = FesConnection.ParseStatusVector(statusVector, Charset.DefaultCharset);
-			return exception == null || exception.IsWarning;
+			return true;
 		}
+
+		var statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
+		var @ref = this;
+		FbClient.isc_rollback_transaction(statusVector, ref @ref);
+		handle = @ref.handle;
+		var exception = FesConnection.ParseStatusVector(statusVector, Charset.DefaultCharset);
+		return exception == null || exception.IsWarning;
 	}
 }

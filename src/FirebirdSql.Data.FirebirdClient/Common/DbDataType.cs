@@ -17,34 +17,33 @@
 
 using System;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal enum DbDataType
 {
-	internal enum DbDataType
-	{
-		Array,
-		BigInt,
-		Binary,
-		Boolean,
-		Char,
-		Date,
-		Decimal,
-		Double,
-		Float,
-		Guid,
-		Integer,
-		Numeric,
-		SmallInt,
-		Text,
-		Time,
-		TimeStamp,
-		VarChar,
-		TimeStampTZ,
-		TimeStampTZEx,
-		TimeTZ,
-		TimeTZEx,
-		Dec16,
-		Dec34,
-		Int128,
-		Null,
-	}
+	Array,
+	BigInt,
+	Binary,
+	Boolean,
+	Char,
+	Date,
+	Decimal,
+	Double,
+	Float,
+	Guid,
+	Integer,
+	Numeric,
+	SmallInt,
+	Text,
+	Time,
+	TimeStamp,
+	VarChar,
+	TimeStampTZ,
+	TimeStampTZEx,
+	TimeTZ,
+	TimeTZEx,
+	Dec16,
+	Dec34,
+	Int128,
+	Null,
 }

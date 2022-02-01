@@ -17,12 +17,11 @@
 
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class InheritanceQueryFbTest : InheritanceRelationalQueryTestBase<InheritanceQueryFbFixture>
 {
-	public class InheritanceQueryFbTest : InheritanceRelationalQueryTestBase<InheritanceQueryFbFixture>
-	{
-		public InheritanceQueryFbTest(InheritanceQueryFbFixture fixture)
-			: base(fixture)
-		{ }
-	}
+	public InheritanceQueryFbTest(InheritanceQueryFbFixture fixture)
+		: base(fixture)
+	{ }
 }

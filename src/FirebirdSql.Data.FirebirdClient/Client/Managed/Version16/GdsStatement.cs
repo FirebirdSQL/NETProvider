@@ -20,33 +20,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed.Version16
+namespace FirebirdSql.Data.Client.Managed.Version16;
+
+internal class GdsStatement : Version15.GdsStatement
 {
-	internal class GdsStatement : Version15.GdsStatement
+	public GdsStatement(DatabaseBase db)
+		: base(db)
+	{ }
+
+	public GdsStatement(DatabaseBase db, TransactionBase transaction)
+		: base(db, transaction)
+	{ }
+
+	protected override void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
 	{
-		public GdsStatement(DatabaseBase db)
-			: base(db)
-		{ }
+		base.SendExecuteToBuffer(timeout, descriptorFiller);
+		_database.Xdr.Write(timeout);
+	}
 
-		public GdsStatement(DatabaseBase db, TransactionBase transaction)
-			: base(db, transaction)
-		{ }
+	protected override async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
+	{
+		await base.SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteAsync(timeout, cancellationToken).ConfigureAwait(false);
+	}
 
-		protected override void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
-		{
-			base.SendExecuteToBuffer(timeout, descriptorFiller);
-			_database.Xdr.Write(timeout);
-		}
-
-		protected override async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
-		{
-			await base.SendExecuteToBufferAsync(timeout, descriptorFiller, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(timeout, cancellationToken).ConfigureAwait(false);
-		}
-
-		public override BatchBase CreateBatch()
-		{
-			return new GdsBatch(this);
-		}
+	public override BatchBase CreateBatch()
+	{
+		return new GdsBatch(this);
 	}
 }

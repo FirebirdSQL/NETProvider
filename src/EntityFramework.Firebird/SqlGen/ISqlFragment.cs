@@ -15,10 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace EntityFramework.Firebird.SqlGen
+namespace EntityFramework.Firebird.SqlGen;
+
+internal interface ISqlFragment
 {
-	internal interface ISqlFragment
-	{
-		void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator);
-	}
+	void WriteSql(SqlWriter writer, SqlGenerator sqlGenerator);
 }

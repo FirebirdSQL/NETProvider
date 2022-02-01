@@ -20,19 +20,19 @@ using System.Data;
 using System.Globalization;
 using System.Text;
 
-namespace FirebirdSql.Data.Schema
+namespace FirebirdSql.Data.Schema;
+
+internal class FbUniqueKeys : FbSchema
 {
-	internal class FbUniqueKeys : FbSchema
+	#region Protected Methods
+
+	protected override StringBuilder GetCommandText(string[] restrictions)
 	{
-		#region Protected Methods
+		var sql = new StringBuilder();
+		var where = new StringBuilder();
 
-		protected override StringBuilder GetCommandText(string[] restrictions)
-		{
-			var sql = new StringBuilder();
-			var where = new StringBuilder();
-
-			sql.Append(
-				@"SELECT
+		sql.Append(
+			@"SELECT
 					null AS TABLE_CATALOG,
 					null AS TABLE_SCHEMA,
 					rel.rdb$relation_name AS TABLE_NAME,
@@ -43,39 +43,38 @@ namespace FirebirdSql.Data.Schema
 					LEFT JOIN rdb$indices idx ON rel.rdb$index_name = idx.rdb$index_name
 					LEFT JOIN rdb$index_segments seg ON idx.rdb$index_name = seg.rdb$index_name");
 
-			where.Append("rel.rdb$constraint_type = 'UNIQUE'");
+		where.Append("rel.rdb$constraint_type = 'UNIQUE'");
 
-			if (restrictions != null)
+		if (restrictions != null)
+		{
+			var index = 0;
+
+			/* TABLE_CATALOG */
+			if (restrictions.Length >= 1 && restrictions[0] != null)
 			{
-				var index = 0;
-
-				/* TABLE_CATALOG */
-				if (restrictions.Length >= 1 && restrictions[0] != null)
-				{
-				}
-
-				/* TABLE_SCHEMA */
-				if (restrictions.Length >= 2 && restrictions[1] != null)
-				{
-				}
-
-				/* TABLE_NAME */
-				if (restrictions.Length >= 3 && restrictions[2] != null)
-				{
-					where.AppendFormat(" AND rel.rdb$relation_name = @p{0}", index++);
-				}
 			}
 
-			if (where.Length > 0)
+			/* TABLE_SCHEMA */
+			if (restrictions.Length >= 2 && restrictions[1] != null)
 			{
-				sql.AppendFormat(" WHERE {0} ", where.ToString());
 			}
 
-			sql.Append(" ORDER BY TABLE_NAME, UK_NAME, ORDINAL_POSITION");
-
-			return sql;
+			/* TABLE_NAME */
+			if (restrictions.Length >= 3 && restrictions[2] != null)
+			{
+				where.AppendFormat(" AND rel.rdb$relation_name = @p{0}", index++);
+			}
 		}
 
-		#endregion
+		if (where.Length > 0)
+		{
+			sql.AppendFormat(" WHERE {0} ", where.ToString());
+		}
+
+		sql.Append(" ORDER BY TABLE_NAME, UK_NAME, ORDINAL_POSITION");
+
+		return sql;
 	}
+
+	#endregion
 }

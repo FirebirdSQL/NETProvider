@@ -17,17 +17,16 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
-{
-	public class FbBackupFile
-	{
-		public string BackupFile { get; set; }
-		public int? BackupLength { get; set; }
+namespace FirebirdSql.Data.Services;
 
-		public FbBackupFile(string fileName, int? fileLength = null)
-		{
-			BackupFile = fileName;
-			BackupLength = fileLength;
-		}
+public class FbBackupFile
+{
+	public string BackupFile { get; set; }
+	public int? BackupLength { get; set; }
+
+	public FbBackupFile(string fileName, int? fileLength = null)
+	{
+		BackupFile = fileName;
+		BackupLength = fileLength;
 	}
 }

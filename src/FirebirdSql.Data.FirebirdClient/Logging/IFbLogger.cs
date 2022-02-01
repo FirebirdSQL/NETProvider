@@ -17,28 +17,27 @@
 
 using System;
 
-namespace FirebirdSql.Data.Logging
+namespace FirebirdSql.Data.Logging;
+
+public interface IFbLogger
 {
-	public interface IFbLogger
-	{
-		bool IsEnabled(FbLogLevel level);
-		void Log(FbLogLevel level, string msg, Exception exception = null);
-	}
+	bool IsEnabled(FbLogLevel level);
+	void Log(FbLogLevel level, string msg, Exception exception = null);
+}
 
-	public static class IFbLoggerExtensions
-	{ 
-		public static void Trace(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Trace, msg);
-		public static void Debug(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Debug, msg);
-		public static void Info(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Info, msg);
-		public static void Warn(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Warn, msg);
-		public static void Error(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Error, msg);
-		public static void Fatal(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Fatal, msg);
+public static class IFbLoggerExtensions
+{
+	public static void Trace(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Trace, msg);
+	public static void Debug(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Debug, msg);
+	public static void Info(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Info, msg);
+	public static void Warn(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Warn, msg);
+	public static void Error(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Error, msg);
+	public static void Fatal(this IFbLogger logger, string msg) => logger.Log(FbLogLevel.Fatal, msg);
 
-		public static void Trace(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Trace, msg, ex);
-		public static void Debug(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Debug, msg, ex);
-		public static void Info(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Info, msg, ex);
-		public static void Warn(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Warn, msg, ex);
-		public static void Error(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Error, msg, ex);
-		public static void Fatal(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Fatal, msg, ex);
-	}
+	public static void Trace(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Trace, msg, ex);
+	public static void Debug(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Debug, msg, ex);
+	public static void Info(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Info, msg, ex);
+	public static void Warn(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Warn, msg, ex);
+	public static void Error(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Error, msg, ex);
+	public static void Fatal(this IFbLogger logger, string msg, Exception ex) => logger.Log(FbLogLevel.Fatal, msg, ex);
 }

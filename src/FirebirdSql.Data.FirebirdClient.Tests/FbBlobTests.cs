@@ -20,76 +20,75 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
+namespace FirebirdSql.Data.FirebirdClient.Tests;
+
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+public class FbBlobTests : FbTestsBase
 {
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	public class FbBlobTests : FbTestsBase
+	public FbBlobTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task BinaryBlobTest()
 	{
-		public FbBlobTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+		var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+		var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
 
-		[Test]
-		public async Task BinaryBlobTest()
+		await using (var transaction = await Connection.BeginTransactionAsync())
 		{
-			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
-			var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
-
-			await using (var transaction = await Connection.BeginTransactionAsync())
+			await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", Connection, transaction))
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", Connection, transaction))
-				{
-					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-					insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
-					await insert.ExecuteNonQueryAsync();
-				}
-				await transaction.CommitAsync();
+				insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+				insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
+				await insert.ExecuteNonQueryAsync();
 			}
-
-			await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", Connection))
-			{
-				var select_values = (byte[])await select.ExecuteScalarAsync();
-				CollectionAssert.AreEqual(insert_values, select_values);
-			}
+			await transaction.CommitAsync();
 		}
 
-		[Test]
-		public async Task ReaderGetBytes()
+		await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", Connection))
 		{
-			var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
-			var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
+			var select_values = (byte[])await select.ExecuteScalarAsync();
+			CollectionAssert.AreEqual(insert_values, select_values);
+		}
+	}
 
-			await using (var transaction = await Connection.BeginTransactionAsync())
+	[Test]
+	public async Task ReaderGetBytes()
+	{
+		var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+		var insert_values = RandomNumberGenerator.GetBytes(100000 * 4);
+
+		await using (var transaction = await Connection.BeginTransactionAsync())
+		{
+			await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", Connection, transaction))
 			{
-				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", Connection, transaction))
-				{
-					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
-					insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
-					await insert.ExecuteNonQueryAsync();
-				}
-				await transaction.CommitAsync();
+				insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+				insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
+				await insert.ExecuteNonQueryAsync();
 			}
+			await transaction.CommitAsync();
+		}
 
-			await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", Connection))
+		await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", Connection))
+		{
+			var select_values = new byte[100000 * 4];
+			using (var reader = await select.ExecuteReaderAsync())
 			{
-				var select_values = new byte[100000 * 4];
-				using (var reader = await select.ExecuteReaderAsync())
+				var index = 0;
+				var segmentSize = 1000;
+				while (await reader.ReadAsync())
 				{
-					var index = 0;
-					var segmentSize = 1000;
-					while (await reader.ReadAsync())
+					while (index < 400000)
 					{
-						while (index < 400000)
-						{
-							reader.GetBytes(0, index, select_values, index, segmentSize);
+						reader.GetBytes(0, index, select_values, index, segmentSize);
 
-							index += segmentSize;
-						}
+						index += segmentSize;
 					}
 				}
-				CollectionAssert.AreEqual(insert_values, select_values);
 			}
+			CollectionAssert.AreEqual(insert_values, select_values);
 		}
 	}
 }

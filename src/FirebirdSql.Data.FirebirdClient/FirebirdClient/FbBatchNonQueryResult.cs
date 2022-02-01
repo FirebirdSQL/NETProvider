@@ -21,36 +21,35 @@ using System.Linq;
 using static FirebirdSql.Data.Common.BatchBase;
 using static FirebirdSql.Data.FirebirdClient.FbBatchNonQueryResult;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public sealed class FbBatchNonQueryResult : IEnumerable<FbBatchNonQueryResultItem>
 {
-	public sealed class FbBatchNonQueryResult : IEnumerable<FbBatchNonQueryResultItem>
+	public sealed class FbBatchNonQueryResultItem
 	{
-		public sealed class FbBatchNonQueryResultItem
-		{
-			public int RecordsAffected { get; internal set; }
-			public bool IsSuccess { get; internal set; }
-			public FbException Exception { get; internal set; }
-		}
-
-		readonly List<FbBatchNonQueryResultItem> _items;
-
-		public bool AllSuccess => _items.TrueForAll(x => x.IsSuccess);
-		public int Count => _items.Count;
-
-		internal FbBatchNonQueryResult(ExecuteResultItem[] result)
-		{
-			_items = result.Select(x => new FbBatchNonQueryResultItem()
-			{
-				RecordsAffected = x.RecordsAffected,
-				IsSuccess = !x.IsError,
-				Exception = x.Exception != null ? (FbException)FbException.Create(x.Exception) : null,
-			}).ToList();
-		}
-
-		public FbBatchNonQueryResultItem this[int index] => _items[index];
-
-		public IEnumerator<FbBatchNonQueryResultItem> GetEnumerator() => _items.GetEnumerator();
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		public int RecordsAffected { get; internal set; }
+		public bool IsSuccess { get; internal set; }
+		public FbException Exception { get; internal set; }
 	}
+
+	readonly List<FbBatchNonQueryResultItem> _items;
+
+	public bool AllSuccess => _items.TrueForAll(x => x.IsSuccess);
+	public int Count => _items.Count;
+
+	internal FbBatchNonQueryResult(ExecuteResultItem[] result)
+	{
+		_items = result.Select(x => new FbBatchNonQueryResultItem()
+		{
+			RecordsAffected = x.RecordsAffected,
+			IsSuccess = !x.IsError,
+			Exception = x.Exception != null ? (FbException)FbException.Create(x.Exception) : null,
+		}).ToList();
+	}
+
+	public FbBatchNonQueryResultItem this[int index] => _items[index];
+
+	public IEnumerator<FbBatchNonQueryResultItem> GetEnumerator() => _items.GetEnumerator();
+
+	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

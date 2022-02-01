@@ -12,138 +12,137 @@
 using System;
 using System.Text;
 
-namespace FirebirdSql.Data.Common
+namespace FirebirdSql.Data.Common;
+
+internal class BinaryEncoding : Encoding
 {
-	internal class BinaryEncoding : Encoding
+	public static string BytesToString(byte[] byteArray)
 	{
-		public static string BytesToString(byte[] byteArray)
-		{
-			// This code isn't great because it requires a double copy,
-			// but it requires unsafe code to solve the problem efficiently.
-			var charArray = new char[byteArray.GetLength(0)];
-			Array.Copy(byteArray, charArray, byteArray.Length);
+		// This code isn't great because it requires a double copy,
+		// but it requires unsafe code to solve the problem efficiently.
+		var charArray = new char[byteArray.GetLength(0)];
+		Array.Copy(byteArray, charArray, byteArray.Length);
 
-			return new string(charArray);
+		return new string(charArray);
+	}
+
+	static void Validate(object data, int dataLength, int index, int count)
+	{
+		if (data == null)
+		{
+			throw new ArgumentNullException();
 		}
 
-		static void Validate(object data, int dataLength, int index, int count)
+		if (index < 0 || count < 0 || dataLength - index < count)
 		{
-			if (data == null)
-			{
-				throw new ArgumentNullException();
-			}
+			throw new ArgumentOutOfRangeException();
+		}
+	}
 
-			if (index < 0 || count < 0 || dataLength - index < count)
-			{
-				throw new ArgumentOutOfRangeException();
-			}
+	public override int GetByteCount(char[] chars, int index, int count)
+	{
+		Validate(chars, chars.Length, index, count);
+
+		return count;
+	}
+
+	public override int GetByteCount(string chars)
+	{
+		return chars.Length;
+	}
+
+	public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int index)
+	{
+		Validate(chars, chars.Length, charIndex, charCount);
+
+		if (index < 0 || index > bytes.Length)
+		{
+			throw new ArgumentOutOfRangeException();
+		}
+		if (bytes.Length - index < charCount)
+		{
+			throw new ArgumentException();
 		}
 
-		public override int GetByteCount(char[] chars, int index, int count)
+		var charEnd = charIndex + charCount;
+		while (charIndex < charEnd)
 		{
-			Validate(chars, chars.Length, index, count);
-
-			return count;
+			bytes[index++] = (byte)chars[charIndex++];
 		}
 
-		public override int GetByteCount(string chars)
+		return charCount;
+	}
+
+	public override int GetBytes(string chars, int charIndex, int charCount, byte[] bytes, int index)
+	{
+		Validate(chars, chars.Length, charIndex, charCount);
+
+		if (index < 0 || index > bytes.Length)
 		{
-			return chars.Length;
+			throw new ArgumentOutOfRangeException();
+		}
+		if (bytes.Length - index < charCount)
+		{
+			throw new ArgumentException();
 		}
 
-		public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int index)
+		var charEnd = charIndex + charCount;
+		while (charIndex < charEnd)
 		{
-			Validate(chars, chars.Length, charIndex, charCount);
-
-			if (index < 0 || index > bytes.Length)
-			{
-				throw new ArgumentOutOfRangeException();
-			}
-			if (bytes.Length - index < charCount)
-			{
-				throw new ArgumentException();
-			}
-
-			var charEnd = charIndex + charCount;
-			while (charIndex < charEnd)
-			{
-				bytes[index++] = (byte)chars[charIndex++];
-			}
-
-			return charCount;
+			bytes[index++] = (byte)chars[charIndex++];
 		}
 
-		public override int GetBytes(string chars, int charIndex, int charCount, byte[] bytes, int index)
+		return charCount;
+	}
+
+	public override int GetCharCount(byte[] bytes, int index, int count)
+	{
+		Validate(bytes, bytes.Length, index, count);
+
+		return (count);
+	}
+
+	public override int GetChars(byte[] bytes, int index, int count, char[] chars, int charIndex)
+	{
+		Validate(bytes, bytes.Length, index, count);
+
+		if (charIndex < 0 || charIndex > chars.Length)
 		{
-			Validate(chars, chars.Length, charIndex, charCount);
-
-			if (index < 0 || index > bytes.Length)
-			{
-				throw new ArgumentOutOfRangeException();
-			}
-			if (bytes.Length - index < charCount)
-			{
-				throw new ArgumentException();
-			}
-
-			var charEnd = charIndex + charCount;
-			while (charIndex < charEnd)
-			{
-				bytes[index++] = (byte)chars[charIndex++];
-			}
-
-			return charCount;
+			throw new ArgumentOutOfRangeException();
+		}
+		if (chars.Length - charIndex < count)
+		{
+			throw new ArgumentException();
 		}
 
-		public override int GetCharCount(byte[] bytes, int index, int count)
+		var byteEnd = index + count;
+		while (index < byteEnd)
 		{
-			Validate(bytes, bytes.Length, index, count);
-
-			return (count);
+			chars[charIndex++] = (char)bytes[index++];
 		}
 
-		public override int GetChars(byte[] bytes, int index, int count, char[] chars, int charIndex)
-		{
-			Validate(bytes, bytes.Length, index, count);
+		return count;
+	}
 
-			if (charIndex < 0 || charIndex > chars.Length)
-			{
-				throw new ArgumentOutOfRangeException();
-			}
-			if (chars.Length - charIndex < count)
-			{
-				throw new ArgumentException();
-			}
+	public override string GetString(byte[] bytes)
+	{
+		return BytesToString(bytes);
+	}
 
-			var byteEnd = index + count;
-			while (index < byteEnd)
-			{
-				chars[charIndex++] = (char)bytes[index++];
-			}
+	public override string GetString(byte[] bytes, int index, int count)
+	{
+		Validate(bytes, bytes.Length, index, count);
 
-			return count;
-		}
+		return BytesToString(bytes);
+	}
 
-		public override string GetString(byte[] bytes)
-		{
-			return BytesToString(bytes);
-		}
+	public override int GetMaxByteCount(int charCount)
+	{
+		return charCount;
+	}
 
-		public override string GetString(byte[] bytes, int index, int count)
-		{
-			Validate(bytes, bytes.Length, index, count);
-
-			return BytesToString(bytes);
-		}
-
-		public override int GetMaxByteCount(int charCount)
-		{
-			return charCount;
-		}
-
-		public override int GetMaxCharCount(int count)
-		{
-			return count;
-		}
+	public override int GetMaxCharCount(int count)
+	{
+		return count;
 	}
 }

@@ -18,12 +18,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace FirebirdSql.Data.Isql
+namespace FirebirdSql.Data.Isql;
+
+[Serializable]
+public class FbStatementCollection : List<FbStatement>
 {
-	[Serializable]
-	public class FbStatementCollection : List<FbStatement>
-	{
-		internal FbStatementCollection()
-		{ }
-	}
+	internal FbStatementCollection()
+	{ }
 }

@@ -19,17 +19,16 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
-{
-	public class NullKeysFbTest : NullKeysTestBase<NullKeysFbTest.NullKeysFbFixture>
-	{
-		public NullKeysFbTest(NullKeysFbFixture fixture)
-			: base(fixture)
-		{ }
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-		public class NullKeysFbFixture : NullKeysFixtureBase
-		{
-			protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-		}
+public class NullKeysFbTest : NullKeysTestBase<NullKeysFbTest.NullKeysFbFixture>
+{
+	public NullKeysFbTest(NullKeysFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	public class NullKeysFbFixture : NullKeysFixtureBase
+	{
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 	}
 }

@@ -19,30 +19,29 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
-namespace FirebirdSql.Data.FirebirdClient.Tests
-{
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
-	[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
-	class FbExceptionTests : FbTestsBase
-	{
-		public FbExceptionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
-			: base(serverType, compression, wireCrypt)
-		{ }
+namespace FirebirdSql.Data.FirebirdClient.Tests;
 
-		[Test]
-		public async Task SQLSTATETest()
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Default))]
+[TestFixtureSource(typeof(FbServerTypeTestFixtureSource), nameof(FbServerTypeTestFixtureSource.Embedded))]
+class FbExceptionTests : FbTestsBase
+{
+	public FbExceptionTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
+		: base(serverType, compression, wireCrypt)
+	{ }
+
+	[Test]
+	public async Task SQLSTATETest()
+	{
+		await using (var cmd = Connection.CreateCommand())
 		{
-			await using (var cmd = Connection.CreateCommand())
+			cmd.CommandText = "drop exception nonexisting";
+			try
 			{
-				cmd.CommandText = "drop exception nonexisting";
-				try
-				{
-					await cmd.ExecuteNonQueryAsync();
-				}
-				catch (FbException ex)
-				{
-					Assert.AreEqual("42000", ex.SQLSTATE);
-				}
+				await cmd.ExecuteNonQueryAsync();
+			}
+			catch (FbException ex)
+			{
+				Assert.AreEqual("42000", ex.SQLSTATE);
 			}
 		}
 	}

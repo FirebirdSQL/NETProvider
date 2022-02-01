@@ -23,37 +23,36 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbByteArrayMethodTranslator : IMethodCallTranslator
 {
-	public class FbByteArrayMethodTranslator : IMethodCallTranslator
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+
+	public FbByteArrayMethodTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
 	{
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
 
-		public FbByteArrayMethodTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (method.IsGenericMethod
+			&& method.GetGenericMethodDefinition().Equals(EnumerableMethods.Contains)
+			&& arguments[0].Type == typeof(byte[]))
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
-		}
+			var value = arguments[1] is SqlConstantExpression constantValue
+				? _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Constant((byte)constantValue.Value) }, false, new[] { false }, typeof(string))
+				: _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]), typeof(byte)) }, true, new[] { true }, typeof(string));
 
-		public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (method.IsGenericMethod
-				&& method.GetGenericMethodDefinition().Equals(EnumerableMethods.Contains)
-				&& arguments[0].Type == typeof(byte[]))
-			{
-				var value = arguments[1] is SqlConstantExpression constantValue
-					? _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Constant((byte)constantValue.Value) }, false, new[] { false }, typeof(string))
-					: _fbSqlExpressionFactory.Function("ASCII_CHAR", new[] { _fbSqlExpressionFactory.Convert(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[1]), typeof(byte)) }, true, new[] { true }, typeof(string));
-
-				return _fbSqlExpressionFactory.GreaterThan(
-					_fbSqlExpressionFactory.Function(
-						"POSITION",
-						new[] { value, _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]) },
-						true,
-						new[] { true, true },
-						typeof(int)),
-					_fbSqlExpressionFactory.Constant(0));
-			}
-			return null;
+			return _fbSqlExpressionFactory.GreaterThan(
+				_fbSqlExpressionFactory.Function(
+					"POSITION",
+					new[] { value, _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]) },
+					true,
+					new[] { true, true },
+					typeof(int)),
+				_fbSqlExpressionFactory.Constant(0));
 		}
+		return null;
 	}
 }

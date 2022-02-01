@@ -15,10 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class FiltersInheritanceQueryFbFixture : InheritanceQueryFbFixture
 {
-	public class FiltersInheritanceQueryFbFixture : InheritanceQueryFbFixture
-	{
-		protected override bool EnableFilters => true;
-	}
+	protected override bool EnableFilters => true;
 }

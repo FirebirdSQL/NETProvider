@@ -25,13 +25,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
+
+public class FbTimeOnlyPartComponentTranslator : IMemberTranslator
 {
-	public class FbTimeOnlyPartComponentTranslator : IMemberTranslator
-	{
-		const string SecondPart = "SECOND";
-		const string MillisecondPart = "MILLISECOND";
-		private static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
+	const string SecondPart = "SECOND";
+	const string MillisecondPart = "MILLISECOND";
+	private static readonly Dictionary<MemberInfo, string> MemberMapping = new Dictionary<MemberInfo, string>
 		{
 			{  typeof(TimeOnly).GetProperty(nameof(TimeOnly.Hour)), "HOUR" },
 			{  typeof(TimeOnly).GetProperty(nameof(TimeOnly.Minute)), "MINUTE" },
@@ -39,29 +39,28 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 			{  typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)), MillisecondPart },
 		};
 
-		readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
+	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
-		public FbTimeOnlyPartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	public FbTimeOnlyPartComponentTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
+	{
+		_fbSqlExpressionFactory = fbSqlExpressionFactory;
+	}
+
+	public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
+	{
+		if (!MemberMapping.TryGetValue(member, out var part))
+			return null;
+
+		var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
+			"EXTRACT",
+			new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
+			true,
+			new[] { false, false, true },
+			typeof(int));
+		if (part == SecondPart || part == MillisecondPart)
 		{
-			_fbSqlExpressionFactory = fbSqlExpressionFactory;
+			result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
 		}
-
-		public SqlExpression Translate(SqlExpression instance, MemberInfo member, Type returnType, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-		{
-			if (!MemberMapping.TryGetValue(member, out var part))
-				return null;
-
-			var result = (SqlExpression)_fbSqlExpressionFactory.SpacedFunction(
-				"EXTRACT",
-				new[] { _fbSqlExpressionFactory.Fragment(part), _fbSqlExpressionFactory.Fragment("FROM"), instance },
-				true,
-				new[] { false, false, true },
-				typeof(int));
-			if (part == SecondPart || part == MillisecondPart)
-			{
-				result = _fbSqlExpressionFactory.Function("TRUNC", new[] { result }, true, new[] { true }, typeof(int));
-			}
-			return result;
-		}
+		return result;
 	}
 }

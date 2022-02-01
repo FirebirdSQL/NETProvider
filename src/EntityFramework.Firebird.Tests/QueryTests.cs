@@ -22,214 +22,213 @@ using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using NUnit.Framework;
 
-namespace EntityFramework.Firebird.Tests
+namespace EntityFramework.Firebird.Tests;
+
+public class QueryTests : EntityFrameworkTestsBase
 {
-	public class QueryTests : EntityFrameworkTestsBase
+	class QueryTest1Context : FbTestDbContext
 	{
-		class QueryTest1Context : FbTestDbContext
-		{
-			public QueryTest1Context(FbConnection conn)
-				: base(conn)
-			{ }
+		public QueryTest1Context(FbConnection conn)
+			: base(conn)
+		{ }
 
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-				var queryTest1Entity = modelBuilder.Entity<QueryTest1Entity>();
-				queryTest1Entity.Property(x => x.ID).HasColumnName("ID");
-				queryTest1Entity.ToTable("TEST_QUERYTEST1ENTITY");
-			}
-
-			public IDbSet<QueryTest1Entity> QueryTest1Entity { get; set; }
-		}
-		[Test]
-		public void QueryTest1()
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
-			using (var c = GetDbContext<QueryTest1Context>())
-			{
-				c.Database.ExecuteSqlCommand("create table test_querytest1entity (id int primary key)");
-				Assert.DoesNotThrow(() => c.QueryTest1Entity.Max<QueryTest1Entity, int?>(x => x.ID));
-			}
+			base.OnModelCreating(modelBuilder);
+			var queryTest1Entity = modelBuilder.Entity<QueryTest1Entity>();
+			queryTest1Entity.Property(x => x.ID).HasColumnName("ID");
+			queryTest1Entity.ToTable("TEST_QUERYTEST1ENTITY");
 		}
 
-		class QueryTest2Context : FbTestDbContext
+		public IDbSet<QueryTest1Entity> QueryTest1Entity { get; set; }
+	}
+	[Test]
+	public void QueryTest1()
+	{
+		using (var c = GetDbContext<QueryTest1Context>())
 		{
-			public QueryTest2Context(FbConnection conn)
-				: base(conn)
-			{ }
-
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-			}
-
-			public IDbSet<Foo> Foos { get; set; }
+			c.Database.ExecuteSqlCommand("create table test_querytest1entity (id int primary key)");
+			Assert.DoesNotThrow(() => c.QueryTest1Entity.Max<QueryTest1Entity, int?>(x => x.ID));
 		}
-		[Test]
-		public void QueryTest2()
+	}
+
+	class QueryTest2Context : FbTestDbContext
+	{
+		public QueryTest2Context(FbConnection conn)
+			: base(conn)
+		{ }
+
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
-			using (var c = GetDbContext<QueryTest2Context>())
-			{
-				var q = c.Foos
-					.OrderBy(x => x.ID)
-					.Take(45).Skip(0)
-					.Select(x => new
-					{
-						x.ID,
-						x.BazID,
-						BazID2 = x.Baz.ID,
-						x.Baz.BazString,
-					});
-				Assert.DoesNotThrow(() =>
+			base.OnModelCreating(modelBuilder);
+		}
+
+		public IDbSet<Foo> Foos { get; set; }
+	}
+	[Test]
+	public void QueryTest2()
+	{
+		using (var c = GetDbContext<QueryTest2Context>())
+		{
+			var q = c.Foos
+				.OrderBy(x => x.ID)
+				.Take(45).Skip(0)
+				.Select(x => new
 				{
-					q.ToString();
+					x.ID,
+					x.BazID,
+					BazID2 = x.Baz.ID,
+					x.Baz.BazString,
 				});
-			}
-		}
-
-		class QueryTest3Context : FbTestDbContext
-		{
-			public QueryTest3Context(FbConnection conn)
-				: base(conn)
-			{ }
-
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
+			Assert.DoesNotThrow(() =>
 			{
-				base.OnModelCreating(modelBuilder);
-			}
-
-			public IDbSet<Foo> Foos { get; set; }
-		}
-		[Test]
-		public void QueryTest3()
-		{
-			using (var c = GetDbContext<QueryTest3Context>())
-			{
-				var q = c.Foos
-					 .OrderByDescending(m => m.Bars.Count())
-					 .Skip(3)
-					 .SelectMany(m => m.Bars);
-				Assert.DoesNotThrow(() =>
-				{
-					q.ToString();
-				});
-			}
-		}
-
-		class ProperVarcharLengthForConstantContext : FbTestDbContext
-		{
-			public ProperVarcharLengthForConstantContext(FbConnection conn)
-				: base(conn)
-			{ }
-
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-			}
-
-			public IDbSet<Bar> Bars { get; set; }
-		}
-		[Test]
-		public void ProperVarcharLengthForConstantTest()
-		{
-			using (var c = GetDbContext<ProperVarcharLengthForConstantContext>())
-			{
-				var q = c.Bars.Where(x => x.BarString == "TEST");
-				StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
-
-			}
-		}
-
-		class DbFunctionsContext : FbTestDbContext
-		{
-			public DbFunctionsContext(FbConnection conn)
-				: base(conn)
-			{ }
-
-			protected override void OnModelCreating(DbModelBuilder modelBuilder)
-			{
-				base.OnModelCreating(modelBuilder);
-			}
-
-			public IDbSet<Qux> Quxs { get; set; }
-		}
-		[Test]
-		public void QueryTestDbFunctionsCreateDateTime1()
-		{
-			using (var c = GetDbContext<DbFunctionsContext>())
-			{
-				var q = c.Quxs
-					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 0))
-					.ToString();
-				StringAssert.Contains("CAST('2020-3-19 14:12:00' AS TIMESTAMP)", q.ToString());
-			}
-		}
-		[Test]
-		public void QueryTestDbFunctionsCreateDateTime2()
-		{
-			using (var c = GetDbContext<DbFunctionsContext>())
-			{
-				var q = c.Quxs
-					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 36))
-					.ToString();
-				StringAssert.Contains("DATEADD(SECOND, CAST(36 AS DOUBLE PRECISION), CAST('2020-3-19 14:12:00' AS TIMESTAMP))", q.ToString());
-			}
-		}
-		[Test]
-		public void QueryTestDbFunctionsCreateDateTime3()
-		{
-			using (var c = GetDbContext<DbFunctionsContext>())
-			{
-				var q = c.Quxs
-					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(null, null, null, null, null, null))
-					.ToString();
-				StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, CAST('0001-01-01 00:00:00' AS TIMESTAMP))))", q.ToString());
-			}
-		}
-		[Test]
-		public void QueryTestDbFunctionsCreateDateTime4()
-		{
-			using (var c = GetDbContext<DbFunctionsContext>())
-			{
-				var q = c.Quxs
-					.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(x.QuxYear, x.QuxMonth, x.QuxDay, null, null, null))
-					.ToString();
-				StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, DATEADD(DAY, \"B\".\"QuxDay\", DATEADD(MONTH, \"B\".\"QuxMonth\", DATEADD(YEAR, \"B\".\"QuxYear\", CAST('0001-01-01 00:00:00' AS TIMESTAMP)))))))", q.ToString());
-			}
+				q.ToString();
+			});
 		}
 	}
 
-	class QueryTest1Entity
+	class QueryTest3Context : FbTestDbContext
 	{
-		public int ID { get; set; }
+		public QueryTest3Context(FbConnection conn)
+			: base(conn)
+		{ }
+
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+		}
+
+		public IDbSet<Foo> Foos { get; set; }
+	}
+	[Test]
+	public void QueryTest3()
+	{
+		using (var c = GetDbContext<QueryTest3Context>())
+		{
+			var q = c.Foos
+				 .OrderByDescending(m => m.Bars.Count())
+				 .Skip(3)
+				 .SelectMany(m => m.Bars);
+			Assert.DoesNotThrow(() =>
+			{
+				q.ToString();
+			});
+		}
 	}
 
-	class Foo
+	class ProperVarcharLengthForConstantContext : FbTestDbContext
 	{
-		public int ID { get; set; }
-		public int BazID { get; set; }
-		public ICollection<Bar> Bars { get; set; }
-		public Baz Baz { get; set; }
+		public ProperVarcharLengthForConstantContext(FbConnection conn)
+			: base(conn)
+		{ }
+
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+		}
+
+		public IDbSet<Bar> Bars { get; set; }
 	}
-	class Bar
+	[Test]
+	public void ProperVarcharLengthForConstantTest()
 	{
-		public int ID { get; set; }
-		public int FooID { get; set; }
-		public string BarString { get; set; }
-		public Foo Foo { get; set; }
+		using (var c = GetDbContext<ProperVarcharLengthForConstantContext>())
+		{
+			var q = c.Bars.Where(x => x.BarString == "TEST");
+			StringAssert.Contains("CAST(_UTF8'TEST' AS VARCHAR(8191))", q.ToString());
+
+		}
 	}
-	class Baz
+
+	class DbFunctionsContext : FbTestDbContext
 	{
-		public int ID { get; set; }
-		public string BazString { get; set; }
-		public ICollection<Foo> Foos { get; set; }
+		public DbFunctionsContext(FbConnection conn)
+			: base(conn)
+		{ }
+
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+		}
+
+		public IDbSet<Qux> Quxs { get; set; }
 	}
-	class Qux
+	[Test]
+	public void QueryTestDbFunctionsCreateDateTime1()
 	{
-		public int ID { get; set; }
-		public DateTime QuxDateTime { get; set; }
-		public int QuxYear { get; set; }
-		public int QuxMonth { get; set; }
-		public int QuxDay { get; set; }
+		using (var c = GetDbContext<DbFunctionsContext>())
+		{
+			var q = c.Quxs
+				.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 0))
+				.ToString();
+			StringAssert.Contains("CAST('2020-3-19 14:12:00' AS TIMESTAMP)", q.ToString());
+		}
 	}
+	[Test]
+	public void QueryTestDbFunctionsCreateDateTime2()
+	{
+		using (var c = GetDbContext<DbFunctionsContext>())
+		{
+			var q = c.Quxs
+				.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(2020, 3, 19, 14, 12, 36))
+				.ToString();
+			StringAssert.Contains("DATEADD(SECOND, CAST(36 AS DOUBLE PRECISION), CAST('2020-3-19 14:12:00' AS TIMESTAMP))", q.ToString());
+		}
+	}
+	[Test]
+	public void QueryTestDbFunctionsCreateDateTime3()
+	{
+		using (var c = GetDbContext<DbFunctionsContext>())
+		{
+			var q = c.Quxs
+				.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(null, null, null, null, null, null))
+				.ToString();
+			StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, CAST('0001-01-01 00:00:00' AS TIMESTAMP))))", q.ToString());
+		}
+	}
+	[Test]
+	public void QueryTestDbFunctionsCreateDateTime4()
+	{
+		using (var c = GetDbContext<DbFunctionsContext>())
+		{
+			var q = c.Quxs
+				.Where(x => x.QuxDateTime == DbFunctions.CreateDateTime(x.QuxYear, x.QuxMonth, x.QuxDay, null, null, null))
+				.ToString();
+			StringAssert.Contains("DATEADD(DAY, -1, DATEADD(MONTH, -1, DATEADD(YEAR, -1, DATEADD(DAY, \"B\".\"QuxDay\", DATEADD(MONTH, \"B\".\"QuxMonth\", DATEADD(YEAR, \"B\".\"QuxYear\", CAST('0001-01-01 00:00:00' AS TIMESTAMP)))))))", q.ToString());
+		}
+	}
+}
+
+class QueryTest1Entity
+{
+	public int ID { get; set; }
+}
+
+class Foo
+{
+	public int ID { get; set; }
+	public int BazID { get; set; }
+	public ICollection<Bar> Bars { get; set; }
+	public Baz Baz { get; set; }
+}
+class Bar
+{
+	public int ID { get; set; }
+	public int FooID { get; set; }
+	public string BarString { get; set; }
+	public Foo Foo { get; set; }
+}
+class Baz
+{
+	public int ID { get; set; }
+	public string BazString { get; set; }
+	public ICollection<Foo> Foos { get; set; }
+}
+class Qux
+{
+	public int ID { get; set; }
+	public DateTime QuxDateTime { get; set; }
+	public int QuxYear { get; set; }
+	public int QuxMonth { get; set; }
+	public int QuxDay { get; set; }
 }

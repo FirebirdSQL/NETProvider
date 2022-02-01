@@ -21,22 +21,21 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbRelationalConnection : RelationalConnection, IFbRelationalConnection
 {
-	public class FbRelationalConnection : RelationalConnection, IFbRelationalConnection
+	public FbRelationalConnection(RelationalConnectionDependencies dependencies)
+		: base(dependencies)
+	{ }
+
+	protected override DbConnection CreateDbConnection()
+		=> new FbConnection(ConnectionString);
+
+	protected override Task CloseDbConnectionAsync()
 	{
-		public FbRelationalConnection(RelationalConnectionDependencies dependencies)
-			: base(dependencies)
-		{ }
-
-		protected override DbConnection CreateDbConnection()
-			=> new FbConnection(ConnectionString);
-
-		protected override Task CloseDbConnectionAsync()
-		{
 #warning Quick-fix for efcore#26790
-			base.CloseDbConnection();
-			return Task.CompletedTask;
-		}
+		base.CloseDbConnection();
+		return Task.CompletedTask;
 	}
 }

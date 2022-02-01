@@ -20,38 +20,37 @@ using System.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+
+public class FbStringTypeMapping : StringTypeMapping
 {
-	public class FbStringTypeMapping : StringTypeMapping
+	readonly FbDbType _fbDbType;
+
+	public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null)
+		: base(storeType, dbType, unicode: true, size: size)
 	{
-		readonly FbDbType _fbDbType;
-
-		public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null)
-			: base(storeType, dbType, unicode: true, size: size)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected FbStringTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
-			: base(parameters)
-		{
-			_fbDbType = fbDbType;
-		}
-
-		protected override void ConfigureParameter(DbParameter parameter)
-		{
-			((FbParameter)parameter).FbDbType = _fbDbType;
-		}
-
-		protected override string GenerateNonNullSqlLiteral(object value)
-		{
-			var svalue = value.ToString();
-			return IsUnicode
-				? $"_UTF8'{EscapeSqlLiteral(svalue)}'"
-				: $"'{EscapeSqlLiteral(svalue)}'";
-		}
-
-		protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
-			=> new FbStringTypeMapping(parameters, _fbDbType);
+		_fbDbType = fbDbType;
 	}
+
+	protected FbStringTypeMapping(RelationalTypeMappingParameters parameters, FbDbType fbDbType)
+		: base(parameters)
+	{
+		_fbDbType = fbDbType;
+	}
+
+	protected override void ConfigureParameter(DbParameter parameter)
+	{
+		((FbParameter)parameter).FbDbType = _fbDbType;
+	}
+
+	protected override string GenerateNonNullSqlLiteral(object value)
+	{
+		var svalue = value.ToString();
+		return IsUnicode
+			? $"_UTF8'{EscapeSqlLiteral(svalue)}'"
+			: $"'{EscapeSqlLiteral(svalue)}'";
+	}
+
+	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)
+		=> new FbStringTypeMapping(parameters, _fbDbType);
 }

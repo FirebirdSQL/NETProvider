@@ -17,11 +17,10 @@
 
 using System;
 
-namespace FirebirdSql.Data.Services
+namespace FirebirdSql.Data.Services;
+
+public enum FbServiceState
 {
-	public enum FbServiceState
-	{
-		Closed = 0,
-		Open = 1
-	}
+	Closed = 0,
+	Open = 1
 }

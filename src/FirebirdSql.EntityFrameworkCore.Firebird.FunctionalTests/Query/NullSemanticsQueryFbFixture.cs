@@ -19,10 +19,9 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class NullSemanticsQueryFbFixture : NullSemanticsQueryFixtureBase
 {
-    public class NullSemanticsQueryFbFixture : NullSemanticsQueryFixtureBase
-    {
-        protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-    }
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

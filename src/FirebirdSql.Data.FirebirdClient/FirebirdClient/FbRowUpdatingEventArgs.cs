@@ -19,31 +19,30 @@ using System;
 using System.Data;
 using System.Data.Common;
 
-namespace FirebirdSql.Data.FirebirdClient
+namespace FirebirdSql.Data.FirebirdClient;
+
+public sealed class FbRowUpdatingEventArgs : RowUpdatingEventArgs
 {
-	public sealed class FbRowUpdatingEventArgs : RowUpdatingEventArgs
+	#region Properties
+
+	public new FbCommand Command
 	{
-		#region Properties
-
-		public new FbCommand Command
-		{
-			get  { return (FbCommand)base.Command; }
-			set  { base.Command = value; }
-		}
-
-		#endregion
-
-		#region Constructors
-
-		public FbRowUpdatingEventArgs(
-			DataRow				row,
-			IDbCommand			command,
-			StatementType		statementType,
-			DataTableMapping		tableMapping)
-			: base(row, command, statementType, tableMapping)
-		{
-		}
-
-		#endregion
+		get { return (FbCommand)base.Command; }
+		set { base.Command = value; }
 	}
+
+	#endregion
+
+	#region Constructors
+
+	public FbRowUpdatingEventArgs(
+		DataRow row,
+		IDbCommand command,
+		StatementType statementType,
+		DataTableMapping tableMapping)
+		: base(row, command, statementType, tableMapping)
+	{
+	}
+
+	#endregion
 }

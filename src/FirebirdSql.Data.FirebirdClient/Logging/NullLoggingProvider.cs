@@ -17,21 +17,20 @@
 
 using System;
 
-namespace FirebirdSql.Data.Logging
+namespace FirebirdSql.Data.Logging;
+
+sealed class NullLoggingProvider : IFbLoggingProvider
 {
-	sealed class NullLoggingProvider : IFbLoggingProvider
+	public IFbLogger CreateLogger(string name) => NullLogger.Instance;
+
+	sealed class NullLogger : IFbLogger
 	{
-		public IFbLogger CreateLogger(string name) => NullLogger.Instance;
+		internal static NullLogger Instance = new NullLogger();
 
-		sealed class NullLogger : IFbLogger
-		{
-			internal static NullLogger Instance = new NullLogger();
+		NullLogger() { }
 
-			NullLogger() { }
+		public bool IsEnabled(FbLogLevel level) => false;
 
-			public bool IsEnabled(FbLogLevel level) => false;
-
-			public void Log(FbLogLevel level, string msg, Exception exception = null) { }
-		}
+		public void Log(FbLogLevel level, string msg, Exception exception = null) { }
 	}
 }

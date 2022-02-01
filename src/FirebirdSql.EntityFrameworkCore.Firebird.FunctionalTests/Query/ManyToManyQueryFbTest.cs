@@ -21,26 +21,25 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Xunit;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class ManyToManyQueryFbTest : ManyToManyQueryRelationalTestBase<ManyToManyQueryFbFixture>
 {
-	public class ManyToManyQueryFbTest : ManyToManyQueryRelationalTestBase<ManyToManyQueryFbFixture>
+	public ManyToManyQueryFbTest(ManyToManyQueryFbFixture fixture)
+		: base(fixture)
+	{ }
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Filtered_include_skip_navigation_order_by_skip_take_then_include_skip_navigation_where(bool async)
 	{
-		public ManyToManyQueryFbTest(ManyToManyQueryFbFixture fixture)
-			: base(fixture)
-		{ }
+		return base.Filtered_include_skip_navigation_order_by_skip_take_then_include_skip_navigation_where(async);
+	}
 
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Filtered_include_skip_navigation_order_by_skip_take_then_include_skip_navigation_where(bool async)
-		{
-			return base.Filtered_include_skip_navigation_order_by_skip_take_then_include_skip_navigation_where(async);
-		}
-
-		[NotSupportedOnFirebirdTheory]
-		[MemberData(nameof(IsAsyncData))]
-		public override Task Skip_navigation_order_by_single_or_default(bool async)
-		{
-			return base.Skip_navigation_order_by_single_or_default(async);
-		}
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Skip_navigation_order_by_single_or_default(bool async)
+	{
+		return base.Skip_navigation_order_by_single_or_default(async);
 	}
 }

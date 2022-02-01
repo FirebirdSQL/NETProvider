@@ -23,26 +23,25 @@ using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
-namespace EntityFramework.Firebird
-{
-	public class FbConnectionFactory : IDbConnectionFactory
-	{
-		public DbConnection CreateConnection(string nameOrConnectionString)
-		{
-			if (nameOrConnectionString == null)
-				throw new ArgumentNullException(nameof(nameOrConnectionString));
+namespace EntityFramework.Firebird;
 
-			if (nameOrConnectionString.Contains('='))
-			{
-				return new FbConnection(nameOrConnectionString);
-			}
-			else
-			{
-				var configuration = ConfigurationManager.ConnectionStrings[nameOrConnectionString];
-				if (configuration == null)
-					throw new ArgumentException("Specified connection string name cannot be found.");
-				return new FbConnection(configuration.ConnectionString);
-			}
+public class FbConnectionFactory : IDbConnectionFactory
+{
+	public DbConnection CreateConnection(string nameOrConnectionString)
+	{
+		if (nameOrConnectionString == null)
+			throw new ArgumentNullException(nameof(nameOrConnectionString));
+
+		if (nameOrConnectionString.Contains('='))
+		{
+			return new FbConnection(nameOrConnectionString);
+		}
+		else
+		{
+			var configuration = ConfigurationManager.ConnectionStrings[nameOrConnectionString];
+			if (configuration == null)
+				throw new ArgumentException("Specified connection string name cannot be found.");
+			return new FbConnection(configuration.ConnectionString);
 		}
 	}
 }
