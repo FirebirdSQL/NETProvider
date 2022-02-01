@@ -581,7 +581,7 @@ namespace FirebirdSql.Data.Common
 
 		private static string WrapValueIfNeeded(string value)
 		{
-			if (value != null && value.Contains(";"))
+			if (value != null && value.Contains(';'))
 				return "'" + value + "'";
 			return value;
 		}
