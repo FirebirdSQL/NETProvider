@@ -13,15 +13,12 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net), Jean Ressouche, Rafael Almeida (ralms@ralms.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.Diagnostics.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
-using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Scaffolding;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal;
@@ -29,10 +26,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Design.Internal;
 public class FbDesignTimeServices : IDesignTimeServices
 {
 	public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
-		=> serviceCollection
-			.AddSingleton<LoggingDefinitions, FbLoggingDefinitions>()
-			.AddSingleton<IRelationalTypeMappingSource, FbTypeMappingSource>()
-			.AddSingleton<IDatabaseModelFactory, FbDatabaseModelFactory>()
-			.AddSingleton<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
-			.AddSingleton<IAnnotationCodeGenerator, AnnotationCodeGenerator>();
+	{
+		serviceCollection.AddEntityFrameworkFirebird();
+		new EntityFrameworkRelationalDesignServicesBuilder(serviceCollection)
+			.TryAdd<IAnnotationCodeGenerator, AnnotationCodeGenerator>()
+			.TryAdd<IDatabaseModelFactory, FbDatabaseModelFactory>()
+			.TryAdd<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
+			.TryAddCoreServices();
+	}
 }
