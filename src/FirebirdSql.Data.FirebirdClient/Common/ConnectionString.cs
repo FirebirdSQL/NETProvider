@@ -207,9 +207,9 @@ internal sealed class ConnectionString
 	public string DataSource => GetString(DefaultKeyDataSource, _options.TryGetValue);
 	public int Port => GetInt32(DefaultKeyPortNumber, _options.TryGetValue);
 	public string Database => ExpandDataDirectory(GetString(DefaultKeyCatalog, _options.TryGetValue));
-	public short PacketSize => GetInt16(DefaultKeyPacketSize, _options.TryGetValue);
+	public int PacketSize => GetInt32(DefaultKeyPacketSize, _options.TryGetValue);
 	public string Role => GetString(DefaultKeyRoleName, _options.TryGetValue);
-	public byte Dialect => GetByte(DefaultKeyDialect, _options.TryGetValue);
+	public short Dialect => GetInt16(DefaultKeyDialect, _options.TryGetValue);
 	public string Charset => GetString(DefaultKeyCharacterSet, _options.TryGetValue);
 	public int ConnectionTimeout => GetInt32(DefaultKeyConnectionTimeout, _options.TryGetValue);
 	public bool Pooling => GetBoolean(DefaultKeyPooling, _options.TryGetValue);
@@ -523,13 +523,6 @@ internal sealed class ConnectionString
 	{
 		return tryGetValue(key, out var value)
 			? Convert.ToBoolean(value, CultureInfo.InvariantCulture)
-			: defaultValue;
-	}
-
-	internal static byte GetByte(string key, TryGetValueDelegate tryGetValue, byte defaultValue = default)
-	{
-		return tryGetValue(key, out var value)
-			? Convert.ToByte(value, CultureInfo.CurrentCulture)
 			: defaultValue;
 	}
 

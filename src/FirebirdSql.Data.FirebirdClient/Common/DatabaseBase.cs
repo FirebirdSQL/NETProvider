@@ -30,7 +30,7 @@ internal abstract class DatabaseBase
 	public int TransactionCount { get; set; }
 	public string ServerVersion { get; protected set; }
 	public Charset Charset { get; set; }
-	public short PacketSize { get; set; }
+	public int PacketSize { get; set; }
 	public short Dialect { get; set; }
 	public abstract bool HasRemoteEventSupport { get; }
 	public abstract bool ConnectionBroken { get; }

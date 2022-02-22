@@ -105,7 +105,7 @@ internal class FbConnectionInternal
 		var dpb = db.CreateDatabaseParameterBuffer();
 
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { _options.Dialect, 0, 0, 0 });
+		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
 		if (!string.IsNullOrEmpty(_options.UserID))
 		{
 			dpb.Append(IscCodes.isc_dpb_user_name, _options.UserID);
@@ -152,7 +152,7 @@ internal class FbConnectionInternal
 		var dpb = db.CreateDatabaseParameterBuffer();
 
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { _options.Dialect, 0, 0, 0 });
+		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
 		if (!string.IsNullOrEmpty(_options.UserID))
 		{
 			dpb.Append(IscCodes.isc_dpb_user_name, _options.UserID);
@@ -635,7 +635,7 @@ internal class FbConnectionInternal
 		var dpb = db.CreateDatabaseParameterBuffer();
 
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { options.Dialect, 0, 0, 0 });
+		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)options.Dialect, 0, 0, 0 });
 		dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);
 		if (options.DbCachePages > 0)
 		{
