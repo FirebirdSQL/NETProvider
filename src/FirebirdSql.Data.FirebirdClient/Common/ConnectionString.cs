@@ -262,12 +262,18 @@ internal sealed class ConnectionString
 		if (
 			(string.IsNullOrEmpty(Database)) ||
 			(string.IsNullOrEmpty(DataSource) && ServerType != FbServerType.Embedded) ||
-			(string.IsNullOrEmpty(Charset)) ||
-			(Port <= 0) ||
-			(MinPoolSize > MaxPoolSize)
+			(string.IsNullOrEmpty(Charset))
 		   )
 		{
 			throw new ArgumentException("An invalid connection string argument has been supplied or a required connection string argument has not been supplied.");
+		}
+		if (Port <= 0 || Port > 65535)
+		{
+			throw new ArgumentException("Incorrect port.");
+		}
+		if (MinPoolSize > MaxPoolSize)
+		{
+			throw new ArgumentException("Incorrect pool size.");
 		}
 		if (Dialect < 1 || Dialect > 3)
 		{
