@@ -26,6 +26,7 @@ public enum SqlStatementType
 	AlterDatabase,
 	AlterDomain,
 	AlterException,
+	AlterExternalFunction,
 	AlterFunction,
 	AlterIndex,
 	AlterPackage,

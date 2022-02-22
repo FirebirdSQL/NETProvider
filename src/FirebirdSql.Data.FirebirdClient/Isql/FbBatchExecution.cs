@@ -125,6 +125,7 @@ public sealed class FbBatchExecution
 					case SqlStatementType.AlterDatabase:
 					case SqlStatementType.AlterDomain:
 					case SqlStatementType.AlterException:
+					case SqlStatementType.AlterExternalFunction:
 					case SqlStatementType.AlterFunction:
 					case SqlStatementType.AlterIndex:
 					case SqlStatementType.AlterPackage:

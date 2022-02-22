@@ -148,6 +148,10 @@ public class FbScript
 				{
 					return SqlStatementType.AlterException;
 				}
+				if (sqlStatement.StartsWith("ALTER EXTERNAL FUNCTION", StringComparison.OrdinalIgnoreCase))
+				{
+					return SqlStatementType.AlterExternalFunction;
+				}
 				if (sqlStatement.StartsWith("ALTER FUNCTION", StringComparison.OrdinalIgnoreCase))
 				{
 					return SqlStatementType.AlterFunction;
