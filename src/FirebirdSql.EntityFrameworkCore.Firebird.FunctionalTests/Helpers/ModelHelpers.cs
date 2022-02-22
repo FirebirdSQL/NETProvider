@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 
@@ -57,9 +58,10 @@ public static class ModelHelpers
 		}
 	}
 
-	public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger)
+	public static void SetPrimaryKeyGeneration(ModelBuilder modelBuilder, FbValueGenerationStrategy valueGenerationStrategy = FbValueGenerationStrategy.SequenceTrigger, Func<IMutableEntityType, bool> filter = null)
 	{
-		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+		filter ??= _ => true;
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(filter))
 		{
 			var pk = entityType.FindPrimaryKey();
 			if (pk == null)

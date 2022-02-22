@@ -16,8 +16,6 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -31,11 +29,4 @@ public class FbRelationalConnection : RelationalConnection, IFbRelationalConnect
 
 	protected override DbConnection CreateDbConnection()
 		=> new FbConnection(ConnectionString);
-
-	protected override Task CloseDbConnectionAsync()
-	{
-#warning Quick-fix for efcore#26790
-		base.CloseDbConnection();
-		return Task.CompletedTask;
-	}
 }

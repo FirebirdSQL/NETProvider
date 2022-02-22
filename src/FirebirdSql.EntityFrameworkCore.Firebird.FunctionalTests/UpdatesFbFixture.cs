@@ -17,7 +17,9 @@
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests;
@@ -30,5 +32,6 @@ public class UpdatesFbFixture : UpdatesRelationalFixture
 	{
 		base.OnModelCreating(modelBuilder, context);
 		ModelHelpers.SetStringLengths(modelBuilder);
+		ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, FbValueGenerationStrategy.IdentityColumn, x => x.ClrType == typeof(Person));
 	}
 }

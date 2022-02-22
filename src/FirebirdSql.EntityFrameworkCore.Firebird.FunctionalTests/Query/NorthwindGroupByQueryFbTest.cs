@@ -120,4 +120,11 @@ public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<Northwi
 
 		Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
 	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task GroupBy_aggregate_from_multiple_query_in_same_projection(bool async)
+	{
+		return base.GroupBy_aggregate_from_multiple_query_in_same_projection(async);
+	}
 }
