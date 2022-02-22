@@ -39,8 +39,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 
 	private FbConnection _connection;
 	private FbTransaction _transaction;
-#warning Create FbBatchParameterCollection?
-	private List<FbParameterCollection> _batchParameters;
+	private FbBatchParameterCollection _batchParameters;
 	private StatementBase _statement;
 	//private FbDataReader _activeReader;
 	private IReadOnlyList<string> _namedParameters;
@@ -116,13 +115,13 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		}
 	}
 
-	public List<FbParameterCollection> BatchParameters
+	public FbBatchParameterCollection BatchParameters
 	{
 		get
 		{
 			if (_batchParameters == null)
 			{
-				_batchParameters = new List<FbParameterCollection>();
+				_batchParameters = new FbBatchParameterCollection();
 			}
 			return _batchParameters;
 		}
