@@ -21,11 +21,14 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 public sealed class FbTransaction : DbTransaction
 {
+	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbTransaction));
+
 	internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
 	#region Fields
@@ -145,6 +148,8 @@ public sealed class FbTransaction : DbTransaction
 
 	public override void Commit()
 	{
+		LogMessages.TransactionCommitting(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -155,6 +160,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionCommitted(Log, this);
 	}
 #if NET48 || NETSTANDARD2_0
 	public async Task CommitAsync(CancellationToken cancellationToken = default)
@@ -162,6 +169,8 @@ public sealed class FbTransaction : DbTransaction
 	public override async Task CommitAsync(CancellationToken cancellationToken = default)
 #endif
 	{
+		LogMessages.TransactionCommitting(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -172,10 +181,14 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionCommitted(Log, this);
 	}
 
 	public override void Rollback()
 	{
+		LogMessages.TransactionRollingBack(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -186,6 +199,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBack(Log, this);
 	}
 #if NET48 || NETSTANDARD2_0
 	public async Task RollbackAsync(CancellationToken cancellationToken = default)
@@ -193,6 +208,8 @@ public sealed class FbTransaction : DbTransaction
 	public override async Task RollbackAsync(CancellationToken cancellationToken = default)
 #endif
 	{
+		LogMessages.TransactionRollingBack(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -203,6 +220,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBack(Log, this);
 	}
 
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
@@ -211,6 +230,8 @@ public sealed class FbTransaction : DbTransaction
 	public override void Save(string savePointName)
 #endif
 	{
+		LogMessages.TransactionSaving(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -229,6 +250,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionSaved(Log, this);
 	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 	public async Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
@@ -236,6 +259,8 @@ public sealed class FbTransaction : DbTransaction
 	public override async Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
 #endif
 	{
+		LogMessages.TransactionSaving(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -254,6 +279,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionSaved(Log, this);
 	}
 
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
@@ -262,6 +289,8 @@ public sealed class FbTransaction : DbTransaction
 	public override void Release(string savePointName)
 #endif
 	{
+		LogMessages.TransactionReleasingSavepoint(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -280,6 +309,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionReleasedSavepoint(Log, this);
 	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 	public async Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
@@ -287,6 +318,8 @@ public sealed class FbTransaction : DbTransaction
 	public override async Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
 #endif
 	{
+		LogMessages.TransactionReleasingSavepoint(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -305,6 +338,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionReleasedSavepoint(Log, this);
 	}
 
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
@@ -313,6 +348,8 @@ public sealed class FbTransaction : DbTransaction
 	public override void Rollback(string savePointName)
 #endif
 	{
+		LogMessages.TransactionRollingBackSavepoint(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -331,6 +368,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBackSavepoint(Log, this);
 	}
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 	public async Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
@@ -338,6 +377,8 @@ public sealed class FbTransaction : DbTransaction
 	public override async Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
 #endif
 	{
+		LogMessages.TransactionRollingBackSavepoint(Log, this);
+
 		EnsureSavePointName(savePointName);
 		EnsureCompleted();
 		try
@@ -356,10 +397,14 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBackSavepoint(Log, this);
 	}
 
 	public void CommitRetaining()
 	{
+		LogMessages.TransactionCommittingRetaining(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -369,9 +414,13 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionCommittedRetaining(Log, this);
 	}
 	public async Task CommitRetainingAsync(CancellationToken cancellationToken = default)
 	{
+		LogMessages.TransactionCommittingRetaining(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -381,10 +430,14 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionCommittedRetaining(Log, this);
 	}
 
 	public void RollbackRetaining()
 	{
+		LogMessages.TransactionRollingBackRetaining(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -394,9 +447,13 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBackRetaining(Log, this);
 	}
 	public async Task RollbackRetainingAsync(CancellationToken cancellationToken = default)
 	{
+		LogMessages.TransactionRollingBackRetaining(Log, this);
+
 		EnsureCompleted();
 		try
 		{
@@ -406,6 +463,8 @@ public sealed class FbTransaction : DbTransaction
 		{
 			throw FbException.Create(ex);
 		}
+
+		LogMessages.TransactionRolledBackRetaining(Log, this);
 	}
 
 	#endregion
@@ -414,20 +473,36 @@ public sealed class FbTransaction : DbTransaction
 
 	internal void BeginTransaction()
 	{
+		LogMessages.TransactionBeginning(Log, this);
+
 		_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb());
+
+		LogMessages.TransactionBegan(Log, this);
 	}
 	internal async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
 	{
+		LogMessages.TransactionBeginning(Log, this);
+
 		_transaction = await _connection.InnerConnection.Database.BeginTransactionAsync(BuildTpb(), cancellationToken).ConfigureAwait(false);
+
+		LogMessages.TransactionBegan(Log, this);
 	}
 
 	internal void BeginTransaction(FbTransactionOptions options)
 	{
+		LogMessages.TransactionBeginning(Log, this);
+
 		_transaction = _connection.InnerConnection.Database.BeginTransaction(BuildTpb(options));
+
+		LogMessages.TransactionBegan(Log, this);
 	}
 	internal async Task BeginTransactionAsync(FbTransactionOptions options, CancellationToken cancellationToken = default)
 	{
+		LogMessages.TransactionBeginning(Log, this);
+
 		_transaction = await _connection.InnerConnection.Database.BeginTransactionAsync(BuildTpb(options), cancellationToken).ConfigureAwait(false);
+
+		LogMessages.TransactionBegan(Log, this);
 	}
 
 	#endregion

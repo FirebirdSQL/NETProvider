@@ -1213,7 +1213,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 
 	private FbBatchNonQueryResult ExecuteCommand(bool returnsSet)
 	{
-		LogCommandExecutionIfEnabled();
+		LogMessages.CommandExecution(Log, this);
 
 		Prepare(returnsSet);
 
@@ -1243,7 +1243,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 	}
 	private async Task<FbBatchNonQueryResult> ExecuteCommandAsync(bool returnsSet, CancellationToken cancellationToken = default)
 	{
-		LogCommandExecutionIfEnabled();
+		LogMessages.CommandExecution(Log, this);
 
 		await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
 
@@ -1303,40 +1303,6 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		{
 			throw new InvalidOperationException("The command text for this Command has not been set.");
 		}
-	}
-
-	private void LogCommandExecutionIfEnabled()
-	{
-		if (Log.IsEnabled(FbLogLevel.Debug))
-		{
-			var sb = new StringBuilder();
-			sb.AppendLine("Executing command:");
-			sb.AppendLine(_commandText);
-			if (FbLogManager.IsParameterLoggingEnabled)
-			{
-				sb.AppendLine("Parameters:");
-				if (_batchParameters == null || _batchParameters.Count == 0 || _batchParameters[0].Count == 0)
-				{
-					sb.AppendLine("<no parameters>");
-				}
-				else
-				{
-					foreach (var batchParameter in _batchParameters)
-					{
-						foreach (FbParameter parameter in batchParameter)
-						{
-							sb.AppendLine(string.Format("Name:{0}\tType:{1}\tUsed Value:{2}", parameter.ParameterName, parameter.FbDbType, (!IsNullParameterValue(parameter.InternalValue) ? parameter.InternalValue : "<null>")));
-						}
-					}
-				}
-			}
-			Log.Debug(sb.ToString());
-		}
-	}
-
-	private static bool IsNullParameterValue(object value)
-	{
-		return (value == DBNull.Value || value == null);
 	}
 
 	#endregion

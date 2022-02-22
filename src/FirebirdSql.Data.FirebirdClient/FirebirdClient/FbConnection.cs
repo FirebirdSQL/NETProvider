@@ -22,12 +22,15 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 [DefaultEvent("InfoMessage")]
 public sealed class FbConnection : DbConnection, ICloneable
 {
+	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbConnection));
+
 	#region Static Pool Handling Methods
 
 	public static void ClearAllPools()
@@ -553,6 +556,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 
 	public override void Open()
 	{
+		LogMessages.ConnectionOpening(Log, this);
+
 		if (string.IsNullOrEmpty(_connectionString))
 		{
 			throw new InvalidOperationException("Connection String is not initialized.");
@@ -639,9 +644,13 @@ public sealed class FbConnection : DbConnection, ICloneable
 			OnStateChange(_state, ConnectionState.Closed);
 			throw;
 		}
+
+		LogMessages.ConnectionOpened(Log, this);
 	}
 	public override async Task OpenAsync(CancellationToken cancellationToken)
 	{
+		LogMessages.ConnectionOpening(Log, this);
+
 		if (string.IsNullOrEmpty(_connectionString))
 		{
 			throw new InvalidOperationException("Connection String is not initialized.");
@@ -728,10 +737,14 @@ public sealed class FbConnection : DbConnection, ICloneable
 			OnStateChange(_state, ConnectionState.Closed);
 			throw;
 		}
+
+		LogMessages.ConnectionOpened(Log, this);
 	}
 
 	public override void Close()
 	{
+		LogMessages.ConnectionClosing(Log, this);
+
 		if (!IsClosed && _innerConnection != null)
 		{
 			try
@@ -772,6 +785,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 			{
 				OnStateChange(_state, ConnectionState.Closed);
 			}
+
+			LogMessages.ConnectionClosed(Log, this);
 		}
 
 		void DisconnectEnlistedHelper()
@@ -789,6 +804,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 	public override async Task CloseAsync()
 #endif
 	{
+		LogMessages.ConnectionClosing(Log, this);
+
 		if (!IsClosed && _innerConnection != null)
 		{
 			try
@@ -829,6 +846,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 			{
 				OnStateChange(_state, ConnectionState.Closed);
 			}
+
+			LogMessages.ConnectionClosed(Log, this);
 		}
 
 		async Task DisconnectEnlistedHelper()
