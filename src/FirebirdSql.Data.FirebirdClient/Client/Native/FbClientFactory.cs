@@ -21,7 +21,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using System.Collections.Concurrent;
+using System.Threading;
 using FirebirdSql.Data.Client.Native.Handle;
 using FirebirdSql.Data.Common;
 
@@ -39,15 +39,17 @@ internal static class FbClientFactory
 	/// Because generating the class at runtime is expensive, we cache it here based on the name
 	/// specified.
 	/// </summary>
-	private static ConcurrentDictionary<string, IFbClient> cache;
-	private static HashSet<Type> injectionTypes;
+	private static readonly Dictionary<string, IFbClient> cache;
+	private static readonly ReaderWriterLockSlim cacheLock;
+	private static readonly HashSet<Type> injectionTypes;
 
 	/// <summary>
 	/// Static constructor sets up member variables.
 	/// </summary>
 	static FbClientFactory()
 	{
-		cache = new ConcurrentDictionary<string, IFbClient>();
+		cache = new Dictionary<string, IFbClient>();
+		cacheLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 		injectionTypes = new HashSet<Type>(typeof(FbClientFactory).Assembly.GetTypes()
 			.Where(x => !x.IsAbstract && !x.IsInterface)
 			.Where(x => typeof(IFirebirdHandle).IsAssignableFrom(x))
@@ -66,13 +68,34 @@ internal static class FbClientFactory
 		{
 			dllName = DefaultDllName;
 		}
-		var createdNew = false;
-		var result = cache.GetOrAdd(dllName, s => { createdNew = true; return BuildFbClient(s); });
-		if (createdNew)
+
+		cacheLock.EnterUpgradeableReadLock();
+		try
 		{
-			ShutdownHelper.RegisterFbClientShutdown(() => NativeHelpers.CallIfExists(() => result.fb_shutdown(0, 0)));
+			if (cache.TryGetValue(dllName, out var result))
+			{
+				return result;
+			}
+			else
+			{
+				cacheLock.EnterWriteLock();
+				try
+				{
+					result = BuildFbClient(dllName);
+					cache.Add(dllName, result);
+					ShutdownHelper.RegisterFbClientShutdown(() => NativeHelpers.CallIfExists(() => result.fb_shutdown(0, 0)));
+					return result;
+				}
+				finally
+				{
+					cacheLock.ExitWriteLock();
+				}
+			}
 		}
-		return result;
+		finally
+		{
+			cacheLock.ExitUpgradeableReadLock();
+		}
 	}
 
 	/// <summary>
