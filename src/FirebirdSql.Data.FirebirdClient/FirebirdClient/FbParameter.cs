@@ -416,7 +416,9 @@ public sealed class FbParameter : DbParameter, ICloneable
 
 	internal static bool IsNonAsciiParameterName(string parameterName)
 	{
-		return string.IsNullOrEmpty(parameterName) || Encoding.UTF8.GetByteCount(parameterName) != parameterName.Length;
+		var isAscii = string.IsNullOrWhiteSpace(parameterName)
+			|| Encoding.UTF8.GetByteCount(parameterName) == parameterName.Length;
+		return !isAscii;
 	}
 
 	#endregion
