@@ -113,7 +113,6 @@ internal sealed class Descriptor
 	{
 		using (var blr = new MemoryStream())
 		{
-#warning Refactor handling of this length
 			var length = 0;
 
 			blr.WriteByte(IscCodes.blr_version5);
