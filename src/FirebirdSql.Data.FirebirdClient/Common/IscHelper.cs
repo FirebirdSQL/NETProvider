@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Resources;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 
@@ -26,7 +25,7 @@ namespace FirebirdSql.Data.Common;
 
 internal static class IscHelper
 {
-	public static List<object> ParseDatabaseInfo(byte[] buffer)
+	public static List<object> ParseDatabaseInfo(byte[] buffer, Charset charset)
 	{
 		var info = new List<object>();
 
@@ -86,17 +85,17 @@ internal static class IscHelper
 					break;
 
 				case IscCodes.isc_info_user_names:
-					info.Add(Encoding2.Default.GetString(buffer, pos + 1, buffer[pos]));
+					info.Add(charset.GetString(buffer, pos + 1, buffer[pos]));
 					break;
 
 				case IscCodes.fb_info_wire_crypt:
 				case IscCodes.fb_info_crypt_plugin:
 				case IscCodes.fb_info_db_file_id:
-					info.Add(Encoding2.Default.GetString(buffer, pos, length));
+					info.Add(charset.GetString(buffer, pos, length));
 					break;
 
 				case IscCodes.fb_info_db_guid:
-					info.Add(Guid.ParseExact(Encoding2.Default.GetString(buffer, pos, length), "B"));
+					info.Add(Guid.ParseExact(charset.GetString(buffer, pos, length), "B"));
 					break;
 
 				case IscCodes.isc_info_base_level:
@@ -105,14 +104,14 @@ internal static class IscHelper
 
 				case IscCodes.isc_info_db_id:
 					{
-						var dbFile = Encoding2.Default.GetString(buffer, pos + 2, buffer[pos + 1]);
+						var dbFile = charset.GetString(buffer, pos + 2, buffer[pos + 1]);
 						var sitePos = pos + 2 + buffer[pos + 1];
 						int siteLength = buffer[sitePos];
-						var siteName = Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
+						var siteName = charset.GetString(buffer, sitePos + 1, siteLength);
 
 						sitePos += siteLength + 1;
 						siteLength = buffer[sitePos];
-						siteName += "." + Encoding2.Default.GetString(buffer, sitePos + 1, siteLength);
+						siteName += "." + charset.GetString(buffer, sitePos + 1, siteLength);
 
 						info.Add(siteName + ":" + dbFile);
 					}
@@ -130,7 +129,7 @@ internal static class IscHelper
 						for (var i = 0; i < count; i++)
 						{
 							var messageLength = buffer[messagePosition + 1];
-							info.Add(Encoding2.Default.GetString(buffer, messagePosition + 2, messageLength));
+							info.Add(charset.GetString(buffer, messagePosition + 2, messageLength));
 							messagePosition += 1 + messageLength;
 						}
 					}

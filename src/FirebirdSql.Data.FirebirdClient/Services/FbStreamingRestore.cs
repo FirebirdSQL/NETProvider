@@ -61,10 +61,10 @@ public class FbStreamingRestore : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_restore);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin");
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			if (Verbose)
 			{
 				startSpb.Append(IscCodes.isc_spb_verbose);
@@ -96,10 +96,10 @@ public class FbStreamingRestore : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_restore);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin", SpbFilenameEncoding);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin");
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			if (Verbose)
 			{
 				startSpb.Append(IscCodes.isc_spb_verbose);
@@ -128,7 +128,7 @@ public class FbStreamingRestore : FbService
 	void ReadInput()
 	{
 		var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
-		var spb = ServiceParameterBufferBase.Empty;
+		var spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 		var response = Query(items, spb);
 		var requestedLength = GetLength(response);
 		while (true)
@@ -140,9 +140,8 @@ public class FbStreamingRestore : FbService
 				if (read > 0)
 				{
 					Array.Resize(ref data, read);
-					var dataSpb = new ServiceParameterBuffer2();
-					dataSpb.Append2(IscCodes.isc_info_svc_line, data);
-					spb = dataSpb;
+					spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+					spb.Append2(IscCodes.isc_info_svc_line, data);
 				}
 			}
 			response = Query(items, spb);
@@ -155,13 +154,13 @@ public class FbStreamingRestore : FbService
 				OnServiceOutput(message);
 			}
 			requestedLength = GetLength(response);
-			spb = ServiceParameterBufferBase.Empty;
+			spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 		}
 	}
 	async Task ReadInputAsync(CancellationToken cancellationToken = default)
 	{
 		var items = new byte[] { IscCodes.isc_info_svc_stdin, IscCodes.isc_info_svc_line };
-		var spb = ServiceParameterBufferBase.Empty;
+		var spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 		var response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
 		var requestedLength = GetLength(response);
 		while (true)
@@ -173,9 +172,8 @@ public class FbStreamingRestore : FbService
 				if (read > 0)
 				{
 					Array.Resize(ref data, read);
-					var dataSpb = new ServiceParameterBuffer2();
-					dataSpb.Append2(IscCodes.isc_info_svc_line, data);
-					spb = dataSpb;
+					spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+					spb.Append2(IscCodes.isc_info_svc_line, data);
 				}
 			}
 			response = await QueryAsync(items, spb, cancellationToken).ConfigureAwait(false);
@@ -188,7 +186,7 @@ public class FbStreamingRestore : FbService
 				OnServiceOutput(message);
 			}
 			requestedLength = GetLength(response);
-			spb = ServiceParameterBufferBase.Empty;
+			spb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 		}
 	}
 

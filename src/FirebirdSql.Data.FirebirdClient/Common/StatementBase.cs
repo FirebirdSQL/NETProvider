@@ -246,6 +246,7 @@ internal abstract class StatementBase
 	public abstract ValueTask<ArrayBase> CreateArrayAsync(long handle, string tableName, string fieldName, CancellationToken cancellationToken = default);
 
 	public abstract BatchBase CreateBatch();
+	public abstract BatchParameterBuffer CreateBatchParameterBuffer();
 
 	#endregion
 

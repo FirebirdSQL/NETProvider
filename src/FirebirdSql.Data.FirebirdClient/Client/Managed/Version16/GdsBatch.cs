@@ -51,7 +51,7 @@ internal class GdsBatch : BatchBase
 		var blr = _statement.Parameters.ToBlr();
 		Database.Xdr.WriteBuffer(blr.Data); // p_batch_blr
 		Database.Xdr.Write(blr.Length); // p_batch_msglen
-		var pb = new BatchParameterBuffer();
+		var pb = _statement.CreateBatchParameterBuffer();
 		if (_statement.ReturnRecordsAffected)
 		{
 			pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);
@@ -108,7 +108,7 @@ internal class GdsBatch : BatchBase
 		var blr = _statement.Parameters.ToBlr();
 		await Database.Xdr.WriteBufferAsync(blr.Data, cancellationToken).ConfigureAwait(false); // p_batch_blr
 		await Database.Xdr.WriteAsync(blr.Length, cancellationToken).ConfigureAwait(false); // p_batch_msglen
-		var pb = new BatchParameterBuffer();
+		var pb = _statement.CreateBatchParameterBuffer();
 		if (_statement.ReturnRecordsAffected)
 		{
 			pb.Append(IscCodes.Batch.TAG_RECORD_COUNTS, 1);

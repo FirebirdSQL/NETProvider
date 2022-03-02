@@ -17,6 +17,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using FirebirdSql.Data.Client.Native.Handle;
 
 namespace FirebirdSql.Data.Client.Native;
@@ -246,6 +247,9 @@ public interface IFbClient
 		[In, Out] IntPtr[] statusVector,
 		[MarshalAs(UnmanagedType.I4)] ref StatementHandle stmtHandle,
 		uint timeout);
+
+	void isc_get_client_version(
+		[MarshalAs(UnmanagedType.LPStr)] StringBuilder version);
 
 #pragma warning restore IDE1006
 }

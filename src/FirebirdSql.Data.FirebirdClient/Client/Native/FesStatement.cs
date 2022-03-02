@@ -220,8 +220,12 @@ internal sealed class FesStatement : StatementBase
 
 	public override BatchBase CreateBatch()
 	{
-#warning Check supported fbclient?
-		throw new NotSupportedException("Batching is not supported on this Firebird version.");
+		throw new NotSupportedException("Batching isn't, yet, supported on Firebird Embedded.");
+	}
+
+	public override BatchParameterBuffer CreateBatchParameterBuffer()
+	{
+		throw new NotSupportedException("Batching isn't, yet, supported on Firebird Embedded.");
 	}
 
 	#endregion

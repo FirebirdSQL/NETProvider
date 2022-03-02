@@ -49,13 +49,13 @@ public sealed class FbTrace : FbService
 			var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_trace_start);
 			if (!string.IsNullOrEmpty(sessionName))
 				startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
 			startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -78,13 +78,13 @@ public sealed class FbTrace : FbService
 			var config = string.Join(Environment.NewLine, DatabasesConfigurations.BuildConfiguration(version), ServiceConfiguration?.BuildConfiguration(version) ?? string.Empty);
 
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_trace_start);
 			if (!string.IsNullOrEmpty(sessionName))
 				startSpb.Append2(IscCodes.isc_spb_trc_name, sessionName);
 			startSpb.Append2(IscCodes.isc_spb_trc_cfg, config);
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{
@@ -137,12 +137,12 @@ public sealed class FbTrace : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(action);
 			if (sessionID.HasValue)
 				startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -158,12 +158,12 @@ public sealed class FbTrace : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(action);
 			if (sessionID.HasValue)
 				startSpb.Append(IscCodes.isc_spb_trc_id, (int)sessionID);
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

@@ -87,15 +87,15 @@ sealed class AuthBlock
 				result.WriteByte((byte)login.Length);
 				result.Write(login, 0, login.Length);
 
-				var pluginNameBytes = Encoding.ASCII.GetBytes(_srp256.Name);
+				var pluginNameBytes = Encoding.UTF8.GetBytes(_srp256.Name);
 				result.WriteByte(IscCodes.CNCT_plugin_name);
 				result.WriteByte((byte)pluginNameBytes.Length);
 				result.Write(pluginNameBytes, 0, pluginNameBytes.Length);
-				var specificData = Encoding.ASCII.GetBytes(_srp256.PublicKeyHex);
+				var specificData = Encoding.UTF8.GetBytes(_srp256.PublicKeyHex);
 				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
 				var plugins = string.Join(",", new[] { _srp256.Name, _srp.Name });
-				var pluginsBytes = Encoding.ASCII.GetBytes(plugins);
+				var pluginsBytes = Encoding.UTF8.GetBytes(plugins);
 				result.WriteByte(IscCodes.CNCT_plugin_list);
 				result.WriteByte((byte)pluginsBytes.Length);
 				result.Write(pluginsBytes, 0, pluginsBytes.Length);
@@ -106,7 +106,7 @@ sealed class AuthBlock
 			}
 			else
 			{
-				var pluginNameBytes = Encoding.ASCII.GetBytes(_sspi.Name);
+				var pluginNameBytes = Encoding.UTF8.GetBytes(_sspi.Name);
 				result.WriteByte(IscCodes.CNCT_plugin_name);
 				result.WriteByte((byte)pluginNameBytes.Length);
 				result.Write(pluginNameBytes, 0, pluginNameBytes.Length);
@@ -262,20 +262,20 @@ sealed class AuthBlock
 		var hasServerData = ServerData.Length != 0;
 		if (AcceptPluginName.Equals(_srp256.Name, StringComparison.Ordinal))
 		{
-			PublicClientData = Encoding.ASCII.GetBytes(_srp256.PublicKeyHex);
+			PublicClientData = Encoding.UTF8.GetBytes(_srp256.PublicKeyHex);
 			if (hasServerData)
 			{
-				ClientData = Encoding.ASCII.GetBytes(_srp256.ClientProof(NormalizeLogin(User), Password, ServerData).ToHexString());
+				ClientData = Encoding.UTF8.GetBytes(_srp256.ClientProof(NormalizeLogin(User), Password, ServerData).ToHexString());
 			}
 			SessionKey = _srp256.SessionKey;
 			SessionKeyName = _srp256.SessionKeyName;
 		}
 		else if (AcceptPluginName.Equals(_srp.Name, StringComparison.Ordinal))
 		{
-			PublicClientData = Encoding.ASCII.GetBytes(_srp.PublicKeyHex);
+			PublicClientData = Encoding.UTF8.GetBytes(_srp.PublicKeyHex);
 			if (hasServerData)
 			{
-				ClientData = Encoding.ASCII.GetBytes(_srp.ClientProof(NormalizeLogin(User), Password, ServerData).ToHexString());
+				ClientData = Encoding.UTF8.GetBytes(_srp.ClientProof(NormalizeLogin(User), Password, ServerData).ToHexString());
 			}
 			SessionKey = _srp.SessionKey;
 			SessionKeyName = _srp.SessionKeyName;

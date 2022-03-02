@@ -64,9 +64,4 @@ internal class GdsDatabase : Version15.GdsDatabase
 	{
 		return new GdsStatement(this, transaction);
 	}
-
-	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
-	{
-		return new DatabaseParameterBuffer2();
-	}
 }

@@ -13,7 +13,7 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Hennadii Zabula
+//$Authors = Hennadii Zabula, Jiri Cincura (jiri@cincura.net)
 
 using System;
 using System.Diagnostics.Contracts;
@@ -37,7 +37,7 @@ public class DatabaseHandle : FirebirdHandle
 		var @ref = this;
 		FbClient.isc_detach_database(statusVector, ref @ref);
 		handle = @ref.handle;
-		var exception = FesConnection.ParseStatusVector(statusVector, Charset.DefaultCharset);
+		var exception = StatusVectorHelper.ParseStatusVector(statusVector, Charset.DefaultCharset);
 		return exception == null || exception.IsWarning;
 	}
 }

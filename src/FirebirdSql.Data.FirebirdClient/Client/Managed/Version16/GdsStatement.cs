@@ -48,4 +48,9 @@ internal class GdsStatement : Version15.GdsStatement
 	{
 		return new GdsBatch(this);
 	}
+
+	public override BatchParameterBuffer CreateBatchParameterBuffer()
+	{
+		return new BatchParameterBuffer(Database.Charset.Encoding);
+	}
 }

@@ -42,9 +42,9 @@ public sealed class FbValidation2 : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_validate);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			if (!string.IsNullOrEmpty(TablesInclude))
 				startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
 			if (!string.IsNullOrEmpty(TablesExclude))
@@ -56,7 +56,7 @@ public sealed class FbValidation2 : FbService
 			if (LockTimeout.HasValue)
 				startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -74,9 +74,9 @@ public sealed class FbValidation2 : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_validate);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			if (!string.IsNullOrEmpty(TablesInclude))
 				startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
 			if (!string.IsNullOrEmpty(TablesExclude))
@@ -88,7 +88,7 @@ public sealed class FbValidation2 : FbService
 			if (LockTimeout.HasValue)
 				startSpb.Append(IscCodes.isc_spb_val_lock_timeout, (int)LockTimeout);
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

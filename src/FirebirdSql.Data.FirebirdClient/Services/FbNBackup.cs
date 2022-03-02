@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -51,15 +52,15 @@ public sealed class FbNBackup : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_nbak);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			startSpb.Append(IscCodes.isc_spb_nbk_level, _level);
-			startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile);
 			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -77,15 +78,15 @@ public sealed class FbNBackup : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_nbak);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			startSpb.Append(IscCodes.isc_spb_nbk_level, _level);
-			startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile);
 			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

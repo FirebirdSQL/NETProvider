@@ -28,11 +28,11 @@ namespace FirebirdSql.Data.Client.Managed.Version10;
 
 internal class GdsDatabase : DatabaseBase
 {
-	const int DatabaseObjectId = 0;
-	const int PartnerIdentification = 0;
-	const int AddressOfAstRoutine = 0;
-	const int ArgumentToAstRoutine = 0;
-	internal const int Incarnation = 0;
+	protected const int PartnerIdentification = 0;
+	protected const int AddressOfAstRoutine = 0;
+	protected const int ArgumentToAstRoutine = 0;
+	protected internal const int DatabaseObjectId = 0;
+	protected internal const int Incarnation = 0;
 
 	#region Fields
 
@@ -43,6 +43,8 @@ internal class GdsDatabase : DatabaseBase
 	#endregion
 
 	#region Properties
+
+	public override bool UseUtf8ParameterBuffer => false;
 
 	public override int Handle
 	{
@@ -74,12 +76,10 @@ internal class GdsDatabase : DatabaseBase
 	#region Constructors
 
 	public GdsDatabase(GdsConnection connection)
+		: base(connection.Charset, connection.PacketSize, connection.Dialect)
 	{
 		_connection = connection;
 		_handle = -1;
-		Charset = Charset.DefaultCharset;
-		Dialect = 3;
-		PacketSize = 8192;
 	}
 
 	#endregion
@@ -132,23 +132,23 @@ internal class GdsDatabase : DatabaseBase
 	protected virtual void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 	{
 		Xdr.Write(IscCodes.op_attach);
-		Xdr.Write(0);
+		Xdr.Write(DatabaseObjectId);
 		if (!string.IsNullOrEmpty(AuthBlock.Password))
 		{
 			dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 		}
-		Xdr.WriteBuffer(Encoding2.Default.GetBytes(database));
+		Xdr.WriteBuffer(dpb.Encoding.GetBytes(database));
 		Xdr.WriteBuffer(dpb.ToArray());
 	}
 	protected virtual async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
 	{
 		await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
-		await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteAsync(DatabaseObjectId, cancellationToken).ConfigureAwait(false);
 		if (!string.IsNullOrEmpty(AuthBlock.Password))
 		{
 			dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 		}
-		await Xdr.WriteBufferAsync(Encoding2.Default.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.Encoding.GetBytes(database), cancellationToken).ConfigureAwait(false);
 		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 	}
 
@@ -219,12 +219,9 @@ internal class GdsDatabase : DatabaseBase
 		finally
 		{
 			_connection = null;
-			Charset = null;
 			_eventManager = null;
 			ServerVersion = null;
-			Dialect = 0;
 			_handle = -1;
-			PacketSize = 0;
 			WarningMessage = null;
 			TransactionCount = 0;
 		}
@@ -268,12 +265,9 @@ internal class GdsDatabase : DatabaseBase
 		finally
 		{
 			_connection = null;
-			Charset = null;
 			_eventManager = null;
 			ServerVersion = null;
-			Dialect = 0;
 			_handle = -1;
-			PacketSize = 0;
 			WarningMessage = null;
 			TransactionCount = 0;
 		}
@@ -337,7 +331,7 @@ internal class GdsDatabase : DatabaseBase
 		{
 			dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 		}
-		Xdr.WriteBuffer(Encoding2.Default.GetBytes(database));
+		Xdr.WriteBuffer(dpb.Encoding.GetBytes(database));
 		Xdr.WriteBuffer(dpb.ToArray());
 	}
 	protected virtual async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
@@ -348,7 +342,7 @@ internal class GdsDatabase : DatabaseBase
 		{
 			dpb.Append(IscCodes.isc_dpb_password, AuthBlock.Password);
 		}
-		await Xdr.WriteBufferAsync(Encoding2.Default.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.Encoding.GetBytes(database), cancellationToken).ConfigureAwait(false);
 		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 	}
 
@@ -701,11 +695,21 @@ internal class GdsDatabase : DatabaseBase
 
 	#endregion
 
-	#region DPB
+	#region Parameter Buffers
 
 	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
 	{
-		return new DatabaseParameterBuffer1();
+		return new DatabaseParameterBuffer1(ParameterBufferEncoding);
+	}
+
+	public override EventParameterBuffer CreateEventParameterBuffer()
+	{
+		return new EventParameterBuffer(Charset.Encoding);
+	}
+
+	public override TransactionParameterBuffer CreateTransactionParameterBuffer()
+	{
+		return new TransactionParameterBuffer(Charset.Encoding);
 	}
 
 	#endregion
@@ -725,13 +729,13 @@ internal class GdsDatabase : DatabaseBase
 	{
 		var buffer = new byte[bufferLength];
 		DatabaseInfo(items, buffer, buffer.Length);
-		return IscHelper.ParseDatabaseInfo(buffer);
+		return IscHelper.ParseDatabaseInfo(buffer, Charset);
 	}
 	public override async ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
 	{
 		var buffer = new byte[bufferLength];
 		await DatabaseInfoAsync(items, buffer, buffer.Length, cancellationToken).ConfigureAwait(false);
-		return IscHelper.ParseDatabaseInfo(buffer);
+		return IscHelper.ParseDatabaseInfo(buffer, Charset);
 	}
 
 	#endregion

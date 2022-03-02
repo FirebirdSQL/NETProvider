@@ -15,12 +15,16 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
+using System.Text;
 
 namespace FirebirdSql.Data.Common;
 
 internal sealed class BlobParameterBuffer : ParameterBuffer
 {
-	public BlobParameterBuffer()
-	{ }
+	public BlobParameterBuffer(Encoding encoding)
+	{
+		Encoding = encoding;
+	}
+
+	public Encoding Encoding { get; }
 }

@@ -237,6 +237,11 @@ internal class GdsStatement : StatementBase
 		throw new NotSupportedException("Batching is not supported on this Firebird version.");
 	}
 
+	public override BatchParameterBuffer CreateBatchParameterBuffer()
+	{
+		throw new NotSupportedException("Batching is not supported on this Firebird version.");
+	}
+
 	#endregion
 
 	#region Methods

@@ -34,6 +34,8 @@ internal class GdsServiceManager : ServiceManagerBase
 
 	#region Properties
 
+	public override bool UseUtf8ParameterBuffer => false;
+
 	public GdsConnection Connection
 	{
 		get { return _connection; }
@@ -49,6 +51,7 @@ internal class GdsServiceManager : ServiceManagerBase
 	#region Constructors
 
 	public GdsServiceManager(GdsConnection connection)
+		: base(connection.Charset)
 	{
 		_connection = connection;
 		_database = CreateDatabase(_connection);
@@ -91,14 +94,14 @@ internal class GdsServiceManager : ServiceManagerBase
 	protected virtual void SendAttachToBuffer(ServiceParameterBufferBase spb, string service)
 	{
 		_database.Xdr.Write(IscCodes.op_service_attach);
-		_database.Xdr.Write(0);
+		_database.Xdr.Write(GdsDatabase.DatabaseObjectId);
 		_database.Xdr.Write(service);
 		_database.Xdr.WriteBuffer(spb.ToArray());
 	}
 	protected virtual async ValueTask SendAttachToBufferAsync(ServiceParameterBufferBase spb, string service, CancellationToken cancellationToken = default)
 	{
 		await _database.Xdr.WriteAsync(IscCodes.op_service_attach, cancellationToken).ConfigureAwait(false);
-		await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteAsync(GdsDatabase.DatabaseObjectId, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(service, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteBufferAsync(spb.ToArray(), cancellationToken).ConfigureAwait(false);
 	}
@@ -288,7 +291,7 @@ internal class GdsServiceManager : ServiceManagerBase
 
 	public override ServiceParameterBufferBase CreateServiceParameterBuffer()
 	{
-		return new ServiceParameterBuffer2();
+		return new ServiceParameterBuffer2(Database.ParameterBufferEncoding);
 	}
 
 	protected virtual GdsDatabase CreateDatabase(GdsConnection connection)

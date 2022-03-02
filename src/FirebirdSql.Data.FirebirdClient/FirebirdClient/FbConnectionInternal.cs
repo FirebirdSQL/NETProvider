@@ -104,6 +104,10 @@ internal class FbConnectionInternal
 
 		var dpb = db.CreateDatabaseParameterBuffer();
 
+		if (db.UseUtf8ParameterBuffer)
+		{
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		}
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
 		if (!string.IsNullOrEmpty(_options.UserID))
@@ -112,15 +116,9 @@ internal class FbConnectionInternal
 		}
 		if (_options.Charset.Length > 0)
 		{
-			var charset = Charset.GetCharset(_options.Charset);
-			if (charset == null)
-			{
-				throw new ArgumentException("Character set is not valid.");
-			}
-			else
-			{
-				dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
-			}
+			if (!Charset.TryGetByName(_options.Charset, out var charset))
+				throw new ArgumentException("Invalid character set specified.");
+			dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
 		}
 		dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
 		dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
@@ -151,6 +149,10 @@ internal class FbConnectionInternal
 
 		var dpb = db.CreateDatabaseParameterBuffer();
 
+		if (db.UseUtf8ParameterBuffer)
+		{
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		}
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
 		if (!string.IsNullOrEmpty(_options.UserID))
@@ -159,15 +161,9 @@ internal class FbConnectionInternal
 		}
 		if (_options.Charset.Length > 0)
 		{
-			var charset = Charset.GetCharset(_options.Charset);
-			if (charset == null)
-			{
-				throw new ArgumentException("Character set is not valid.");
-			}
-			else
-			{
-				dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
-			}
+			if (!Charset.TryGetByName(_options.Charset, out var charset))
+				throw new ArgumentException("Invalid character set specified.");
+			dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
 		}
 		dpb.Append(IscCodes.isc_dpb_force_write, (short)(forcedWrites ? 1 : 0));
 		dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
@@ -240,20 +236,13 @@ internal class FbConnectionInternal
 
 	public void Connect()
 	{
-		if (Charset.GetCharset(_options.Charset) == null)
-		{
-			throw FbException.Create("Invalid character set specified");
-		}
+		if (!Charset.TryGetByName(_options.Charset, out var charset))
+			throw new ArgumentException("Invalid character set specified.");
 
 		try
 		{
 			_db = ClientFactory.CreateDatabase(_options);
-			_db.Charset = Charset.GetCharset(_options.Charset);
-			_db.Dialect = _options.Dialect;
-			_db.PacketSize = _options.PacketSize;
-
 			var dpb = BuildDpb(_db, _options);
-
 			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 			{
 				_db.AttachWithTrustedAuth(dpb, _options.Database, _options.CryptKey);
@@ -270,20 +259,13 @@ internal class FbConnectionInternal
 	}
 	public async Task ConnectAsync(CancellationToken cancellationToken = default)
 	{
-		if (Charset.GetCharset(_options.Charset) == null)
-		{
-			throw FbException.Create("Invalid character set specified");
-		}
+		if (!Charset.TryGetByName(_options.Charset, out var charset))
+			throw new ArgumentException("Invalid character set specified.");
 
 		try
 		{
 			_db = await ClientFactory.CreateDatabaseAsync(_options, cancellationToken).ConfigureAwait(false);
-			_db.Charset = Charset.GetCharset(_options.Charset);
-			_db.Dialect = _options.Dialect;
-			_db.PacketSize = _options.PacketSize;
-
 			var dpb = BuildDpb(_db, _options);
-
 			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
 			{
 				await _db.AttachWithTrustedAuthAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
@@ -634,6 +616,10 @@ internal class FbConnectionInternal
 	{
 		var dpb = db.CreateDatabaseParameterBuffer();
 
+		if (db.UseUtf8ParameterBuffer)
+		{
+			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
+		}
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
 		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)options.Dialect, 0, 0, 0 });
 		dpb.Append(IscCodes.isc_dpb_lc_ctype, options.Charset);

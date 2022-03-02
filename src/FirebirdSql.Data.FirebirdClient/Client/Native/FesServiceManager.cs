@@ -26,28 +26,27 @@ internal sealed class FesServiceManager : ServiceManagerBase
 {
 	#region Fields
 
-	private IFbClient _fbClient;
+	private static readonly Version Version30 = new Version(3, 0);
+
+	private readonly IFbClient _fbClient;
+	private readonly Version _fbClientVersion;
 	private IntPtr[] _statusVector;
-	private Charset _charset;
 
 	#endregion
 
 	#region Properties
 
-	public Charset Charset
-	{
-		get { return _charset; }
-		set { _charset = value; }
-	}
+	public override bool UseUtf8ParameterBuffer => _fbClientVersion >= Version30;
 
 	#endregion
 
 	#region Constructors
 
 	public FesServiceManager(string dllName, Charset charset)
+		: base(charset)
 	{
 		_fbClient = FbClientFactory.Create(dllName);
-		_charset = charset ?? Charset.DefaultCharset;
+		_fbClientVersion = FesConnection.GetClientVersion(_fbClient);
 		_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 	}
 
@@ -59,7 +58,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 	{
 		FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 
@@ -71,7 +70,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			spb.Length,
 			spb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 
 		Handle = svcHandle;
 	}
@@ -79,7 +78,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 	{
 		FesDatabase.CheckCryptKeyForSupport(cryptKey);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 
@@ -91,7 +90,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			spb.Length,
 			spb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 
 		Handle = svcHandle;
 
@@ -100,25 +99,25 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 	public override void Detach()
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 
 		_fbClient.isc_service_detach(_statusVector, ref svcHandle);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		Handle = svcHandle;
 	}
 	public override ValueTask DetachAsync(CancellationToken cancellationToken = default)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 
 		_fbClient.isc_service_detach(_statusVector, ref svcHandle);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		Handle = svcHandle;
 
@@ -127,7 +126,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 	public override void Start(ServiceParameterBufferBase spb)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 		var reserved = 0;
@@ -139,11 +138,11 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			spb.Length,
 			spb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 	}
 	public override ValueTask StartAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 		var reserved = 0;
@@ -155,14 +154,14 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			spb.Length,
 			spb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		return ValueTask2.CompletedTask;
 	}
 
 	public override void Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 		var reserved = 0;
@@ -178,11 +177,11 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			(short)buffer.Length,
 			buffer);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 	}
 	public override ValueTask QueryAsync(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer, CancellationToken cancellationToken = default)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		var svcHandle = Handle;
 		var reserved = 0;
@@ -198,40 +197,28 @@ internal sealed class FesServiceManager : ServiceManagerBase
 			(short)buffer.Length,
 			buffer);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		return ValueTask2.CompletedTask;
 	}
 
 	public override ServiceParameterBufferBase CreateServiceParameterBuffer()
 	{
-		return new ServiceParameterBuffer2();
+		return new ServiceParameterBuffer2(ParameterBufferEncoding);
 	}
 
 	#endregion
 
 	#region Private Methods
 
-	private void ProcessStatusVector(IntPtr[] statusVector)
+	private void ProcessStatusVector()
 	{
-		var ex = FesConnection.ParseStatusVector(statusVector, _charset);
-
-		if (ex != null)
-		{
-			if (ex.IsWarning)
-			{
-				WarningMessage?.Invoke(ex);
-			}
-			else
-			{
-				throw ex;
-			}
-		}
+		StatusVectorHelper.ProcessStatusVector(_statusVector, Charset, WarningMessage);
 	}
 
-	private void ClearStatusVector()
+	private void ProcessStatusVector(Charset charset)
 	{
-		Array.Clear(_statusVector, 0, _statusVector.Length);
+		StatusVectorHelper.ProcessStatusVector(_statusVector, charset, WarningMessage);
 	}
 
 	#endregion

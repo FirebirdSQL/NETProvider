@@ -21,8 +21,9 @@ namespace FirebirdSql.Data.Common;
 
 internal abstract class DatabaseParameterBufferBase : ParameterBuffer
 {
-	public DatabaseParameterBufferBase(int version)
+	public DatabaseParameterBufferBase(int version, Encoding encoding)
 	{
+		Encoding = encoding;
 		Append(version);
 	}
 
@@ -31,5 +32,7 @@ internal abstract class DatabaseParameterBufferBase : ParameterBuffer
 	public abstract void Append(int type, int value);
 	public abstract void Append(int type, byte[] buffer);
 
-	public void Append(int type, string content) => Append(type, Encoding2.Default.GetBytes(content));
+	public void Append(int type, string content) => Append(type, Encoding.GetBytes(content));
+
+	public Encoding Encoding { get; }
 }

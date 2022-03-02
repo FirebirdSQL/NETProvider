@@ -29,6 +29,8 @@ internal class GdsServiceManager : Version12.GdsServiceManager
 		: base(connection)
 	{ }
 
+	public override bool UseUtf8ParameterBuffer => true;
+
 	public override void Attach(ServiceParameterBufferBase spb, string dataSource, int port, string service, byte[] cryptKey)
 	{
 		try
@@ -124,7 +126,7 @@ internal class GdsServiceManager : Version12.GdsServiceManager
 
 	public override ServiceParameterBufferBase CreateServiceParameterBuffer()
 	{
-		return new ServiceParameterBuffer3();
+		return new ServiceParameterBuffer3(Database.ParameterBufferEncoding);
 	}
 
 	protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)

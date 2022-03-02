@@ -24,14 +24,8 @@ namespace FirebirdSql.Data.Common;
 
 internal sealed class Charset
 {
-	#region Constants
-
 	internal const string Octets = "OCTETS";
 	internal const string None = "NONE";
-
-	#endregion
-
-	#region Statics
 
 	private readonly static Dictionary<int, Charset> charsetsById;
 	private readonly static Dictionary<string, Charset> charsetsByName;
@@ -43,20 +37,11 @@ internal sealed class Charset
 		charsetsByName = charsets.ToDictionary(x => x.Name, StringComparer.CurrentCultureIgnoreCase);
 	}
 
-	public static Charset DefaultCharset
-	{
-		get { return charsetsById.First().Value; }
-	}
+	public static Charset DefaultCharset => charsetsByName[None];
 
-	public static Charset GetCharset(int charsetId)
-	{
-		return charsetsById.TryGetValue(charsetId, out var value) ? value : null;
-	}
+	public static bool TryGetById(int id, out Charset charset) => charsetsById.TryGetValue(id, out charset);
 
-	public static Charset GetCharset(string charsetName)
-	{
-		return charsetsByName.TryGetValue(charsetName, out var value) ? value : null;
-	}
+	public static bool TryGetByName(string name, out Charset charset) => charsetsByName.TryGetValue(name, out charset);
 
 	private static List<Charset> GetSupportedCharsets()
 	{
@@ -109,98 +94,55 @@ internal sealed class Charset
 		{ }
 	}
 
-	#endregion
-
-	#region Fields
-
-	private int _id;
-	private int _bytesPerCharacter;
-	private string _name;
-	private string _systemName;
-	private Encoding _encoding;
-	private bool _isNone;
-	private bool _isOctets;
-
-	#endregion
-
-	#region Properties
-
-	public int Identifier
-	{
-		get { return _id; }
-	}
-
-	public string Name
-	{
-		get { return _name; }
-	}
-
-	public int BytesPerCharacter
-	{
-		get { return _bytesPerCharacter; }
-	}
-
-	public bool IsOctetsCharset
-	{
-		get { return _isOctets; }
-	}
-
-	public bool IsNoneCharset
-	{
-		get { return _isNone; }
-	}
-
-	#endregion
-
-	#region Constructors
+	public int Identifier { get; }
+	public string Name { get; }
+	public string SystemName { get; private set; }
+	public int BytesPerCharacter { get; }
+	public Encoding Encoding { get; }
+	public bool IsOctetsCharset { get; }
+	public bool IsNoneCharset { get; }
 
 	public Charset(int id, string name, int bytesPerCharacter, string systemName)
 	{
-		_id = id;
-		_name = name;
-		_bytesPerCharacter = bytesPerCharacter;
-		_systemName = systemName;
-		_isNone = false;
-		_isOctets = false;
-		switch (_systemName)
+		Identifier = id;
+		Name = name;
+		BytesPerCharacter = bytesPerCharacter;
+		SystemName = systemName;
+		IsNoneCharset = false;
+		IsOctetsCharset = false;
+		switch (SystemName)
 		{
 			case None:
-				_encoding = Encoding2.Default;
-				_isNone = true;
+				Encoding = Encoding2.Default;
+				IsNoneCharset = true;
 				break;
 			case Octets:
-				_encoding = new BinaryEncoding();
-				_isOctets = true;
+				Encoding = new BinaryEncoding();
+				IsOctetsCharset = true;
 				break;
 			default:
-				_encoding = Encoding.GetEncoding(_systemName);
+				Encoding = Encoding.GetEncoding(SystemName);
 				break;
 		}
 	}
 
-	#endregion
-
-	#region Methods
-
 	public byte[] GetBytes(string s)
 	{
-		return _encoding.GetBytes(s);
+		return Encoding.GetBytes(s);
 	}
 
 	public int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
 	{
-		return _encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
+		return Encoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
 	}
 
 	public string GetString(byte[] buffer)
 	{
-		return GetString(buffer, 0, buffer.Length);
+		return Encoding.GetString(buffer);
 	}
 
 	public string GetString(byte[] buffer, int index, int count)
 	{
-		return _encoding.GetString(buffer, index, count);
+		return Encoding.GetString(buffer, index, count);
 	}
-
-	#endregion
 }

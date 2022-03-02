@@ -572,9 +572,9 @@ public sealed class FbTransaction : DbTransaction
 		}
 	}
 
-	private static TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
+	private TransactionParameterBuffer BuildTpb(FbTransactionOptions options)
 	{
-		var tpb = new TransactionParameterBuffer();
+		var tpb = Connection.InnerConnection.Database.CreateTransactionParameterBuffer();
 
 		tpb.Append(IscCodes.isc_tpb_version3);
 

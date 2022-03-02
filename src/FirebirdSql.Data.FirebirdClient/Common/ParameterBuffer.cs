@@ -13,34 +13,33 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Net;
 
 namespace FirebirdSql.Data.Common;
 
 internal abstract class ParameterBuffer
 {
-#warning Strictly speaking this should be disposed
-	private MemoryStream _stream;
+	private readonly List<byte> _data;
 
-	public short Length => (short)_stream.Length;
+	public short Length => (short)_data.Count;
 
 	protected ParameterBuffer()
 	{
-		_stream = new MemoryStream();
-	}
-
-	public virtual void Append(int type)
-	{
-		WriteByte(type);
+		_data = new List<byte>();
 	}
 
 	public byte[] ToArray()
 	{
-		return _stream.ToArray();
+		return _data.ToArray();
+	}
+
+	public void Append(int type)
+	{
+		WriteByte(type);
 	}
 
 	protected void WriteByte(int value)
@@ -50,7 +49,7 @@ internal abstract class ParameterBuffer
 
 	protected void WriteByte(byte value)
 	{
-		_stream.WriteByte(value);
+		_data.Add(value);
 	}
 
 	protected void Write(byte value)
@@ -64,10 +63,8 @@ internal abstract class ParameterBuffer
 		{
 			value = IPAddress.NetworkToHostOrder(value);
 		}
-
 		var buffer = BitConverter.GetBytes(value);
-
-		_stream.Write(buffer, 0, buffer.Length);
+		_data.AddRange(buffer);
 	}
 
 	protected void Write(int value)
@@ -76,10 +73,8 @@ internal abstract class ParameterBuffer
 		{
 			value = IPAddress.NetworkToHostOrder(value);
 		}
-
 		var buffer = BitConverter.GetBytes(value);
-
-		_stream.Write(buffer, 0, buffer.Length);
+		_data.AddRange(buffer);
 	}
 
 	protected void Write(byte[] buffer)
@@ -89,6 +84,6 @@ internal abstract class ParameterBuffer
 
 	protected void Write(byte[] buffer, int offset, int count)
 	{
-		_stream.Write(buffer, offset, count);
+		_data.AddRange(new ArraySegment<byte>(buffer, offset, count));
 	}
 }

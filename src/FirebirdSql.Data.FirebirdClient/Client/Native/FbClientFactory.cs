@@ -24,6 +24,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using FirebirdSql.Data.Client.Native.Handle;
 using FirebirdSql.Data.Common;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 
 namespace FirebirdSql.Data.Client.Native;
 

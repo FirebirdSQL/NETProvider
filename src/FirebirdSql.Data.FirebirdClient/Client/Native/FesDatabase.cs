@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Native.Handle;
@@ -29,50 +28,35 @@ internal sealed class FesDatabase : DatabaseBase
 {
 	#region Fields
 
+	private static readonly Version Version25 = new Version(2, 5);
+
+	private readonly IFbClient _fbClient;
+	private readonly Version _fbClientVersion;
 	private DatabaseHandle _handle;
 	private IntPtr[] _statusVector;
-	private IFbClient _fbClient;
 
 	#endregion
 
 	#region Properties
 
-	public override int Handle
-	{
-		get { return _handle.DangerousGetHandle().AsInt(); }
-	}
-
-	public DatabaseHandle HandlePtr
-	{
-		get { return _handle; }
-	}
-
-	public override bool HasRemoteEventSupport
-	{
-		get { return false; }
-	}
-
-	public override bool ConnectionBroken
-	{
-		get { return false; }
-	}
-
-	public IFbClient FbClient
-	{
-		get { return _fbClient; }
-	}
+	public override bool UseUtf8ParameterBuffer => _fbClientVersion >= Version25;
+	public override int Handle => _handle.DangerousGetHandle().AsInt();
+	public override bool HasRemoteEventSupport => false;
+	public override bool ConnectionBroken => false;
+	public IFbClient FbClient => _fbClient;
+	public Version FbClientVersion => _fbClientVersion;
+	public DatabaseHandle HandlePtr => _handle;
 
 	#endregion
 
 	#region Constructors
 
-	public FesDatabase(string dllName, Charset charset)
+	public FesDatabase(string dllName, Charset charset, int packetSize, short dialect)
+		: base(charset, packetSize, dialect)
 	{
 		_fbClient = FbClientFactory.Create(dllName);
+		_fbClientVersion = FesConnection.GetClientVersion(_fbClient);
 		_handle = new DatabaseHandle();
-		Charset = charset ?? Charset.DefaultCharset;
-		Dialect = 3;
-		PacketSize = 8192;
 		_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 	}
 
@@ -84,9 +68,9 @@ internal sealed class FesDatabase : DatabaseBase
 	{
 		CheckCryptKeyForSupport(cryptKey);
 
-		var databaseBuffer = Encoding2.Default.GetBytes(database);
+		var databaseBuffer = dpb.Encoding.GetBytes(database);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_create_database(
 			_statusVector,
@@ -97,15 +81,15 @@ internal sealed class FesDatabase : DatabaseBase
 			dpb.ToArray(),
 			0);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 	}
 	public override ValueTask CreateDatabaseAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default)
 	{
 		CheckCryptKeyForSupport(cryptKey);
 
-		var databaseBuffer = Encoding2.Default.GetBytes(database);
+		var databaseBuffer = dpb.Encoding.GetBytes(database);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_create_database(
 			_statusVector,
@@ -116,7 +100,7 @@ internal sealed class FesDatabase : DatabaseBase
 			dpb.ToArray(),
 			0);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 
 		return ValueTask2.CompletedTask;
 	}
@@ -132,21 +116,21 @@ internal sealed class FesDatabase : DatabaseBase
 
 	public override void DropDatabase()
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_drop_database(_statusVector, ref _handle);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		_handle.Dispose();
 	}
 	public override ValueTask DropDatabaseAsync(CancellationToken cancellationToken = default)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_drop_database(_statusVector, ref _handle);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
 
 		_handle.Dispose();
 
@@ -192,9 +176,9 @@ internal sealed class FesDatabase : DatabaseBase
 	{
 		CheckCryptKeyForSupport(cryptKey);
 
-		var databaseBuffer = Encoding2.Default.GetBytes(database);
+		var databaseBuffer = dpb.Encoding.GetBytes(database);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_attach_database(
 			_statusVector,
@@ -204,7 +188,7 @@ internal sealed class FesDatabase : DatabaseBase
 			dpb.Length,
 			dpb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 
 		ServerVersion = GetServerVersion();
 	}
@@ -212,9 +196,9 @@ internal sealed class FesDatabase : DatabaseBase
 	{
 		CheckCryptKeyForSupport(cryptKey);
 
-		var databaseBuffer = Encoding2.Default.GetBytes(database);
+		var databaseBuffer = dpb.Encoding.GetBytes(database);
 
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_attach_database(
 			_statusVector,
@@ -224,7 +208,7 @@ internal sealed class FesDatabase : DatabaseBase
 			dpb.Length,
 			dpb.ToArray());
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector(Charset.DefaultCharset);
 
 		ServerVersion = await GetServerVersionAsync(cancellationToken).ConfigureAwait(false);
 	}
@@ -247,22 +231,19 @@ internal sealed class FesDatabase : DatabaseBase
 
 		if (!_handle.IsInvalid)
 		{
-			ClearStatusVector();
+			StatusVectorHelper.ClearStatusVector(_statusVector);
 
 			_fbClient.isc_detach_database(_statusVector, ref _handle);
 
-			ProcessStatusVector(_statusVector);
+			ProcessStatusVector();
 
 			_handle.Dispose();
 		}
 
 		WarningMessage = null;
-		Charset = null;
 		ServerVersion = null;
 		_statusVector = null;
 		TransactionCount = 0;
-		Dialect = 0;
-		PacketSize = 0;
 	}
 	public override ValueTask DetachAsync(CancellationToken cancellationToken = default)
 	{
@@ -273,22 +254,19 @@ internal sealed class FesDatabase : DatabaseBase
 
 		if (!_handle.IsInvalid)
 		{
-			ClearStatusVector();
+			StatusVectorHelper.ClearStatusVector(_statusVector);
 
 			_fbClient.isc_detach_database(_statusVector, ref _handle);
 
-			ProcessStatusVector(_statusVector);
+			ProcessStatusVector();
 
 			_handle.Dispose();
 		}
 
 		WarningMessage = null;
-		Charset = null;
 		ServerVersion = null;
 		_statusVector = null;
 		TransactionCount = 0;
-		Dialect = 0;
-		PacketSize = 0;
 
 		return ValueTask2.CompletedTask;
 	}
@@ -359,11 +337,21 @@ internal sealed class FesDatabase : DatabaseBase
 
 	#endregion
 
-	#region DPB
+	#region Parameter Buffers
 
 	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
 	{
-		return new DatabaseParameterBuffer1();
+		return new DatabaseParameterBuffer1(ParameterBufferEncoding);
+	}
+
+	public override EventParameterBuffer CreateEventParameterBuffer()
+	{
+		return new EventParameterBuffer(Charset.Encoding);
+	}
+
+	public override TransactionParameterBuffer CreateTransactionParameterBuffer()
+	{
+		return new TransactionParameterBuffer(Charset.Encoding);
 	}
 
 	#endregion
@@ -385,7 +373,7 @@ internal sealed class FesDatabase : DatabaseBase
 
 		DatabaseInfo(items, buffer, buffer.Length);
 
-		return IscHelper.ParseDatabaseInfo(buffer);
+		return IscHelper.ParseDatabaseInfo(buffer, Charset);
 	}
 	public override ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
 	{
@@ -393,7 +381,7 @@ internal sealed class FesDatabase : DatabaseBase
 
 		DatabaseInfo(items, buffer, buffer.Length);
 
-		return ValueTask2.FromResult(IscHelper.ParseDatabaseInfo(buffer));
+		return ValueTask2.FromResult(IscHelper.ParseDatabaseInfo(buffer, Charset));
 	}
 
 	#endregion
@@ -402,33 +390,16 @@ internal sealed class FesDatabase : DatabaseBase
 
 	internal void ProcessStatusVector(IntPtr[] statusVector)
 	{
-		var ex = FesConnection.ParseStatusVector(statusVector, Charset);
-
-		if (ex != null)
-		{
-			if (ex.IsWarning)
-			{
-				WarningMessage?.Invoke(ex);
-			}
-			else
-			{
-				throw ex;
-			}
-		}
+		StatusVectorHelper.ProcessStatusVector(statusVector, Charset, WarningMessage);
 	}
 
 	#endregion
 
 	#region Private Methods
 
-	private void ClearStatusVector()
-	{
-		Array.Clear(_statusVector, 0, _statusVector.Length);
-	}
-
 	private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
 	{
-		ClearStatusVector();
+		StatusVectorHelper.ClearStatusVector(_statusVector);
 
 		_fbClient.isc_database_info(
 			_statusVector,
@@ -438,7 +409,17 @@ internal sealed class FesDatabase : DatabaseBase
 			(short)bufferLength,
 			buffer);
 
-		ProcessStatusVector(_statusVector);
+		ProcessStatusVector();
+	}
+
+	private void ProcessStatusVector()
+	{
+		StatusVectorHelper.ProcessStatusVector(_statusVector, Charset, WarningMessage);
+	}
+
+	private void ProcessStatusVector(Charset charset)
+	{
+		StatusVectorHelper.ProcessStatusVector(_statusVector, charset, WarningMessage);
 	}
 
 	#endregion

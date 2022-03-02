@@ -34,10 +34,10 @@ public sealed class FbLog : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer3();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -53,10 +53,10 @@ public sealed class FbLog : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer3();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_get_fb_log);
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

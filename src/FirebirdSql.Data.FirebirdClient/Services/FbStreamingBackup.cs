@@ -43,10 +43,10 @@ public sealed class FbStreamingBackup : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout", SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
 			if (!string.IsNullOrEmpty(SkipData))
 				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
@@ -69,10 +69,10 @@ public sealed class FbStreamingBackup : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout", SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
 			if (!string.IsNullOrEmpty(SkipData))
 				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
@@ -91,7 +91,7 @@ public sealed class FbStreamingBackup : FbService
 
 	void ReadOutput()
 	{
-		Query(new byte[] { IscCodes.isc_info_svc_to_eof }, ServiceParameterBufferBase.Empty, (_, x) =>
+		Query(new byte[] { IscCodes.isc_info_svc_to_eof }, new ServiceParameterBuffer2(Service.ParameterBufferEncoding), (_, x) =>
 		{
 			var buffer = x as byte[];
 			OutputStream.Write(buffer, 0, buffer.Length);
@@ -99,7 +99,7 @@ public sealed class FbStreamingBackup : FbService
 	}
 	Task ReadOutputAsync(CancellationToken cancellationToken = default)
 	{
-		return QueryAsync(new byte[] { IscCodes.isc_info_svc_to_eof }, ServiceParameterBufferBase.Empty, async (_, x) =>
+		return QueryAsync(new byte[] { IscCodes.isc_info_svc_to_eof }, new ServiceParameterBuffer2(Service.ParameterBufferEncoding), async (_, x) =>
 		{
 			var buffer = x as byte[];
 			await OutputStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);

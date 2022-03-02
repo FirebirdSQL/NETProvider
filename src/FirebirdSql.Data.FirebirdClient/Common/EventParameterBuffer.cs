@@ -15,20 +15,15 @@
 
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
-using System;
-using System.IO;
 using System.Text;
 
 namespace FirebirdSql.Data.Common;
 
 internal sealed class EventParameterBuffer : ParameterBuffer
 {
-	public EventParameterBuffer()
-	{ }
-
-	public void Append(string content, int actualCount)
+	public EventParameterBuffer(Encoding encoding)
 	{
-		Append(Encoding2.Default.GetBytes(content), actualCount);
+		Encoding = encoding;
 	}
 
 	public void Append(byte[] content, int actualCount)
@@ -37,4 +32,11 @@ internal sealed class EventParameterBuffer : ParameterBuffer
 		Write(content);
 		Write(actualCount);
 	}
+
+	public void Append(string content, int actualCount)
+	{
+		Append(Encoding.GetBytes(content), actualCount);
+	}
+
+	public Encoding Encoding { get; }
 }

@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
+using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Services;
 
@@ -132,11 +133,35 @@ public sealed class FbServerProperties : FbService
 
 	private List<object> GetInfo(byte[] items)
 	{
-		return Query(items, ServiceParameterBufferBase.Empty);
+		try
+		{
+			Open();
+			return Query(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			Close();
+		}
 	}
-	private Task<List<object>> GetInfoAsync(byte[] items, CancellationToken cancellationToken = default)
+	private async Task<List<object>> GetInfoAsync(byte[] items, CancellationToken cancellationToken = default)
 	{
-		return QueryAsync(items, ServiceParameterBufferBase.Empty, cancellationToken);
+		try
+		{
+			await OpenAsync(cancellationToken).ConfigureAwait(false);
+			return await QueryAsync(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			throw FbException.Create(ex);
+		}
+		finally
+		{
+			await CloseAsync(cancellationToken).ConfigureAwait(false);
+		}
 	}
 
 	public static Version ParseServerVersion(string version)

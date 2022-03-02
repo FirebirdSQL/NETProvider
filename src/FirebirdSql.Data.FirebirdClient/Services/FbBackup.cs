@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -45,12 +46,12 @@ public sealed class FbBackup : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			foreach (var file in BackupFiles)
 			{
-				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile);
 				if (file.BackupLength.HasValue)
 					startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 			}
@@ -65,7 +66,7 @@ public sealed class FbBackup : FbService
 			StartTask(startSpb);
 			if (Verbose)
 			{
-				ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+				ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 			}
 		}
 		catch (Exception ex)
@@ -84,12 +85,12 @@ public sealed class FbBackup : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			foreach (var file in BackupFiles)
 			{
-				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile);
 				if (file.BackupLength.HasValue)
 					startSpb.Append(IscCodes.isc_spb_bkp_length, (int)file.BackupLength);
 			}
@@ -104,7 +105,7 @@ public sealed class FbBackup : FbService
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			if (Verbose)
 			{
-				await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 			}
 		}
 		catch (Exception ex)

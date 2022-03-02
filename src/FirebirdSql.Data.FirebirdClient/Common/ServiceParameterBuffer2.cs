@@ -15,12 +15,16 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+using System.Text;
 
 namespace FirebirdSql.Data.Common;
 
 internal sealed class ServiceParameterBuffer2 : ServiceParameterBufferBase
 {
+	public ServiceParameterBuffer2(Encoding encoding)
+		: base(encoding)
+	{ }
+
 	public override void AppendPreamble()
 	{
 		Append(IscCodes.isc_spb_version);
@@ -41,13 +45,13 @@ internal sealed class ServiceParameterBuffer2 : ServiceParameterBufferBase
 		Write(value);
 	}
 
-	public void Append(int type, byte value)
+	public override void Append(int type, byte value)
 	{
 		WriteByte(type);
 		WriteByte(value);
 	}
 
-	public void Append(int type, int value)
+	public override void Append(int type, int value)
 	{
 		WriteByte(type);
 		Write(value);

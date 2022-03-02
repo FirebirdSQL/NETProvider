@@ -15,12 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Text;
+
 namespace FirebirdSql.Data.Common;
 
 internal sealed class BatchParameterBuffer : DatabaseParameterBufferBase
 {
-	public BatchParameterBuffer()
-		: base(IscCodes.Batch.VERSION1)
+	public BatchParameterBuffer(Encoding encoding)
+		: base(IscCodes.Batch.VERSION1, encoding)
 	{ }
 
 	public override void Append(int type, byte value)

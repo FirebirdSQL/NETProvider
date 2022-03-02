@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -40,16 +41,16 @@ public sealed class FbNRestore : FbService
 		try
 		{
 			Open();
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_nrest);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			foreach (var file in BackupFiles)
 			{
-				startSpb.Append2(IscCodes.isc_spb_nbk_file, file, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
 			}
 			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 			StartTask(startSpb);
-			ProcessServiceOutput(ServiceParameterBufferBase.Empty);
+			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 		}
 		catch (Exception ex)
 		{
@@ -67,16 +68,16 @@ public sealed class FbNRestore : FbService
 		try
 		{
 			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2();
+			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 			startSpb.Append(IscCodes.isc_action_svc_nrest);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database, SpbFilenameEncoding);
+			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 			foreach (var file in BackupFiles)
 			{
-				startSpb.Append2(IscCodes.isc_spb_nbk_file, file, SpbFilenameEncoding);
+				startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
 			}
 			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
 			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(ServiceParameterBufferBase.Empty, cancellationToken).ConfigureAwait(false);
+			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 		}
 		catch (Exception ex)
 		{

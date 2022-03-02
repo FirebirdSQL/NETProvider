@@ -496,8 +496,8 @@ public sealed class FbDatabaseInfo
 
 		var items = new byte[]
 		{
-				item,
-				IscCodes.isc_info_end
+			item,
+			IscCodes.isc_info_end
 		};
 		var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
 		return info.Any() ? ConvertValue<T>(info[0]) : default;
@@ -508,8 +508,8 @@ public sealed class FbDatabaseInfo
 
 		var items = new byte[]
 		{
-				item,
-				IscCodes.isc_info_end
+			item,
+			IscCodes.isc_info_end
 		};
 		var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false);
 		return info.Any() ? ConvertValue<T>(info[0]) : default;
@@ -521,10 +521,10 @@ public sealed class FbDatabaseInfo
 
 		var db = Connection.InnerConnection.Database;
 		var items = new byte[]
-			{
-					item,
-					IscCodes.isc_info_end
-			};
+		{
+			item,
+			IscCodes.isc_info_end
+		};
 
 		return (db.GetDatabaseInfo(items)).Select(ConvertValue<T>).ToList();
 	}
@@ -534,10 +534,10 @@ public sealed class FbDatabaseInfo
 
 		var db = Connection.InnerConnection.Database;
 		var items = new byte[]
-			{
-					item,
-					IscCodes.isc_info_end
-			};
+		{
+			item,
+			IscCodes.isc_info_end
+		};
 
 		return (await db.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Select(ConvertValue<T>).ToList();
 	}

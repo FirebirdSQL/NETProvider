@@ -77,13 +77,9 @@ internal sealed class DbField
 				// current attachment charset).
 				// Bits 8-17 hold collation_id for this value.
 				var cs = BitConverter.GetBytes(value);
-
-				_charset = Charset.GetCharset(cs[0]);
-
-				if (_charset == null)
-				{
-					_charset = Charset.DefaultCharset;
-				}
+				_charset = Charset.TryGetById(cs[0], out var charset)
+					? charset
+					: Charset.DefaultCharset;
 			}
 		}
 	}

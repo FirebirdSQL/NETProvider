@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,14 +27,24 @@ internal abstract class DatabaseBase
 {
 	public Action<IscException> WarningMessage { get; set; }
 
+	public abstract bool UseUtf8ParameterBuffer { get; }
+	public Encoding ParameterBufferEncoding => UseUtf8ParameterBuffer ? Encoding.UTF8 : Encoding2.Default;
+
 	public abstract int Handle { get; }
+	public Charset Charset { get; }
+	public int PacketSize { get; }
+	public short Dialect { get; }
 	public int TransactionCount { get; set; }
 	public string ServerVersion { get; protected set; }
-	public Charset Charset { get; set; }
-	public int PacketSize { get; set; }
-	public short Dialect { get; set; }
 	public abstract bool HasRemoteEventSupport { get; }
 	public abstract bool ConnectionBroken { get; }
+
+	public DatabaseBase(Charset charset, int packetSize, short dialect)
+	{
+		Charset = charset;
+		PacketSize = packetSize;
+		Dialect = dialect;
+	}
 
 	public abstract void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey);
 	public abstract ValueTask AttachAsync(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey, CancellationToken cancellationToken = default);
@@ -60,6 +71,8 @@ internal abstract class DatabaseBase
 	public abstract StatementBase CreateStatement(TransactionBase transaction);
 
 	public abstract DatabaseParameterBufferBase CreateDatabaseParameterBuffer();
+	public abstract EventParameterBuffer CreateEventParameterBuffer();
+	public abstract TransactionParameterBuffer CreateTransactionParameterBuffer();
 
 	public abstract List<object> GetDatabaseInfo(byte[] items);
 	public abstract ValueTask<List<object>> GetDatabaseInfoAsync(byte[] items, CancellationToken cancellationToken = default);

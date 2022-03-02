@@ -29,11 +29,6 @@ internal class GdsServiceManager : Version13.GdsServiceManager
 		: base(connection)
 	{ }
 
-	public override ServiceParameterBufferBase CreateServiceParameterBuffer()
-	{
-		return new ServiceParameterBuffer3();
-	}
-
 	protected override Version10.GdsDatabase CreateDatabase(GdsConnection connection)
 	{
 		return new GdsDatabase(connection);

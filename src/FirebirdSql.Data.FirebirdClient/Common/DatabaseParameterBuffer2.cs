@@ -15,12 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Text;
+
 namespace FirebirdSql.Data.Common;
 
 internal sealed class DatabaseParameterBuffer2 : DatabaseParameterBufferBase
 {
-	public DatabaseParameterBuffer2()
-		: base(IscCodes.isc_dpb_version2)
+	public DatabaseParameterBuffer2(Encoding encoding)
+		: base(IscCodes.isc_dpb_version2, encoding)
 	{ }
 
 	public override void Append(int type, byte value)

@@ -132,7 +132,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 	protected override void SendAttachToBuffer(DatabaseParameterBufferBase dpb, string database)
 	{
 		Xdr.Write(IscCodes.op_attach);
-		Xdr.Write(0);
+		Xdr.Write(DatabaseObjectId);
 		if (!AuthBlock.HasClientData)
 		{
 			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -142,14 +142,13 @@ internal class GdsDatabase : Version12.GdsDatabase
 		{
 			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 		}
-		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-		Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+		Xdr.WriteBuffer(dpb.Encoding.GetBytes(database));
 		Xdr.WriteBuffer(dpb.ToArray());
 	}
 	protected override async ValueTask SendAttachToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
 	{
 		await Xdr.WriteAsync(IscCodes.op_attach, cancellationToken).ConfigureAwait(false);
-		await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteAsync(DatabaseObjectId, cancellationToken).ConfigureAwait(false);
 		if (!AuthBlock.HasClientData)
 		{
 			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -159,8 +158,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 		{
 			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 		}
-		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-		await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.Encoding.GetBytes(database), cancellationToken).ConfigureAwait(false);
 		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 	}
 
@@ -248,7 +246,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 	protected override void SendCreateToBuffer(DatabaseParameterBufferBase dpb, string database)
 	{
 		Xdr.Write(IscCodes.op_create);
-		Xdr.Write(0);
+		Xdr.Write(DatabaseObjectId);
 		if (!AuthBlock.HasClientData)
 		{
 			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -258,14 +256,13 @@ internal class GdsDatabase : Version12.GdsDatabase
 		{
 			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 		}
-		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-		Xdr.WriteBuffer(Encoding.UTF8.GetBytes(database));
+		Xdr.WriteBuffer(dpb.Encoding.GetBytes(database));
 		Xdr.WriteBuffer(dpb.ToArray());
 	}
 	protected override async ValueTask SendCreateToBufferAsync(DatabaseParameterBufferBase dpb, string database, CancellationToken cancellationToken = default)
 	{
 		await Xdr.WriteAsync(IscCodes.op_create, cancellationToken).ConfigureAwait(false);
-		await Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteAsync(DatabaseObjectId, cancellationToken).ConfigureAwait(false);
 		if (!AuthBlock.HasClientData)
 		{
 			dpb.Append(IscCodes.isc_dpb_auth_plugin_name, AuthBlock.AcceptPluginName);
@@ -275,8 +272,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 		{
 			dpb.Append(IscCodes.isc_dpb_specific_auth_data, AuthBlock.ClientData);
 		}
-		dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
-		await Xdr.WriteBufferAsync(Encoding.UTF8.GetBytes(database), cancellationToken).ConfigureAwait(false);
+		await Xdr.WriteBufferAsync(dpb.Encoding.GetBytes(database), cancellationToken).ConfigureAwait(false);
 		await Xdr.WriteBufferAsync(dpb.ToArray(), cancellationToken).ConfigureAwait(false);
 	}
 
@@ -333,6 +329,6 @@ internal class GdsDatabase : Version12.GdsDatabase
 
 	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()
 	{
-		return new DatabaseParameterBuffer2();
+		return new DatabaseParameterBuffer2(ParameterBufferEncoding);
 	}
 }

@@ -139,9 +139,9 @@ internal class RemoteEvent
 			throw new InvalidOperationException("Events are already running.");
 	}
 
-	static EventParameterBuffer BuildEpb(IList<string> events, Func<int, int> countFactory)
+	EventParameterBuffer BuildEpb(IList<string> events, Func<int, int> countFactory)
 	{
-		var epb = new EventParameterBuffer();
+		var epb = Database.CreateEventParameterBuffer();
 		epb.Append(IscCodes.EPB_version1);
 		for (var i = 0; i < events.Count; i++)
 		{
@@ -150,7 +150,7 @@ internal class RemoteEvent
 		return epb;
 	}
 
-	static void EnsureEventsCollection(ICollection<string> events)
+	void EnsureEventsCollection(ICollection<string> events)
 	{
 		if (events == null)
 			throw new ArgumentNullException(nameof(events));
