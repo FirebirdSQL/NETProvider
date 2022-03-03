@@ -393,6 +393,40 @@ end";
 		await validationSvc.ExecuteAsync();
 	}
 
+	[Test]
+	public async Task NFixupTest()
+	{
+		if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+			return;
+
+		var deltaFile = Path.GetTempFileName();
+		Connection.Open();
+		try
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = $"alter database add difference file '{deltaFile}'";
+				await cmd.ExecuteNonQueryAsync();
+				cmd.CommandText = "alter database begin backup";
+				await cmd.ExecuteNonQueryAsync();
+			}
+		}
+		finally
+		{
+			Connection.Close();
+		}
+		File.Delete(deltaFile);
+
+		Assert.ThrowsAsync<FbException>(() => Connection.OpenAsync());
+
+		var fixup = new FbNFixup();
+		fixup.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
+		fixup.ServiceOutput += ServiceOutput;
+		await fixup.ExecuteAsync();
+
+		Assert.DoesNotThrowAsync(() => Connection.OpenAsync());
+	}
+
 	static void ServiceOutput(object sender, ServiceOutputEventArgs e)
 	{
 		var dummy = e.Message;

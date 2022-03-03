@@ -397,30 +397,31 @@ internal static class IscCodes
 
 	#region Services Actions
 
-	public const int isc_action_svc_backup = 1; /* Starts database backup process on the server	*/
-	public const int isc_action_svc_restore = 2;    /* Starts database restore process on the server */
-	public const int isc_action_svc_repair = 3; /* Starts database repair process on the server	*/
-	public const int isc_action_svc_add_user = 4;   /* Adds	a new user to the security database	*/
-	public const int isc_action_svc_delete_user = 5;    /* Deletes a user record from the security database	*/
-	public const int isc_action_svc_modify_user = 6;    /* Modifies	a user record in the security database */
-	public const int isc_action_svc_display_user = 7;   /* Displays	a user record from the security	database */
-	public const int isc_action_svc_properties = 8; /* Sets	database properties	*/
-	public const int isc_action_svc_add_license = 9;    /* Adds	a license to the license file */
-	public const int isc_action_svc_remove_license = 10;    /* Removes a license from the license file */
-	public const int isc_action_svc_db_stats = 11;  /* Retrieves database statistics */
-	public const int isc_action_svc_get_ib_log = 12;    /* Retrieves the InterBase log file	from the server	*/
-	public const int isc_action_svc_get_fb_log = 12;    /* Retrieves the Firebird log file from the server */
-	public const int isc_action_svc_nbak = 20;  /* Incremental nbackup */
+	public const int isc_action_svc_backup = 1; /* Starts database backup process on the server */
+	public const int isc_action_svc_restore = 2; /* Starts database restore process on the server */
+	public const int isc_action_svc_repair = 3; /* Starts database repair process on the server */
+	public const int isc_action_svc_add_user = 4; /* Adds a new user to the security database */
+	public const int isc_action_svc_delete_user = 5; /* Deletes a user record from the security database */
+	public const int isc_action_svc_modify_user = 6; /* Modifies a user record in the security database */
+	public const int isc_action_svc_display_user = 7; /* Displays a user record from the security database */
+	public const int isc_action_svc_properties = 8; /* Sets database properties */
+	public const int isc_action_svc_add_license = 9; /* Adds a license to the license file */
+	public const int isc_action_svc_remove_license = 10; /* Removes a license from the license file */
+	public const int isc_action_svc_db_stats = 11; /* Retrieves database statistics */
+	public const int isc_action_svc_get_ib_log = 12; /* Retrieves the InterBase log file from the server */
+	public const int isc_action_svc_get_fb_log = 12; /* Retrieves the Firebird log file from the server */
+	public const int isc_action_svc_nbak = 20; /* Incremental nbackup */
 	public const int isc_action_svc_nrest = 21; /* Incremental database restore */
-	public const int isc_action_svc_trace_start = 22;   // Start trace session
-	public const int isc_action_svc_trace_stop = 23;    // Stop trace session
+	public const int isc_action_svc_trace_start = 22; // Start trace session
+	public const int isc_action_svc_trace_stop = 23; // Stop trace session
 	public const int isc_action_svc_trace_suspend = 24; // Suspend trace session
-	public const int isc_action_svc_trace_resume = 25;  // Resume trace session
-	public const int isc_action_svc_trace_list = 26;    // List existing sessions
-	public const int isc_action_svc_set_mapping = 27;   // Set auto admins mapping in security database
-	public const int isc_action_svc_drop_mapping = 28;  // Drop auto admins mapping in security database
-	public const int isc_action_svc_display_user_adm = 29;  // Displays user(s) from security database with admin info
-	public const int isc_action_svc_validate = 30;  // Starts database online validation
+	public const int isc_action_svc_trace_resume = 25; // Resume trace session
+	public const int isc_action_svc_trace_list = 26; // List existing sessions
+	public const int isc_action_svc_set_mapping = 27; // Set auto admins mapping in security database
+	public const int isc_action_svc_drop_mapping = 28; // Drop auto admins mapping in security database
+	public const int isc_action_svc_display_user_adm = 29; // Displays user(s) from security database with admin info
+	public const int isc_action_svc_validate = 30; // Starts database online validation
+	public const int isc_action_svc_nfix = 31; // Fixup database after file system copy
 
 	#endregion
 
