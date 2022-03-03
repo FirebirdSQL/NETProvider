@@ -23,7 +23,7 @@ using System.Security.Cryptography;
 using System.Text;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Managed;
+namespace FirebirdSql.Data.Client.Managed.Srp;
 
 /// <remarks>
 /// http://srp.stanford.edu/design.html

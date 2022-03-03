@@ -18,7 +18,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace FirebirdSql.Data.Client.Managed;
+namespace FirebirdSql.Data.Client.Managed.Srp;
 
 internal sealed class Srp256Client : SrpClientBase
 {

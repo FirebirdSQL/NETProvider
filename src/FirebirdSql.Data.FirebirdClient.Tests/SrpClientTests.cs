@@ -16,6 +16,7 @@
 //$Authors = Hajime Nakagami (nakagami@gmail.com), Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.Data.Client.Managed;
+using FirebirdSql.Data.Client.Managed.Srp;
 using FirebirdSql.Data.TestsBase;
 using NUnit.Framework;
 
