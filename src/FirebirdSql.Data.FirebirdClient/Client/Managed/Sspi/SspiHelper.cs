@@ -26,12 +26,13 @@ internal sealed class SspiHelper : IDisposable
 {
 	public string Name { get; } = "Win_Sspi";
 
+	private const int SECBUFFER_VERSION = 0;
+
 	private enum SecBufferType
 	{
-		SECBUFFER_VERSION = 0,
 		SECBUFFER_EMPTY = 0,
 		SECBUFFER_DATA = 1,
-		SECBUFFER_TOKEN = 2
+		SECBUFFER_TOKEN = 2,
 	}
 
 	#region Structures used in native Win API calls
@@ -123,7 +124,7 @@ internal sealed class SspiHelper : IDisposable
 
 		public SecBufferDesc(int bufferSize)
 		{
-			ulVersion = (int)SecBufferType.SECBUFFER_VERSION;
+			ulVersion = SECBUFFER_VERSION;
 			cBuffers = 1;
 			var secBuffer = new SecBuffer(bufferSize);
 			pBuffers = Marshal.AllocHGlobal(Marshal.SizeOf(secBuffer));
@@ -132,7 +133,7 @@ internal sealed class SspiHelper : IDisposable
 
 		public SecBufferDesc(byte[] secBufferBytes)
 		{
-			ulVersion = (int)SecBufferType.SECBUFFER_VERSION;
+			ulVersion = SECBUFFER_VERSION;
 			cBuffers = 1;
 			var secBuffer = new SecBuffer(secBufferBytes);
 			pBuffers = Marshal.AllocHGlobal(Marshal.SizeOf(secBuffer));
