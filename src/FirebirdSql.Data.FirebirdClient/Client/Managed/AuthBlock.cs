@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Managed.Srp;
+using FirebirdSql.Data.Client.Managed.Sspi;
 using FirebirdSql.Data.Common;
 using WireCryptOption = FirebirdSql.Data.Client.Managed.Version13.WireCryptOption;
 

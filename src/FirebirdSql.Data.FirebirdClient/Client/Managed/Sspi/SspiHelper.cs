@@ -20,7 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Managed;
+namespace FirebirdSql.Data.Client.Managed.Sspi;
 
 internal sealed class SspiHelper : IDisposable
 {
