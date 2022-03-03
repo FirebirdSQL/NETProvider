@@ -489,11 +489,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 		return new FbBatchCommand(null, this);
 	}
 
-	public override void ChangeDatabase(string db)
+	public override void ChangeDatabase(string databaseName)
 	{
 		CheckClosed();
 
-		if (string.IsNullOrEmpty(db))
+		if (string.IsNullOrEmpty(databaseName))
 		{
 			throw new InvalidOperationException("Database name is not valid.");
 		}
@@ -507,7 +507,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 			Close();
 
 			/* Set up the new Database	*/
-			csb.Database = db;
+			csb.Database = databaseName;
 			ConnectionString = csb.ToString();
 
 			/* Open	new	connection	*/
@@ -520,14 +520,14 @@ public sealed class FbConnection : DbConnection, ICloneable
 		}
 	}
 #if NET48 || NETSTANDARD2_0
-	public async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+	public async Task ChangeDatabaseAsync(string databaseName, CancellationToken cancellationToken = default)
 #else
-	public override async Task ChangeDatabaseAsync(string db, CancellationToken cancellationToken = default)
+	public override async Task ChangeDatabaseAsync(string databaseName, CancellationToken cancellationToken = default)
 #endif
 	{
 		CheckClosed();
 
-		if (string.IsNullOrEmpty(db))
+		if (string.IsNullOrEmpty(databaseName))
 		{
 			throw new InvalidOperationException("Database name is not valid.");
 		}
@@ -541,7 +541,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 			await CloseAsync().ConfigureAwait(false);
 
 			/* Set up the new Database	*/
-			csb.Database = db;
+			csb.Database = databaseName;
 			ConnectionString = csb.ToString();
 
 			/* Open	new	connection	*/
