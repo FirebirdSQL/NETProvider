@@ -324,7 +324,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 
 	public override StatementBase CreateStatement(TransactionBase transaction)
 	{
-		return new GdsStatement(this, transaction);
+		return new GdsStatement(this, (Version10.GdsTransaction)transaction);
 	}
 
 	public override DatabaseParameterBufferBase CreateDatabaseParameterBuffer()

@@ -101,28 +101,19 @@ internal class GdsStatement : StatementBase
 
 	#region Constructors
 
-	public GdsStatement(DatabaseBase db)
-		: this(db, null)
+	public GdsStatement(GdsDatabase database)
+		: this(database, null)
 	{
 	}
 
-	public GdsStatement(DatabaseBase db, TransactionBase transaction)
+	public GdsStatement(GdsDatabase database, GdsTransaction transaction)
 	{
-		if (!(db is GdsDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
-		}
-		if (transaction != null && !(transaction is GdsTransaction))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
-		}
-
 		_handle = IscCodes.INVALID_OBJECT;
 		_fetchSize = 200;
 		_rows = new Queue<DbValue[]>();
 		OutputParameters = new Queue<DbValue[]>();
 
-		_database = (GdsDatabase)db;
+		_database = database;
 
 		if (transaction != null)
 		{

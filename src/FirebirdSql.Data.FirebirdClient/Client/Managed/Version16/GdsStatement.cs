@@ -24,12 +24,12 @@ namespace FirebirdSql.Data.Client.Managed.Version16;
 
 internal class GdsStatement : Version15.GdsStatement
 {
-	public GdsStatement(DatabaseBase db)
-		: base(db)
+	public GdsStatement(GdsDatabase database)
+		: base(database)
 	{ }
 
-	public GdsStatement(DatabaseBase db, TransactionBase transaction)
-		: base(db, transaction)
+	public GdsStatement(GdsDatabase database, Version10.GdsTransaction transaction)
+		: base(database, transaction)
 	{ }
 
 	protected override void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)

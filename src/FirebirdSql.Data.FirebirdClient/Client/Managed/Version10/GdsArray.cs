@@ -65,25 +65,15 @@ internal sealed class GdsArray : ArrayBase
 		: base(descriptor)
 	{ }
 
-	public GdsArray(DatabaseBase db, TransactionBase transaction, string tableName, string fieldName)
-		: this(db, transaction, -1, tableName, fieldName)
+	public GdsArray(GdsDatabase database, GdsTransaction transaction, string tableName, string fieldName)
+		: this(database, transaction, -1, tableName, fieldName)
 	{ }
 
-	public GdsArray(DatabaseBase db, TransactionBase transaction, long handle, string tableName, string fieldName)
+	public GdsArray(GdsDatabase database, GdsTransaction transaction, long handle, string tableName, string fieldName)
 		: base(tableName, fieldName)
 	{
-		if (!(db is GdsDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
-		}
-
-		if (!(transaction is GdsTransaction))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
-		}
-
-		_database = (GdsDatabase)db;
-		_transaction = (GdsTransaction)transaction;
+		_database = database;
+		_transaction = transaction;
 		_handle = handle;
 	}
 

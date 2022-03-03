@@ -28,7 +28,7 @@ internal sealed class FesBlob : BlobBase
 {
 	#region Fields
 
-	private FesDatabase _db;
+	private FesDatabase _database;
 	private IntPtr[] _statusVector;
 	private BlobHandle _blobHandle;
 
@@ -38,7 +38,7 @@ internal sealed class FesBlob : BlobBase
 
 	public override DatabaseBase Database
 	{
-		get { return _db; }
+		get { return _database; }
 	}
 
 	public override int Handle
@@ -50,25 +50,16 @@ internal sealed class FesBlob : BlobBase
 
 	#region Constructors
 
-	public FesBlob(DatabaseBase db, TransactionBase transaction)
-		: this(db, transaction, 0)
+	public FesBlob(FesDatabase database, FesTransaction transaction)
+		: this(database, transaction, 0)
 	{
 	}
 
-	public FesBlob(DatabaseBase db, TransactionBase transaction, long blobId)
-		: base(db)
+	public FesBlob(FesDatabase database, FesTransaction transaction, long blobId)
+		: base(database)
 	{
-		if (!(db is FesDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
-		}
-		if (!(transaction is FesTransaction))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(FesTransaction)} type.");
-		}
-
-		_db = (FesDatabase)db;
-		_transaction = (FesTransaction)transaction;
+		_database = database;
+		_transaction = transaction;
 		_position = 0;
 		_blobHandle = new BlobHandle();
 		_blobId = blobId;
@@ -83,10 +74,10 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-		_db.FbClient.isc_create_blob2(
+		_database.FbClient.isc_create_blob2(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -95,7 +86,7 @@ internal sealed class FesBlob : BlobBase
 			0,
 			new byte[0]);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		RblAddValue(IscCodes.RBL_create);
 	}
@@ -103,10 +94,10 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-		_db.FbClient.isc_create_blob2(
+		_database.FbClient.isc_create_blob2(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -115,7 +106,7 @@ internal sealed class FesBlob : BlobBase
 			0,
 			new byte[0]);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		RblAddValue(IscCodes.RBL_create);
 
@@ -126,10 +117,10 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-		_db.FbClient.isc_open_blob2(
+		_database.FbClient.isc_open_blob2(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -138,16 +129,16 @@ internal sealed class FesBlob : BlobBase
 			0,
 			new byte[0]);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 	}
 	protected override ValueTask OpenAsync(CancellationToken cancellationToken = default)
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = ((FesTransaction)_transaction).HandlePtr;
 
-		_db.FbClient.isc_open_blob2(
+		_database.FbClient.isc_open_blob2(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -156,7 +147,7 @@ internal sealed class FesBlob : BlobBase
 			0,
 			new byte[0]);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.CompletedTask;
 	}
@@ -170,7 +161,7 @@ internal sealed class FesBlob : BlobBase
 
 		var tmp = new byte[requested];
 
-		var status = _db.FbClient.isc_get_segment(
+		var status = _database.FbClient.isc_get_segment(
 			_statusVector,
 			ref _blobHandle,
 			ref segmentLength,
@@ -193,7 +184,7 @@ internal sealed class FesBlob : BlobBase
 			}
 			else
 			{
-				_db.ProcessStatusVector(_statusVector);
+				_database.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -208,7 +199,7 @@ internal sealed class FesBlob : BlobBase
 
 		var tmp = new byte[requested];
 
-		var status = _db.FbClient.isc_get_segment(
+		var status = _database.FbClient.isc_get_segment(
 			_statusVector,
 			ref _blobHandle,
 			ref segmentLength,
@@ -231,7 +222,7 @@ internal sealed class FesBlob : BlobBase
 			}
 			else
 			{
-				_db.ProcessStatusVector(_statusVector);
+				_database.ProcessStatusVector(_statusVector);
 			}
 		}
 
@@ -244,25 +235,25 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_put_segment(
+		_database.FbClient.isc_put_segment(
 			_statusVector,
 			ref _blobHandle,
 			(short)buffer.Length,
 			buffer);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 	}
 	protected override ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default)
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_put_segment(
+		_database.FbClient.isc_put_segment(
 			_statusVector,
 			ref _blobHandle,
 			(short)buffer.Length,
 			buffer);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.CompletedTask;
 	}
@@ -280,17 +271,17 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
+		_database.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 	}
 	protected override ValueTask CloseAsync(CancellationToken cancellationToken = default)
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
+		_database.FbClient.isc_close_blob(_statusVector, ref _blobHandle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.CompletedTask;
 	}
@@ -299,17 +290,17 @@ internal sealed class FesBlob : BlobBase
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
+		_database.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 	}
 	protected override ValueTask CancelAsync(CancellationToken cancellationToken = default)
 	{
 		ClearStatusVector();
 
-		_db.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
+		_database.FbClient.isc_cancel_blob(_statusVector, ref _blobHandle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.CompletedTask;
 	}

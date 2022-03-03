@@ -41,7 +41,7 @@ internal class GdsDatabase : Version10.GdsDatabase
 
 	public override StatementBase CreateStatement(TransactionBase transaction)
 	{
-		return new GdsStatement(this, transaction);
+		return new GdsStatement(this, (Version10.GdsTransaction)transaction);
 	}
 
 	public override void AttachWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)

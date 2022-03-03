@@ -51,23 +51,14 @@ internal sealed class GdsBlob : BlobBase
 
 	#region Constructors
 
-	public GdsBlob(DatabaseBase db, TransactionBase transaction)
-		: this(db, transaction, 0)
+	public GdsBlob(GdsDatabase database, GdsTransaction transaction)
+		: this(database, transaction, 0)
 	{ }
 
-	public GdsBlob(DatabaseBase db, TransactionBase transaction, long blobId)
-		: base(db)
+	public GdsBlob(GdsDatabase database, GdsTransaction transaction, long blobId)
+		: base(database)
 	{
-		if (!(db is GdsDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
-		}
-		if (!(transaction is GdsTransaction))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsTransaction)} type.");
-		}
-
-		_database = (GdsDatabase)db;
+		_database = database;
 		_transaction = transaction;
 		_position = 0;
 		_blobHandle = 0;

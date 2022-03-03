@@ -62,6 +62,6 @@ internal class GdsDatabase : Version13.GdsDatabase
 
 	public override StatementBase CreateStatement(TransactionBase transaction)
 	{
-		return new GdsStatement(this, transaction);
+		return new GdsStatement(this, (Version10.GdsTransaction)transaction);
 	}
 }

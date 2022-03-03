@@ -44,7 +44,7 @@ internal sealed class FesTransaction : TransactionBase
 	#region Fields
 
 	private TransactionHandle _handle;
-	private FesDatabase _db;
+	private FesDatabase _database;
 	private bool _disposed;
 	private IntPtr[] _statusVector;
 
@@ -66,14 +66,9 @@ internal sealed class FesTransaction : TransactionBase
 
 	#region Constructors
 
-	public FesTransaction(DatabaseBase db)
+	public FesTransaction(FesDatabase database)
 	{
-		if (!(db is FesDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
-		}
-
-		_db = (FesDatabase)db;
+		_database = database;
 		_handle = new TransactionHandle();
 		State = TransactionState.NoTransaction;
 		_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
@@ -92,7 +87,7 @@ internal sealed class FesTransaction : TransactionBase
 			{
 				Rollback();
 			}
-			_db = null;
+			_database = null;
 			_handle.Dispose();
 			State = TransactionState.NoTransaction;
 			_statusVector = null;
@@ -108,7 +103,7 @@ internal sealed class FesTransaction : TransactionBase
 			{
 				await RollbackAsync(cancellationToken).ConfigureAwait(false);
 			}
-			_db = null;
+			_database = null;
 			_handle.Dispose();
 			State = TransactionState.NoTransaction;
 			_statusVector = null;
@@ -135,7 +130,7 @@ internal sealed class FesTransaction : TransactionBase
 			ClearStatusVector();
 
 			teb.dbb_ptr = Marshal.AllocHGlobal(4);
-			Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
+			Marshal.WriteInt32(teb.dbb_ptr, _database.Handle);
 
 			teb.tpb_len = tpb.Length;
 
@@ -147,17 +142,17 @@ internal sealed class FesTransaction : TransactionBase
 
 			Marshal.StructureToPtr(teb, tebData, true);
 
-			_db.FbClient.isc_start_multiple(
+			_database.FbClient.isc_start_multiple(
 				_statusVector,
 				ref _handle,
 				1,
 				tebData);
 
-			_db.ProcessStatusVector(_statusVector);
+			_database.ProcessStatusVector(_statusVector);
 
 			State = TransactionState.Active;
 
-			_db.TransactionCount++;
+			_database.TransactionCount++;
 		}
 		finally
 		{
@@ -191,7 +186,7 @@ internal sealed class FesTransaction : TransactionBase
 			ClearStatusVector();
 
 			teb.dbb_ptr = Marshal.AllocHGlobal(4);
-			Marshal.WriteInt32(teb.dbb_ptr, _db.Handle);
+			Marshal.WriteInt32(teb.dbb_ptr, _database.Handle);
 
 			teb.tpb_len = tpb.Length;
 
@@ -203,17 +198,17 @@ internal sealed class FesTransaction : TransactionBase
 
 			Marshal.StructureToPtr(teb, tebData, true);
 
-			_db.FbClient.isc_start_multiple(
+			_database.FbClient.isc_start_multiple(
 				_statusVector,
 				ref _handle,
 				1,
 				tebData);
 
-			_db.ProcessStatusVector(_statusVector);
+			_database.ProcessStatusVector(_statusVector);
 
 			State = TransactionState.Active;
 
-			_db.TransactionCount++;
+			_database.TransactionCount++;
 		}
 		finally
 		{
@@ -241,11 +236,11 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
+		_database.FbClient.isc_commit_transaction(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
-		_db.TransactionCount--;
+		_database.TransactionCount--;
 
 		OnUpdate(EventArgs.Empty);
 
@@ -257,11 +252,11 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_commit_transaction(_statusVector, ref _handle);
+		_database.FbClient.isc_commit_transaction(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
-		_db.TransactionCount--;
+		_database.TransactionCount--;
 
 		OnUpdate(EventArgs.Empty);
 
@@ -276,11 +271,11 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
+		_database.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
-		_db.TransactionCount--;
+		_database.TransactionCount--;
 
 		OnUpdate(EventArgs.Empty);
 
@@ -292,11 +287,11 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
+		_database.FbClient.isc_rollback_transaction(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
-		_db.TransactionCount--;
+		_database.TransactionCount--;
 
 		OnUpdate(EventArgs.Empty);
 
@@ -311,9 +306,9 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
+		_database.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		State = TransactionState.Active;
 	}
@@ -323,9 +318,9 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_commit_retaining(_statusVector, ref _handle);
+		_database.FbClient.isc_commit_retaining(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		State = TransactionState.Active;
 
@@ -338,9 +333,9 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
+		_database.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		State = TransactionState.Active;
 	}
@@ -350,9 +345,9 @@ internal sealed class FesTransaction : TransactionBase
 
 		ClearStatusVector();
 
-		_db.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
+		_database.FbClient.isc_rollback_retaining(_statusVector, ref _handle);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		State = TransactionState.Active;
 

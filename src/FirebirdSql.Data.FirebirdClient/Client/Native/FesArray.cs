@@ -31,7 +31,7 @@ internal sealed class FesArray : ArrayBase
 	#region Fields
 
 	private long _handle;
-	private FesDatabase _db;
+	private FesDatabase _database;
 	private FesTransaction _transaction;
 	private IntPtr[] _statusVector;
 
@@ -47,8 +47,8 @@ internal sealed class FesArray : ArrayBase
 
 	public override DatabaseBase Database
 	{
-		get { return _db; }
-		set { _db = (FesDatabase)value; }
+		get { return _database; }
+		set { _database = (FesDatabase)value; }
 	}
 
 	public override TransactionBase Transaction
@@ -67,23 +67,15 @@ internal sealed class FesArray : ArrayBase
 		_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 	}
 
-	public FesArray(DatabaseBase db, TransactionBase transaction, string tableName, string fieldName)
-		: this(db, transaction, -1, tableName, fieldName)
+	public FesArray(FesDatabase database, FesTransaction transaction, string tableName, string fieldName)
+		: this(database, transaction, -1, tableName, fieldName)
 	{ }
 
-	public FesArray(DatabaseBase db, TransactionBase transaction, long handle, string tableName, string fieldName)
+	public FesArray(FesDatabase database, FesTransaction transaction, long handle, string tableName, string fieldName)
 		: base(tableName, fieldName)
 	{
-		if (!(db is FesDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(FesDatabase)} type.");
-		}
-		if (!(transaction is FesTransaction))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(FesTransaction)} type.");
-		}
-		_db = (FesDatabase)db;
-		_transaction = (FesTransaction)transaction;
+		_database = database;
+		_transaction = transaction;
 		_handle = handle;
 		_statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 	}
@@ -96,14 +88,14 @@ internal sealed class FesArray : ArrayBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = _transaction.HandlePtr;
 
 		var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
 		var buffer = new byte[sliceLength];
 
-		_db.FbClient.isc_array_get_slice(
+		_database.FbClient.isc_array_get_slice(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -114,7 +106,7 @@ internal sealed class FesArray : ArrayBase
 
 		ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return buffer;
 	}
@@ -122,14 +114,14 @@ internal sealed class FesArray : ArrayBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = _transaction.HandlePtr;
 
 		var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
 
 		var buffer = new byte[sliceLength];
 
-		_db.FbClient.isc_array_get_slice(
+		_database.FbClient.isc_array_get_slice(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -140,7 +132,7 @@ internal sealed class FesArray : ArrayBase
 
 		ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.FromResult(buffer);
 	}
@@ -149,7 +141,7 @@ internal sealed class FesArray : ArrayBase
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = _transaction.HandlePtr;
 
 		var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
@@ -166,7 +158,7 @@ internal sealed class FesArray : ArrayBase
 			buffer = EncodeSlice(Descriptor, sourceArray, sliceLength);
 		}
 
-		_db.FbClient.isc_array_put_slice(
+		_database.FbClient.isc_array_put_slice(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -177,13 +169,13 @@ internal sealed class FesArray : ArrayBase
 
 		ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 	}
 	public override ValueTask PutSliceAsync(Array sourceArray, int sliceLength, CancellationToken cancellationToken = default)
 	{
 		ClearStatusVector();
 
-		var dbHandle = _db.HandlePtr;
+		var dbHandle = _database.HandlePtr;
 		var trHandle = _transaction.HandlePtr;
 
 		var arrayDesc = ArrayDescMarshaler.MarshalManagedToNative(Descriptor);
@@ -200,7 +192,7 @@ internal sealed class FesArray : ArrayBase
 			buffer = EncodeSlice(Descriptor, sourceArray, sliceLength);
 		}
 
-		_db.FbClient.isc_array_put_slice(
+		_database.FbClient.isc_array_put_slice(
 			_statusVector,
 			ref dbHandle,
 			ref trHandle,
@@ -211,7 +203,7 @@ internal sealed class FesArray : ArrayBase
 
 		ArrayDescMarshaler.CleanUpNativeData(ref arrayDesc);
 
-		_db.ProcessStatusVector(_statusVector);
+		_database.ProcessStatusVector(_statusVector);
 
 		return ValueTask2.CompletedTask;
 	}
@@ -227,7 +219,7 @@ internal sealed class FesArray : ArrayBase
 		var type = 0;
 		var dbType = DbDataType.Array;
 		var systemType = GetSystemType();
-		var charset = _db.Charset;
+		var charset = _database.Charset;
 		var lengths = new int[Descriptor.Dimensions];
 		var lowerBounds = new int[Descriptor.Dimensions];
 
@@ -382,7 +374,7 @@ internal sealed class FesArray : ArrayBase
 		var type = 0;
 		var dbType = DbDataType.Array;
 		var systemType = GetSystemType();
-		var charset = _db.Charset;
+		var charset = _database.Charset;
 		var lengths = new int[Descriptor.Dimensions];
 		var lowerBounds = new int[Descriptor.Dimensions];
 
@@ -546,7 +538,7 @@ internal sealed class FesArray : ArrayBase
 		{
 			using (var writer = new BinaryWriter(ms))
 			{
-				var charset = _db.Charset;
+				var charset = _database.Charset;
 				var dbType = DbDataType.Array;
 				var subType = (Descriptor.Scale < 0) ? 2 : 0;
 				var type = 0;

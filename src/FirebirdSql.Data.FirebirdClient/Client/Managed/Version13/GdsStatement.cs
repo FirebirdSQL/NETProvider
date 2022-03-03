@@ -28,12 +28,12 @@ internal class GdsStatement : Version12.GdsStatement
 {
 	#region Constructors
 
-	public GdsStatement(DatabaseBase db)
-		: base(db)
+	public GdsStatement(GdsDatabase database)
+		: base(database)
 	{ }
 
-	public GdsStatement(DatabaseBase db, TransactionBase transaction)
-		: base(db, transaction)
+	public GdsStatement(GdsDatabase database, Version10.GdsTransaction transaction)
+		: base(database, transaction)
 	{ }
 
 	#endregion

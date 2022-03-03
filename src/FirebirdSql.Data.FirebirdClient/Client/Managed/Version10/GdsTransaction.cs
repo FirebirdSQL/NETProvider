@@ -44,14 +44,9 @@ internal class GdsTransaction : TransactionBase
 
 	#region Constructors
 
-	public GdsTransaction(DatabaseBase db)
+	public GdsTransaction(GdsDatabase database)
 	{
-		if (!(db is GdsDatabase))
-		{
-			throw new ArgumentException($"Specified argument is not of {nameof(GdsDatabase)} type.");
-		}
-
-		_database = (GdsDatabase)db;
+		_database = database;
 		State = TransactionState.NoTransaction;
 	}
 

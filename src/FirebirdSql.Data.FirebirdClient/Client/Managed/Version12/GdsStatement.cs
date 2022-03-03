@@ -19,7 +19,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using FirebirdSql.Data.Client.Managed.Version10;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed.Version12;
@@ -28,12 +27,12 @@ internal class GdsStatement : Version11.GdsStatement
 {
 	#region Constructors
 
-	public GdsStatement(DatabaseBase db)
-		: base(db)
+	public GdsStatement(GdsDatabase database)
+		: base(database)
 	{ }
 
-	public GdsStatement(DatabaseBase db, TransactionBase transaction)
-		: base(db, transaction)
+	public GdsStatement(GdsDatabase database, Version10.GdsTransaction transaction)
+		: base(database, transaction)
 	{ }
 
 	#endregion

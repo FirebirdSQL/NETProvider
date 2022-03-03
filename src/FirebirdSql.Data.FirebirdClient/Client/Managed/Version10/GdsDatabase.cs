@@ -690,7 +690,7 @@ internal class GdsDatabase : DatabaseBase
 
 	public override StatementBase CreateStatement(TransactionBase transaction)
 	{
-		return new GdsStatement(this, transaction);
+		return new GdsStatement(this, (GdsTransaction)transaction);
 	}
 
 	#endregion
