@@ -18,7 +18,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Client.Native.Handles;
 
 namespace FirebirdSql.Data.Client.Native;
 

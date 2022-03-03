@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Client.Native.Handles;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native;

@@ -19,10 +19,10 @@ using System;
 using System.Diagnostics.Contracts;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Native.Handle;
+namespace FirebirdSql.Data.Client.Native.Handles;
 
 // public visibility added, because auto-generated assembly can't work with internal types
-public class StatementHandle : FirebirdHandle
+public class DatabaseHandle : FirebirdHandle
 {
 	protected override bool ReleaseHandle()
 	{
@@ -35,9 +35,8 @@ public class StatementHandle : FirebirdHandle
 
 		var statusVector = new IntPtr[IscCodes.ISC_STATUS_LENGTH];
 		var @ref = this;
-		FbClient.isc_dsql_free_statement(statusVector, ref @ref, IscCodes.DSQL_drop);
+		FbClient.isc_detach_database(statusVector, ref @ref);
 		handle = @ref.handle;
-
 		var exception = StatusVectorHelper.ParseStatusVector(statusVector, Charset.DefaultCharset);
 		return exception == null || exception.IsWarning;
 	}

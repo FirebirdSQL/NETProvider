@@ -22,7 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Threading;
-using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Client.Native.Handles;
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Native;

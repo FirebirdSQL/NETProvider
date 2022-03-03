@@ -16,31 +16,11 @@
 //$Authors = Hennadii Zabula
 
 using System;
-using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices;
 
-namespace FirebirdSql.Data.Client.Native.Handle;
+namespace FirebirdSql.Data.Client.Native.Handles;
 
 // public visibility added, because auto-generated assembly can't work with internal types
-public abstract class FirebirdHandle : SafeHandle, IFirebirdHandle
+public interface IFirebirdHandle
 {
-	private IFbClient _fbClient;
-
-	protected FirebirdHandle()
-		: base(IntPtr.Zero, true)
-	{ }
-
-	// Method added because we can't inject IFbClient in ctor
-	public void SetClient(IFbClient fbClient)
-	{
-		Contract.Requires(_fbClient == null);
-		Contract.Requires(fbClient != null);
-		Contract.Ensures(_fbClient != null);
-
-		_fbClient = fbClient;
-	}
-
-	public IFbClient FbClient => _fbClient;
-
-	public override bool IsInvalid => handle == IntPtr.Zero;
+	void SetClient(IFbClient fbClient);
 }

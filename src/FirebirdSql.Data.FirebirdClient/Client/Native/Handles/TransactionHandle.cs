@@ -19,7 +19,7 @@ using System;
 using System.Diagnostics.Contracts;
 using FirebirdSql.Data.Common;
 
-namespace FirebirdSql.Data.Client.Native.Handle;
+namespace FirebirdSql.Data.Client.Native.Handles;
 
 // public visibility added, because auto-generated assembly can't work with internal types
 public class TransactionHandle : FirebirdHandle

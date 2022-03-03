@@ -21,7 +21,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 
 using FirebirdSql.Data.Common;
-using FirebirdSql.Data.Client.Native.Handle;
+using FirebirdSql.Data.Client.Native.Handles;
 using System.Threading.Tasks;
 using System.Threading;
 
