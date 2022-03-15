@@ -49,6 +49,14 @@ public sealed class FbBatchNonQueryResult : IEnumerable<FbBatchNonQueryResultIte
 
 	public FbBatchNonQueryResultItem this[int index] => _items[index];
 
+	public void EnsureSuccess()
+	{
+		var indexes = _items.Where(x => !x.IsSuccess).Select((_, i) => i).ToList();
+		if (indexes.Count == 0)
+			return;
+		throw FbException.Create($"Indexes {string.Join(", ", indexes)} failed in batch.");
+	}
+
 	public IEnumerator<FbBatchNonQueryResultItem> GetEnumerator() => _items.GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

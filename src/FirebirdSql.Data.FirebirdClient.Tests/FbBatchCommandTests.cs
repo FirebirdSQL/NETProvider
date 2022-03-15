@@ -289,6 +289,21 @@ public class FbBatchCommandTests : FbTestsBase
 			Assert.IsTrue(result.AllSuccess);
 		}
 	}
+	[Test]
+	public async Task EnsureSuccess()
+	{
+		await EmptyTable();
+
+		await using (var cmd = Connection.CreateBatchCommand())
+		{
+			cmd.CommandText = "insert into batch (i) values (@i)";
+			var batch1 = cmd.AddBatchParameters();
+			batch1.Add("i", 2000);
+			var result = await cmd.ExecuteNonQueryAsync();
+
+			Assert.Throws<FbException>(result.EnsureSuccess);
+		}
+	}
 
 	async Task EmptyTable()
 	{
