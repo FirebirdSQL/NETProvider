@@ -289,8 +289,9 @@ public class FbBatchCommandTests : FbTestsBase
 			Assert.IsTrue(result.AllSuccess);
 		}
 	}
+
 	[Test]
-	public async Task EnsureSuccess()
+	public async Task EnsureSuccessThrow()
 	{
 		await EmptyTable();
 
@@ -302,6 +303,22 @@ public class FbBatchCommandTests : FbTestsBase
 			var result = await cmd.ExecuteNonQueryAsync();
 
 			Assert.Throws<FbException>(result.EnsureSuccess);
+		}
+	}
+
+	[Test]
+	public async Task EnsureSuccessNoThrow()
+	{
+		await EmptyTable();
+
+		await using (var cmd = Connection.CreateBatchCommand())
+		{
+			cmd.CommandText = "insert into batch (i) values (@i)";
+			var batch1 = cmd.AddBatchParameters();
+			batch1.Add("i", 20);
+			var result = await cmd.ExecuteNonQueryAsync();
+
+			Assert.DoesNotThrow(result.EnsureSuccess);
 		}
 	}
 
