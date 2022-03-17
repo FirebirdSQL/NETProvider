@@ -831,4 +831,117 @@ end";
 			Assert.ThrowsAsync<OperationCanceledException>(async () => await cmd.ExecuteNonQueryAsync());
 		}
 	}
+
+	[Test]
+	public async Task DefaultTimeoutValueTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				Assert.AreEqual(0, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task TimeoutConnectionStringTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.CommandTimeout = 20;
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				Assert.AreEqual(20, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task TimeoutNegativeConnectionStringTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.CommandTimeout = -1;
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				Assert.AreEqual(0, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task Timeout0ConnectionStringTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.CommandTimeout = 0;
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				Assert.AreEqual(0, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task SetTimeoutTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				cmd.CommandTimeout = 6;
+				Assert.AreEqual(6, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task SetTimeout0Test()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				cmd.CommandTimeout = 0;
+				Assert.AreEqual(0, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task TimeoutConnectionStringOverrideTest()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.CommandTimeout = 20;
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				cmd.CommandTimeout = 2;
+				Assert.AreEqual(2, cmd.CommandTimeout);
+			}
+		}
+	}
+
+	[Test]
+	public async Task TimeoutConnectionStringOverride0Test()
+	{
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.CommandTimeout = 20;
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await using (var cmd = conn.CreateCommand())
+			{
+				cmd.CommandTimeout = 0;
+				Assert.AreEqual(0, cmd.CommandTimeout);
+			}
+		}
+	}
 }

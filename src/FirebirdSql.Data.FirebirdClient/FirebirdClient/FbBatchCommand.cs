@@ -46,7 +46,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 	private string _commandText;
 	private bool _disposed;
 	private bool _implicitTransaction;
-	//private int _commandTimeout;
+	//private int? _commandTimeout;
 	//private int _fetchSize;
 	private bool _multiError;
 
@@ -68,15 +68,17 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		}
 	}
 
+	//[Category("Behavior")]
+	//[DefaultValue(ConnectionString.DefaultValueCommandTimeout)]
 	//public int CommandTimeout
 	//{
 	//	get
 	//	{
-	//		if (_commandTimeout > 0)
-	//			return _commandTimeout;
-	//		if (_connection?.ConnectionOptions.CommandTimeout > 0)
-	//			return (int)_connection?.ConnectionOptions.CommandTimeout;
-	//		return 30;
+	//		if (_commandTimeout != null)
+	//			return (int)_commandTimeout;
+	//		if (_connection?.CommandTimeout >= 0)
+	//			return (int)_connection?.CommandTimeout;
+	//		return ConnectionString.DefaultValueCommandTimeout;
 	//	}
 	//	set
 	//	{
@@ -228,7 +230,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 	public FbBatchCommand(string cmdText, FbConnection connection, FbTransaction transaction)
 	{
 		_namedParameters = Array.Empty<string>();
-		//_commandTimeout = 0;
+		//_commandTimeout = null;
 		//_fetchSize = 200;
 		_multiError = false;
 		_commandText = string.Empty;
@@ -265,7 +267,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 				throw FbException.Create(ex);
 			}
 			_multiError = false;
-			//_commandTimeout = 0;
+			//_commandTimeout = null;
 			//_fetchSize = 0;
 			_implicitTransaction = false;
 			_commandText = null;

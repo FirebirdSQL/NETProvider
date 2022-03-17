@@ -46,7 +46,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	private bool _disposed;
 	private bool _designTimeVisible;
 	private bool _implicitTransaction;
-	private int _commandTimeout;
+	private int? _commandTimeout;
 	private int _fetchSize;
 	private Type[] _expectedColumnTypes;
 
@@ -72,22 +72,25 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	}
 
 	[Category("Data")]
-	[DefaultValue(CommandType.Text), RefreshProperties(RefreshProperties.All)]
+	[DefaultValue(CommandType.Text)]
+	[RefreshProperties(RefreshProperties.All)]
 	public override CommandType CommandType
 	{
 		get { return _commandType; }
 		set { _commandType = value; }
 	}
 
+	[Category("Behavior")]
+	[DefaultValue(ConnectionString.DefaultValueCommandTimeout)]
 	public override int CommandTimeout
 	{
 		get
 		{
-			if (_commandTimeout > 0)
-				return _commandTimeout;
-			if (_connection?.ConnectionOptions.CommandTimeout > 0)
-				return (int)_connection?.ConnectionOptions.CommandTimeout;
-			return 30;
+			if (_commandTimeout != null)
+				return (int)_commandTimeout;
+			if (_connection?.CommandTimeout >= 0)
+				return (int)_connection?.CommandTimeout;
+			return ConnectionString.DefaultValueCommandTimeout;
 		}
 		set
 		{
@@ -312,7 +315,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		_updatedRowSource = UpdateRowSource.Both;
 		_commandType = CommandType.Text;
 		_designTimeVisible = true;
-		_commandTimeout = 0;
+		_commandTimeout = null;
 		_fetchSize = 200;
 		_commandText = string.Empty;
 
@@ -356,7 +359,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				{
 					throw FbException.Create(ex);
 				}
-				_commandTimeout = 0;
+				_commandTimeout = null;
 				_fetchSize = 0;
 				_implicitTransaction = false;
 				_commandText = null;

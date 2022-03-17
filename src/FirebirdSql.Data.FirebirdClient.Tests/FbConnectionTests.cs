@@ -668,21 +668,6 @@ public class FbConnectionTests : FbTestsBase
 
 	}
 
-	[Test]
-	public async Task CommandTimeoutProperlyPassed()
-	{
-		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
-		csb.CommandTimeout = 23;
-		await using (var conn = new FbConnection(csb.ToString()))
-		{
-			await using (var command = conn.CreateCommand())
-			{
-				Assert.AreEqual(csb.CommandTimeout, command.CommandTimeout);
-			}
-		}
-
-	}
-
 	private async Task BeginTransactionILTestsHelper(IsolationLevel level)
 	{
 		await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
