@@ -15,6 +15,8 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+
 namespace FirebirdSql.Data.Common;
 
 internal static class PageSizeHelper
@@ -27,5 +29,10 @@ internal static class PageSizeHelper
 			|| value == 8192
 			|| value == 16384
 			|| value == 32768;
+	}
+
+	public static Exception InvalidPageSizeException()
+	{
+		return new InvalidOperationException("Invalid page size.");
 	}
 }

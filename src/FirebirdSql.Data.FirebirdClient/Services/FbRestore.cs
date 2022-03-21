@@ -33,7 +33,7 @@ public sealed class FbRestore : FbService
 		set
 		{
 			if (value is int v && !PageSizeHelper.IsValidPageSize(v))
-				throw new InvalidOperationException("Invalid page size.");
+				throw PageSizeHelper.InvalidPageSizeException();
 
 			_pageSize = value;
 		}

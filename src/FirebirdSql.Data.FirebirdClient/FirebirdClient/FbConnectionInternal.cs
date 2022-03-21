@@ -124,6 +124,9 @@ internal class FbConnectionInternal
 		dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
 		if (pageSize > 0)
 		{
+			if (!PageSizeHelper.IsValidPageSize(pageSize))
+				throw PageSizeHelper.InvalidPageSizeException();
+
 			dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 		}
 
@@ -169,6 +172,8 @@ internal class FbConnectionInternal
 		dpb.Append(IscCodes.isc_dpb_overwrite, (overwrite ? 1 : 0));
 		if (pageSize > 0)
 		{
+			if (!PageSizeHelper.IsValidPageSize(pageSize))
+				throw PageSizeHelper.InvalidPageSizeException();
 			dpb.Append(IscCodes.isc_dpb_page_size, pageSize);
 		}
 
