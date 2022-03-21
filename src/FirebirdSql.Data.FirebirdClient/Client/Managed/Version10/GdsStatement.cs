@@ -764,9 +764,8 @@ internal class GdsStatement : StatementBase
 	#region op_execute/op_execute2 methods
 	protected virtual void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
 	{
-		descriptorFiller.Fill(_parameters, 0);
 		// this may throw error, so it needs to be before any writing
-		var parametersData = WriteParameters();
+		var parametersData = GetParameterData(descriptorFiller, 0);
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
@@ -802,9 +801,8 @@ internal class GdsStatement : StatementBase
 	}
 	protected virtual async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 	{
-		await descriptorFiller.FillAsync(_parameters, 0, cancellationToken).ConfigureAwait(false);
 		// this may throw error, so it needs to be before any writing
-		var parametersData = await WriteParametersAsync(cancellationToken).ConfigureAwait(false);
+		var parametersData = await GetParameterDataAsync(descriptorFiller, 0, cancellationToken).ConfigureAwait(false);
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
@@ -1170,6 +1168,57 @@ internal class GdsStatement : StatementBase
 			{ }
 		}
 		return rowDescs;
+	}
+
+	protected virtual byte[] WriteParameters()
+	{
+		if (_parameters == null)
+			return null;
+
+		using (var ms = new MemoryStream())
+		{
+			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+			for (var i = 0; i < _parameters.Count; i++)
+			{
+				var field = _parameters[i];
+				try
+				{
+					WriteRawParameter(xdr, field);
+					xdr.Write(field.NullFlag);
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForIOException(ex);
+				}
+			}
+			xdr.Flush();
+			return ms.ToArray();
+		}
+	}
+	protected virtual async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
+	{
+		if (_parameters == null)
+			return null;
+
+		using (var ms = new MemoryStream())
+		{
+			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+			for (var i = 0; i < _parameters.Count; i++)
+			{
+				var field = _parameters[i];
+				try
+				{
+					await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
+					await xdr.WriteAsync(field.NullFlag, cancellationToken).ConfigureAwait(false);
+				}
+				catch (IOException ex)
+				{
+					throw IscException.ForIOException(ex);
+				}
+			}
+			await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+			return ms.ToArray();
+		}
 	}
 
 	protected void WriteRawParameter(IXdrWriter xdr, DbField field)
@@ -1749,55 +1798,15 @@ internal class GdsStatement : StatementBase
 
 	#region Protected Internal Methods
 
-	protected internal virtual byte[] WriteParameters()
+	protected internal byte[] GetParameterData(IDescriptorFiller descriptorFiller, int index)
 	{
-		if (_parameters == null)
-			return null;
-
-		using (var ms = new MemoryStream())
-		{
-			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-			for (var i = 0; i < _parameters.Count; i++)
-			{
-				var field = _parameters[i];
-				try
-				{
-					WriteRawParameter(xdr, field);
-					xdr.Write(field.NullFlag);
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForIOException(ex);
-				}
-			}
-			xdr.Flush();
-			return ms.ToArray();
-		}
+		descriptorFiller.Fill(_parameters, index);
+		return WriteParameters();
 	}
-	protected internal virtual async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
+	protected internal async ValueTask<byte[]> GetParameterDataAsync(IDescriptorFiller descriptorFiller, int index, CancellationToken cancellationToken = default)
 	{
-		if (_parameters == null)
-			return null;
-
-		using (var ms = new MemoryStream())
-		{
-			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-			for (var i = 0; i < _parameters.Count; i++)
-			{
-				var field = _parameters[i];
-				try
-				{
-					await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
-					await xdr.WriteAsync(field.NullFlag, cancellationToken).ConfigureAwait(false);
-				}
-				catch (IOException ex)
-				{
-					throw IscException.ForIOException(ex);
-				}
-			}
-			await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-			return ms.ToArray();
-		}
+		await descriptorFiller.FillAsync(_parameters, index, cancellationToken).ConfigureAwait(false);
+		return WriteParameters();
 	}
 
 	#endregion

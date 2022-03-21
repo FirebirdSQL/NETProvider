@@ -36,8 +36,8 @@ public class FbStreamingRestore : FbService
 		get { return _pageSize; }
 		set
 		{
-			if (value is int v && !PageSizeHelper.IsValidPageSize(v))
-				throw PageSizeHelper.InvalidPageSizeException();
+			if (value is int v && !SizeHelper.IsValidPageSize(v))
+				throw SizeHelper.InvalidSizeException("page size");
 
 			_pageSize = value;
 		}

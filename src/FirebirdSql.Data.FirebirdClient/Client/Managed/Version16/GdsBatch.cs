@@ -38,13 +38,8 @@ internal class GdsBatch : BatchBase
 
 	public override ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller)
 	{
-		var parametersData = new byte[count][];
-		for (var i = 0; i < parametersData.Length; i++)
-		{
-			descriptorFiller.Fill(_statement.Parameters, i);
-			// this may throw error, so it needs to be before any writing
-			parametersData[i] = _statement.WriteParameters();
-		}
+		// this may throw error, so it needs to be before any writing
+		var parametersData = GetParametersData(count, descriptorFiller);
 
 		Database.Xdr.Write(IscCodes.op_batch_create);
 		Database.Xdr.Write(_statement.Handle); // p_batch_statement
@@ -60,6 +55,7 @@ internal class GdsBatch : BatchBase
 		{
 			pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
 		}
+		pb.Append(IscCodes.Batch.TAG_BUFFER_BYTES_SIZE, BatchBufferSize);
 		Database.Xdr.WriteBuffer(pb.ToArray()); // p_batch_pb
 
 		Database.Xdr.Write(IscCodes.op_batch_msg);
@@ -95,13 +91,8 @@ internal class GdsBatch : BatchBase
 	}
 	public override async ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 	{
-		var parametersData = new byte[count][];
-		for (var i = 0; i < parametersData.Length; i++)
-		{
-			await descriptorFiller.FillAsync(_statement.Parameters, i, cancellationToken).ConfigureAwait(false);
-			// this may throw error, so it needs to be before any writing
-			parametersData[i] = await _statement.WriteParametersAsync(cancellationToken).ConfigureAwait(false);
-		}
+		// this may throw error, so it needs to be before any writing
+		var parametersData = await GetParametersDataAsync(count, descriptorFiller, cancellationToken).ConfigureAwait(false);
 
 		await Database.Xdr.WriteAsync(IscCodes.op_batch_create, cancellationToken).ConfigureAwait(false);
 		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false); // p_batch_statement
@@ -117,6 +108,7 @@ internal class GdsBatch : BatchBase
 		{
 			pb.Append(IscCodes.Batch.TAG_MULTIERROR, 1);
 		}
+		pb.Append(IscCodes.Batch.TAG_BUFFER_BYTES_SIZE, BatchBufferSize);
 		await Database.Xdr.WriteBufferAsync(pb.ToArray(), cancellationToken).ConfigureAwait(false); // p_batch_pb
 
 		await Database.Xdr.WriteAsync(IscCodes.op_batch_msg, cancellationToken).ConfigureAwait(false);
@@ -211,5 +203,24 @@ internal class GdsBatch : BatchBase
 			}
 		}
 		return result;
+	}
+
+	protected byte[][] GetParametersData(int count, IDescriptorFiller descriptorFiller)
+	{
+		var parametersData = new byte[count][];
+		for (var i = 0; i < parametersData.Length; i++)
+		{
+			parametersData[i] = _statement.GetParameterData(descriptorFiller, i);
+		}
+		return parametersData;
+	}
+	protected async ValueTask<byte[][]> GetParametersDataAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
+	{
+		var parametersData = new byte[count][];
+		for (var i = 0; i < parametersData.Length; i++)
+		{
+			parametersData[i] = await _statement.GetParameterDataAsync(descriptorFiller, i, cancellationToken).ConfigureAwait(false);
+		}
+		return parametersData;
 	}
 }

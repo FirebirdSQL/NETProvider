@@ -40,6 +40,97 @@ internal class GdsStatement : Version12.GdsStatement
 
 	#region Overriden Methods
 
+	protected override byte[] WriteParameters()
+	{
+		if (_parameters == null)
+			return null;
+
+		using (var ms = new MemoryStream())
+		{
+			try
+			{
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+
+				var bits = new BitArray(_parameters.Count);
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					bits.Set(i, field.DbValue.IsDBNull());
+				}
+				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
+				for (var i = 0; i < buffer.Length * 8; i++)
+				{
+					var index = i / 8;
+					// LSB
+					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
+				}
+				xdr.WriteOpaque(buffer);
+
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					if (field.DbValue.IsDBNull())
+					{
+						continue;
+					}
+					WriteRawParameter(xdr, field);
+				}
+
+				xdr.Flush();
+				return ms.ToArray();
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+	}
+	protected override async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
+	{
+		if (_parameters == null)
+			return null;
+
+		using (var ms = new MemoryStream())
+		{
+			try
+			{
+				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
+
+				var bits = new BitArray(_parameters.Count);
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					bits.Set(i, field.DbValue.IsDBNull());
+				}
+				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
+				for (var i = 0; i < buffer.Length * 8; i++)
+				{
+					var index = i / 8;
+					// LSB
+					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
+				}
+				await xdr.WriteOpaqueAsync(buffer, cancellationToken).ConfigureAwait(false);
+
+				for (var i = 0; i < _parameters.Count; i++)
+				{
+					var field = _parameters[i];
+					if (field.DbValue.IsDBNull())
+					{
+						continue;
+					}
+					await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
+				}
+
+				await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+				return ms.ToArray();
+			}
+			catch (IOException ex)
+			{
+				throw IscException.ForIOException(ex);
+			}
+		}
+	}
+
 	protected override DbValue[] ReadRow()
 	{
 		var row = new DbValue[_fields.Count];
@@ -97,97 +188,6 @@ internal class GdsStatement : Version12.GdsStatement
 			throw IscException.ForIOException(ex);
 		}
 		return row;
-	}
-
-	protected internal override byte[] WriteParameters()
-	{
-		if (_parameters == null)
-			return null;
-
-		using (var ms = new MemoryStream())
-		{
-			try
-			{
-				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-
-				var bits = new BitArray(_parameters.Count);
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					bits.Set(i, field.DbValue.IsDBNull());
-				}
-				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-				for (var i = 0; i < buffer.Length * 8; i++)
-				{
-					var index = i / 8;
-					// LSB
-					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
-				}
-				xdr.WriteOpaque(buffer);
-
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					if (field.DbValue.IsDBNull())
-					{
-						continue;
-					}
-					WriteRawParameter(xdr, field);
-				}
-
-				xdr.Flush();
-				return ms.ToArray();
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
-	}
-	protected internal override async ValueTask<byte[]> WriteParametersAsync(CancellationToken cancellationToken = default)
-	{
-		if (_parameters == null)
-			return null;
-
-		using (var ms = new MemoryStream())
-		{
-			try
-			{
-				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
-
-				var bits = new BitArray(_parameters.Count);
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					bits.Set(i, field.DbValue.IsDBNull());
-				}
-				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-				for (var i = 0; i < buffer.Length * 8; i++)
-				{
-					var index = i / 8;
-					// LSB
-					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
-				}
-				await xdr.WriteOpaqueAsync(buffer, cancellationToken).ConfigureAwait(false);
-
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					if (field.DbValue.IsDBNull())
-					{
-						continue;
-					}
-					await WriteRawParameterAsync(xdr, field, cancellationToken).ConfigureAwait(false);
-				}
-
-				await xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
-				return ms.ToArray();
-			}
-			catch (IOException ex)
-			{
-				throw IscException.ForIOException(ex);
-			}
-		}
 	}
 
 	#endregion

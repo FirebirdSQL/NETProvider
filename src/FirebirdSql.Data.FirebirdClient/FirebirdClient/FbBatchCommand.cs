@@ -35,6 +35,8 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 {
 	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbBatchCommand));
 
+	private const int DefaultBatchBufferSize = 16 * 1024 * 1024;
+
 	#region Fields
 
 	private FbConnection _connection;
@@ -49,6 +51,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 	//private int? _commandTimeout;
 	//private int _fetchSize;
 	private bool _multiError;
+	private int _batchBufferSize;
 
 	#endregion
 
@@ -176,6 +179,18 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		set { _multiError = value; }
 	}
 
+	public int BatchBufferSize
+	{
+		get { return _batchBufferSize; }
+		set
+		{
+			if (!SizeHelper.IsValidBatchBufferSize(value))
+				throw SizeHelper.InvalidSizeException("batch buffer");
+
+			_batchBufferSize = value;
+		}
+	}
+
 	#endregion
 
 	#region Internal Properties
@@ -233,6 +248,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		//_commandTimeout = null;
 		//_fetchSize = 200;
 		_multiError = false;
+		_batchBufferSize = DefaultBatchBufferSize;
 		_commandText = string.Empty;
 
 		if (connection != null)
@@ -266,6 +282,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			{
 				throw FbException.Create(ex);
 			}
+			_batchBufferSize = DefaultBatchBufferSize;
 			_multiError = false;
 			//_commandTimeout = null;
 			//_fetchSize = 0;
@@ -293,6 +310,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			{
 				throw FbException.Create(ex);
 			}
+			_batchBufferSize = DefaultBatchBufferSize;
 			_multiError = false;
 			//_commandTimeout = 0;
 			//_fetchSize = 0;
@@ -1235,6 +1253,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		try
 		{
 			batch.MultiError = MultiError;
+			batch.BatchBufferSize = BatchBufferSize;
 			// Execute
 			return new FbBatchNonQueryResult(batch.Execute(_batchParameters.Count, this));
 		}
@@ -1265,6 +1284,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		try
 		{
 			batch.MultiError = MultiError;
+			batch.BatchBufferSize = BatchBufferSize;
 			// Execute
 			return new FbBatchNonQueryResult(await batch.ExecuteAsync(_batchParameters.Count, this, cancellationToken).ConfigureAwait(false));
 		}

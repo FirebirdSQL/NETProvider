@@ -24,6 +24,7 @@ internal abstract class BatchBase
 {
 	public abstract StatementBase Statement { get; }
 	public bool MultiError { get; set; }
+	public int BatchBufferSize { get; set; }
 
 	public class ExecuteResultItem
 	{
