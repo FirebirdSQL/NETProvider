@@ -45,7 +45,7 @@ internal class GdsStatement : Version12.GdsStatement
 		if (_parameters == null)
 			return null;
 
-		using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream(256))
 		{
 			try
 			{
@@ -90,7 +90,7 @@ internal class GdsStatement : Version12.GdsStatement
 		if (_parameters == null)
 			return null;
 
-		using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream(256))
 		{
 			try
 			{

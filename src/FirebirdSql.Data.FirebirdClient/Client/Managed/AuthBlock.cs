@@ -66,7 +66,7 @@ sealed class AuthBlock
 
 	public byte[] UserIdentificationData()
 	{
-		using (var result = new MemoryStream(1024))
+		using (var result = new MemoryStream(256))
 		{
 			var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
 			var user = Encoding.UTF8.GetBytes(userString);

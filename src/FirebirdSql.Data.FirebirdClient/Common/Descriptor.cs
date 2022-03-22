@@ -111,7 +111,7 @@ internal sealed class Descriptor
 	}
 	public BlrData ToBlr()
 	{
-		using (var blr = new MemoryStream())
+		using (var blr = new MemoryStream(256))
 		{
 			var length = 0;
 

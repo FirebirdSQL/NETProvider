@@ -1175,7 +1175,7 @@ internal class GdsStatement : StatementBase
 		if (_parameters == null)
 			return null;
 
-		using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream(256))
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 			for (var i = 0; i < _parameters.Count; i++)
@@ -1200,7 +1200,7 @@ internal class GdsStatement : StatementBase
 		if (_parameters == null)
 			return null;
 
-		using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream(256))
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 			for (var i = 0; i < _parameters.Count; i++)
