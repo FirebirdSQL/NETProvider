@@ -51,7 +51,7 @@ public sealed class FbBatchNonQueryResult : IEnumerable<FbBatchNonQueryResultIte
 
 	public void EnsureSuccess()
 	{
-		var indexes = _items.Where(x => !x.IsSuccess).Select((_, i) => i).ToList();
+		var indexes = _items.Select((e, i) => new { Element = e, Index = i }).Where(x => !x.Element.IsSuccess).Select(x => x.Index).ToList();
 		if (indexes.Count == 0)
 			return;
 		throw FbException.Create($"Indexes {string.Join(", ", indexes)} failed in batch.");
