@@ -558,6 +558,10 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		{
 			throw new InvalidOperationException("Batch must be prepared.");
 		}
+		if (!HasParameters)
+		{
+			return 0;
+		}
 		return _batch.ComputeBatchSize(_batchParameters.Count, this);
 	}
 	public async Task<int> GetCurrentBatchSizeAsync(CancellationToken cancellationToken = default)
@@ -565,6 +569,10 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		if (_batch == null)
 		{
 			throw new InvalidOperationException("Batch must be prepared.");
+		}
+		if (!HasParameters)
+		{
+			return 0;
 		}
 		return await _batch.ComputeBatchSizeAsync(_batchParameters.Count, this, cancellationToken).ConfigureAwait(false);
 	}
