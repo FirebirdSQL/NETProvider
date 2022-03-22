@@ -381,7 +381,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			_disposed = true;
 			try
 			{
-				await ReleaseAsync(CancellationToken.None).ConfigureAwait(false);
+				await ReleaseAsync().ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{

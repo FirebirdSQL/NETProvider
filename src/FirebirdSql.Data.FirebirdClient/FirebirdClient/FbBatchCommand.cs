@@ -304,7 +304,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			_disposed = true;
 			try
 			{
-				await ReleaseAsync(CancellationToken.None).ConfigureAwait(false);
+				await ReleaseAsync().ConfigureAwait(false);
 			}
 			catch (IscException ex)
 			{
