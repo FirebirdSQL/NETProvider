@@ -43,6 +43,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 	private FbTransaction _transaction;
 	private FbBatchParameterCollection _batchParameters;
 	private StatementBase _statement;
+	private BatchBase _batch;
 	//private FbDataReader _activeReader;
 	private IReadOnlyList<string> _namedParameters;
 	private string _commandText;
@@ -291,6 +292,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			_connection = null;
 			_transaction = null;
 			_batchParameters = null;
+			_batch = null;
 			_statement = null;
 			//_activeReader = null;
 			_namedParameters = null;
@@ -319,6 +321,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			_connection = null;
 			_transaction = null;
 			_batchParameters = null;
+			_batch = null;
 			_statement = null;
 			//_activeReader = null;
 			_namedParameters = null;
@@ -547,6 +550,23 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			return Task.FromResult<string>(null);
 		}
 		return _statement.GetExecutionExplainedPlanAsync(cancellationToken).AsTask();
+	}
+
+	public int GetCurrentBatchSize()
+	{
+		if (_batch == null)
+		{
+			throw new InvalidOperationException("Batch must be prepared.");
+		}
+		return _batch.ComputeBatchSize(_batchParameters.Count, this);
+	}
+	public async Task<int> GetCurrentBatchSizeAsync(CancellationToken cancellationToken = default)
+	{
+		if (_batch == null)
+		{
+			throw new InvalidOperationException("Batch must be prepared.");
+		}
+		return await _batch.ComputeBatchSizeAsync(_batchParameters.Count, this, cancellationToken).ConfigureAwait(false);
 	}
 
 	#endregion
@@ -855,6 +875,8 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			_connection.InnerConnection.RemovePreparedCommand(this);
 		}
 
+		_batch = null;
+
 		if (_statement != null)
 		{
 			_statement.Dispose2();
@@ -872,6 +894,8 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		{
 			_connection.InnerConnection.RemovePreparedCommand(this);
 		}
+
+		_batch = null;
 
 		if (_statement != null)
 		{
@@ -1131,6 +1155,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		if (_statement == null)
 		{
 			_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
+			_batch = _statement.CreateBatch();
 		}
 
 		// Prepare the statement if	needed
@@ -1150,6 +1175,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			}
 			catch
 			{
+				_batch = null;
 				// Release the statement and rethrow the exception
 				_statement.Release();
 				_statement = null;
@@ -1195,6 +1221,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		if (_statement == null)
 		{
 			_statement = innerConn.Database.CreateStatement(_transaction.Transaction);
+			_batch = _statement.CreateBatch();
 		}
 
 		// Prepare the statement if	needed
@@ -1214,6 +1241,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			}
 			catch
 			{
+				_batch = null;
 				// Release the statement and rethrow the exception
 				await _statement.ReleaseAsync(cancellationToken).ConfigureAwait(false);
 				_statement = null;
@@ -1249,17 +1277,16 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			throw FbException.Create("Must declare command parameters.");
 		}
 
-		var batch = _statement.CreateBatch();
 		try
 		{
-			batch.MultiError = MultiError;
-			batch.BatchBufferSize = BatchBufferSize;
+			_batch.MultiError = MultiError;
+			_batch.BatchBufferSize = BatchBufferSize;
 			// Execute
-			return new FbBatchNonQueryResult(batch.Execute(_batchParameters.Count, this));
+			return new FbBatchNonQueryResult(_batch.Execute(_batchParameters.Count, this));
 		}
 		finally
 		{
-			batch.Dispose2();
+			_batch.Release();
 		}
 	}
 	private async Task<FbBatchNonQueryResult> ExecuteCommandAsync(bool returnsSet, CancellationToken cancellationToken = default)
@@ -1280,17 +1307,16 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 			throw FbException.Create("Must declare command parameters.");
 		}
 
-		var batch = _statement.CreateBatch();
 		try
 		{
-			batch.MultiError = MultiError;
-			batch.BatchBufferSize = BatchBufferSize;
+			_batch.MultiError = MultiError;
+			_batch.BatchBufferSize = BatchBufferSize;
 			// Execute
-			return new FbBatchNonQueryResult(await batch.ExecuteAsync(_batchParameters.Count, this, cancellationToken).ConfigureAwait(false));
+			return new FbBatchNonQueryResult(await _batch.ExecuteAsync(_batchParameters.Count, this, cancellationToken).ConfigureAwait(false));
 		}
 		finally
 		{
-			await batch.Dispose2Async(cancellationToken).ConfigureAwait(false);
+			await _batch.ReleaseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 

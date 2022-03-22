@@ -35,10 +35,9 @@ internal abstract class BatchBase
 	public abstract ExecuteResultItem[] Execute(int count, IDescriptorFiller descriptorFiller);
 	public abstract ValueTask<ExecuteResultItem[]> ExecuteAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default);
 
-	public virtual void Dispose2()
-	{ }
-	public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
-	{
-		return ValueTask2.CompletedTask;
-	}
+	public abstract int ComputeBatchSize(int count, IDescriptorFiller descriptorFiller);
+	public abstract ValueTask<int> ComputeBatchSizeAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default);
+
+	public abstract void Release();
+	public abstract ValueTask ReleaseAsync(CancellationToken cancellationToken = default);
 }

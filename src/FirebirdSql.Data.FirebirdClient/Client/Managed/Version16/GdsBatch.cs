@@ -143,14 +143,25 @@ internal class GdsBatch : BatchBase
 		}
 	}
 
-	public override void Dispose2()
+	public override int ComputeBatchSize(int count, IDescriptorFiller descriptorFiller)
+	{
+		var parametersData = GetParametersData(count, descriptorFiller);
+		return parametersData.Sum(x => x.Length);
+	}
+	public override async ValueTask<int> ComputeBatchSizeAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
+	{
+		var parametersData = await GetParametersDataAsync(count, descriptorFiller, cancellationToken).ConfigureAwait(false);
+		return parametersData.Sum(x => x.Length);
+	}
+
+	public override void Release()
 	{
 		Database.Xdr.Write(IscCodes.op_batch_rls);
 		Database.Xdr.Write(_statement.Handle);
 		Database.AppendDeferredPacket(ProcessReleaseResponse);
 	}
 
-	public override async ValueTask Dispose2Async(CancellationToken cancellationToken = default)
+	public override async ValueTask ReleaseAsync(CancellationToken cancellationToken = default)
 	{
 		await Database.Xdr.WriteAsync(IscCodes.op_batch_rls, cancellationToken).ConfigureAwait(false);
 		await Database.Xdr.WriteAsync(_statement.Handle, cancellationToken).ConfigureAwait(false);
