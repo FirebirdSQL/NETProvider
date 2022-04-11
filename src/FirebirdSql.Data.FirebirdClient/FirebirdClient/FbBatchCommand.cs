@@ -552,7 +552,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		return _statement.GetExecutionExplainedPlanAsync(cancellationToken).AsTask();
 	}
 
-	public int GetCurrentBatchSize()
+	public int ComputeCurrentBatchSize()
 	{
 		if (_batch == null)
 		{
@@ -564,7 +564,7 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		}
 		return _batch.ComputeBatchSize(_batchParameters.Count, this);
 	}
-	public async Task<int> GetCurrentBatchSizeAsync(CancellationToken cancellationToken = default)
+	public async Task<int> ComputeCurrentBatchSizeAsync(CancellationToken cancellationToken = default)
 	{
 		if (_batch == null)
 		{

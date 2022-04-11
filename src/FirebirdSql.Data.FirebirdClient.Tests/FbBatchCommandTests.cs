@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
@@ -273,7 +274,7 @@ public class FbBatchCommandTests : FbTestsBase
 	{
 		await EmptyTable();
 
-		const int Size = 60000;
+		const int Size = 100_000;
 
 		await using (var cmd = Connection.CreateBatchCommand())
 		{
@@ -319,6 +320,37 @@ public class FbBatchCommandTests : FbTestsBase
 			var result = await cmd.ExecuteNonQueryAsync();
 
 			Assert.DoesNotThrow(result.EnsureSuccess);
+		}
+	}
+
+	[Test]
+	public async Task BatchSizeDynamicHandling()
+	{
+		await EmptyTable();
+
+		using (var cmd = Connection.CreateBatchCommand())
+		{
+			// something silly small
+			cmd.BatchBufferSize = 32 * 1024;
+			cmd.CommandText = "insert into batch (i) values (@i)";
+			await cmd.PrepareAsync();
+			for (var i = 0; i < 10_000; i++)
+			{
+				var bp = cmd.AddBatchParameters();
+				bp.Add("i", 66);
+
+				if (await cmd.ComputeCurrentBatchSizeAsync() > cmd.BatchBufferSize)
+				{
+					var last = cmd.BatchParameters[^1];
+					cmd.BatchParameters.Remove(last);
+					var result = await cmd.ExecuteNonQueryAsync();
+					Assert.DoesNotThrow(result.EnsureSuccess);
+					cmd.BatchParameters.Clear();
+					cmd.BatchParameters.Add(last);
+				}
+			}
+			var result2 = await cmd.ExecuteNonQueryAsync();
+			Assert.DoesNotThrow(result2.EnsureSuccess);
 		}
 	}
 
