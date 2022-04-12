@@ -4,4 +4,4 @@ Time zones from Firebird 4 are handled by `FbZonedDateTime` and `FbZonedTime` ty
 
 ### Examples
 
-Examples can be found in `FbTimeZonesSupportTests`.
+Examples can be found in [`FbTimeZonesSupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbTimeZonesSupportTests.cs).

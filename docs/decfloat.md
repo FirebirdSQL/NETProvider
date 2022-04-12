@@ -4,4 +4,4 @@
 
 ### Examples
 
-Examples can be found in `FbDecFloat16SupportTests` and `FbDecFloat34SupportTests`.
+Examples can be found in [`FbDecFloat16SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat16SupportTests.cs) and [`FbDecFloat34SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat34SupportTests.cs).

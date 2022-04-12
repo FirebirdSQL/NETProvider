@@ -18,4 +18,4 @@ Using (real) blobs as values is not supported. Regular `byte[]`, `string`, etc. 
 
 ### Examples
 
-Examples can be found in `FbBatchCommandTests`.
+Examples can be found in [`FbBatchCommandTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbBatchCommandTests.cs).
