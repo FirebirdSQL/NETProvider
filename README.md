@@ -11,6 +11,7 @@
 * [Time zones](docs/time-zones.md)
 * [DECFLOAT datatype](docs/decfloat.md)
 * [INT128 datatype](docs/int128.md)
+* [Batching](docs/batching.md)
 
 ## Packages
 
