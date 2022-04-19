@@ -33,6 +33,7 @@ public static class FbPropertyExtensions
 		}
 
 		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.IsForeignKey()
 			|| property.TryGetDefaultValue(out _)
 			|| property.GetDefaultValueSql() != null
 			|| property.GetComputedColumnSql() != null)
@@ -63,6 +64,7 @@ public static class FbPropertyExtensions
 		}
 
 		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.IsForeignKey()
 			|| property.TryGetDefaultValue(out _)
 			|| property.GetDefaultValueSql() != null
 			|| property.GetComputedColumnSql() != null)
@@ -93,6 +95,7 @@ public static class FbPropertyExtensions
 		}
 
 		if (property.ValueGenerated != ValueGenerated.OnAdd
+			|| property.IsForeignKey()
 			|| property.TryGetDefaultValue(out _)
 			|| property.GetDefaultValueSql() != null
 			|| property.GetComputedColumnSql() != null)
