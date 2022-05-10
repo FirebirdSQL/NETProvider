@@ -26,8 +26,8 @@ public class FbStringTypeMapping : StringTypeMapping
 {
 	readonly FbDbType _fbDbType;
 
-	public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null)
-		: base(storeType, dbType, unicode: true, size: size)
+	public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null, bool unicode = true)
+		: base(storeType, dbType, unicode: unicode, size: size)
 	{
 		_fbDbType = fbDbType;
 	}
