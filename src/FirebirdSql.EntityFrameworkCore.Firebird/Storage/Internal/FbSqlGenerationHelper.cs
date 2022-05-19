@@ -30,13 +30,14 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 	public virtual string StringLiteralQueryType(string s)
 	{
 		var length = MinimumStringQueryTypeLength(s);
-		EnsureStringQueryTypeLength(length);
+		EnsureStringLiteralQueryTypeLength(length);
 		return $"VARCHAR({length}) CHARACTER SET UTF8";
 	}
 
-	public virtual string StringParameterQueryType()
+	public virtual string StringParameterQueryType(bool isUnicode)
 	{
-		return $"VARCHAR({FbTypeMappingSource.VarcharMaxSize})";
+		var size = isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize;
+		return $"VARCHAR({size})";
 	}
 
 	public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
@@ -54,9 +55,9 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		return length;
 	}
 
-	static void EnsureStringQueryTypeLength(int length)
+	static void EnsureStringLiteralQueryTypeLength(int length)
 	{
-		if (length > FbTypeMappingSource.VarcharMaxSize)
+		if (length > FbTypeMappingSource.UnicodeVarcharMaxSize)
 			throw new ArgumentOutOfRangeException(nameof(length));
 	}
 }

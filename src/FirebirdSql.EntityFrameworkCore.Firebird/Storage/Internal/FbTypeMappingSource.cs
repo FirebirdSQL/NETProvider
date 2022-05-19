@@ -27,7 +27,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 public class FbTypeMappingSource : RelationalTypeMappingSource
 {
 	public const int BinaryMaxSize = Int32.MaxValue;
-	public const int VarcharMaxSize = 32765 / 4;
+	public const int UnicodeVarcharMaxSize = VarcharMaxSize / 4;
+	public const int VarcharMaxSize = 32765;
 	public const int DefaultDecimalPrecision = 18;
 	public const int DefaultDecimalScale = 2;
 
@@ -133,7 +134,7 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 		var clrType = mappingInfo.ClrType;
 		var storeTypeName = mappingInfo.StoreTypeName;
 		var storeTypeNameBase = mappingInfo.StoreTypeNameBase;
-		var isUnicode = mappingInfo.IsUnicode ?? true;
+		var isUnicode = IsUnicode(mappingInfo.IsUnicode);
 
 		if (storeTypeName != null)
 		{
@@ -165,10 +166,11 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 			{
 				var isFixedLength = mappingInfo.IsFixedLength == true;
 				var size = mappingInfo.Size ?? (mappingInfo.IsKeyOrIndex ? 256 : (int?)null);
+				var maxSize = isUnicode ? UnicodeVarcharMaxSize : VarcharMaxSize;
 
-				if (size > VarcharMaxSize)
+				if (size > maxSize)
 				{
-					size = isFixedLength ? VarcharMaxSize : (int?)null;
+					size = isFixedLength ? maxSize : (int?)null;
 				}
 
 				if (size == null)
@@ -196,4 +198,8 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 
 		return null;
 	}
+
+	public static bool IsUnicode(RelationalTypeMapping mapping) => IsUnicode(mapping?.IsUnicode);
+	public static bool IsUnicode(RelationalTypeMappingInfo mappingInfo) => IsUnicode(mappingInfo.IsUnicode);
+	public static bool IsUnicode(bool? isUnicode) => isUnicode ?? true;
 }

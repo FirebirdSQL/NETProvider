@@ -114,7 +114,8 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 			Sql.Append(" AS ");
 			if (sqlParameterExpression.Type == typeof(string))
 			{
-				Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringParameterQueryType());
+				var isUnicode = FbTypeMappingSource.IsUnicode(sqlParameterExpression.TypeMapping);
+				Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringParameterQueryType(isUnicode));
 			}
 			else
 			{
