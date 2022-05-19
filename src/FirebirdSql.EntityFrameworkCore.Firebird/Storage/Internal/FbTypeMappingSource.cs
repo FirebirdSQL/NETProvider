@@ -133,6 +133,7 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 		var clrType = mappingInfo.ClrType;
 		var storeTypeName = mappingInfo.StoreTypeName;
 		var storeTypeNameBase = mappingInfo.StoreTypeNameBase;
+		var isUnicode = mappingInfo.IsUnicode ?? true;
 
 		if (storeTypeName != null)
 		{
@@ -178,11 +179,11 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 				{
 					if (!isFixedLength)
 					{
-						return new FbStringTypeMapping($"VARCHAR({size})", DbType.String, FbDbType.VarChar, size);
+						return new FbStringTypeMapping($"VARCHAR({size})", DbType.String, FbDbType.VarChar, size, isUnicode);
 					}
 					else
 					{
-						return new FbStringTypeMapping($"CHAR({size})", DbType.StringFixedLength, FbDbType.Char, size);
+						return new FbStringTypeMapping($"CHAR({size})", DbType.StringFixedLength, FbDbType.Char, size, isUnicode);
 					}
 				}
 			}
