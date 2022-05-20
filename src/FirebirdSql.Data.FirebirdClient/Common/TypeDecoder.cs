@@ -24,11 +24,11 @@ namespace FirebirdSql.Data.Common;
 
 internal static class TypeDecoder
 {
-	public static decimal DecodeDecimal(object value, int scale, int sqltype)
+	public static decimal DecodeDecimal(object value, int scale, int type)
 	{
 		var shift = scale < 0 ? -scale : scale;
 
-		switch (sqltype & ~1)
+		switch (type & ~1)
 		{
 			case IscCodes.SQL_SHORT:
 				return DecimalShiftHelper.ShiftDecimalLeft((decimal)(short)value, shift);
@@ -48,7 +48,7 @@ internal static class TypeDecoder
 				return DecimalShiftHelper.ShiftDecimalLeft((decimal)(BigInteger)value, shift);
 
 			default:
-				throw new ArgumentOutOfRangeException(nameof(sqltype), $"{nameof(sqltype)}={sqltype}");
+				throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
 		}
 	}
 
