@@ -1304,7 +1304,7 @@ internal class GdsStatement : StatementBase
 					break;
 
 				case DbDataType.Guid:
-					xdr.Write(field.DbValue.GetGuid());
+					xdr.Write(field.DbValue.GetGuid(), field.SqlType);
 					break;
 
 				case DbDataType.Double:
@@ -1452,7 +1452,7 @@ internal class GdsStatement : StatementBase
 					break;
 
 				case DbDataType.Guid:
-					await xdr.WriteAsync(field.DbValue.GetGuid(), cancellationToken).ConfigureAwait(false);
+					await xdr.WriteAsync(field.DbValue.GetGuid(), field.SqlType, cancellationToken).ConfigureAwait(false);
 					break;
 
 				case DbDataType.Double:
@@ -1573,7 +1573,7 @@ internal class GdsStatement : StatementBase
 				return xdr.ReadSingle();
 
 			case DbDataType.Guid:
-				return xdr.ReadGuid();
+				return xdr.ReadGuid(field.SqlType);
 
 			case DbDataType.Double:
 				return xdr.ReadDouble();
@@ -1670,7 +1670,7 @@ internal class GdsStatement : StatementBase
 				return await xdr.ReadSingleAsync(cancellationToken).ConfigureAwait(false);
 
 			case DbDataType.Guid:
-				return await xdr.ReadGuidAsync(cancellationToken).ConfigureAwait(false);
+				return await xdr.ReadGuidAsync(field.SqlType, cancellationToken).ConfigureAwait(false);
 
 			case DbDataType.Double:
 				return await xdr.ReadDoubleAsync(cancellationToken).ConfigureAwait(false);

@@ -625,7 +625,7 @@ internal static class TypeHelper
 	public static DbDataType GetDbDataTypeFromSqlType(int type, int subType, int scale, int? length = null, Charset charset = null)
 	{
 		// Special case for Guid handling
-		if (type == IscCodes.SQL_TEXT && length == 16 && (charset?.IsOctetsCharset ?? false))
+		if ((type == IscCodes.SQL_TEXT || type == IscCodes.SQL_VARYING) && length == 16 && (charset?.IsOctetsCharset ?? false))
 		{
 			return DbDataType.Guid;
 		}

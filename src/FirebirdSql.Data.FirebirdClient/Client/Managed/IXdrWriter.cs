@@ -76,8 +76,8 @@ interface IXdrWriter
 	void Write(DateTime value);
 	ValueTask WriteAsync(DateTime value, CancellationToken cancellationToken = default);
 
-	void Write(Guid value);
-	ValueTask WriteAsync(Guid value, CancellationToken cancellationToken = default);
+	void Write(Guid value, int sqlType);
+	ValueTask WriteAsync(Guid value, int sqlType, CancellationToken cancellationToken = default);
 
 	void Write(FbDecFloat value, int size);
 	ValueTask WriteAsync(FbDecFloat value, int size, CancellationToken cancellationToken = default);

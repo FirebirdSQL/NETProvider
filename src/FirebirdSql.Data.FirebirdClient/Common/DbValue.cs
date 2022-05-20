@@ -477,7 +477,22 @@ internal sealed class DbValue
 				}
 
 			case DbDataType.Guid:
-				return TypeEncoder.EncodeGuid(GetGuid());
+				{
+					var bytes = TypeEncoder.EncodeGuid(GetGuid());
+					byte[] buffer;
+					if (Field.SqlType == IscCodes.SQL_VARYING)
+					{
+						buffer = new byte[bytes.Length + 2];
+						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
+						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
+					}
+					else
+					{
+						buffer = new byte[bytes.Length];
+						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
+					}
+					return buffer;
+				}
 
 			case DbDataType.Boolean:
 				return BitConverter.GetBytes(GetBoolean());
@@ -677,7 +692,22 @@ internal sealed class DbValue
 				}
 
 			case DbDataType.Guid:
-				return TypeEncoder.EncodeGuid(GetGuid());
+				{
+					var bytes = TypeEncoder.EncodeGuid(GetGuid());
+					byte[] buffer;
+					if (Field.SqlType == IscCodes.SQL_VARYING)
+					{
+						buffer = new byte[bytes.Length + 2];
+						Buffer.BlockCopy(BitConverter.GetBytes((short)bytes.Length), 0, buffer, 0, 2);
+						Buffer.BlockCopy(bytes, 0, buffer, 2, bytes.Length);
+					}
+					else
+					{
+						buffer = new byte[bytes.Length];
+						Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
+					}
+					return buffer;
+				}
 
 			case DbDataType.Boolean:
 				return BitConverter.GetBytes(GetBoolean());

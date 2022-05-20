@@ -56,8 +56,8 @@ interface IXdrReader
 	long ReadInt64();
 	ValueTask<long> ReadInt64Async(CancellationToken cancellationToken = default);
 
-	Guid ReadGuid();
-	ValueTask<Guid> ReadGuidAsync(CancellationToken cancellationToken = default);
+	Guid ReadGuid(int sqlType);
+	ValueTask<Guid> ReadGuidAsync(int sqlType, CancellationToken cancellationToken = default);
 
 	float ReadSingle();
 	ValueTask<float> ReadSingleAsync(CancellationToken cancellationToken = default);

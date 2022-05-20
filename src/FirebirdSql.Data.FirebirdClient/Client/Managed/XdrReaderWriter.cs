@@ -184,13 +184,27 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		return TypeDecoder.DecodeInt64(_smallBuffer);
 	}
 
-	public Guid ReadGuid()
+	public Guid ReadGuid(int sqlType)
 	{
-		return TypeDecoder.DecodeGuid(ReadOpaque(16));
+		if (sqlType == IscCodes.SQL_VARYING)
+		{
+			return TypeDecoder.DecodeGuid(ReadBuffer());
+		}
+		else
+		{
+			return TypeDecoder.DecodeGuid(ReadOpaque(16));
+		}
 	}
-	public async ValueTask<Guid> ReadGuidAsync(CancellationToken cancellationToken = default)
+	public async ValueTask<Guid> ReadGuidAsync(int sqlType, CancellationToken cancellationToken = default)
 	{
-		return TypeDecoder.DecodeGuid(await ReadOpaqueAsync(16, cancellationToken).ConfigureAwait(false));
+		if (sqlType == IscCodes.SQL_VARYING)
+		{
+			return TypeDecoder.DecodeGuid(await ReadBufferAsync(cancellationToken).ConfigureAwait(false));
+		}
+		else
+		{
+			return TypeDecoder.DecodeGuid(await ReadOpaqueAsync(16, cancellationToken).ConfigureAwait(false));
+		}
 	}
 
 	public float ReadSingle()
@@ -719,13 +733,29 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		await WriteTimeAsync(TypeHelper.DateTimeTimeToTimeSpan(value), cancellationToken).ConfigureAwait(false);
 	}
 
-	public void Write(Guid value)
+	public void Write(Guid value, int sqlType)
 	{
-		WriteOpaque(TypeEncoder.EncodeGuid(value));
+		var bytes = TypeEncoder.EncodeGuid(value);
+		if (sqlType == IscCodes.SQL_VARYING)
+		{
+			WriteBuffer(bytes);
+		}
+		else
+		{
+			WriteOpaque(bytes);
+		}
 	}
-	public ValueTask WriteAsync(Guid value, CancellationToken cancellationToken = default)
+	public ValueTask WriteAsync(Guid value, int sqlType, CancellationToken cancellationToken = default)
 	{
-		return WriteOpaqueAsync(TypeEncoder.EncodeGuid(value), cancellationToken);
+		var bytes = TypeEncoder.EncodeGuid(value);
+		if (sqlType == IscCodes.SQL_VARYING)
+		{
+			return WriteBufferAsync(bytes, cancellationToken);
+		}
+		else
+		{
+			return WriteOpaqueAsync(bytes, cancellationToken);
+		}
 	}
 
 	public void Write(FbDecFloat value, int size)
