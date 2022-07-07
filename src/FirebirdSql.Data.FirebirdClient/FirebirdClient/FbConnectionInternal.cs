@@ -247,7 +247,7 @@ internal class FbConnectionInternal
 		{
 			_db = ClientFactory.CreateDatabase(_options);
 			var dpb = BuildDpb(_db, _options);
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password) && _options.ServerType == FbServerType.Default)
 			{
 				_db.AttachWithTrustedAuth(dpb, _options.Database, _options.CryptKey);
 			}
@@ -270,7 +270,7 @@ internal class FbConnectionInternal
 		{
 			_db = await ClientFactory.CreateDatabaseAsync(_options, cancellationToken).ConfigureAwait(false);
 			var dpb = BuildDpb(_db, _options);
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password) && _options.ServerType == FbServerType.Default)
 			{
 				await _db.AttachWithTrustedAuthAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
