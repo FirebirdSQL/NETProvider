@@ -28,7 +28,7 @@ internal sealed class FesConnection
 
 	public static Version GetClientVersion(IFbClient fbClient)
 	{
-		var sb = new StringBuilder();
+		var sb = new StringBuilder(64);
 		fbClient.isc_get_client_version(sb);
 		var version = sb.ToString();
 		var m = Regex.Match(version, @"Firebird (\d+.\d+)");
