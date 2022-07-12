@@ -4,7 +4,7 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup>
-		<VersionPrefix>9.0.1</VersionPrefix>
+		<VersionPrefix>9.0.2</VersionPrefix>
 		<VersionSuffix></VersionSuffix>
 		<Company>FirebirdSQL</Company>
 		<Product>NETProvider</Product>
