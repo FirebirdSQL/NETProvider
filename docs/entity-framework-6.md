@@ -3,28 +3,8 @@
 ### Steps
 
 * Install `EntityFramework.Firebird` from NuGet.
-* Add `DbProviderFactories` record.
-```xml
-	<system.data>
-		<DbProviderFactories>
-			<remove invariant="FirebirdSql.Data.FirebirdClient" />
-			<add name="FirebirdClient" description="FirebirdClient" invariant="FirebirdSql.Data.FirebirdClient" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient" />
-		</DbProviderFactories>
-	</system.data>
-```
-* Add/modify `entityFramework` configuration section.
-```xml
-	<configSections>
-		<section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
-	</configSections>
-	<entityFramework>
-		<defaultConnectionFactory type="EntityFramework.Firebird.FbConnectionFactory, EntityFramework.Firebird" />
-		<providers>
-			<provider invariantName="FirebirdSql.Data.FirebirdClient" type="EntityFramework.Firebird.FbProviderServices, EntityFramework.Firebird" />
-			<provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer" />
-		</providers>
-	</entityFramework>
-```
+* Create `DbProviderFactories` record (see below).
+* Create configuration (see below).
 * Create your `DbContext`.
 * Firebird 2.5 and up is supported.
 
@@ -69,7 +49,50 @@ class Demo
 	public int Id { get; set; }
 	public string FooBar { get; set; }
 }
-``` 
+```
+
+### DbProviderFactories
+
+.NET Framework:
+```xml
+<system.data>
+	<DbProviderFactories>
+		<remove invariant="FirebirdSql.Data.FirebirdClient" />
+		<add name="FirebirdClient" description="FirebirdClient" invariant="FirebirdSql.Data.FirebirdClient" type="FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient" />
+	</DbProviderFactories>
+</system.data>
+```
+
+.NET Core/.NET 5+:
+```csharp
+System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
+```
+
+### Configuration
+
+.NET Framework:
+```xml
+<configSections>
+	<section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+</configSections>
+<entityFramework>
+	<defaultConnectionFactory type="EntityFramework.Firebird.FbConnectionFactory, EntityFramework.Firebird" />
+	<providers>
+		<provider invariantName="FirebirdSql.Data.FirebirdClient" type="EntityFramework.Firebird.FbProviderServices, EntityFramework.Firebird" />
+	</providers>
+</entityFramework>
+```
+
+.NET Core/.NET 5+:
+```csharp
+public class Conf : DbConfiguration
+{
+	public Conf()
+	{
+		SetProviderServices(FbProviderServices.ProviderInvariantName, FbProviderServices.Instance);
+	}
+}
+```
 
 ### Scripts
 
