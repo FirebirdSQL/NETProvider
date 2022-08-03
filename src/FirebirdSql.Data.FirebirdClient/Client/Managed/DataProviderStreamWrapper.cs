@@ -39,7 +39,7 @@ sealed class DataProviderStreamWrapper : IDataProvider
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
-		return new ValueTask<int>(_stream.ReadAsync(buffer, offset, count));
+		return new ValueTask<int>(_stream.ReadAsync(buffer, offset, count, cancellationToken));
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,7 +50,7 @@ sealed class DataProviderStreamWrapper : IDataProvider
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
-		return new ValueTask(_stream.WriteAsync(buffer, offset, count));
+		return new ValueTask(_stream.WriteAsync(buffer, offset, count, cancellationToken));
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,6 +61,6 @@ sealed class DataProviderStreamWrapper : IDataProvider
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public ValueTask FlushAsync(CancellationToken cancellationToken = default)
 	{
-		return new ValueTask(_stream.FlushAsync());
+		return new ValueTask(_stream.FlushAsync(cancellationToken));
 	}
 }
