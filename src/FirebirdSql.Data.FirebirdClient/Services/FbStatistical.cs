@@ -37,21 +37,24 @@ public sealed class FbStatistical : FbService
 
 		try
 		{
-			Open();
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_db_stats);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-			StartTask(startSpb);
-			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+			try
+			{
+				Open();
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_db_stats);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartTask(startSpb);
+				ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+			}
+			finally
+			{
+				Close();
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			Close();
 		}
 	}
 	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -60,21 +63,24 @@ public sealed class FbStatistical : FbService
 
 		try
 		{
-			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_db_stats);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_db_stats);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }

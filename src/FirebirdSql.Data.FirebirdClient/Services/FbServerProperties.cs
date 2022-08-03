@@ -135,32 +135,38 @@ public sealed class FbServerProperties : FbService
 	{
 		try
 		{
-			Open();
-			return Query(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+			try
+			{
+				Open();
+				return Query(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+			}
+			finally
+			{
+				Close();
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			Close();
 		}
 	}
 	private async Task<List<object>> GetInfoAsync(byte[] items, CancellationToken cancellationToken = default)
 	{
 		try
 		{
-			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			return await QueryAsync(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				return await QueryAsync(items, new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 

@@ -42,24 +42,27 @@ public sealed class FbStreamingBackup : FbService
 
 		try
 		{
-			Open();
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
-			if (!string.IsNullOrEmpty(SkipData))
-				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
-			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-			StartTask(startSpb);
-			ReadOutput();
+			try
+			{
+				Open();
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_backup);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
+				if (!string.IsNullOrEmpty(SkipData))
+					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				StartTask(startSpb);
+				ReadOutput();
+			}
+			finally
+			{
+				Close();
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			Close();
 		}
 	}
 	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -68,24 +71,27 @@ public sealed class FbStreamingBackup : FbService
 
 		try
 		{
-			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_backup);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
-			if (!string.IsNullOrEmpty(SkipData))
-				startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
-			startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ReadOutputAsync(cancellationToken).ConfigureAwait(false);
+			try
+			{
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_backup);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
+				if (!string.IsNullOrEmpty(SkipData))
+					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
+				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ReadOutputAsync(cancellationToken).ConfigureAwait(false);
+			}
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 

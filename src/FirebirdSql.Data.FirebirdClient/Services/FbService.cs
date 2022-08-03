@@ -119,20 +119,13 @@ public abstract class FbService
 		if (!Charset.TryGetByName(_options.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
-		try
+		if (_svc == null)
 		{
-			if (_svc == null)
-			{
-				_svc = ClientFactory.CreateServiceManager(_options);
-			}
-			_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
-			_svc.WarningMessage = OnWarningMessage;
-			State = FbServiceState.Open;
+			_svc = ClientFactory.CreateServiceManager(_options);
 		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
+		_svc.WarningMessage = OnWarningMessage;
+		State = FbServiceState.Open;
 	}
 	private protected async Task OpenAsync(CancellationToken cancellationToken = default)
 	{
@@ -145,20 +138,13 @@ public abstract class FbService
 		if (!Charset.TryGetByName(_options.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
-		try
+		if (_svc == null)
 		{
-			if (_svc == null)
-			{
-				_svc = await ClientFactory.CreateServiceManagerAsync(_options, cancellationToken).ConfigureAwait(false);
-			}
-			await _svc.AttachAsync(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, cancellationToken).ConfigureAwait(false);
-			_svc.WarningMessage = OnWarningMessage;
-			State = FbServiceState.Open;
+			_svc = await ClientFactory.CreateServiceManagerAsync(_options, cancellationToken).ConfigureAwait(false);
 		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		await _svc.AttachAsync(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+		_svc.WarningMessage = OnWarningMessage;
+		State = FbServiceState.Open;
 	}
 
 	private protected void Close()
@@ -167,16 +153,9 @@ public abstract class FbService
 		{
 			return;
 		}
-		try
-		{
-			_svc.Detach();
-			_svc = null;
-			State = FbServiceState.Closed;
-		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		_svc.Detach();
+		_svc = null;
+		State = FbServiceState.Closed;
 	}
 	private protected async Task CloseAsync(CancellationToken cancellationToken = default)
 	{
@@ -184,16 +163,9 @@ public abstract class FbService
 		{
 			return;
 		}
-		try
-		{
-			await _svc.DetachAsync(cancellationToken).ConfigureAwait(false);
-			_svc = null;
-			State = FbServiceState.Closed;
-		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		await _svc.DetachAsync(cancellationToken).ConfigureAwait(false);
+		_svc = null;
+		State = FbServiceState.Closed;
 	}
 
 	private protected void StartTask(ServiceParameterBufferBase spb)
@@ -201,28 +173,14 @@ public abstract class FbService
 		if (State == FbServiceState.Closed)
 			throw new InvalidOperationException("Service is closed.");
 
-		try
-		{
-			Service.Start(spb);
-		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		Service.Start(spb);
 	}
 	private protected async Task StartTaskAsync(ServiceParameterBufferBase spb, CancellationToken cancellationToken = default)
 	{
 		if (State == FbServiceState.Closed)
 			throw new InvalidOperationException("Service is closed.");
 
-		try
-		{
-			await Service.StartAsync(spb, cancellationToken).ConfigureAwait(false);
-		}
-		catch (Exception ex)
-		{
-			throw FbException.Create(ex);
-		}
+		await Service.StartAsync(spb, cancellationToken).ConfigureAwait(false);
 	}
 
 	private protected List<object> Query(byte[] items, ServiceParameterBufferBase spb)

@@ -40,25 +40,28 @@ public sealed class FbNRestore : FbService
 
 		try
 		{
-			Open();
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_nrest);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			foreach (var file in BackupFiles)
+			try
 			{
-				startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
+				Open();
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_nrest);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				foreach (var file in BackupFiles)
+				{
+					startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
+				}
+				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
+				StartTask(startSpb);
+				ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 			}
-			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
-			StartTask(startSpb);
-			ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
+			finally
+			{
+				Close();
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			Close();
 		}
 	}
 	public async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -67,25 +70,28 @@ public sealed class FbNRestore : FbService
 
 		try
 		{
-			await OpenAsync(cancellationToken).ConfigureAwait(false);
-			var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
-			startSpb.Append(IscCodes.isc_action_svc_nrest);
-			startSpb.Append2(IscCodes.isc_spb_dbname, Database);
-			foreach (var file in BackupFiles)
+			try
 			{
-				startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
+				await OpenAsync(cancellationToken).ConfigureAwait(false);
+				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
+				startSpb.Append(IscCodes.isc_action_svc_nrest);
+				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				foreach (var file in BackupFiles)
+				{
+					startSpb.Append2(IscCodes.isc_spb_nbk_file, file);
+				}
+				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
+				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
+				await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 			}
-			startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
-			await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-			await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
+			finally
+			{
+				await CloseAsync(cancellationToken).ConfigureAwait(false);
+			}
 		}
 		catch (Exception ex)
 		{
 			throw FbException.Create(ex);
-		}
-		finally
-		{
-			await CloseAsync(cancellationToken).ConfigureAwait(false);
 		}
 	}
 }
