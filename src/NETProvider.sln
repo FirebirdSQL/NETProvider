@@ -37,15 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perf", "Perf\Perf.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Perf", "Perf", "{CE2BB2BB-4639-49EA-8369-0215A1D7245D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scratchpad", "Scratchpad", "{5F1D1BB9-4657-424C-B3DE-75818824940E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scratchpad", "Scratchpad\Scratchpad.csproj", "{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{2f67ff6e-a6fc-44f4-9687-9e5ca05c73a3}*SharedItemsImports = 13
-		FirebirdSql.Data.External\FirebirdSql.Data.External.projitems*{884ee120-b22e-4940-8c1c-626f13028376}*SharedItemsImports = 13
-		FirebirdSql.Data.External\FirebirdSql.Data.External.projitems*{adc34658-2605-4588-a056-5288ede4f5de}*SharedItemsImports = 5
-		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{c954bc7e-8c16-472f-ba78-93afb11c69a4}*SharedItemsImports = 5
-		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{e6849ff6-d309-433a-b3ee-0554f07e3b21}*SharedItemsImports = 5
-		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{e9e13e28-1e4a-4b99-b594-07a696b19bc8}*SharedItemsImports = 5
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -83,6 +79,10 @@ Global
 		{BB846245-545A-4506-A0DA-0041C535D3A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB846245-545A-4506-A0DA-0041C535D3A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB846245-545A-4506-A0DA-0041C535D3A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,9 +99,19 @@ Global
 		{884EE120-B22E-4940-8C1C-626F13028376} = {C94B5B06-9023-43C1-9B0D-6BDD504F9A06}
 		{BB846245-545A-4506-A0DA-0041C535D3A9} = {CE2BB2BB-4639-49EA-8369-0215A1D7245D}
 		{CE2BB2BB-4639-49EA-8369-0215A1D7245D} = {C94B5B06-9023-43C1-9B0D-6BDD504F9A06}
+		{5F1D1BB9-4657-424C-B3DE-75818824940E} = {C94B5B06-9023-43C1-9B0D-6BDD504F9A06}
+		{C3F47B3D-FA1F-4665-A58D-63B6FFDCD65F} = {5F1D1BB9-4657-424C-B3DE-75818824940E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D574B071-15C1-4024-BB37-78D690F61070}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{2f67ff6e-a6fc-44f4-9687-9e5ca05c73a3}*SharedItemsImports = 13
+		FirebirdSql.Data.External\FirebirdSql.Data.External.projitems*{884ee120-b22e-4940-8c1c-626f13028376}*SharedItemsImports = 13
+		FirebirdSql.Data.External\FirebirdSql.Data.External.projitems*{adc34658-2605-4588-a056-5288ede4f5de}*SharedItemsImports = 5
+		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{c954bc7e-8c16-472f-ba78-93afb11c69a4}*SharedItemsImports = 5
+		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{e6849ff6-d309-433a-b3ee-0554f07e3b21}*SharedItemsImports = 5
+		FirebirdSql.Data.TestsBase\FirebirdSql.Data.TestsBase.projitems*{e9e13e28-1e4a-4b99-b594-07a696b19bc8}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(TextTemplating) = postSolution
 		TextTemplating = 1
