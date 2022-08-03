@@ -38,11 +38,11 @@ public class FbDatabaseCreator : RelationalDatabaseCreator
 
 	public override void Create()
 	{
-		FbConnection.CreateDatabase(_connection.ConnectionString);
+		FbConnection.CreateDatabase(_connection.ConnectionString, pageSize: 16384);
 	}
 	public override Task CreateAsync(CancellationToken cancellationToken = default)
 	{
-		return FbConnection.CreateDatabaseAsync(_connection.ConnectionString, cancellationToken: cancellationToken);
+		return FbConnection.CreateDatabaseAsync(_connection.ConnectionString, pageSize: 16384, cancellationToken: cancellationToken);
 	}
 
 	public override void Delete()

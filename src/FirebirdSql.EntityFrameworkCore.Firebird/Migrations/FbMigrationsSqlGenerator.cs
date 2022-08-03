@@ -309,7 +309,7 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 		if (Options.HasFlag(MigrationsSqlGenerationOptions.Script))
 			throw new NotSupportedException("Creating database from script is not supported.");
 
-		FbConnection.CreateDatabase(operation.ConnectionString);
+		FbConnection.CreateDatabase(operation.ConnectionString, pageSize: 16384);
 	}
 
 	public virtual void Generate(FbDropDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
