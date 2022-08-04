@@ -183,6 +183,19 @@ public class ElementaryTests : EntityFrameworkCoreTestsBase
 			Assert.DoesNotThrowAsync(() => query.LoadAsync());
 		}
 	}
+
+	[Test]
+	public async Task SelectStartsWithConstant()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Set<MonAttachment>()
+				.Where(x => x.AttachmentName.StartsWith("Jiri"));
+			Assert.DoesNotThrowAsync(() => query.LoadAsync());
+			var sql = db.LastCommandText;
+			StringAssert.Contains("'Jiri%'", sql);
+		}
+	}
 }
 
 class SelectContext : FbTestDbContext

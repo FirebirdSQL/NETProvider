@@ -42,10 +42,14 @@ public class FbStringStartsWithTranslator : IMethodCallTranslator
 			return null;
 
 		var patternExpression = _fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]);
+		var patternConstantExpression = patternExpression as SqlConstantExpression;
+		var likePatternExpression = patternConstantExpression != null
+			? (SqlExpression)_fbSqlExpressionFactory.Constant(((string)patternConstantExpression.Value) + "%")
+			: (SqlExpression)_fbSqlExpressionFactory.Add(patternExpression, _fbSqlExpressionFactory.Constant("%"));
 		var startsWithExpression = _fbSqlExpressionFactory.AndAlso(
 			_fbSqlExpressionFactory.Like(
 				instance,
-				_fbSqlExpressionFactory.Add(patternExpression, _fbSqlExpressionFactory.Constant("%"))),
+				likePatternExpression),
 			_fbSqlExpressionFactory.Equal(
 				_fbSqlExpressionFactory.ApplyDefaultTypeMapping(_fbSqlExpressionFactory.Function(
 					"LEFT",
@@ -61,9 +65,9 @@ public class FbStringStartsWithTranslator : IMethodCallTranslator
 					new[] { true, true },
 					instance.Type)),
 				patternExpression));
-		return patternExpression is SqlConstantExpression sqlConstantExpression
-			? (string)sqlConstantExpression.Value == string.Empty
-				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
+		return patternConstantExpression != null
+			? (string)patternConstantExpression.Value == string.Empty
+				? _fbSqlExpressionFactory.Constant(true)
 				: startsWithExpression
 			: _fbSqlExpressionFactory.OrElse(
 				startsWithExpression,
