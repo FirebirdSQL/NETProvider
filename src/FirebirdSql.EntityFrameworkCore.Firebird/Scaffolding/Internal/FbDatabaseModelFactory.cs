@@ -68,7 +68,10 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 			foreach (var table in tables)
 			{
 				table.Database = databaseModel;
-				databaseModel.Tables.Add(table);
+				if (tableFilter.Invoke(table))
+				{
+					databaseModel.Tables.Add(table);
+				}
 			}
 
 			return databaseModel;
@@ -87,9 +90,9 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		return null;
 	}
 
-	private static Func<string, string, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
+	private static Func<DatabaseTable, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
 	{
-		return tables.Any() ? (s, t) => tables.Contains(t) : null;
+		return tables.Any() ? x => tables.Contains(x.Name) : _ => true;
 	}
 
 	private const string GetTablesQuery =
@@ -104,7 +107,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
              ORDER BY
               r.RDB$RELATION_NAME";
 
-	private IEnumerable<DatabaseTable> GetTables(DbConnection connection, Func<string, string, bool> filter)
+	private IEnumerable<DatabaseTable> GetTables(DbConnection connection, Func<DatabaseTable, bool> filter)
 	{
 		using (var command = connection.CreateCommand())
 		{
@@ -126,10 +129,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 					table.Name = name;
 					table.Comment = string.IsNullOrEmpty(comment) ? null : comment;
 
-					if (filter?.Invoke(table.Schema, table.Name) ?? true)
-					{
-						tables.Add(table);
-					}
+					tables.Add(table);
 				}
 			}
 
@@ -195,7 +195,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
              ORDER BY
               RF.RDB$FIELD_POSITION;";
 
-	private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<DatabaseTable, bool> tableFilter)
 	{
 		var identityType = MajorVersionNumber < 3 ? "null" : "rf.RDB$IDENTITY_TYPE";
 
@@ -318,7 +318,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 	/// <remarks>
 	/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
 	/// </remarks>
-	private void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<string, string, bool> tableFilter)
+	private void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<DatabaseTable, bool> tableFilter)
 	{
 		foreach (var table in tables)
 		{
