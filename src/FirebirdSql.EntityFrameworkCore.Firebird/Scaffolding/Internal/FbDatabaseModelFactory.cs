@@ -82,7 +82,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		}
 	}
 
-	private string GetDefaultSchema(DbConnection connection)
+	private static string GetDefaultSchema(DbConnection connection)
 	{
 		return null;
 	}
