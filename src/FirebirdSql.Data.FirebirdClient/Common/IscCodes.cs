@@ -285,6 +285,11 @@ internal static class IscCodes
 	public const int isc_dpb_old_start_file = 39;
 	public const int isc_dpb_drop_walfile = 40;
 	public const int isc_dpb_old_dump_id = 41;
+	public const int isc_dpb_wal_backup_dir = 42;
+	public const int isc_dpb_wal_chkptlen = 43;
+	public const int isc_dpb_wal_numbufs = 44;
+	public const int isc_dpb_wal_bufsize = 45;
+	public const int isc_dpb_wal_grp_cmt_wait = 46;
 	public const int isc_dpb_lc_messages = 47;
 	public const int isc_dpb_lc_ctype = 48;
 	public const int isc_dpb_cache_manager = 49;
@@ -294,6 +299,7 @@ internal static class IscCodes
 	public const int isc_dpb_reserved = 53;
 	public const int isc_dpb_overwrite = 54;
 	public const int isc_dpb_sec_attach = 55;
+	public const int isc_dpb_disable_wal = 56;
 	public const int isc_dpb_connect_timeout = 57;
 	public const int isc_dpb_dummy_packet_interval = 58;
 	public const int isc_dpb_gbak_attach = 59;
@@ -306,12 +312,21 @@ internal static class IscCodes
 	public const int isc_dpb_gfix_attach = 66;
 	public const int isc_dpb_gstat_attach = 67;
 	public const int isc_dpb_set_db_charset = 68;
+	public const int isc_dpb_gsec_attach = 69;
+	public const int isc_dpb_address_path = 70;
 	public const int isc_dpb_process_id = 71;
 	public const int isc_dpb_no_db_triggers = 72;
 	public const int isc_dpb_trusted_auth = 73;
 	public const int isc_dpb_process_name = 74;
+	public const int isc_dpb_trusted_role = 75;
+	public const int isc_dpb_org_filename = 76;
 	public const int isc_dpb_utf8_filename = 77;
+	public const int isc_dpb_ext_call_depth = 78;
+	public const int isc_dpb_auth_block = 79;
 	public const int isc_dpb_client_version = 80;
+	public const int isc_dpb_remote_protocol = 81;
+	public const int isc_dpb_host_name = 82;
+	public const int isc_dpb_os_user = 83;
 	public const int isc_dpb_specific_auth_data = 84;
 	public const int isc_dpb_auth_plugin_list = 85;
 	public const int isc_dpb_auth_plugin_name = 86;
@@ -319,6 +334,14 @@ internal static class IscCodes
 	public const int isc_dpb_nolinger = 88;
 	public const int isc_dpb_reset_icu = 89;
 	public const int isc_dpb_map_attach = 90;
+	public const int isc_dpb_session_time_zone = 91;
+	public const int isc_dpb_set_db_replica = 92;
+	public const int isc_dpb_set_bind = 93;
+	public const int isc_dpb_decfloat_round = 94;
+	public const int isc_dpb_decfloat_traps = 95;
+	public const int isc_dpb_clear_map = 96;
+	public const int isc_dpb_parallel_workers = 100;
+	public const int isc_dpb_worker_attach = 101;
 
 	#endregion
 
