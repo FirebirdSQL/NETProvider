@@ -57,6 +57,7 @@ internal sealed class ConnectionString
 	internal const FbWireCrypt DefaultValueWireCrypt = FbWireCrypt.Enabled;
 	internal const string DefaultValueApplicationName = "";
 	internal const int DefaultValueCommandTimeout = 0;
+	internal const int DefaultValueParallelWorkers = 0;
 
 	internal const string DefaultKeyUserId = "user id";
 	internal const string DefaultKeyPortNumber = "port number";
@@ -86,6 +87,7 @@ internal sealed class ConnectionString
 	internal const string DefaultKeyWireCrypt = "wire crypt";
 	internal const string DefaultKeyApplicationName = "application name";
 	internal const string DefaultKeyCommandTimeout = "command timeout";
+	internal const string DefaultKeyParallelWorkers = "parallel workers";
 	#endregion
 
 	#region Static Fields
@@ -158,6 +160,9 @@ internal sealed class ConnectionString
 			{ "app", DefaultKeyApplicationName },
 			{ DefaultKeyCommandTimeout, DefaultKeyCommandTimeout },
 			{ "commandtimeout", DefaultKeyCommandTimeout },
+			{ DefaultKeyParallelWorkers, DefaultKeyParallelWorkers },
+			{ "parallelworkers", DefaultKeyParallelWorkers },
+			{ "parallel", DefaultKeyParallelWorkers },
 		};
 
 	internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -190,6 +195,7 @@ internal sealed class ConnectionString
 			{ DefaultKeyWireCrypt, DefaultValueWireCrypt },
 			{ DefaultKeyApplicationName, DefaultValueApplicationName },
 			{ DefaultKeyCommandTimeout, DefaultValueCommandTimeout },
+			{ DefaultKeyParallelWorkers, DefaultValueParallelWorkers },
 		};
 
 	#endregion
@@ -230,6 +236,7 @@ internal sealed class ConnectionString
 	public FbWireCrypt WireCrypt => GetWireCrypt(DefaultKeyWireCrypt, _options.TryGetValue);
 	public string ApplicationName => GetString(DefaultKeyApplicationName, _options.TryGetValue);
 	public int CommandTimeout => GetInt32(DefaultKeyCommandTimeout, _options.TryGetValue);
+	public int ParallelWorkers => GetInt32(DefaultKeyParallelWorkers, _options.TryGetValue);
 
 	#endregion
 
@@ -290,6 +297,10 @@ internal sealed class ConnectionString
 		if (Pooling && NoDatabaseTriggers)
 		{
 			throw new ArgumentException("Cannot use Pooling and NoDatabaseTriggers together.");
+		}
+		if (ParallelWorkers < 0)
+		{
+			throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Parallel Workers' value of {0} is not valid.{1}The value should be an integer >= 0.", ParallelWorkers, Environment.NewLine));
 		}
 	}
 

@@ -651,6 +651,10 @@ internal class FbConnectionInternal
 		{
 			dpb.Append(IscCodes.isc_dpb_no_garbage_collect, (byte)0);
 		}
+		if (options.ParallelWorkers > 0)
+		{
+			dpb.Append(IscCodes.isc_dpb_parallel_workers, options.ParallelWorkers);
+		}
 
 		return dpb;
 	}
