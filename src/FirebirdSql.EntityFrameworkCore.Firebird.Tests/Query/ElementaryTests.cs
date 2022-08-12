@@ -203,10 +203,10 @@ public class ElementaryTests : EntityFrameworkCoreTestsBase
 		await using (var db = await GetDbContext<SelectContext>())
 		{
 			var query = db.Set<MonAttachment>()
-				.Where(x => EF.Functions.Collate(x.AttachmentName, "UNICODE_CI_AI") == "test");
+				.Where(x => x.AttachmentName == EF.Functions.Collate("test", "UNICODE_CI_AI"));
 			Assert.DoesNotThrowAsync(() => query.LoadAsync());
 			var sql = db.LastCommandText;
-			StringAssert.Contains(@"""m"".""MON$ATTACHMENT_NAME"" COLLATE UNICODE_CI_AI", sql);
+			StringAssert.Contains(@"CAST(_UTF8'test' AS VARCHAR(4) CHARACTER SET UTF8) COLLATE UNICODE_CI_AI", sql);
 		}
 	}
 }
