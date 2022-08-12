@@ -1,4 +1,4 @@
-# Entity Framework Core 5.x
+# Entity Framework Core 6.x
 
 * Install `FirebirdSql.EntityFrameworkCore.Firebird` from NuGet.
 * Create your `DbContext`.
