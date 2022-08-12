@@ -196,6 +196,19 @@ public class ElementaryTests : EntityFrameworkCoreTestsBase
 			StringAssert.Contains("'Jiri%'", sql);
 		}
 	}
+
+	[Test]
+	public async Task SelectWithCollate()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Set<MonAttachment>()
+				.Where(x => EF.Functions.Collate(x.AttachmentName, "UNICODE_CI_AI") == "test");
+			Assert.DoesNotThrowAsync(() => query.LoadAsync());
+			var sql = db.LastCommandText;
+			StringAssert.Contains(@"""m"".""MON$ATTACHMENT_NAME"" COLLATE UNICODE_CI_AI", sql);
+		}
+	}
 }
 
 class SelectContext : FbTestDbContext
