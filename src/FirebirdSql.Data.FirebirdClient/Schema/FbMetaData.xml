@@ -1360,9 +1360,6 @@
 		<DbType>16</DbType>
 	</DataTypes>
 	<ReservedWords>
-		<ReservedWord>ACTION</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
 		<ReservedWord>ACTIVE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
@@ -1405,9 +1402,6 @@
 		<ReservedWord>AVG</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>BASE_NAME</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
 		<ReservedWord>BEFORE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
@@ -1420,19 +1414,22 @@
 		<ReservedWord>BIGINT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>BINARY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>BIT_LENGTH</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>BLOB</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>BREAK</ReservedWord>
+		<ReservedWord>BOOLEAN</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>BOTH</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>BY</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>CACHE</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>CASCADE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CASE</ReservedWord>
@@ -1447,19 +1444,25 @@
 		<ReservedWord>CHARACTER</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>CHARACTER_LENGTH</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>CHAR_LENGTH</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>CHECK</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>CHECK_POINT_LENGTH</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>COALESCE</ReservedWord>
+		<ReservedWord>CLOSE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>COLLATE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>COLUMN</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>COMMENT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>COMMIT</ReservedWord>
@@ -1474,7 +1477,7 @@
 		<ReservedWord>CONDITIONAL</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>CONNECTION_ID</ReservedWord>
+		<ReservedWord>CONNECT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CONSTRAINT</ReservedWord>
@@ -1483,16 +1486,31 @@
 		<ReservedWord>CONTAINING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>CORR</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>COUNT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>COVAR_POP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>COVAR_SAMP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>CREATE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>CROSS</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CSTRING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CURRENT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>CURRENT_CONNECTION</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CURRENT_DATE</ReservedWord>
@@ -1505,6 +1523,9 @@
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CURRENT_TIMESTAMP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>CURRENT_TRANSACTION</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>CURRENT_USER</ReservedWord>
@@ -1528,6 +1549,9 @@
 		<ReservedWord>DEC</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>DECFLOAT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>DECIMAL</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
@@ -1540,13 +1564,19 @@
 		<ReservedWord>DELETE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>DELETING</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>DESC</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>DESCENDING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>DESCRIPTOR</ReservedWord>
+		<ReservedWord>DETERMINISTIC</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>DISCONNECT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>DISTINCT</ReservedWord>
@@ -1594,13 +1624,16 @@
 		<ReservedWord>EXTRACT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>FALSE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>FETCH</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>FILE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>FILTER</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>FIRST</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>FLOAT</ReservedWord>
@@ -1610,9 +1643,6 @@
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>FOREIGN</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>FREE_IT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>FROM</ReservedWord>
@@ -1633,13 +1663,13 @@
 		<ReservedWord>GEN_ID</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>GLOBAL</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>GRANT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>GROUP</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>GROUP_COMMIT_WAIT_TIME</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>HAVING</ReservedWord>
@@ -1666,10 +1696,19 @@
 		<ReservedWord>INPUT_TYPE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>INSENSITIVE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>INSERT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>INSERTING</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>INT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>INT128</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>INTEGER</ReservedWord>
@@ -1690,7 +1729,10 @@
 		<ReservedWord>KEY</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>LAST</ReservedWord>
+		<ReservedWord>LATERAL</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>LEADING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>LEFT</ReservedWord>
@@ -1705,13 +1747,19 @@
 		<ReservedWord>LIKE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>LOGFILE</ReservedWord>
+		<ReservedWord>LOCAL</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>LOG_BUFFER_SIZE</ReservedWord>
+		<ReservedWord>LOCALTIME</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>LOCALTIMESTAMP</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>LONG</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>LOWER</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>MANUAL</ReservedWord>
@@ -1759,31 +1807,28 @@
 		<ReservedWord>NOT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>NULLIF</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
 		<ReservedWord>NULL</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>NULLS</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>LOCK</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>NUMERIC</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>NUM_LOG_BUFFERS</ReservedWord>
+		<ReservedWord>OCTET_LENGTH</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>OF</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>OFFSET</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>ON</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>ONLY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>OPEN</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>OPTION</ReservedWord>
@@ -1799,6 +1844,9 @@
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>OUTPUT_TYPE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>OVER</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>OVERFLOW</ReservedWord>
@@ -1843,10 +1891,31 @@
 		<ReservedWord>PROTECTED</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>RAW_PARTITIONS</ReservedWord>
+		<ReservedWord>PUBLICATION</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>RDB$DB_KEY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$ERROR</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$GET_CONTEXT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$GET_TRANSACTION_CN</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$RECORD_VERSION</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$ROLE_IN_USE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$SET_CONTEXT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RDB$SYSTEM_PRIVILEGE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>READ</ReservedWord>
@@ -1861,7 +1930,40 @@
 		<ReservedWord>RECREATE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>RECURSIVE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>REFERENCES</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_AVGX</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_AVGY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_COUNT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_INTERCEPT</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_R2</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_SLOPE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_SXX</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_SXY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>REGR_SYY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RELEASE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>RESERV</ReservedWord>
@@ -1870,10 +1972,13 @@
 		<ReservedWord>RESERVING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>RESTRICT</ReservedWord>
+		<ReservedWord>RESETTING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>RETAIN</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>RETURN</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>RETURNING_VALUES</ReservedWord>
@@ -1888,19 +1993,25 @@
 		<ReservedWord>RIGHT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>ROLE</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
 		<ReservedWord>ROLLBACK</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>ROWS_AFFECTED</ReservedWord>
+		<ReservedWord>ROW</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>ROWS</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>ROW_COUNT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SAVEPOINT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SCHEMA</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>SCROLL</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SECOND</ReservedWord>
@@ -1912,6 +2023,9 @@
 		<ReservedWord>SELECT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>SENSITIVE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>SET</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
@@ -1921,13 +2035,13 @@
 		<ReservedWord>SHARED</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>SIMILAR</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>SINGULAR</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SIZE</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>SKIP</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SMALLINT</ReservedWord>
@@ -1945,7 +2059,13 @@
 		<ReservedWord>SQLCODE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>SQLSTATE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>STABILITY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>START</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>STARTING</ReservedWord>
@@ -1957,7 +2077,10 @@
 		<ReservedWord>STATISTICS</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>SUBSTRING</ReservedWord>
+		<ReservedWord>STDDEV_POP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>STDDEV_SAMP</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>SUB_TYPE</ReservedWord>
@@ -1981,19 +2104,31 @@
 		<ReservedWord>TIMESTAMP</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>TIMEZONE_HOUR</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>TIMEZONE_MINUTE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>TO</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>TRAILING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>TRANSACTION</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>TRANSACTION_ID</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
 		<ReservedWord>TRIGGER</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
-		<ReservedWord>TYPE</ReservedWord>
+		<ReservedWord>TRIM</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>TRUE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>UNBOUNDED</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>UNCOMMITTED</ReservedWord>
@@ -2005,7 +2140,13 @@
 		<ReservedWord>UNIQUE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>UNKNOWN</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>UPDATE</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>UPDATING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>UPPER</ReservedWord>
@@ -2023,6 +2164,9 @@
 		<ReservedWord>VALUES</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>VARBINARY</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>VARCHAR</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
@@ -2032,13 +2176,16 @@
 		<ReservedWord>VARYING</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>VAR_POP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>VAR_SAMP</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>VIEW</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>WAIT</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>WEEKDAY</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>WHEN</ReservedWord>
@@ -2050,7 +2197,13 @@
 		<ReservedWord>WHILE</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
+		<ReservedWord>WINDOW</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
 		<ReservedWord>WITH</ReservedWord>
+	</ReservedWords>
+	<ReservedWords>
+		<ReservedWord>WITHOUT</ReservedWord>
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>WORK</ReservedWord>
@@ -2060,8 +2213,5 @@
 	</ReservedWords>
 	<ReservedWords>
 		<ReservedWord>YEAR</ReservedWord>
-	</ReservedWords>
-	<ReservedWords>
-		<ReservedWord>YEARDAY</ReservedWord>
 	</ReservedWords>
 </NewDataSet>
