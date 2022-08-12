@@ -95,6 +95,15 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 							DefaultValueSql = "'x'",
 							IsNullable = true,
 						},
+						new AddColumnOperation
+						{
+							Name = "COLLA",
+							Table = "People",
+							ClrType = typeof(string),
+							MaxLength = 20,
+							IsNullable = true,
+							Collation = "UNICODE_CI_AI"
+						},
 				},
 			PrimaryKey = new AddPrimaryKeyOperation
 			{
@@ -125,6 +134,7 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
     ""SSN"" char(11),
     ""DEF_O"" VARCHAR(20) DEFAULT _UTF8'test',
     ""DEF_S"" VARCHAR(20) DEFAULT 'x',
+    ""COLLA"" VARCHAR(20) COLLATE UNICODE_CI_AI,
     PRIMARY KEY (""Id""),
     UNIQUE (""SSN""),
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -201,6 +211,15 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 							DefaultValueSql = "'x'",
 							IsNullable = true,
 						},
+						new AddColumnOperation
+						{
+							Name = "COLLA",
+							Table = "People",
+							ClrType = typeof(string),
+							MaxLength = 20,
+							IsNullable = true,
+							Collation = "UNICODE_CI_AI"
+						},
 				},
 			PrimaryKey = new AddPrimaryKeyOperation
 			{
@@ -231,6 +250,7 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
     ""SSN"" char(11),
     ""DEF_O"" VARCHAR(20) DEFAULT _UTF8'test',
     ""DEF_S"" VARCHAR(20) DEFAULT 'x',
+    ""COLLA"" VARCHAR(20) COLLATE UNICODE_CI_AI,
     PRIMARY KEY (""Id""),
     UNIQUE (""SSN""),
     FOREIGN KEY (""EmployerId"") REFERENCES ""Companies"" (""Id"") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -270,6 +290,23 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 		var batch = await Generate(new[] { operation });
 		Assert.AreEqual(1, batch.Count());
 		Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""schema"".""People"" ADD ""NewColumn"" DECIMAL(18,2) NOT NULL;"), batch[0].CommandText);
+	}
+
+	[Test]
+	public async Task AddColumnWithCollation()
+	{
+		var operation = new AddColumnOperation()
+		{
+			Table = "People",
+			Name = "NewColumn",
+			ClrType = typeof(string),
+			MaxLength = 10,
+			IsNullable = false,
+			Collation = "UNICODE_CI_AI",
+		};
+		var batch = await Generate(new[] { operation });
+		Assert.AreEqual(1, batch.Count());
+		Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD ""NewColumn"" VARCHAR(10) COLLATE UNICODE_CI_AI NOT NULL;"), batch[0].CommandText);
 	}
 
 	[Test]
@@ -454,6 +491,29 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 		Assert.AreEqual(4, batch.Count());
 		StringAssert.Contains("drop trigger", batch[0].CommandText);
 		Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE INTEGER;"), batch[2].CommandText);
+	}
+
+	[Test]
+	public async Task AlterColumnCollation()
+	{
+		var operation = new AlterColumnOperation()
+		{
+			Table = "People",
+			Name = "Col",
+			ClrType = typeof(string),
+			MaxLength = 10,
+			IsNullable = false,
+			Collation = "UNICODE_CI_AI",
+			OldColumn = new AddColumnOperation()
+			{
+				ClrType = typeof(string),
+				MaxLength = 10,
+				IsNullable = false,
+			},
+		};
+		var batch = await Generate(new[] { operation });
+		Assert.AreEqual(3, batch.Count());
+		Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ALTER COLUMN ""Col"" TYPE VARCHAR(10) COLLATE UNICODE_CI_AI;"), batch[1].CommandText);
 	}
 
 	[Test]
