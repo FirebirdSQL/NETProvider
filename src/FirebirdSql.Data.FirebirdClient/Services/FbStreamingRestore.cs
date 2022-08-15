@@ -80,7 +80,7 @@ public class FbStreamingRestore : FbService
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				if (ConnectionStringOptions.ParallelWorkers > 0)
-					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
+					startSpb.Append(IscCodes.isc_spb_res_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
 				ReadInput();
 			}
@@ -120,7 +120,7 @@ public class FbStreamingRestore : FbService
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				if (ConnectionStringOptions.ParallelWorkers > 0)
-					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
+					startSpb.Append(IscCodes.isc_spb_res_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 				await ReadInputAsync(cancellationToken).ConfigureAwait(false);
 			}
