@@ -80,6 +80,8 @@ public sealed class FbRestore : FbService
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				startSpb.Append2(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
 				if (Verbose)
 				{
@@ -123,6 +125,8 @@ public sealed class FbRestore : FbService
 					startSpb.Append2(IscCodes.isc_spb_res_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				startSpb.Append2(IscCodes.isc_spb_res_stat, Statistics.BuildConfiguration());
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 				if (Verbose)
 				{

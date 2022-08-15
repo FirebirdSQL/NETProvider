@@ -52,6 +52,8 @@ public sealed class FbStreamingBackup : FbService
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
 				ReadOutput();
 			}
@@ -81,6 +83,8 @@ public sealed class FbStreamingBackup : FbService
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 				await ReadOutputAsync(cancellationToken).ConfigureAwait(false);
 			}

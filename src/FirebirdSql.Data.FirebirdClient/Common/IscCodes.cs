@@ -522,6 +522,11 @@ internal static class IscCodes
 	public const int isc_spb_bkp_length = 7;
 	public const int isc_spb_bkp_skip_data = 8;
 	public const int isc_spb_bkp_stat = 15;
+	public const int isc_spb_bkp_keyholder = 16;
+	public const int isc_spb_bkp_keyname = 17;
+	public const int isc_spb_bkp_crypt = 18;
+	public const int isc_spb_bkp_include_data = 19;
+	public const int isc_spb_bkp_parallel_workers = 21;
 	public const int isc_spb_bkp_ignore_checksums = 0x01;
 	public const int isc_spb_bkp_ignore_limbo = 0x02;
 	public const int isc_spb_bkp_metadata_only = 0x04;
@@ -531,19 +536,26 @@ internal static class IscCodes
 	public const int isc_spb_bkp_convert = 0x40;
 	public const int isc_spb_bkp_expand = 0x80;
 	public const int isc_spb_bkp_no_triggers = 0x8000;
+	public const int isc_spb_bkp_zip = 0x010000;
+	public const int isc_spb_bkp_direct_io = 0x020000;
 
 	#endregion
 
 	#region Restore Service
 
 	public const int isc_spb_res_skip_data = isc_spb_bkp_skip_data;
+	public const int isc_spb_res_include_data = isc_spb_bkp_include_data;
 	public const int isc_spb_res_buffers = 9;
 	public const int isc_spb_res_page_size = 10;
 	public const int isc_spb_res_length = 11;
 	public const int isc_spb_res_access_mode = 12;
 	public const int isc_spb_res_fix_fss_data = 13;
 	public const int isc_spb_res_fix_fss_metadata = 14;
+	public const int isc_spb_res_keyholder = isc_spb_bkp_keyholder;
+	public const int isc_spb_res_keyname = isc_spb_bkp_keyname;
+	public const int isc_spb_res_crypt = isc_spb_bkp_crypt;
 	public const int isc_spb_res_stat = isc_spb_bkp_stat;
+	public const int isc_spb_res_parallel_workers = isc_spb_bkp_parallel_workers;
 	public const int isc_spb_res_metadata_only = isc_spb_bkp_metadata_only;
 	public const int isc_spb_res_deactivate_idx = 0x0100;
 	public const int isc_spb_res_no_shadow = 0x0200;
@@ -552,6 +564,8 @@ internal static class IscCodes
 	public const int isc_spb_res_replace = 0x1000;
 	public const int isc_spb_res_create = 0x2000;
 	public const int isc_spb_res_use_all_space = 0x4000;
+	public const int isc_spb_res_direct_io = isc_spb_bkp_direct_io;
+	public const int isc_spb_res_replica_mode = 20;
 
 	public const int isc_spb_res_am_readonly = isc_spb_prp_am_readonly;
 	public const int isc_spb_res_am_readwrite = isc_spb_prp_am_readwrite;

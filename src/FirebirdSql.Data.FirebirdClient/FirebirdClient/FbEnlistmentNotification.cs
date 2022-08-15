@@ -78,7 +78,7 @@ internal sealed class FbEnlistmentNotification : IEnlistmentNotification
 
 			if (_connection != null)
 			{
-				if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
+				if (!_connection.ConnectionStringOptions.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 				{
 					_connection.Disconnect();
 				}
@@ -112,7 +112,7 @@ internal sealed class FbEnlistmentNotification : IEnlistmentNotification
 
 			if (_connection != null)
 			{
-				if (!_connection.Options.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
+				if (!_connection.ConnectionStringOptions.Pooling && (_connection.OwningConnection == null || _connection.OwningConnection.IsClosed))
 				{
 					_connection.Disconnect();
 				}

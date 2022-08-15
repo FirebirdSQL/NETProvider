@@ -197,7 +197,7 @@ sealed class FbConnectionPoolManager : IDisposable
 	{
 		CheckDisposed();
 
-		if (_pools.TryGetValue(connection.Options.NormalizedConnectionString, out var pool))
+		if (_pools.TryGetValue(connection.ConnectionStringOptions.NormalizedConnectionString, out var pool))
 		{
 			pool.ReleaseConnection(connection, returnToAvailable);
 		}

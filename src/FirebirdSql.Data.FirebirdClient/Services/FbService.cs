@@ -35,10 +35,11 @@ public abstract class FbService
 	private const string ServiceName = "service_mgr";
 
 	private ServiceManagerBase _svc;
-	private ConnectionString _options;
+	private ConnectionString _connectionStringOptions;
 
 	private protected ServiceManagerBase Service => _svc;
-	private protected string Database => _options.Database;
+	private protected ConnectionString ConnectionStringOptions => _connectionStringOptions;
+	private protected string Database => _connectionStringOptions.Database;
 
 	public FbServiceState State { get; private set; }
 	public int QueryBufferSize { get; set; }
@@ -54,7 +55,7 @@ public abstract class FbService
 				throw new InvalidOperationException("ConnectionString cannot be modified on open instances.");
 			}
 
-			_options = new ConnectionString(value);
+			_connectionStringOptions = new ConnectionString(value);
 
 			if (value == null)
 			{
@@ -96,15 +97,15 @@ public abstract class FbService
 		}
 		else
 		{
-			spb.Append1(IscCodes.isc_spb_user_name, _options.UserID);
-			spb.Append1(IscCodes.isc_spb_password, _options.Password);
+			spb.Append1(IscCodes.isc_spb_user_name, _connectionStringOptions.UserID);
+			spb.Append1(IscCodes.isc_spb_password, _connectionStringOptions.Password);
 		}
 		spb.Append1(IscCodes.isc_spb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		if ((_options?.Role.Length ?? 0) != 0)
+		if ((_connectionStringOptions?.Role.Length ?? 0) != 0)
 		{
-			spb.Append1(IscCodes.isc_spb_sql_role_name, _options.Role);
+			spb.Append1(IscCodes.isc_spb_sql_role_name, _connectionStringOptions.Role);
 		}
-		spb.Append1(IscCodes.isc_spb_expected_db, _options.Database);
+		spb.Append1(IscCodes.isc_spb_expected_db, _connectionStringOptions.Database);
 		return spb;
 	}
 
@@ -112,18 +113,18 @@ public abstract class FbService
 	{
 		if (State != FbServiceState.Closed)
 			throw new InvalidOperationException("Service already open.");
-		if (string.IsNullOrEmpty(_options.UserID))
+		if (string.IsNullOrEmpty(_connectionStringOptions.UserID))
 			throw new InvalidOperationException("No user name was specified.");
-		if (string.IsNullOrEmpty(_options.Password))
+		if (string.IsNullOrEmpty(_connectionStringOptions.Password))
 			throw new InvalidOperationException("No user password was specified.");
-		if (!Charset.TryGetByName(_options.Charset, out var charset))
+		if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
 		if (_svc == null)
 		{
-			_svc = ClientFactory.CreateServiceManager(_options);
+			_svc = ClientFactory.CreateServiceManager(_connectionStringOptions);
 		}
-		_svc.Attach(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey);
+		_svc.Attach(BuildSpb(), _connectionStringOptions.DataSource, _connectionStringOptions.Port, ServiceName, _connectionStringOptions.CryptKey);
 		_svc.WarningMessage = OnWarningMessage;
 		State = FbServiceState.Open;
 	}
@@ -131,18 +132,18 @@ public abstract class FbService
 	{
 		if (State != FbServiceState.Closed)
 			throw new InvalidOperationException("Service already open.");
-		if (string.IsNullOrEmpty(_options.UserID))
+		if (string.IsNullOrEmpty(_connectionStringOptions.UserID))
 			throw new InvalidOperationException("No user name was specified.");
-		if (string.IsNullOrEmpty(_options.Password))
+		if (string.IsNullOrEmpty(_connectionStringOptions.Password))
 			throw new InvalidOperationException("No user password was specified.");
-		if (!Charset.TryGetByName(_options.Charset, out var charset))
+		if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
 		if (_svc == null)
 		{
-			_svc = await ClientFactory.CreateServiceManagerAsync(_options, cancellationToken).ConfigureAwait(false);
+			_svc = await ClientFactory.CreateServiceManagerAsync(_connectionStringOptions, cancellationToken).ConfigureAwait(false);
 		}
-		await _svc.AttachAsync(BuildSpb(), _options.DataSource, _options.Port, ServiceName, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+		await _svc.AttachAsync(BuildSpb(), _connectionStringOptions.DataSource, _connectionStringOptions.Port, ServiceName, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 		_svc.WarningMessage = OnWarningMessage;
 		State = FbServiceState.Open;
 	}

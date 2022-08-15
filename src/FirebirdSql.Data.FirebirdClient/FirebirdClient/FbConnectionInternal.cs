@@ -37,7 +37,7 @@ internal class FbConnectionInternal
 	private DatabaseBase _db;
 	private FbTransaction _activeTransaction;
 	private HashSet<IFbPreparedCommand> _preparedCommands;
-	private ConnectionString _options;
+	private ConnectionString _connectionStringOptions;
 	private FbConnection _owningConnection;
 	private FbEnlistmentNotification _enlistmentNotification;
 
@@ -76,9 +76,9 @@ internal class FbConnectionInternal
 		}
 	}
 
-	public ConnectionString Options
+	public ConnectionString ConnectionStringOptions
 	{
-		get { return _options; }
+		get { return _connectionStringOptions; }
 	}
 
 	public bool CancelDisabled { get; private set; }
@@ -91,7 +91,7 @@ internal class FbConnectionInternal
 	{
 		_preparedCommands = new HashSet<IFbPreparedCommand>();
 
-		_options = options;
+		_connectionStringOptions = options;
 	}
 
 	#endregion
@@ -100,7 +100,7 @@ internal class FbConnectionInternal
 
 	public void CreateDatabase(int pageSize, bool forcedWrites, bool overwrite)
 	{
-		var db = ClientFactory.CreateDatabase(_options);
+		var db = ClientFactory.CreateDatabase(_connectionStringOptions);
 
 		var dpb = db.CreateDatabaseParameterBuffer();
 
@@ -109,14 +109,14 @@ internal class FbConnectionInternal
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 		}
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
-		if (!string.IsNullOrEmpty(_options.UserID))
+		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_connectionStringOptions.Dialect, 0, 0, 0 });
+		if (!string.IsNullOrEmpty(_connectionStringOptions.UserID))
 		{
-			dpb.Append(IscCodes.isc_dpb_user_name, _options.UserID);
+			dpb.Append(IscCodes.isc_dpb_user_name, _connectionStringOptions.UserID);
 		}
-		if (_options.Charset.Length > 0)
+		if (_connectionStringOptions.Charset.Length > 0)
 		{
-			if (!Charset.TryGetByName(_options.Charset, out var charset))
+			if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 				throw new ArgumentException("Invalid character set specified.");
 			dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
 		}
@@ -131,13 +131,13 @@ internal class FbConnectionInternal
 
 		try
 		{
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				db.CreateDatabaseWithTrustedAuth(dpb, _options.Database, _options.CryptKey);
+				db.CreateDatabaseWithTrustedAuth(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 			else
 			{
-				db.CreateDatabase(dpb, _options.Database, _options.CryptKey);
+				db.CreateDatabase(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 		}
 		finally
@@ -147,7 +147,7 @@ internal class FbConnectionInternal
 	}
 	public async Task CreateDatabaseAsync(int pageSize, bool forcedWrites, bool overwrite, CancellationToken cancellationToken = default)
 	{
-		var db = await ClientFactory.CreateDatabaseAsync(_options, cancellationToken).ConfigureAwait(false);
+		var db = await ClientFactory.CreateDatabaseAsync(_connectionStringOptions, cancellationToken).ConfigureAwait(false);
 
 		var dpb = db.CreateDatabaseParameterBuffer();
 
@@ -156,14 +156,14 @@ internal class FbConnectionInternal
 			dpb.Append(IscCodes.isc_dpb_utf8_filename, 0);
 		}
 		dpb.Append(IscCodes.isc_dpb_dummy_packet_interval, new byte[] { 120, 10, 0, 0 });
-		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_options.Dialect, 0, 0, 0 });
-		if (!string.IsNullOrEmpty(_options.UserID))
+		dpb.Append(IscCodes.isc_dpb_sql_dialect, new byte[] { (byte)_connectionStringOptions.Dialect, 0, 0, 0 });
+		if (!string.IsNullOrEmpty(_connectionStringOptions.UserID))
 		{
-			dpb.Append(IscCodes.isc_dpb_user_name, _options.UserID);
+			dpb.Append(IscCodes.isc_dpb_user_name, _connectionStringOptions.UserID);
 		}
-		if (_options.Charset.Length > 0)
+		if (_connectionStringOptions.Charset.Length > 0)
 		{
-			if (!Charset.TryGetByName(_options.Charset, out var charset))
+			if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 				throw new ArgumentException("Invalid character set specified.");
 			dpb.Append(IscCodes.isc_dpb_set_db_charset, charset.Name);
 		}
@@ -178,13 +178,13 @@ internal class FbConnectionInternal
 
 		try
 		{
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				await db.CreateDatabaseWithTrustedAuthAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await db.CreateDatabaseWithTrustedAuthAsync(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 			else
 			{
-				await db.CreateDatabaseAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await db.CreateDatabaseAsync(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 		}
 		finally
@@ -195,16 +195,16 @@ internal class FbConnectionInternal
 
 	public void DropDatabase()
 	{
-		var db = ClientFactory.CreateDatabase(_options);
+		var db = ClientFactory.CreateDatabase(_connectionStringOptions);
 		try
 		{
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				db.AttachWithTrustedAuth(BuildDpb(db, _options), _options.Database, _options.CryptKey);
+				db.AttachWithTrustedAuth(BuildDpb(db, _connectionStringOptions), _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 			else
 			{
-				db.Attach(BuildDpb(db, _options), _options.Database, _options.CryptKey);
+				db.Attach(BuildDpb(db, _connectionStringOptions), _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 			db.DropDatabase();
 		}
@@ -215,16 +215,16 @@ internal class FbConnectionInternal
 	}
 	public async Task DropDatabaseAsync(CancellationToken cancellationToken = default)
 	{
-		var db = await ClientFactory.CreateDatabaseAsync(_options, cancellationToken).ConfigureAwait(false);
+		var db = await ClientFactory.CreateDatabaseAsync(_connectionStringOptions, cancellationToken).ConfigureAwait(false);
 		try
 		{
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				await db.AttachWithTrustedAuthAsync(BuildDpb(db, _options), _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await db.AttachWithTrustedAuthAsync(BuildDpb(db, _connectionStringOptions), _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 			else
 			{
-				await db.AttachAsync(BuildDpb(db, _options), _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await db.AttachAsync(BuildDpb(db, _connectionStringOptions), _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 			await db.DropDatabaseAsync(cancellationToken).ConfigureAwait(false);
 		}
@@ -240,20 +240,20 @@ internal class FbConnectionInternal
 
 	public void Connect()
 	{
-		if (!Charset.TryGetByName(_options.Charset, out var charset))
+		if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
 		try
 		{
-			_db = ClientFactory.CreateDatabase(_options);
-			var dpb = BuildDpb(_db, _options);
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			_db = ClientFactory.CreateDatabase(_connectionStringOptions);
+			var dpb = BuildDpb(_db, _connectionStringOptions);
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				_db.AttachWithTrustedAuth(dpb, _options.Database, _options.CryptKey);
+				_db.AttachWithTrustedAuth(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 			else
 			{
-				_db.Attach(dpb, _options.Database, _options.CryptKey);
+				_db.Attach(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey);
 			}
 		}
 		catch (IscException ex)
@@ -263,20 +263,20 @@ internal class FbConnectionInternal
 	}
 	public async Task ConnectAsync(CancellationToken cancellationToken = default)
 	{
-		if (!Charset.TryGetByName(_options.Charset, out var charset))
+		if (!Charset.TryGetByName(_connectionStringOptions.Charset, out var charset))
 			throw new ArgumentException("Invalid character set specified.");
 
 		try
 		{
-			_db = await ClientFactory.CreateDatabaseAsync(_options, cancellationToken).ConfigureAwait(false);
-			var dpb = BuildDpb(_db, _options);
-			if (string.IsNullOrEmpty(_options.UserID) && string.IsNullOrEmpty(_options.Password))
+			_db = await ClientFactory.CreateDatabaseAsync(_connectionStringOptions, cancellationToken).ConfigureAwait(false);
+			var dpb = BuildDpb(_db, _connectionStringOptions);
+			if (string.IsNullOrEmpty(_connectionStringOptions.UserID) && string.IsNullOrEmpty(_connectionStringOptions.Password))
 			{
-				await _db.AttachWithTrustedAuthAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await _db.AttachWithTrustedAuthAsync(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 			else
 			{
-				await _db.AttachAsync(dpb, _options.Database, _options.CryptKey, cancellationToken).ConfigureAwait(false);
+				await _db.AttachAsync(dpb, _connectionStringOptions.Database, _connectionStringOptions.CryptKey, cancellationToken).ConfigureAwait(false);
 			}
 		}
 		catch (IscException ex)
@@ -299,7 +299,7 @@ internal class FbConnectionInternal
 			{
 				_db = null;
 				_owningConnection = null;
-				_options = null;
+				_connectionStringOptions = null;
 			}
 		}
 	}
@@ -317,7 +317,7 @@ internal class FbConnectionInternal
 			{
 				_db = null;
 				_owningConnection = null;
-				_options = null;
+				_connectionStringOptions = null;
 			}
 		}
 	}
