@@ -606,6 +606,7 @@ internal static class IscCodes
 	public const int isc_spb_rpr_commit_trans_64 = 49;
 	public const int isc_spb_rpr_rollback_trans_64 = 50;
 	public const int isc_spb_rpr_recover_two_phase_64 = 51;
+	public const int isc_spb_rpr_par_workers = 52;
 
 	public const int isc_spb_rpr_validate_db = 0x01;
 	public const int isc_spb_rpr_sweep_db = 0x02;

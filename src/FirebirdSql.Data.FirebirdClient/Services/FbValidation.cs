@@ -44,6 +44,8 @@ public sealed class FbValidation : FbService
 				startSpb.Append(IscCodes.isc_action_svc_repair);
 				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_rpr_par_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
 				ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 			}
@@ -70,6 +72,8 @@ public sealed class FbValidation : FbService
 				startSpb.Append(IscCodes.isc_action_svc_repair);
 				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
+				if (ConnectionStringOptions.ParallelWorkers > 0)
+					startSpb.Append(IscCodes.isc_spb_rpr_par_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 				await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 			}
