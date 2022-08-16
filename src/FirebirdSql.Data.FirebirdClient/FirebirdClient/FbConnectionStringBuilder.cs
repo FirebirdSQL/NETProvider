@@ -309,6 +309,16 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 		set { SetValue(Common.ConnectionString.DefaultKeyCommandTimeout, value); }
 	}
 
+	[Category("Advanced")]
+	[DisplayName("Parallel Workers")]
+	[Description("Number of parallel workers to use for certain operations in Firebird.")]
+	[DefaultValue(Common.ConnectionString.DefaultValueParallelWorkers)]
+	public int ParallelWorkers
+	{
+		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyParallelWorkers), base.TryGetValue, Common.ConnectionString.DefaultValueParallelWorkers); }
+		set { SetValue(Common.ConnectionString.DefaultKeyParallelWorkers, value); }
+	}
+
 	#endregion
 
 	#region Constructors
