@@ -575,8 +575,6 @@ internal sealed class GdsArray : ArrayBase
 						xdr.Write(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat));
 						break;
 
-#warning New datatypes
-
 					default:
 						throw TypeHelper.InvalidDataType((int)dbType);
 				}
@@ -649,8 +647,6 @@ internal sealed class GdsArray : ArrayBase
 					case DbDataType.TimeStamp:
 						await xdr.WriteAsync(Convert.ToDateTime(source, CultureInfo.CurrentCulture.DateTimeFormat), cancellationToken).ConfigureAwait(false);
 						break;
-
-#warning New datatypes
 
 					default:
 						throw TypeHelper.InvalidDataType((int)dbType);
