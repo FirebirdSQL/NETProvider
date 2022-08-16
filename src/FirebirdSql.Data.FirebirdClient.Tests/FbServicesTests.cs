@@ -173,7 +173,7 @@ end";
 	}
 
 	[Test]
-	public async Task SweepTestParallel()
+	public async Task SweepParallelTest()
 	{
 		if (!EnsureServerVersionAtLeast(new Version(5, 0, 0, 0)))
 			return;
