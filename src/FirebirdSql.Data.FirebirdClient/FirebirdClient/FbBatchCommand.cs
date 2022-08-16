@@ -27,7 +27,6 @@ using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
-#warning Pull methods shared with FbCommand into some helper?
 public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDisposable
 #if !(NET48 || NETSTANDARD2_0)
 		, IAsyncDisposable
