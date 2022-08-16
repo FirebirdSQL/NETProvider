@@ -111,7 +111,7 @@ public class FbTransactionTests : FbTestsBase
 	[Test]
 	public async Task ReadCommittedReadConsistency()
 	{
-		if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
 			return;
 
 		await using (var transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency }))

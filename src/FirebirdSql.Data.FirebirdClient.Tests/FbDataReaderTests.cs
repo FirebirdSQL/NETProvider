@@ -457,7 +457,7 @@ end";
 	[Test]
 	public async Task ReadCancellation()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		using (var cts = new CancellationTokenSource())
@@ -500,7 +500,7 @@ end";
 	[Test]
 	public async Task ReadOnAlreadyCancelledToken()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		using (var cts = new CancellationTokenSource())

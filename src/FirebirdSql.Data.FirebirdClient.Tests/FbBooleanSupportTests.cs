@@ -39,7 +39,7 @@ public class FbBooleanSupportTests : FbTestsBase
 	{
 		await base.SetUp();
 
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		_shouldTearDown = true;

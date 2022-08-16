@@ -36,7 +36,7 @@ public class FbTimeZonesSupportTests : FbTestsBase
 	{
 		await base.SetUp();
 
-		if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
 			return;
 	}
 

@@ -485,6 +485,9 @@ end";
 	[Test]
 	public async Task ReturningClauseParameterTest()
 	{
+		if (!EnsureServerVersionAtMost(new Version(5, 0, 0, 0)))
+			return;
+
 		const int ColumnValue = 1234;
 		await using (var cmd = Connection.CreateCommand())
 		{
@@ -585,7 +588,7 @@ end";
 	[Test]
 	public async Task GetCommandExplainedPlanTest()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		await using (var cmd = Connection.CreateCommand())
@@ -614,7 +617,7 @@ end";
 	[Test]
 	public async Task GetCommandExplainedPlanNoPlanTest()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		await using (var cmd = Connection.CreateCommand())
@@ -689,7 +692,7 @@ end";
 	[Test]
 	public async Task CommandCancellationDirectTest()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		await using (var cmd = Connection.CreateCommand())
@@ -711,7 +714,7 @@ end";
 	[Test]
 	public async Task CommandCancellationCancellationTokenTest()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		using (var cts = new CancellationTokenSource())
@@ -736,7 +739,7 @@ end";
 	[Test]
 	public async Task CommandUsableAfterCancellationTest()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		using (var cts = new CancellationTokenSource())
@@ -776,7 +779,7 @@ end";
 	[Test]
 	public async Task ExecuteNonQueryOnAlreadyCancelledToken()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		using (var cts = new CancellationTokenSource())
@@ -819,7 +822,7 @@ end";
 	[Test]
 	public async Task CommandTimeoutTest()
 	{
-		if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
 			return;
 
 		await using (var cmd = Connection.CreateCommand())

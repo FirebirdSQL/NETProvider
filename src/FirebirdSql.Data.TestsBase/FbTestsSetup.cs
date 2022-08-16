@@ -77,6 +77,7 @@ public class FbTestsSetup
 	}
 
 	public static bool ServerVersionAtLeast(Version serverVersion, Version minimum) => serverVersion >= minimum;
+	public static bool ServerVersionAtMost(Version serverVersion, Version maximum) => serverVersion < maximum;
 
 	private static async Task CreateTables(FbConnection connection, Version serverVersion)
 	{

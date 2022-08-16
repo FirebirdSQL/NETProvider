@@ -397,7 +397,7 @@ public class FbConnectionTests : FbTestsBase
 	[TestCase(true)]
 	public async Task UseCompression(bool compression)
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 		if (!EnsureServerType(FbServerType.Default))
 			return;
@@ -424,7 +424,7 @@ public class FbConnectionTests : FbTestsBase
 	[TestCase(FbWireCrypt.Required)]
 	public async Task UseWireCrypt(FbWireCrypt wireCrypt)
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 		if (!EnsureServerType(FbServerType.Default))
 			return;
@@ -495,7 +495,7 @@ public class FbConnectionTests : FbTestsBase
 	[Test]
 	public async Task CaseSensitiveLogin()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
@@ -622,7 +622,7 @@ public class FbConnectionTests : FbTestsBase
 	[Test]
 	public async Task SrpWithLeadingZeros()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		await using (var cmd = Connection.CreateCommand())

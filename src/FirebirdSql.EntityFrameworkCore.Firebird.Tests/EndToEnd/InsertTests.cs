@@ -83,7 +83,7 @@ public class InsertTests : EntityFrameworkCoreTestsBase
 	[Test]
 	public async Task IdentityInsert()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		var id = ServerVersion >= new Version(4, 0, 0, 0) ? 26 : 27;
@@ -164,7 +164,7 @@ public class InsertTests : EntityFrameworkCoreTestsBase
 	[Test]
 	public async Task DefaultValuesInsert()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		var id = ServerVersion >= new Version(4, 0, 0, 0) ? 26 : 27;
@@ -211,7 +211,7 @@ public class InsertTests : EntityFrameworkCoreTestsBase
 	[Test]
 	public async Task TwoComputedInsert()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		await using (var db = await GetDbContext<TwoComputedInsertContext>())

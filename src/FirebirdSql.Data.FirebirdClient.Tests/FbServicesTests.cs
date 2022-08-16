@@ -86,7 +86,7 @@ public class FbServicesTests : FbTestsBase
 	[TestCase(false)]
 	public async Task StreamingBackupRestoreTest(bool verbose)
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		Task BackupPart(MemoryStream buffer)
@@ -194,7 +194,7 @@ end";
 	[Test]
 	public async Task ShutdownOnline2Test()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		var configurationSvc = new FbConfiguration();
@@ -273,7 +273,7 @@ end";
 	[Test]
 	public async Task NBackupBackupRestoreTest()
 	{
-		if (!EnsureServerVersion(new Version(2, 5, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
 			return;
 
 		const int Levels = 2;
@@ -352,7 +352,7 @@ end";
 	[Test]
 	public async Task NoLingerTest()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		var configurationSvc = new FbConfiguration();
@@ -379,7 +379,7 @@ end";
 	[Test]
 	public async Task Validation2Test()
 	{
-		if (!EnsureServerVersion(new Version(3, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
 			return;
 
 		var validationSvc = new FbValidation2();
@@ -396,7 +396,7 @@ end";
 	[Test]
 	public async Task NFixupTest()
 	{
-		if (!EnsureServerVersion(new Version(4, 0, 0, 0)))
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
 			return;
 
 		var deltaFile = Path.GetTempFileName();

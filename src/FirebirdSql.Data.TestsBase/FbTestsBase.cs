@@ -234,9 +234,16 @@ end";
 		}
 	}
 
-	protected bool EnsureServerVersion(Version serverVersion)
+	protected bool EnsureServerVersionAtLeast(Version serverVersion)
 	{
 		if (FbTestsSetup.ServerVersionAtLeast(ServerVersion, serverVersion))
+			return true;
+		Assert.Inconclusive("Not supported on this version.");
+		return false;
+	}
+	protected bool EnsureServerVersionAtMost(Version serverVersion)
+	{
+		if (FbTestsSetup.ServerVersionAtMost(ServerVersion, serverVersion))
 			return true;
 		Assert.Inconclusive("Not supported on this version.");
 		return false;
