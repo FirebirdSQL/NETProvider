@@ -52,31 +52,26 @@ public class FbServicesTests : FbTestsBase
 	public async Task BackupRestoreTest()
 	{
 		var backupName = $"{Guid.NewGuid()}.bak";
-		Task BackupPart()
-		{
-			var backupSvc = new FbBackup();
-			backupSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-			backupSvc.Options = FbBackupFlags.IgnoreLimbo;
-			backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
-			backupSvc.Verbose = true;
-			backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
-			backupSvc.ServiceOutput += ServiceOutput;
-			return backupSvc.ExecuteAsync();
-		}
-		Task RestorePart()
-		{
-			var restoreSvc = new FbRestore();
-			restoreSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
-			restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
-			restoreSvc.PageSize = FbTestsSetup.PageSize;
-			restoreSvc.Verbose = true;
-			restoreSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
-			restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
-			restoreSvc.ServiceOutput += ServiceOutput;
-			return restoreSvc.ExecuteAsync();
-		}
-		await BackupPart();
-		await RestorePart();
+		var connectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
+		await BackupPartHelper(backupName, connectionString);
+		await RestorePartHelper(backupName, connectionString);
+		// test the database was actually restored fine
+		await Connection.OpenAsync();
+		await Connection.CloseAsync();
+	}
+
+	[Test]
+	public async Task BackupRestoreParallelTest()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(5, 0, 0, 0)))
+			return;
+
+		var backupName = $"{Guid.NewGuid()}.bak";
+		var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
+		csb.ParallelWorkers = 6;
+		var connectionString = csb.ToString();
+		await BackupPartHelper(backupName, connectionString);
+		await RestorePartHelper(backupName, connectionString);
 		// test the database was actually restored fine
 		await Connection.OpenAsync();
 		await Connection.CloseAsync();
@@ -440,6 +435,30 @@ end";
 		await fixup.ExecuteAsync();
 
 		Assert.DoesNotThrowAsync(() => Connection.OpenAsync());
+	}
+
+	static Task BackupPartHelper(string backupName, string connectionString)
+	{
+		var backupSvc = new FbBackup();
+		backupSvc.ConnectionString = connectionString;
+		backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+		backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
+		backupSvc.Verbose = true;
+		backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
+		backupSvc.ServiceOutput += ServiceOutput;
+		return backupSvc.ExecuteAsync();
+	}
+	static Task RestorePartHelper(string backupName, string connectionString)
+	{
+		var restoreSvc = new FbRestore();
+		restoreSvc.ConnectionString = connectionString;
+		restoreSvc.Options = FbRestoreFlags.Create | FbRestoreFlags.Replace;
+		restoreSvc.PageSize = FbTestsSetup.PageSize;
+		restoreSvc.Verbose = true;
+		restoreSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
+		restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
+		restoreSvc.ServiceOutput += ServiceOutput;
+		return restoreSvc.ExecuteAsync();
 	}
 
 	static void ServiceOutput(object sender, ServiceOutputEventArgs e)
