@@ -173,6 +173,21 @@ end";
 	}
 
 	[Test]
+	public async Task SweepTestParallel()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(5, 0, 0, 0)))
+			return;
+
+		var validationSvc = new FbValidation();
+		var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
+		csb.ParallelWorkers = 6;
+		validationSvc.ConnectionString = csb.ToString();
+		validationSvc.Options = FbValidationFlags.SweepDatabase;
+		validationSvc.ServiceOutput += ServiceOutput;
+		await validationSvc.ExecuteAsync();
+	}
+
+	[Test]
 	public async Task SetPropertiesTest()
 	{
 		var configurationSvc = new FbConfiguration();
