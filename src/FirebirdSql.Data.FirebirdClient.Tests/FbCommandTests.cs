@@ -503,7 +503,6 @@ end";
 		await using (var cmd = Connection.CreateCommand())
 		{
 			cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
-			cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 			var returningValue = (int)await cmd.ExecuteScalarAsync();
 			Assert.AreEqual(ColumnValue, returningValue);
 		}
@@ -516,7 +515,6 @@ end";
 		await using (var cmd = Connection.CreateCommand())
 		{
 			cmd.CommandText = string.Format("update TEST set int_field = '{0}' where int_field = 1 returning int_field", ColumnValue);
-			cmd.Parameters.Add(new FbParameter() { Direction = ParameterDirection.Output });
 			await using (var reader = await cmd.ExecuteReaderAsync())
 			{
 				Assert.IsTrue(await reader.ReadAsync());
