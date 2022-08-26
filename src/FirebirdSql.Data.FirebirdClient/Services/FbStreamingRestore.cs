@@ -66,7 +66,7 @@ public class FbStreamingRestore : FbService
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_restore);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin");
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (Verbose)
 				{
 					startSpb.Append(IscCodes.isc_spb_verbose);
@@ -106,7 +106,7 @@ public class FbStreamingRestore : FbService
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_restore);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin");
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (Verbose)
 				{
 					startSpb.Append(IscCodes.isc_spb_verbose);

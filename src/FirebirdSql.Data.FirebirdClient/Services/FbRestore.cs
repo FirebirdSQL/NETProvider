@@ -68,7 +68,7 @@ public sealed class FbRestore : FbService
 				{
 					startSpb.Append2(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
 				}
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (Verbose)
 					startSpb.Append(IscCodes.isc_spb_verbose);
 				if (PageBuffers.HasValue)
@@ -113,7 +113,7 @@ public sealed class FbRestore : FbService
 				{
 					startSpb.Append2(IscCodes.isc_spb_bkp_file, bkpFile.BackupFile);
 				}
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (Verbose)
 					startSpb.Append(IscCodes.isc_spb_verbose);
 				if (PageBuffers.HasValue)

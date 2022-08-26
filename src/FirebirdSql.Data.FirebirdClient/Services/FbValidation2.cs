@@ -46,7 +46,7 @@ public sealed class FbValidation2 : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_validate);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (!string.IsNullOrEmpty(TablesInclude))
 					startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
 				if (!string.IsNullOrEmpty(TablesExclude))
@@ -81,7 +81,7 @@ public sealed class FbValidation2 : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_validate);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (!string.IsNullOrEmpty(TablesInclude))
 					startSpb.Append2(IscCodes.isc_spb_val_tab_incl, TablesInclude);
 				if (!string.IsNullOrEmpty(TablesExclude))

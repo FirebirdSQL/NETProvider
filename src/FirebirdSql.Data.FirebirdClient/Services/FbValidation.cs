@@ -42,7 +42,7 @@ public sealed class FbValidation : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_repair);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_rpr_par_workers, ConnectionStringOptions.ParallelWorkers);
@@ -70,7 +70,7 @@ public sealed class FbValidation : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_repair);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_rpr_par_workers, ConnectionStringOptions.ParallelWorkers);

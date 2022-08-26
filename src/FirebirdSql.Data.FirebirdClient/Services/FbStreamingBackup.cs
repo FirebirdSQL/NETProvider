@@ -47,7 +47,7 @@ public sealed class FbStreamingBackup : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
@@ -78,7 +78,7 @@ public sealed class FbStreamingBackup : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdout");
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);

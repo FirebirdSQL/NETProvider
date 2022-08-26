@@ -40,7 +40,7 @@ public sealed class FbNFixup : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_nfix);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				StartTask(startSpb);
 				ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 			}
@@ -65,7 +65,7 @@ public sealed class FbNFixup : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_nfix);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 				await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 			}

@@ -40,7 +40,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
 				StartTask(startSpb);
 			}
@@ -65,7 +65,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_set_sql_dialect, sqlDialect);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -91,7 +91,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
 				StartTask(startSpb);
 			}
@@ -116,7 +116,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_sweep_interval, sweepInterval);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -142,7 +142,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
 				StartTask(startSpb);
 			}
@@ -167,7 +167,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_page_buffers, pageBuffers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -193,7 +193,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				switch (mode)
 				{
 					case FbShutdownMode.Forced:
@@ -229,7 +229,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				switch (mode)
 				{
 					case FbShutdownMode.Forced:
@@ -266,7 +266,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
 				switch (type)
 				{
@@ -303,7 +303,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_shutdown_mode, FbShutdownOnlineModeToIscCode(mode));
 				switch (type)
 				{
@@ -341,7 +341,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
 				StartTask(startSpb);
 			}
@@ -366,7 +366,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_db_online);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -392,7 +392,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
 				StartTask(startSpb);
 			}
@@ -417,7 +417,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_online_mode, FbShutdownOnlineModeToIscCode(mode));
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -443,7 +443,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
 				StartTask(startSpb);
 			}
@@ -468,7 +468,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_activate);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -494,7 +494,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (forcedWrites)
 				{
 					startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
@@ -526,7 +526,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (forcedWrites)
 				{
 					startSpb.Append(IscCodes.isc_spb_prp_write_mode, (byte)IscCodes.isc_spb_prp_wm_sync);
@@ -559,7 +559,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (reserveSpace)
 				{
 					startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
@@ -591,7 +591,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (reserveSpace)
 				{
 					startSpb.Append(IscCodes.isc_spb_prp_reserve_space, (byte)IscCodes.isc_spb_prp_res);
@@ -624,7 +624,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
 				StartTask(startSpb);
 			}
@@ -649,7 +649,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_prp_access_mode, (byte)(readOnly ? IscCodes.isc_spb_prp_am_readonly : IscCodes.isc_spb_prp_am_readwrite));
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}
@@ -675,7 +675,7 @@ public sealed class FbConfiguration : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
 				StartTask(startSpb);
 			}
@@ -700,7 +700,7 @@ public sealed class FbConfiguration : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_properties);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_options, IscCodes.isc_spb_prp_nolinger);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
 			}

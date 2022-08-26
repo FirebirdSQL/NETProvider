@@ -56,7 +56,7 @@ public sealed class FbNBackup : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_nbak);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_nbk_level, _level);
 				startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile);
 				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");
@@ -85,7 +85,7 @@ public sealed class FbNBackup : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_nbak);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				startSpb.Append(IscCodes.isc_spb_nbk_level, _level);
 				startSpb.Append2(IscCodes.isc_spb_nbk_file, BackupFile);
 				startSpb.Append2(IscCodes.isc_spb_nbk_direct, DirectIO ? "ON" : "OFF");

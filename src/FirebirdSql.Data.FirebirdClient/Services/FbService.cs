@@ -39,7 +39,6 @@ public abstract class FbService
 
 	private protected ServiceManagerBase Service => _svc;
 	private protected ConnectionString ConnectionStringOptions => _connectionStringOptions;
-	private protected string Database => _connectionStringOptions.Database;
 
 	public FbServiceState State { get; private set; }
 	public int QueryBufferSize { get; set; }
@@ -525,7 +524,7 @@ public abstract class FbService
 
 	private protected void EnsureDatabase()
 	{
-		if (string.IsNullOrEmpty(Database))
+		if (string.IsNullOrEmpty(ConnectionStringOptions.Database))
 			throw FbException.Create("Action should be executed against a specific database.");
 	}
 

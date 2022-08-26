@@ -50,7 +50,7 @@ public sealed class FbBackup : FbService
 				Open();
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				foreach (var file in BackupFiles)
 				{
 					startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile);
@@ -94,7 +94,7 @@ public sealed class FbBackup : FbService
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 				var startSpb = new ServiceParameterBuffer2(Service.ParameterBufferEncoding);
 				startSpb.Append(IscCodes.isc_action_svc_backup);
-				startSpb.Append2(IscCodes.isc_spb_dbname, Database);
+				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				foreach (var file in BackupFiles)
 				{
 					startSpb.Append2(IscCodes.isc_spb_bkp_file, file.BackupFile);
