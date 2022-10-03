@@ -8,5 +8,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
+	  <ProjectReference Include="..\FirebirdSql.EntityFrameworkCore.Firebird\FirebirdSql.EntityFrameworkCore.Firebird.csproj" />
 	</ItemGroup>
 </Project>
