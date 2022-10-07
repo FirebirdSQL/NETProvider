@@ -16,13 +16,14 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
-using FirebirdSql.EntityFrameworkCore.Firebird.Migrations.Operations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -46,12 +47,6 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 	{
 		switch (operation)
 		{
-			case FbCreateDatabaseOperation createDatabaseOperation:
-				Generate(createDatabaseOperation, model, builder);
-				break;
-			case FbDropDatabaseOperation dropDatabaseOperation:
-				Generate(dropDatabaseOperation, model, builder);
-				break;
 			default:
 				base.Generate(operation, model, builder);
 				break;
@@ -308,23 +303,6 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 	protected override void Generate(EnsureSchemaOperation operation, IModel model, MigrationCommandListBuilder builder)
 		=> throw new NotSupportedException("Schemas are not supported by Firebird.");
 
-
-	public virtual void Generate(FbCreateDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
-	{
-		if (Options.HasFlag(MigrationsSqlGenerationOptions.Script))
-			throw new NotSupportedException("Creating database from script is not supported.");
-
-		FbConnection.CreateDatabase(operation.ConnectionString, pageSize: 16384);
-	}
-
-	public virtual void Generate(FbDropDatabaseOperation operation, IModel model, MigrationCommandListBuilder builder)
-	{
-		if (Options.HasFlag(MigrationsSqlGenerationOptions.Script))
-			throw new NotSupportedException("Dropping database from script is not supported.");
-
-		FbConnection.ClearPool(operation.ConnectionString);
-		FbConnection.DropDatabase(operation.ConnectionString);
-	}
 
 	protected override void ColumnDefinition(string schema, string table, string name, ColumnOperation operation, IModel model, MigrationCommandListBuilder builder)
 	{
