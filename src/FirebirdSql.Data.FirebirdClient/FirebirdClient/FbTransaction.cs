@@ -675,7 +675,7 @@ public sealed class FbTransaction : DbTransaction
 	{
 		if (string.IsNullOrWhiteSpace(savePointName))
 		{
-			throw new ArgumentException("No transaction name was be specified.");
+			throw new ArgumentException("No transaction name was specified.");
 		}
 	}
 
