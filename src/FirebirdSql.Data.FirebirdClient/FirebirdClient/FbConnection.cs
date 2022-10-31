@@ -585,12 +585,15 @@ public sealed class FbConnection : DbConnection, ICloneable
 			{
 				try
 				{
-					_innerConnection.Connect();
-				}
-				catch (OperationCanceledException ex)
-				{
-					//cancellationToken.ThrowIfCancellationRequested();
-					throw new TimeoutException("Timeout while connecting.", ex);
+					try
+					{
+						_innerConnection.Connect();
+					}
+					catch (OperationCanceledException ex)
+					{
+						//cancellationToken.ThrowIfCancellationRequested();
+						throw new TimeoutException("Timeout while connecting.", ex);
+					}
 				}
 				catch
 				{
@@ -678,12 +681,15 @@ public sealed class FbConnection : DbConnection, ICloneable
 			{
 				try
 				{
-					await _innerConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
-				}
-				catch (OperationCanceledException ex)
-				{
-					cancellationToken.ThrowIfCancellationRequested();
-					throw new TimeoutException("Timeout while connecting.", ex);
+					try
+					{
+						await _innerConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
+					}
+					catch (OperationCanceledException ex)
+					{
+						cancellationToken.ThrowIfCancellationRequested();
+						throw new TimeoutException("Timeout while connecting.", ex);
+					}
 				}
 				catch
 				{
