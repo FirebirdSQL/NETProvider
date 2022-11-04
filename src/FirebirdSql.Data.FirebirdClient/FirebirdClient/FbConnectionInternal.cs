@@ -328,7 +328,7 @@ internal class FbConnectionInternal
 
 	public FbTransaction BeginTransaction(IsolationLevel level, string transactionName)
 	{
-		EnsureActiveTransaction();
+		EnsureNoActiveTransaction();
 
 		try
 		{
@@ -350,7 +350,7 @@ internal class FbConnectionInternal
 	}
 	public async Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, string transactionName, CancellationToken cancellationToken = default)
 	{
-		EnsureActiveTransaction();
+		EnsureNoActiveTransaction();
 
 		try
 		{
@@ -373,7 +373,7 @@ internal class FbConnectionInternal
 
 	public FbTransaction BeginTransaction(FbTransactionOptions options, string transactionName)
 	{
-		EnsureActiveTransaction();
+		EnsureNoActiveTransaction();
 
 		try
 		{
@@ -395,7 +395,7 @@ internal class FbConnectionInternal
 	}
 	public async Task<FbTransaction> BeginTransactionAsync(FbTransactionOptions options, string transactionName, CancellationToken cancellationToken = default)
 	{
-		EnsureActiveTransaction();
+		EnsureNoActiveTransaction();
 
 		try
 		{
@@ -610,7 +610,7 @@ internal class FbConnectionInternal
 
 	#region Private Methods
 
-	private void EnsureActiveTransaction()
+	private void EnsureNoActiveTransaction()
 	{
 		if (HasActiveTransaction)
 			throw new InvalidOperationException("A transaction is currently active. Parallel transactions are not supported.");
