@@ -500,7 +500,7 @@ public sealed class FbDatabaseInfo
 			IscCodes.isc_info_end
 		};
 		var info = Connection.InnerConnection.Database.GetDatabaseInfo(items);
-		return info.Any() ? ConvertValue<T>(info[0]) : default;
+		return info.Any() ? InfoValuesHelper.ConvertValue<T>(info[0]) : default;
 	}
 	private async Task<T> GetValueAsync<T>(byte item, CancellationToken cancellationToken = default)
 	{
@@ -512,37 +512,33 @@ public sealed class FbDatabaseInfo
 			IscCodes.isc_info_end
 		};
 		var info = await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false);
-		return info.Any() ? ConvertValue<T>(info[0]) : default;
+		return info.Any() ? InfoValuesHelper.ConvertValue<T>(info[0]) : default;
 	}
 
 	private List<T> GetList<T>(byte item)
 	{
 		FbConnection.EnsureOpen(Connection);
 
-		var db = Connection.InnerConnection.Database;
 		var items = new byte[]
 		{
 			item,
 			IscCodes.isc_info_end
 		};
 
-		return (db.GetDatabaseInfo(items)).Select(ConvertValue<T>).ToList();
+		return (Connection.InnerConnection.Database.GetDatabaseInfo(items)).Select(InfoValuesHelper.ConvertValue<T>).ToList();
 	}
 	private async Task<List<T>> GetListAsync<T>(byte item, CancellationToken cancellationToken = default)
 	{
 		FbConnection.EnsureOpen(Connection);
 
-		var db = Connection.InnerConnection.Database;
 		var items = new byte[]
 		{
 			item,
 			IscCodes.isc_info_end
 		};
 
-		return (await db.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Select(ConvertValue<T>).ToList();
+		return (await Connection.InnerConnection.Database.GetDatabaseInfoAsync(items, cancellationToken).ConfigureAwait(false)).Select(InfoValuesHelper.ConvertValue<T>).ToList();
 	}
-
-	static T ConvertValue<T>(object value) => value is IConvertible ? (T)Convert.ChangeType(value, typeof(T)) : (T)value;
 
 	#endregion
 }

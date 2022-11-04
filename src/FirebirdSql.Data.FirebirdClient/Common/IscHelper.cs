@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Common;
@@ -177,6 +176,38 @@ internal static class IscHelper
 						dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
 						info.Add(TypeHelper.CreateZonedDateTime(dt, tzId, null));
 					}
+					break;
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(type), $"{nameof(type)}={type}");
+			}
+
+			pos += length;
+		}
+
+		return info;
+	}
+
+	public static List<object> ParseTransactionInfo(byte[] buffer, Charset charset)
+	{
+		var info = new List<object>();
+
+		var pos = 0;
+		var length = 0;
+		var type = 0;
+
+		while ((type = buffer[pos++]) != IscCodes.isc_info_end)
+		{
+			length = (int)VaxInteger(buffer, pos, 2);
+			pos += 2;
+
+			switch (type)
+			{
+				case IscCodes.isc_info_error:
+					throw FbException.Create("Received error response.");
+
+				case IscCodes.fb_info_tra_snapshot_number:
+					info.Add(VaxInteger(buffer, pos, length));
 					break;
 
 				default:

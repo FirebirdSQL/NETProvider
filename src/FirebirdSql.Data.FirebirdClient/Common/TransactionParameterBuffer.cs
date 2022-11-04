@@ -34,6 +34,20 @@ internal sealed class TransactionParameterBuffer : ParameterBuffer
 		Write(value);
 	}
 
+	public void Append(int type, int value)
+	{
+		WriteByte(type);
+		WriteByte(4);
+		Write(value);
+	}
+
+	public void Append(int type, long value)
+	{
+		WriteByte(type);
+		WriteByte(8);
+		Write(value);
+	}
+
 	public void Append(int type, byte[] buffer)
 	{
 		WriteByte(type);

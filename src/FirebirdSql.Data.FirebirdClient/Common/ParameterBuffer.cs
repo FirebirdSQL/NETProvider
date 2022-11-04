@@ -64,7 +64,7 @@ internal abstract class ParameterBuffer
 			value = IPAddress.NetworkToHostOrder(value);
 		}
 		var buffer = BitConverter.GetBytes(value);
-		_data.AddRange(buffer);
+		Write(buffer);
 	}
 
 	protected void Write(int value)
@@ -74,7 +74,17 @@ internal abstract class ParameterBuffer
 			value = IPAddress.NetworkToHostOrder(value);
 		}
 		var buffer = BitConverter.GetBytes(value);
-		_data.AddRange(buffer);
+		Write(buffer);
+	}
+
+	protected void Write(long value)
+	{
+		if (!BitConverter.IsLittleEndian)
+		{
+			value = IPAddress.NetworkToHostOrder(value);
+		}
+		var buffer = BitConverter.GetBytes(value);
+		Write(buffer);
 	}
 
 	protected void Write(byte[] buffer)

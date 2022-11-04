@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -314,10 +315,6 @@ internal class GdsTransaction : TransactionBase
 		}
 	}
 
-	#endregion
-
-	#region Two Phase Commit Methods
-
 	public override void Prepare()
 	{
 		EnsureActiveTransactionState();
@@ -399,6 +396,89 @@ internal class GdsTransaction : TransactionBase
 			await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
 
 			State = TransactionState.Prepared;
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+
+	public override List<object> GetTransactionInfo(byte[] items)
+	{
+		return GetTransactionInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+	}
+	public override ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, CancellationToken cancellationToken = default)
+	{
+		return GetTransactionInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, cancellationToken);
+	}
+
+	public override List<object> GetTransactionInfo(byte[] items, int bufferLength)
+	{
+		var buffer = new byte[bufferLength];
+		DatabaseInfo(items, buffer, buffer.Length);
+		return IscHelper.ParseTransactionInfo(buffer, _database.Charset);
+	}
+	public override async ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
+	{
+		var buffer = new byte[bufferLength];
+		await DatabaseInfoAsync(items, buffer, buffer.Length, cancellationToken).ConfigureAwait(false);
+		return IscHelper.ParseTransactionInfo(buffer, _database.Charset);
+	}
+
+	#endregion
+
+	#region Private Methods
+
+	private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
+	{
+		try
+		{
+			_database.Xdr.Write(IscCodes.op_info_transaction);
+			_database.Xdr.Write(_handle);
+			_database.Xdr.Write(GdsDatabase.Incarnation);
+			_database.Xdr.WriteBuffer(items, items.Length);
+			_database.Xdr.Write(bufferLength);
+
+			_database.Xdr.Flush();
+
+			var response = (GenericResponse)_database.ReadResponse();
+
+			var responseLength = bufferLength;
+
+			if (response.Data.Length < bufferLength)
+			{
+				responseLength = response.Data.Length;
+			}
+
+			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+	}
+	private async ValueTask DatabaseInfoAsync(byte[] items, byte[] buffer, int bufferLength, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await _database.Xdr.WriteAsync(IscCodes.op_info_transaction, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(GdsDatabase.Incarnation, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBufferAsync(items, items.Length, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(bufferLength, cancellationToken).ConfigureAwait(false);
+
+			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+			var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+
+			var responseLength = bufferLength;
+
+			if (response.Data.Length < bufferLength)
+			{
+				responseLength = response.Data.Length;
+			}
+
+			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
 		}
 		catch (IOException ex)
 		{

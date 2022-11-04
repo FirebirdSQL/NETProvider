@@ -54,4 +54,6 @@ public class FbTransactionOptions
 			_lockTables = value ?? throw new ArgumentNullException($"{nameof(LockTables)} cannot be null.");
 		}
 	}
+
+	public long? SnapshotAtNumber { get; set; }
 }

@@ -1098,6 +1098,34 @@ internal static class IscCodes
 
 	#endregion
 
+	#region Transaction information items
+
+	public const int isc_info_tra_id = 4;
+	public const int isc_info_tra_oldest_interesting = 5;
+	public const int isc_info_tra_oldest_snapshot = 6;
+	public const int isc_info_tra_oldest_active = 7;
+	public const int isc_info_tra_isolation = 8;
+	public const int isc_info_tra_access = 9;
+	public const int isc_info_tra_lock_timeout = 10;
+	public const int fb_info_tra_dbpath = 11;
+	public const int fb_info_tra_snapshot_number = 12;
+
+	// isc_info_tra_isolation responses
+	public const int isc_info_tra_consistency = 1;
+	public const int isc_info_tra_concurrency = 2;
+	public const int isc_info_tra_read_committed = 3;
+
+	// isc_info_tra_read_committed options
+	public const int isc_info_tra_no_rec_version = 0;
+	public const int isc_info_tra_rec_version = 1;
+	public const int isc_info_tra_read_consistency = 2;
+
+	// isc_info_tra_access responses
+	public const int isc_info_tra_readonly = 0;
+	public const int isc_info_tra_readwrite = 1;
+
+	#endregion
+
 	public static class Batch
 	{
 		public const int VERSION1 = 1;

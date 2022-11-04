@@ -505,6 +505,12 @@ public sealed class FbTransaction : DbTransaction
 		LogMessages.TransactionBegan(Log, this);
 	}
 
+	internal static void EnsureActive(FbTransaction transaction)
+	{
+		if (transaction == null || transaction.IsCompleted)
+			throw new InvalidOperationException("Transaction must be valid and active.");
+	}
+
 	#endregion
 
 	#region Private Methods
@@ -589,7 +595,7 @@ public sealed class FbTransaction : DbTransaction
 		if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.Wait))
 		{
 			tpb.Append(IscCodes.isc_tpb_wait);
-			if (options.WaitTimeoutTPBValue.HasValue)
+			if (options.WaitTimeoutTPBValue != null)
 			{
 				tpb.Append(IscCodes.isc_tpb_lock_timeout, (short)options.WaitTimeoutTPBValue);
 			}
@@ -636,8 +642,10 @@ public sealed class FbTransaction : DbTransaction
 			{
 				lockBehavior = IscCodes.isc_tpb_shared;
 			}
-			if (lockBehavior.HasValue)
+			if (lockBehavior != null)
+			{
 				tpb.Append((int)lockBehavior);
+			}
 		}
 		if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.ReadCommitted))
 		{
@@ -666,6 +674,11 @@ public sealed class FbTransaction : DbTransaction
 		if (options.TransactionBehavior.HasFlag(FbTransactionBehavior.ReadConsistency))
 		{
 			tpb.Append(IscCodes.isc_tpb_read_consistency);
+		}
+
+		if (options.SnapshotAtNumber != null)
+		{
+			tpb.Append(IscCodes.isc_tpb_at_snapshot_number, (long)options.SnapshotAtNumber);
 		}
 
 		return tpb;

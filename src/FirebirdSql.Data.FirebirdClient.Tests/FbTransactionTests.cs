@@ -115,8 +115,28 @@ public class FbTransactionTests : FbTestsBase
 			return;
 
 		await using (var transaction = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.ReadConsistency }))
+		{ }
+	}
+
+	[Test]
+	public async Task SnapshotAtNumber()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
+			return;
+
+		await using (var transaction1 = await Connection.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Concurrency }))
 		{
-			await transaction.DisposeAsync();
+			var number1 = await new FbTransactionInfo(transaction1).GetTransactionSnapshotNumberAsync();
+			Assert.NotZero(number1);
+			await using (var conn = new FbConnection(BuildConnectionString(ServerType, Compression, WireCrypt)))
+			{
+				await conn.OpenAsync();
+				await using (var transaction2 = await conn.BeginTransactionAsync(new FbTransactionOptions() { TransactionBehavior = FbTransactionBehavior.Concurrency, SnapshotAtNumber = number1 }))
+				{
+					var number2 = await new FbTransactionInfo(transaction2).GetTransactionSnapshotNumberAsync();
+					Assert.AreEqual(number1, number2);
+				}
+			}
 		}
 	}
 }

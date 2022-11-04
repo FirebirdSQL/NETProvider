@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,6 +49,12 @@ internal abstract class TransactionBase
 
 	public abstract void Prepare(byte[] buffer);
 	public abstract ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default);
+
+	public abstract List<object> GetTransactionInfo(byte[] items);
+	public abstract ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, CancellationToken cancellationToken = default);
+
+	public abstract List<object> GetTransactionInfo(byte[] items, int bufferLength);
+	public abstract ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default);
 
 	public virtual void Dispose2()
 	{ }

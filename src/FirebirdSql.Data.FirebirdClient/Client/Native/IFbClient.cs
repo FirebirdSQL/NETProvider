@@ -251,5 +251,13 @@ public interface IFbClient
 	void isc_get_client_version(
 		[MarshalAs(UnmanagedType.LPStr)] StringBuilder version);
 
+	IntPtr isc_transaction_info(
+		[In, Out] IntPtr[] statusVector,
+		[MarshalAs(UnmanagedType.I4)] ref TransactionHandle trHandle,
+		short itemListBufferLength,
+		byte[] itemListBuffer,
+		short resultBufferLength,
+		byte[] resultBuffer);
+
 #pragma warning restore IDE1006
 }

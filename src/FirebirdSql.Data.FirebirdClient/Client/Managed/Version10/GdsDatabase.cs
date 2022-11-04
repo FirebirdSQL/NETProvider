@@ -879,6 +879,10 @@ internal class GdsDatabase : DatabaseBase
 		return response;
 	}
 
+	#endregion
+
+	#region Private Methods
+
 	private void DatabaseInfo(byte[] items, byte[] buffer, int bufferLength)
 	{
 		try

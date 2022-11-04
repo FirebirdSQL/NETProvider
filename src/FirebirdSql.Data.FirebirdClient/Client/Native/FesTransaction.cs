@@ -24,6 +24,8 @@ using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Client.Native.Handles;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net;
+using System.Collections.Generic;
 
 namespace FirebirdSql.Data.Client.Native;
 
@@ -354,10 +356,6 @@ internal sealed class FesTransaction : TransactionBase
 		return ValueTask2.CompletedTask;
 	}
 
-	#endregion
-
-	#region Two Phase Commit Methods
-
 	public override void Prepare()
 	{ }
 	public override ValueTask PrepareAsync(CancellationToken cancellationToken = default)
@@ -372,13 +370,64 @@ internal sealed class FesTransaction : TransactionBase
 		return ValueTask2.CompletedTask;
 	}
 
+	public override List<object> GetTransactionInfo(byte[] items)
+	{
+		return GetTransactionInfo(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE);
+	}
+	public override ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, CancellationToken cancellationToken = default)
+	{
+		return GetTransactionInfoAsync(items, IscCodes.DEFAULT_MAX_BUFFER_SIZE, cancellationToken);
+	}
+
+	public override List<object> GetTransactionInfo(byte[] items, int bufferLength)
+	{
+		var buffer = new byte[bufferLength];
+
+		TransactionInfo(items, buffer, buffer.Length);
+
+		return IscHelper.ParseTransactionInfo(buffer, _database.Charset);
+	}
+	public override ValueTask<List<object>> GetTransactionInfoAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
+	{
+		var buffer = new byte[bufferLength];
+
+		TransactionInfo(items, buffer, buffer.Length);
+
+		return ValueTask2.FromResult(IscHelper.ParseTransactionInfo(buffer, _database.Charset));
+	}
+
 	#endregion
 
 	#region Private Methods
 
+	private void TransactionInfo(byte[] items, byte[] buffer, int bufferLength)
+	{
+		StatusVectorHelper.ClearStatusVector(_statusVector);
+
+		_database.FbClient.isc_transaction_info(
+			_statusVector,
+			ref _handle,
+			(short)items.Length,
+			items,
+			(short)bufferLength,
+			buffer);
+
+		ProcessStatusVector();
+	}
+
 	private void ClearStatusVector()
 	{
 		Array.Clear(_statusVector, 0, _statusVector.Length);
+	}
+
+	private void ProcessStatusVector()
+	{
+		StatusVectorHelper.ProcessStatusVector(_statusVector, _database.Charset, _database.WarningMessage);
+	}
+
+	private void ProcessStatusVector(Charset charset)
+	{
+		StatusVectorHelper.ProcessStatusVector(_statusVector, charset, _database.WarningMessage);
 	}
 
 	#endregion
