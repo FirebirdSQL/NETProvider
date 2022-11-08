@@ -20,6 +20,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
@@ -155,5 +156,12 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 	public override Task FromSqlRaw_queryable_simple_projection_composed(bool async)
 	{
 		return base.FromSqlRaw_queryable_simple_projection_composed(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(bool async)
+	{
+		return base.Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(async);
 	}
 }
