@@ -265,7 +265,14 @@ internal sealed class DbValue
 
 	public BigInteger GetInt128()
 	{
-		return (BigInteger)_value;
+		return _value switch
+		{
+			byte b => b,
+			short s => s,
+			int i => i,
+			long l => l,
+			_ => (BigInteger)_value,
+		};
 	}
 
 	public FbZonedDateTime GetZonedDateTime()

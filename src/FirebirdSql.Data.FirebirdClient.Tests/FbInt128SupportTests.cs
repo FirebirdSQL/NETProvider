@@ -86,6 +86,15 @@ public class FbInt128SupportTests : FbTestsBase
 	}
 
 	[Test]
+	public Task CanPassAsByte() => CanPassAsTypeHelper<byte>(6);
+	[Test]
+	public Task CanPassAsInt16() => CanPassAsTypeHelper<short>(6);
+	[Test]
+	public Task CanPassAsInt32() => CanPassAsTypeHelper<int>(6);
+	[Test]
+	public Task CanPassAsInt64() => CanPassAsTypeHelper<long>(6);
+
+	[Test]
 	public async Task ReadsValueNullCorrectly()
 	{
 		await using (var cmd = Connection.CreateCommand())
@@ -147,6 +156,16 @@ public class FbInt128SupportTests : FbTestsBase
 				await reader.ReadAsync();
 				Assert.AreEqual(value, getter(reader));
 			}
+		}
+	}
+
+	async Task CanPassAsTypeHelper<T>(T value)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as int128) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			Assert.DoesNotThrowAsync(cmd.ExecuteScalarAsync);
 		}
 	}
 }
