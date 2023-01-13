@@ -60,8 +60,8 @@ public class ConsoleLoggingProvider : IFbLoggingProvider
 
 			var sb = new StringBuilder();
 			sb.Append("[");
-			sb.Append(level.ToString().ToUpper());
-			sb.Append("]");
+			sb.Append(level.ToString().ToUpperInvariant());
+			sb.Append("] ");
 
 			sb.AppendLine(msg);
 
