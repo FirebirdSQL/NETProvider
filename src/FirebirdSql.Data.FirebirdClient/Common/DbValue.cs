@@ -184,22 +184,38 @@ internal sealed class DbValue
 
 	public byte GetByte()
 	{
-		return Convert.ToByte(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			BigInteger bi => (byte)bi,
+			_ => Convert.ToByte(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public short GetInt16()
 	{
-		return Convert.ToInt16(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			BigInteger bi => (short)bi,
+			_ => Convert.ToInt16(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public int GetInt32()
 	{
-		return Convert.ToInt32(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			BigInteger bi => (int)bi,
+			_ => Convert.ToInt32(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public long GetInt64()
 	{
-		return Convert.ToInt64(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			BigInteger bi => (long)bi,
+			_ => Convert.ToInt64(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public decimal GetDecimal()

@@ -64,6 +64,15 @@ public class FbInt128SupportTests : FbTestsBase
 		}
 	}
 
+	[Test]
+	public Task CanReadAsByte() => CanReadAsTypeHelper<byte>(6, r => r.GetByte(0));
+	[Test]
+	public Task CanReadAsInt16() => CanReadAsTypeHelper<short>(6, r => r.GetInt16(0));
+	[Test]
+	public Task CanReadAsInt32() => CanReadAsTypeHelper<int>(6, r => r.GetInt32(0));
+	[Test]
+	public Task CanReadAsInt64() => CanReadAsTypeHelper<long>(6, r => r.GetInt64(0));
+
 	[TestCaseSource(nameof(TestValues))]
 	public async Task PassesValueCorrectly(BigInteger value)
 	{
@@ -122,6 +131,21 @@ public class FbInt128SupportTests : FbTestsBase
 			{
 				var schema = await reader.GetSchemaTableAsync();
 				Assert.AreEqual(typeof(BigInteger), schema.Rows[0].ItemArray[5]);
+			}
+		}
+	}
+
+	async Task CanReadAsTypeHelper<T>(T value, Func<FbDataReader, T> getter)
+		where T : IFormattable
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			var svalue = value.ToString(null, CultureInfo.InvariantCulture);
+			cmd.CommandText = $"select cast({svalue} as int128) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(value, getter(reader));
 			}
 		}
 	}
