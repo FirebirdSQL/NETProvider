@@ -130,7 +130,8 @@ static class LogMessages
 			return;
 
 		var sb = new StringBuilder();
-		sb.AppendLine("Beginning transaction.");
+		sb.AppendLine("Beginning transaction:");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionBegan(IFbLogger log, FbTransaction transaction)
@@ -140,7 +141,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Began transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionCommitting(IFbLogger log, FbTransaction transaction)
@@ -150,7 +151,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Committing transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionCommitted(IFbLogger log, FbTransaction transaction)
@@ -160,7 +161,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Committed transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRollingBack(IFbLogger log, FbTransaction transaction)
@@ -170,7 +171,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolling back transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRolledBack(IFbLogger log, FbTransaction transaction)
@@ -180,7 +181,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolled back transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionSaving(IFbLogger log, FbTransaction transaction)
@@ -190,7 +191,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Creating savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionSaved(IFbLogger log, FbTransaction transaction)
@@ -200,7 +201,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Created savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionReleasingSavepoint(IFbLogger log, FbTransaction transaction)
@@ -210,7 +211,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Releasing savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionReleasedSavepoint(IFbLogger log, FbTransaction transaction)
@@ -220,7 +221,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Released savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRollingBackSavepoint(IFbLogger log, FbTransaction transaction)
@@ -230,7 +231,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolling back savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRolledBackSavepoint(IFbLogger log, FbTransaction transaction)
@@ -240,7 +241,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolled back savepoint:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionCommittingRetaining(IFbLogger log, FbTransaction transaction)
@@ -250,7 +251,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Committing (retaining) transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionCommittedRetaining(IFbLogger log, FbTransaction transaction)
@@ -260,7 +261,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Committed (retaining) transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRollingBackRetaining(IFbLogger log, FbTransaction transaction)
@@ -270,7 +271,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolling back (retaining) transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 	public static void TransactionRolledBackRetaining(IFbLogger log, FbTransaction transaction)
@@ -280,7 +281,7 @@ static class LogMessages
 
 		var sb = new StringBuilder();
 		sb.AppendLine("Rolled back (retaining) transaction:");
-		sb.AppendLine($"Transaction Handle: {transaction.Transaction.Handle}");
+		sb.AppendLine($"Isolation Level: {transaction.IsolationLevel}");
 		log.Debug(sb.ToString());
 	}
 
