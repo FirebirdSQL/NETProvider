@@ -596,12 +596,12 @@ public sealed class FbDataReader : DbDataReader
 				}
 				if (nullableUnderlying == typeof(bool))
 				{
-					return GetFieldValue<bool>(i);
+					return _row[i].GetBoolean();
 				}
 			}
 			if (type == typeof(bool))
 			{
-				return GetFieldValue<bool>(i);
+				return _row[i].GetBoolean(); 
 			}
 		}
 
@@ -610,112 +610,75 @@ public sealed class FbDataReader : DbDataReader
 
 	public override int GetValues(object[] values)
 	{
+		CheckState();
+		CheckPosition();
+
 		var count = Math.Min(_fields.Count, values.Length);
-		for (var i = 0; i < count; i++)
+		try
 		{
-			values[i] = GetValue(i);
+			for (var i = 0; i < count; i++)
+			{
+				if (_command.ExpectedColumnTypes != null)
+				{
+					var type = _command.ExpectedColumnTypes.ElementAtOrDefault(i);
+					var nullableUnderlying = Nullable.GetUnderlyingType(type);
+					if (nullableUnderlying != null)
+					{
+						if (IsDBNull(i))
+						{
+							values[i] = null;
+							continue;
+						}
+						if (nullableUnderlying == typeof(bool))
+						{
+							values[i] = _row[i].GetBoolean();
+							continue;
+						}
+					}
+					if (type == typeof(bool))
+					{
+						values[i] = _row[i].GetBoolean();
+						continue;
+					}
+				}
+				values[i] = _row[i].GetValue();
+			}
+			return count;
 		}
-		return count;
+		catch (IscException ex)
+		{
+			throw FbException.Create(ex);
+		}
 	}
 
 	public override T GetFieldValue<T>(int i)
 	{
-		CheckState();
-		CheckPosition();
-		CheckIndex(i);
-
-		var type = typeof(T);
-		type = Nullable.GetUnderlyingType(type) ?? type;
+		var type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
 		try
 		{
-			if (type == typeof(bool))
-			{
-				return (T)(object)_row[i].GetBoolean();
-			}
-			else if (type == typeof(byte))
-			{
-				return (T)(object)_row[i].GetByte();
-			}
-			else if (type == typeof(char))
-			{
-				return (T)(object)_row[i].GetChar();
-			}
-			else if (type == typeof(Guid))
-			{
-				return (T)(object)_row[i].GetGuid();
-			}
-			else if (type == typeof(short))
-			{
-				return (T)(object)_row[i].GetInt16();
-			}
-			else if (type == typeof(int))
-			{
-				return (T)(object)_row[i].GetInt32();
-			}
-			else if (type == typeof(long))
-			{
-				return (T)(object)_row[i].GetInt64();
-			}
-			else if (type == typeof(float))
-			{
-				return (T)(object)_row[i].GetFloat();
-			}
-			else if (type == typeof(double))
-			{
-				return (T)(object)_row[i].GetDouble();
-			}
-			else if (type == typeof(string))
-			{
-				return (T)(object)_row[i].GetString();
-			}
-			else if (type == typeof(decimal))
-			{
-				return (T)(object)_row[i].GetDecimal();
-			}
-			else if (type == typeof(DateTime))
-			{
-				return (T)(object)_row[i].GetDateTime();
-			}
-			else if (type == typeof(TimeSpan))
-			{
-				return (T)(object)_row[i].GetTimeSpan();
-			}
-			else if (type == typeof(byte[]))
-			{
-				return (T)(object)_row[i].GetBinary();
-			}
-			else if (type == typeof(FbDecFloat))
-			{
-				return (T)(object)_row[i].GetDecFloat();
-			}
-			else if (type == typeof(BigInteger))
-			{
-				return (T)(object)_row[i].GetInt128();
-			}
-			else if (type == typeof(FbZonedDateTime))
-			{
-				return (T)(object)_row[i].GetZonedDateTime();
-			}
-			else if (type == typeof(FbZonedTime))
-			{
-				return (T)(object)_row[i].GetZonedTime();
-			}
+			return type == typeof(bool) ? (T)(object)_row[i].GetBoolean()
+					: type == typeof(byte) ? (T)(object)_row[i].GetByte()
+					: type == typeof(char) ? (T)(object)_row[i].GetChar()
+					: type == typeof(short) ? (T)(object)_row[i].GetInt16()
+					: type == typeof(int) ? (T)(object)_row[i].GetInt32()
+					: type == typeof(long) ? (T)(object)_row[i].GetInt64()
+					: type == typeof(float) ? (T)(object)_row[i].GetFloat()
+					: type == typeof(double) ? (T)(object)_row[i].GetDouble()
+					: type == typeof(string) ? (T)(object)_row[i].GetString()
+					: type == typeof(decimal) ? (T)(object)_row[i].GetDecimal()
+					: type == typeof(DateTime) ? (T)(object)_row[i].GetDateTime()
+					: type == typeof(TimeSpan) ? (T)(object)_row[i].GetTimeSpan()
+					: type == typeof(byte[]) ? (T)(object)_row[i].GetBinary()
+					: type == typeof(FbDecFloat) ? (T)(object)_row[i].GetDecFloat()
+					: type == typeof(BigInteger) ? (T)(object)_row[i].GetInt128()
+					: type == typeof(FbZonedDateTime) ? (T)(object)_row[i].GetZonedDateTime()
 #if NET6_0_OR_GREATER
-			else if (type == typeof(DateOnly))
-			{
-				return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
-			}
+					: type == typeof(FbZonedDateTime) ? (T)(object)_row[i].GetZonedDateTime()
+					: type == typeof(DateOnly) ? (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime())
+					: type == typeof(TimeOnly) ? (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan())
 #endif
-#if NET6_0_OR_GREATER
-			else if (type == typeof(TimeOnly))
-			{
-				return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
-			}
-#endif
-			else
-			{
-				return (T)_row[i].GetValue();
-			}
+					: (T)_row[i].GetValue()
+					;
 		}
 		catch (IscException ex)
 		{
@@ -729,98 +692,32 @@ public sealed class FbDataReader : DbDataReader
 		CheckPosition();
 		CheckIndex(i);
 
-		var type = typeof(T);
-		type = Nullable.GetUnderlyingType(type) ?? type;
+		var type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
 		try
 		{
-			if (type == typeof(bool))
-			{
-				return (T)(object)_row[i].GetBoolean();
-			}
-			else if (type == typeof(byte))
-			{
-				return (T)(object)_row[i].GetByte();
-			}
-			else if (type == typeof(char))
-			{
-				return (T)(object)_row[i].GetChar();
-			}
-			else if (type == typeof(Guid))
-			{
-				return (T)(object)_row[i].GetGuid();
-			}
-			else if (type == typeof(short))
-			{
-				return (T)(object)_row[i].GetInt16();
-			}
-			else if (type == typeof(int))
-			{
-				return (T)(object)_row[i].GetInt32();
-			}
-			else if (type == typeof(long))
-			{
-				return (T)(object)_row[i].GetInt64();
-			}
-			else if (type == typeof(float))
-			{
-				return (T)(object)_row[i].GetFloat();
-			}
-			else if (type == typeof(double))
-			{
-				return (T)(object)_row[i].GetDouble();
-			}
-			else if (type == typeof(string))
-			{
-				return (T)(object)await _row[i].GetStringAsync(cancellationToken).ConfigureAwait(false);
-			}
-			else if (type == typeof(decimal))
-			{
-				return (T)(object)_row[i].GetDecimal();
-			}
-			else if (type == typeof(DateTime))
-			{
-				return (T)(object)_row[i].GetDateTime();
-			}
-			else if (type == typeof(TimeSpan))
-			{
-				return (T)(object)_row[i].GetTimeSpan();
-			}
-			else if (type == typeof(byte[]))
-			{
-				return (T)(object)await _row[i].GetBinaryAsync().ConfigureAwait(false);
-			}
-			else if (type == typeof(FbDecFloat))
-			{
-				return (T)(object)_row[i].GetDecFloat();
-			}
-			else if (type == typeof(BigInteger))
-			{
-				return (T)(object)_row[i].GetInt128();
-			}
-			else if (type == typeof(FbZonedDateTime))
-			{
-				return (T)(object)_row[i].GetZonedDateTime();
-			}
-			else if (type == typeof(FbZonedTime))
-			{
-				return (T)(object)_row[i].GetZonedTime();
-			}
+			return type == typeof(bool) ? (T)(object)_row[i].GetBoolean()
+					: type == typeof(byte) ? (T)(object)_row[i].GetByte()
+					: type == typeof(char) ? (T)(object)_row[i].GetChar()
+					: type == typeof(short) ? (T)(object)_row[i].GetInt16()
+					: type == typeof(int) ? (T)(object)_row[i].GetInt32()
+					: type == typeof(long) ? (T)(object)_row[i].GetInt64()
+					: type == typeof(float) ? (T)(object)_row[i].GetFloat()
+					: type == typeof(double) ? (T)(object)_row[i].GetDouble()
+					: type == typeof(string) ? (T)(object)await _row[i].GetStringAsync(cancellationToken).ConfigureAwait(false)
+					: type == typeof(decimal) ? (T)(object)_row[i].GetDecimal()
+					: type == typeof(DateTime) ? (T)(object)_row[i].GetDateTime()
+					: type == typeof(TimeSpan) ? (T)(object)_row[i].GetTimeSpan()
+					: type == typeof(byte[]) ? (T)(object)await _row[i].GetBinaryAsync(cancellationToken).ConfigureAwait(false)
+					: type == typeof(FbDecFloat) ? (T)(object)_row[i].GetDecFloat()
+					: type == typeof(BigInteger) ? (T)(object)_row[i].GetInt128()
+					: type == typeof(FbZonedDateTime) ? (T)(object)_row[i].GetZonedDateTime()
 #if NET6_0_OR_GREATER
-			else if (type == typeof(DateOnly))
-			{
-				return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
-			}
+					: type == typeof(FbZonedDateTime) ? (T)(object)_row[i].GetZonedDateTime()
+					: type == typeof(DateOnly) ? (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime())
+					: type == typeof(TimeOnly) ? (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan())
 #endif
-#if NET6_0_OR_GREATER
-			else if (type == typeof(TimeOnly))
-			{
-				return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
-			}
-#endif
-			else
-			{
-				return (T)await _row[i].GetValueAsync().ConfigureAwait(false);
-			}
+					: (T)await _row[i].GetValueAsync(cancellationToken).ConfigureAwait(false)
+					;
 		}
 		catch (IscException ex)
 		{
