@@ -36,8 +36,9 @@ internal class GdsStatement : StatementBase
 	protected Descriptor _parameters;
 	protected Descriptor _fields;
 	protected bool _allRowsFetched;
-	private Queue<DbValue[]> _rows;
+	private Queue<object[]> _rows;
 	private int _fetchSize;
+	protected DbValue[] _DbValues;
 
 	#endregion
 
@@ -110,7 +111,7 @@ internal class GdsStatement : StatementBase
 	{
 		_handle = IscCodes.INVALID_OBJECT;
 		_fetchSize = 200;
-		_rows = new Queue<DbValue[]>();
+		_rows = new Queue<object[]>();
 		OutputParameters = new Queue<DbValue[]>();
 
 		_database = database;
@@ -133,6 +134,7 @@ internal class GdsStatement : StatementBase
 			Release();
 			Clear();
 			_rows = null;
+   			_DbValues = null;
 			OutputParameters = null;
 			_database = null;
 			_fields = null;
@@ -152,6 +154,7 @@ internal class GdsStatement : StatementBase
 			await ReleaseAsync(cancellationToken).ConfigureAwait(false);
 			Clear();
 			_rows = null;
+   			_DbValues = null;
 			OutputParameters = null;
 			_database = null;
 			_fields = null;
@@ -375,6 +378,25 @@ internal class GdsStatement : StatementBase
 		}
 	}
 
+ 	protected void CreateDbValues()
+	{
+		_dbValues = new DbValue[_fields.Count];
+		for (int i = 0; i < _fields.Count; i++)
+		{
+			_dbValues[i] = new DbValue(this, _fields[i], null);
+		}
+	}
+ 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	protected DbValue[] GetDbValues(object[] values)
+	{
+		for (int i = 0; i < _fields.Count; ++i)
+		{
+			_dbValues[i].SetValue(values[i]);
+		}
+		return _dbValues;
+	}
+
 	public override DbValue[] Fetch()
 	{
 		EnsureNotDeallocated();
@@ -407,6 +429,8 @@ internal class GdsStatement : StatementBase
 				var operation = _database.ReadOperation();
 				if (operation == IscCodes.op_fetch_response)
 				{
+					CreateDbValues();
+	 
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
@@ -418,7 +442,7 @@ internal class GdsStatement : StatementBase
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
-								_rows.Enqueue(ReadRow());
+								_rows.Enqueue(ReadRowObjectValues());
 							}
 							else if (fetchResponse.Status == 100)
 							{
@@ -448,7 +472,7 @@ internal class GdsStatement : StatementBase
 
 		if (_rows != null && _rows.Count > 0)
 		{
-			return _rows.Dequeue();
+			return GetDbValues(_rows.Dequeue());
 		}
 		else
 		{
@@ -488,6 +512,8 @@ internal class GdsStatement : StatementBase
 				var operation = await _database.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
 				if (operation == IscCodes.op_fetch_response)
 				{
+					CreateDbValues();
+	 
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
@@ -499,7 +525,7 @@ internal class GdsStatement : StatementBase
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
-								_rows.Enqueue(await ReadRowAsync(cancellationToken).ConfigureAwait(false));
+								_rows.Enqueue(await ReadRowObjectValuesAsync(cancellationToken).ConfigureAwait(false));
 							}
 							else if (fetchResponse.Status == 100)
 							{
@@ -529,7 +555,7 @@ internal class GdsStatement : StatementBase
 
 		if (_rows != null && _rows.Count > 0)
 		{
-			return _rows.Dequeue();
+			return GetDbValues(_rows.Dequeue());
 		}
 		else
 		{
@@ -1734,6 +1760,36 @@ internal class GdsStatement : StatementBase
 		_parameters = null;
 		_fields = null;
 	}
+	
+ 	protected virtual object[] ReadRowObjectValues()      
+	{
+		var row = new object[_fields.Count];
+		try
+		{
+			for (var i = 0; i < _fields.Count; i++)
+			{
+				var value = ReadRawValue(_database.Xdr, _fields[i]);
+				var sqlInd = _database.Xdr.ReadInt32();
+				if (sqlInd == -1)
+				{
+					row[i] = null;
+				}
+				else if (sqlInd == 0)
+				{
+					row[i] = value;
+				}
+				else
+				{
+					throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
+				}
+			}
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+		return row;
+	}
 
 	protected virtual DbValue[] ReadRow()
 	{
@@ -1764,7 +1820,38 @@ internal class GdsStatement : StatementBase
 		}
 		return row;
 	}
-	protected virtual async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
+ 
+	protected virtual async ValueTask<object[]> ReadRowObjectValuesAsync(CancellationToken cancellationToken = default)
+	{
+		var row = new object[_fields.Count];
+		try
+		{
+			for (var i = 0; i < _fields.Count; i++)
+			{
+				var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
+				var sqlInd = await _database.Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
+				if (sqlInd == -1)
+				{
+					row[i] = null;
+				}
+				else if (sqlInd == 0)
+				{
+					row[i] = value;
+				}
+				else
+				{
+					throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
+				}
+			}
+		}
+		catch (IOException ex)
+		{
+			throw IscException.ForIOException(ex);
+		}
+		return row;
+	}
+
+ 	protected virtual async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
 		var row = new DbValue[_fields.Count];
 		try
