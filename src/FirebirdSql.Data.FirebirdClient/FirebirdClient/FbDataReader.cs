@@ -371,10 +371,10 @@ public sealed class FbDataReader : DbDataReader
 	}
 	private FbCommand GetSchemaCommand()
 	{
-		var command = _connection.CreateCommand();
-		command.Transaction = _command.Transaction;		// Same transaction if exists
-		command.FetchSize = 32767;        // Singlerequest all Fields, single Transaction
-
+		var command = new FbCommand(string.Empty, _command.Connection, _command.Connection.InnerConnection.ActiveTransaction)
+		{
+			FetchSize = 32767        // Singlerequest all Fields, single Transaction
+		};
 		// all relations, which used
 		foreach (var relation in Enumerable.Range(0, _fields.Count).Where(f => !string.IsNullOrEmpty(_fields[f].Relation)).Select(f => _fields[f].Relation).Distinct())
 		{
