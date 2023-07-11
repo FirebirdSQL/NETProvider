@@ -4,6 +4,8 @@ param(
 	[Parameter(Mandatory=$True)]$TestSuite)
 
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue' # Faster downloads with Invoke-RestMethod -- https://stackoverflow.com/a/43477248/33244
+
 
 $baseDir = Split-Path -Parent $PSCommandPath
 
