@@ -37,7 +37,7 @@ if ($env:tests_firebird_dir) {
 	$firebirdDir = $env:tests_firebird_dir
 }
 else {
-	$firebirdDir = 'I:\Downloads\fb_tests'
+	$firebirdDir = "$env:TEMP\fb_tests\$FirebirdSelection\"
 }
 
 function Prepare() {
