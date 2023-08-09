@@ -658,6 +658,9 @@ internal class TimeZoneMapping
 { 64904, "Zulu" },
 { 64903, "America/Nuuk" },
 { 64902, "Asia/Qostanay" },
+{ 64901, "Pacific/Kanton" },
+{ 64900, "Europe/Kyiv" },
+{ 64899, "America/Ciudad_Juarez" },
 		};
 
 	// select '{ "' || trim(rdb$time_zone_name) || '", ' || rdb$time_zone_id || ' },' from rdb$time_zones order by rdb$time_zone_id desc;
@@ -1297,6 +1300,9 @@ internal class TimeZoneMapping
 { "Zulu", 64904 },
 { "America/Nuuk", 64903 },
 { "Asia/Qostanay", 64902 },
+{ "Pacific/Kanton", 64901 },
+{ "Europe/Kyiv", 64900 },
+{ "America/Ciudad_Juarez", 64899 },
 		};
 
 	public static readonly string DefaultTimeZoneName = "GMT";
