@@ -13,20 +13,20 @@ $baseDir = Split-Path -Parent $PSCommandPath
 
 $FirebirdConfiguration = @{
 	FB50 = @{
-		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb50.7z';
-		Executable = '.\firebird.exe';
-		Args = @('-a');
-	};
+		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb50.7z'
+		Executable = '.\firebird.exe'
+		Args = @('-a')
+	}
 	FB40 = @{
-		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb40.7z';
-		Executable = '.\firebird.exe';
-		Args = @('-a');
-	};
+		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb40.7z'
+		Executable = '.\firebird.exe'
+		Args = @('-a')
+	}
 	FB30 = @{
-		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb30.7z';
-		Executable = '.\firebird.exe';
-		Args = @('-a');
-	};
+		Download = 'https://github.com/FirebirdSQL/NETProvider-tests-infrastructure/raw/master/fb30.7z'
+		Executable = '.\firebird.exe'
+		Args = @('-a')
+	}
 }
 
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
