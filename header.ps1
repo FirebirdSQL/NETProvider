@@ -32,6 +32,7 @@ gci $baseDir -Recurse -Filter *.cs | %{
 		}		
 	}
 	if (!$started) {
+		//echo $_.FullName
 		return
 	}
 
