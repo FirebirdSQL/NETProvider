@@ -146,7 +146,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		@"SELECT
                trim(RF.RDB$FIELD_NAME) as COLUMN_NAME,
                COALESCE(RF.RDB$DEFAULT_SOURCE, F.RDB$DEFAULT_SOURCE) as COLUMN_DEFAULT,
-               COALESCE(RF.RDB$NULL_FLAG, 0)  as NOT_NULL,
+               COALESCE(COALESCE(RF.RDB$NULL_FLAG, F.RDB$NULL_FLAG), 0) as NOT_NULL,
                CASE Coalesce(F.RDB$FIELD_TYPE, 0)
                 WHEN 7 THEN
                  CASE F.RDB$FIELD_SUB_TYPE
