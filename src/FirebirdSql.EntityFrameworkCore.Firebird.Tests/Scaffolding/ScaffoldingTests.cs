@@ -71,6 +71,42 @@ public class ScaffoldingTests : EntityFrameworkCoreTestsBase
 
 	}
 
+	[TestCase("SMALLINT")]
+	[TestCase("INTEGER")]
+	[TestCase("FLOAT")]
+	[TestCase("DATE")]
+	[TestCase("TIME")]
+	[TestCase("CHAR(12)")]
+	[TestCase("BIGINT")]
+	[TestCase("BOOLEAN")]
+	[TestCase("DOUBLE PRECISION")]
+	[TestCase("TIMESTAMP")]
+	[TestCase("VARCHAR(24)")]
+	[TestCase("BLOB SUB_TYPE TEXT")]
+	[TestCase("BLOB SUB_TYPE BINARY")]
+	[TestCase("DECIMAL(4,1)")]
+	[TestCase("DECIMAL(9,1)")]
+	[TestCase("DECIMAL(18,1)")]
+	[TestCase("NUMERIC(4,1)")]
+	[TestCase("NUMERIC(9,1)")]
+	[TestCase("NUMERIC(18,1)")]
+	public async Task ReadsCorrectFieldType(string dataType)
+	{
+		var tableName = $"TEST_READS_FIELD_TYPE_CORRECT";
+		var columnName = "FIELD";
+
+		using var commandTable = Connection.CreateCommand();
+		commandTable.CommandText = $"recreate table {tableName} ({columnName} {dataType})";
+		await commandTable.ExecuteNonQueryAsync();
+
+		var modelFactory = GetModelFactory();
+		var model = modelFactory.Create(Connection.ConnectionString, new DatabaseModelFactoryOptions(new string[] { tableName }));
+		var table = model.Tables.Single(x => x.Name == tableName);
+		var column = table.Columns.Single(x => x.Name == columnName);
+
+		Assert.That(column.StoreType, Is.EqualTo(dataType));
+	}
+
 	static IDatabaseModelFactory GetModelFactory()
 	{
 		return new FbDatabaseModelFactory();

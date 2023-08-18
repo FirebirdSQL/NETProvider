@@ -151,22 +151,28 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
                 WHEN 7 THEN
                  CASE F.RDB$FIELD_SUB_TYPE
                   WHEN 0 THEN 'SMALLINT'
-                  ELSE 'DECIMAL'
+			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+				  ELSE '?'
                  END
                 WHEN 8 THEN
                  CASE F.RDB$FIELD_SUB_TYPE
                   WHEN 0 THEN 'INTEGER'
-                  ELSE 'DECIMAL'
+			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+				  ELSE '?'
                  END
 				WHEN 9 THEN 'QUAD'
 				WHEN 10 THEN 'FLOAT'
 				WHEN 12 THEN 'DATE'
 				WHEN 13 THEN 'TIME'
-				WHEN 14 THEN 'CHAR(' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ') '
+				WHEN 14 THEN 'CHAR(' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
 				WHEN 16 THEN
 				 CASE F.RDB$FIELD_SUB_TYPE
 				  WHEN 0 THEN 'BIGINT'
-				  ELSE 'DECIMAL'
+			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
+				  ELSE '?'
 				 END
 				WHEN 23 THEN 'BOOLEAN'
 				WHEN 27 THEN 'DOUBLE PRECISION'
