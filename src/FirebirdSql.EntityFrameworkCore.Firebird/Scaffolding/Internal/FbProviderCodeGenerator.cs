@@ -27,11 +27,9 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 public class FbProviderCodeGenerator : ProviderCodeGenerator
 {
 	static readonly MethodInfo UseFirebirdMethodInfo
-		= typeof(FbDbContextOptionsBuilderExtensions).GetRequiredRuntimeMethod(
+		= typeof(FbDbContextOptionsBuilderExtensions).GetRuntimeMethod(
 			nameof(FbDbContextOptionsBuilderExtensions.UseFirebird),
-			typeof(DbContextOptionsBuilder),
-			typeof(string),
-			typeof(Action<FbDbContextOptionsBuilder>));
+			new[] { typeof(DbContextOptionsBuilder), typeof(string), typeof(Action<FbDbContextOptionsBuilder>) });
 
 	public FbProviderCodeGenerator(ProviderCodeGeneratorDependencies dependencies)
 		: base(dependencies)

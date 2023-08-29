@@ -22,4 +22,5 @@ public enum FbValueGenerationStrategy
 	None,
 	SequenceTrigger,
 	IdentityColumn,
+	HiLo,
 }

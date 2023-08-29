@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
@@ -28,6 +29,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Update;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Migrations;
 
@@ -372,6 +374,54 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 		{
 			builder.Append(" ON DELETE ");
 			ForeignKeyAction(operation.OnDelete, builder);
+		}
+	}
+
+	protected override void Generate(InsertDataOperation operation, IModel model, MigrationCommandListBuilder builder, bool terminate = true)
+	{
+		var sqlBuilder = new StringBuilder();
+		foreach (var modificationCommand in GenerateModificationCommands(operation, model))
+		{
+			SqlGenerator.AppendInsertOperation(
+				sqlBuilder,
+				modificationCommand,
+				0);
+			builder.Append(sqlBuilder.ToString());
+			if (terminate)
+			{
+				EndStatement(builder);
+			}
+			sqlBuilder.Clear();
+		}
+	}
+
+	protected override void Generate(DeleteDataOperation operation, IModel model, MigrationCommandListBuilder builder)
+	{
+		var sqlBuilder = new StringBuilder();
+		foreach (var modificationCommand in GenerateModificationCommands(operation, model))
+		{
+			SqlGenerator.AppendDeleteOperation(
+				sqlBuilder,
+				modificationCommand,
+				0);
+			builder.Append(sqlBuilder.ToString());
+			EndStatement(builder);
+			sqlBuilder.Clear();
+		}
+	}
+
+	protected override void Generate(UpdateDataOperation operation, IModel model, MigrationCommandListBuilder builder)
+	{
+		var sqlBuilder = new StringBuilder();
+		foreach (var modificationCommand in GenerateModificationCommands(operation, model))
+		{
+			SqlGenerator.AppendUpdateOperation(
+				sqlBuilder,
+				modificationCommand,
+				0);
+			builder.Append(sqlBuilder.ToString());
+			EndStatement(builder);
+			sqlBuilder.Clear();
 		}
 	}
 

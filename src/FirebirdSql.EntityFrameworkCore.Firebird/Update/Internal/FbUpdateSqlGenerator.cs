@@ -32,15 +32,9 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 		: base(dependencies)
 	{ }
 
-	protected override void AppendIdentityWhereCondition(StringBuilder commandStringBuilder, IColumnModification columnModification)
-		=> throw new InvalidOperationException();
-
-	protected override void AppendRowsAffectedWhereCondition(StringBuilder commandStringBuilder, int expectedRowsAffected)
-		=> throw new InvalidOperationException();
-
-	public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
+	public override ResultSetMapping AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition, out bool requiresTransaction)
 	{
-		var result = ResultSetMapping.NoResultSet;
+		var result = default(ResultSetMapping);
 		var name = command.TableName;
 		var operations = command.ColumnModifications;
 		var writeOperations = operations.Where(o => o.IsWrite).ToList();
@@ -57,14 +51,21 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 			{
 				b.Append(SqlGenerationHelper.DelimitIdentifier(e.ColumnName));
 			}, ", ");
-			result = ResultSetMapping.LastInResultSet;
+			result = ResultSetMapping.HasResultRow;
+		}
+		else
+		{
+			result = ResultSetMapping.NoResults;
 		}
 		commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
+
+		requiresTransaction = true;
 		return result;
 	}
 
-	public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
+	public override ResultSetMapping AppendUpdateOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition, out bool requiresTransaction)
 	{
+		var result = default(ResultSetMapping);
 		var name = command.TableName;
 		var operations = command.ColumnModifications;
 		var writeOperations = operations.Where(o => o.IsWrite).ToList();
@@ -121,18 +122,22 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 		{
 			commandStringBuilder.AppendLine("ROWS_AFFECTED = ROW_COUNT;");
 			commandStringBuilder.AppendLine("SUSPEND;");
+			result = ResultSetMapping.ResultSetWithRowsAffectedOnly;
 		}
 		else
 		{
 			commandStringBuilder.AppendLine("IF (ROW_COUNT > 0) THEN");
 			commandStringBuilder.AppendLine("SUSPEND;");
+			result = ResultSetMapping.HasResultRow;
 		}
 		commandStringBuilder.Append("END");
 		commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
-		return ResultSetMapping.LastInResultSet;
+
+		requiresTransaction = true;
+		return result;
 	}
 
-	public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition)
+	public override ResultSetMapping AppendDeleteOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, int commandPosition, out bool requiresTransaction)
 	{
 		var name = command.TableName;
 		var operations = command.ColumnModifications;
@@ -158,7 +163,9 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 		commandStringBuilder.AppendLine("SUSPEND;");
 		commandStringBuilder.Append("END");
 		commandStringBuilder.Append(SqlGenerationHelper.StatementTerminator).AppendLine();
-		return ResultSetMapping.LastInResultSet;
+
+		requiresTransaction = true;
+		return ResultSetMapping.ResultSetWithRowsAffectedOnly;
 	}
 
 	// workaround for GenerateBlockParameterName

@@ -16,12 +16,13 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class QueryNoClientEvalFbTest : QueryNoClientEvalTestBase<QueryNoClientEvalFbFixture>
+public class QueryNoClientEvalFbTest : QueryNoClientEvalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
-	public QueryNoClientEvalFbTest(QueryNoClientEvalFbFixture fixture)
+	public QueryNoClientEvalFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
 	{ }
 }

@@ -388,6 +388,41 @@ public class OwnedQueryFbTest : OwnedQueryRelationalTestBase<OwnedQueryFbTest.Ow
 		return base.Owned_entity_without_owner_does_not_throw_for_identity_resolution(async, useAsTracking);
 	}
 
+	[DoesNotHaveTheDataTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Can_query_owner_with_different_owned_types_having_same_property_name_in_hierarchy(bool async)
+	{
+		return base.Can_query_owner_with_different_owned_types_having_same_property_name_in_hierarchy(async);
+	}
+
+	[DoesNotHaveTheDataTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task GroupBy_aggregate_on_owned_navigation_in_aggregate_selector(bool async)
+	{
+		return base.GroupBy_aggregate_on_owned_navigation_in_aggregate_selector(async);
+	}
+
+	[DoesNotHaveTheDataTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Left_join_on_entity_with_owned_navigations(bool async)
+	{
+		return base.Left_join_on_entity_with_owned_navigations(async);
+	}
+
+	[DoesNotHaveTheDataTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Left_join_on_entity_with_owned_navigations_complex(bool async)
+	{
+		return base.Left_join_on_entity_with_owned_navigations_complex(async);
+	}
+
+	[DoesNotHaveTheDataTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Simple_query_entity_with_owned_collection(bool async)
+	{
+		return base.Simple_query_entity_with_owned_collection(async);
+	}
+
 	public class OwnedQueryFbFixture : RelationalOwnedQueryFixture
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;

@@ -205,16 +205,10 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 	public override Task Rename_index() => base.Rename_index();
 
 	[Fact(Skip = SkipReason)]
-	public override Task Add_primary_key() => base.Add_primary_key();
-
-	[Fact(Skip = SkipReason)]
 	public override Task Add_primary_key_with_name() => base.Add_primary_key_with_name();
 
 	[Fact(Skip = SkipReason)]
 	public override Task Add_primary_key_composite_with_name() => base.Add_primary_key_composite_with_name();
-
-	[Fact(Skip = SkipReason)]
-	public override Task Drop_primary_key() => base.Drop_primary_key();
 
 	[Fact(Skip = SkipReason)]
 	public override Task Add_foreign_key() => base.Add_foreign_key();
@@ -294,13 +288,49 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 	[Fact(Skip = SkipReason)]
 	public override Task SqlOperation() => base.SqlOperation();
 
+	[Fact(Skip = SkipReason)]
+	public override Task Add_primary_key_int() => base.Add_primary_key_int();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_primary_key_string() => base.Add_primary_key_string();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Alter_column_change_computed_recreates_indexes() => base.Alter_column_change_computed_recreates_indexes();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Alter_column_make_required_with_null_data() => base.Alter_column_make_required_with_null_data();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Alter_index_change_sort_order() => base.Alter_index_change_sort_order();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Alter_index_make_unique() => base.Alter_index_make_unique();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_index_descending() => base.Create_index_descending();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_index_descending_mixed() => base.Create_index_descending_mixed();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_sequence_long() => base.Create_sequence_long();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_sequence_short() => base.Create_sequence_short();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Drop_primary_key_int() => base.Drop_primary_key_int();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Drop_primary_key_string() => base.Drop_primary_key_string();
+
 	public class MigrationsFbFixture : MigrationsFixtureBase
 	{
 		protected override string StoreName => nameof(MigrationsFbTest);
 
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
-		public override TestHelpers TestHelpers => FbTestHelpers.Instance;
+		public override RelationalTestHelpers TestHelpers => FbTestHelpers.Instance;
 
 		protected override IServiceCollection AddServices(IServiceCollection serviceCollection)
 #pragma warning disable EF1001

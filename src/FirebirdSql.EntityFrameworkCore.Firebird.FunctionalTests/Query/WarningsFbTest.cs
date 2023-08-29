@@ -16,12 +16,13 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class WarningsFbTest : WarningsTestBase<QueryNoClientEvalFbFixture>
+public class WarningsFbTest : WarningsTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
-	public WarningsFbTest(QueryNoClientEvalFbFixture fixture)
+	public WarningsFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
 	{ }
 }

@@ -21,4 +21,9 @@ public static class FbAnnotationNames
 {
 	public const string Prefix = "Fb:";
 	public const string ValueGenerationStrategy = Prefix + nameof(ValueGenerationStrategy);
+	public const string HiLoSequenceName = Prefix + nameof(HiLoSequenceName);
+	public const string HiLoSequenceSchema = Prefix + nameof(HiLoSequenceSchema);
+	public const string SequenceName = Prefix + nameof(SequenceName);
+	public const string SequenceSchema = Prefix + nameof(SequenceSchema);
+	public const string SequenceNameSuffix = Prefix+ nameof(SequenceNameSuffix);
 }

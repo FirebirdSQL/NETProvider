@@ -177,4 +177,53 @@ public class NorthwindSelectQueryFbTest : NorthwindSelectQueryRelationalTestBase
 	{
 		return base.Take_on_top_level_and_on_collection_projection_with_outer_apply(async);
 	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Correlated_collection_after_groupby_with_complex_projection_not_containing_original_identifier(bool async)
+	{
+		return base.Correlated_collection_after_groupby_with_complex_projection_not_containing_original_identifier(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Reverse_in_projection_subquery(bool async)
+	{
+		return base.Reverse_in_projection_subquery(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Reverse_in_projection_subquery_single_result(bool async)
+	{
+		return base.Reverse_in_projection_subquery_single_result(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Reverse_in_SelectMany_with_Take(bool async)
+	{
+		return base.Reverse_in_SelectMany_with_Take(async);
+	}
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override async Task Correlated_collection_after_distinct_with_complex_projection_not_containing_original_identifier(bool async)
+	{
+		Assert.Equal(
+			RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin,
+			(await Assert.ThrowsAsync<InvalidOperationException>(
+				() => base.Correlated_collection_after_distinct_with_complex_projection_not_containing_original_identifier(async)))
+			.Message);
+	}
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task SelectMany_with_collection_being_correlated_subquery_which_references_non_mapped_properties_from_inner_and_outer_entity(bool async)
+	{
+		return AssertUnableToTranslateEFProperty(
+			() => base
+				.SelectMany_with_collection_being_correlated_subquery_which_references_non_mapped_properties_from_inner_and_outer_entity(
+					async));
+	}
 }

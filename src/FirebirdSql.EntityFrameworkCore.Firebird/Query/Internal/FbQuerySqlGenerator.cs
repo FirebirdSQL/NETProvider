@@ -39,6 +39,21 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		_fbOptions = fbOptions;
 	}
 
+	protected override Expression VisitSqlUnary(SqlUnaryExpression sqlUnaryExpression)
+	{
+		if (sqlUnaryExpression.OperatorType == ExpressionType.Not && sqlUnaryExpression.TypeMapping.ClrType != typeof(bool))
+		{
+			Sql.Append("BIN_NOT(");
+			Visit(sqlUnaryExpression.Operand);
+			Sql.Append(")");
+			return sqlUnaryExpression;
+		}
+		else
+		{
+			return base.VisitSqlUnary(sqlUnaryExpression);
+		}
+	}
+
 	protected override Expression VisitSqlBinary(SqlBinaryExpression sqlBinaryExpression)
 	{
 		if (sqlBinaryExpression.OperatorType == ExpressionType.Modulo)
@@ -141,6 +156,15 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 			Sql.Append(")");
 		}
 		return sqlConstantExpression;
+	}
+
+	protected override void GenerateEmptyProjection(SelectExpression selectExpression)
+	{
+		base.GenerateEmptyProjection(selectExpression);
+		if (selectExpression.Alias != null)
+		{
+			Sql.Append(" AS empty");
+		}
 	}
 
 	protected override void GenerateTop(SelectExpression selectExpression)

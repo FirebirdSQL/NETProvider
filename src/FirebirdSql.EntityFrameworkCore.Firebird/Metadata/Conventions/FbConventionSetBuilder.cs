@@ -32,24 +32,14 @@ public class FbConventionSetBuilder : RelationalConventionSetBuilder
 	{
 		var conventionSet = base.CreateConventionSet();
 
-		var valueGenerationStrategyConvention = new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies);
-		conventionSet.ModelInitializedConventions.Add(valueGenerationStrategyConvention);
-		conventionSet.ModelInitializedConventions.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
+		conventionSet.Add(new FbValueGenerationStrategyConvention(Dependencies, RelationalDependencies));
+		conventionSet.Add(new RelationalMaxIdentifierLengthConvention(31, Dependencies, RelationalDependencies));
 
-		var valueGenerationConvention = new FbValueGenerationConvention(Dependencies, RelationalDependencies);
-		ReplaceConvention(conventionSet.EntityTypeBaseTypeChangedConventions, valueGenerationConvention);
-		ReplaceConvention(conventionSet.EntityTypePrimaryKeyChangedConventions, valueGenerationConvention);
-		ReplaceConvention(conventionSet.ForeignKeyAddedConventions, valueGenerationConvention);
-		ReplaceConvention(conventionSet.ForeignKeyRemovedConventions, valueGenerationConvention);
-
-		var storeGenerationConvention = new FbStoreGenerationConvention(Dependencies, RelationalDependencies);
-		ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, storeGenerationConvention);
-		ReplaceConvention(conventionSet.PropertyAnnotationChangedConventions, (RelationalValueGenerationConvention)valueGenerationConvention);
-
-		conventionSet.ModelFinalizingConventions.Add(valueGenerationStrategyConvention);
-		ReplaceConvention(conventionSet.ModelFinalizingConventions, storeGenerationConvention);
+		conventionSet.Replace<StoreGenerationConvention>(new FbStoreGenerationConvention(Dependencies, RelationalDependencies));
+		conventionSet.Replace<ValueGenerationConvention>(new FbValueGenerationConvention(Dependencies, RelationalDependencies));
 
 		return conventionSet;
+
 	}
 
 	public static ConventionSet Build()

@@ -37,6 +37,37 @@ public static class FbModelBuilderExtensions
 		return modelBuilder;
 	}
 
+	public static ModelBuilder UseHiLo(this ModelBuilder modelBuilder, string name = null)
+	{
+		var model = modelBuilder.Model;
+		name ??= FbModelExtensions.DefaultHiLoSequenceName;
+		if (model.FindSequence(name) == null)
+		{
+			modelBuilder.HasSequence(name).IncrementsBy(10);
+		}
+		model.SetValueGenerationStrategy(FbValueGenerationStrategy.HiLo);
+		model.SetHiLoSequenceName(name);
+		model.SetSequenceNameSuffix(null);
+		return modelBuilder;
+	}
+
+	public static IConventionSequenceBuilder HasHiLoSequence(this IConventionModelBuilder modelBuilder, string name, bool fromDataAnnotation = false)
+	{
+		if (!modelBuilder.CanSetHiLoSequence(name))
+		{
+			return null;
+		}
+		modelBuilder.Metadata.SetHiLoSequenceName(name, fromDataAnnotation);
+		return name == null
+			? null
+			: modelBuilder.HasSequence(name, null, fromDataAnnotation);
+	}
+
+	public static bool CanSetHiLoSequence(this IConventionModelBuilder modelBuilder, string name, bool fromDataAnnotation = false)
+	{
+		return modelBuilder.CanSetAnnotation(FbAnnotationNames.HiLoSequenceName, name, fromDataAnnotation);
+	}
+
 	public static IConventionModelBuilder HasValueGenerationStrategy(this IConventionModelBuilder modelBuilder, FbValueGenerationStrategy? valueGenerationStrategy, bool fromDataAnnotation = false)
 	{
 		if (modelBuilder.CanSetAnnotation(FbAnnotationNames.ValueGenerationStrategy, valueGenerationStrategy, fromDataAnnotation))
@@ -46,6 +77,9 @@ public static class FbModelBuilderExtensions
 			{
 			}
 			if (valueGenerationStrategy != FbValueGenerationStrategy.SequenceTrigger)
+			{
+			}
+			if (valueGenerationStrategy != FbValueGenerationStrategy.HiLo)
 			{
 			}
 			return modelBuilder;

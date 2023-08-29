@@ -73,8 +73,8 @@ public class FbStoreGenerationConvention : StoreGenerationConvention
 				break;
 			case FbAnnotationNames.ValueGenerationStrategy:
 				if ((propertyBuilder.HasDefaultValue(null, fromDataAnnotation) == null
-					 | propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) == null
-					 | propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) == null)
+					 || propertyBuilder.HasDefaultValueSql(null, fromDataAnnotation) == null
+					 || propertyBuilder.HasComputedColumnSql(null, fromDataAnnotation) == null)
 					&& propertyBuilder.HasValueGenerationStrategy(null, fromDataAnnotation) != null)
 				{
 					context.StopProcessing();
@@ -89,28 +89,19 @@ public class FbStoreGenerationConvention : StoreGenerationConvention
 
 	protected override void Validate(IConventionProperty property, in StoreObjectIdentifier storeObject)
 	{
-		if (property.GetValueGenerationStrategyConfigurationSource() != null
-			   && property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
+		if (property.GetValueGenerationStrategyConfigurationSource() != null && property.GetValueGenerationStrategy() != FbValueGenerationStrategy.None)
 		{
-			if (property.GetDefaultValue() != null)
+			if (property.TryGetDefaultValue(storeObject, out _))
 			{
-				throw new InvalidOperationException(
-					RelationalStrings.ConflictingColumnServerGeneration(
-						nameof(FbValueGenerationStrategy), property.Name, "DefaultValue"));
+				throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(FbValueGenerationStrategy), property.Name, "DefaultValue"));
 			}
-
 			if (property.GetDefaultValueSql() != null)
 			{
-				throw new InvalidOperationException(
-					RelationalStrings.ConflictingColumnServerGeneration(
-						nameof(FbValueGenerationStrategy), property.Name, "DefaultValueSql"));
+				throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(FbValueGenerationStrategy), property.Name, "DefaultValueSql"));
 			}
-
 			if (property.GetComputedColumnSql() != null)
 			{
-				throw new InvalidOperationException(
-					RelationalStrings.ConflictingColumnServerGeneration(
-						nameof(FbValueGenerationStrategy), property.Name, "ComputedColumnSql"));
+				throw new InvalidOperationException(RelationalStrings.ConflictingColumnServerGeneration(nameof(FbValueGenerationStrategy), property.Name, "ComputedColumnSql"));
 			}
 		}
 		base.Validate(property, storeObject);

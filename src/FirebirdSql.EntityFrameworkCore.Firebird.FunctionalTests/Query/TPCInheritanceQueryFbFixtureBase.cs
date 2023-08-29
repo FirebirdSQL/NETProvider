@@ -15,9 +15,13 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class QueryNoClientEvalFbFixture : NorthwindQueryFbFixture<NoopModelCustomizer>
-{ }
+public abstract class TPCInheritanceQueryFbFixtureBase : TPCInheritanceQueryFixture
+{
+    protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+}

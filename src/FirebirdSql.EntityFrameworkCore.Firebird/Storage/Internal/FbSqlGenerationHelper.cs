@@ -45,7 +45,7 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		builder.Append(":").Append(name);
 	}
 
-	public string AlternativeStatementTerminator => "~";
+	public virtual string AlternativeStatementTerminator => "~";
 
 	static int MinimumStringQueryTypeLength(string s)
 	{

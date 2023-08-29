@@ -23,6 +23,9 @@ namespace Microsoft.EntityFrameworkCore;
 
 public static class FbModelExtensions
 {
+	public const string DefaultHiLoSequenceName = "EntityFrameworkHiLoSequence";
+	public const string DefaultSequenceNameSuffix = "Sequence";
+
 	public static void SetValueGenerationStrategy(this IMutableModel model, FbValueGenerationStrategy? value)
 		=> model.SetOrRemoveAnnotation(FbAnnotationNames.ValueGenerationStrategy, value);
 
@@ -37,4 +40,52 @@ public static class FbModelExtensions
 
 	public static FbValueGenerationStrategy? GetValueGenerationStrategy(this IConventionModel model)
 		=> (FbValueGenerationStrategy?)model[FbAnnotationNames.ValueGenerationStrategy];
+
+	public static string GetHiLoSequenceName(this IReadOnlyModel model)
+		=> (string)model[FbAnnotationNames.HiLoSequenceName] ?? DefaultHiLoSequenceName;
+
+	public static void SetHiLoSequenceName(this IMutableModel model, string name)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.HiLoSequenceName, name);
+
+	public static string SetHiLoSequenceName(this IConventionModel model, string name, bool fromDataAnnotation = false)
+		=> (string)model.SetOrRemoveAnnotation(FbAnnotationNames.HiLoSequenceName, name, fromDataAnnotation)?.Value;
+
+	public static ConfigurationSource? GetHiLoSequenceNameConfigurationSource(this IConventionModel model)
+		=> model.FindAnnotation(FbAnnotationNames.HiLoSequenceName)?.GetConfigurationSource();
+
+	public static string GetHiLoSequenceSchema(this IReadOnlyModel model)
+		=> (string)model[FbAnnotationNames.HiLoSequenceSchema];
+
+	public static void SetHiLoSequenceSchema(this IMutableModel model, string value)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.HiLoSequenceSchema, value);
+
+	public static string SetHiLoSequenceSchema(this IConventionModel model, string value, bool fromDataAnnotation = false)
+		=> (string)model.SetOrRemoveAnnotation(FbAnnotationNames.HiLoSequenceSchema, value, fromDataAnnotation)?.Value;
+
+	public static ConfigurationSource? GetHiLoSequenceSchemaConfigurationSource(this IConventionModel model)
+		=> model.FindAnnotation(FbAnnotationNames.HiLoSequenceSchema)?.GetConfigurationSource();
+
+	public static string GetSequenceNameSuffix(this IReadOnlyModel model)
+		=> (string)model[FbAnnotationNames.SequenceNameSuffix] ?? DefaultSequenceNameSuffix;
+
+	public static void SetSequenceNameSuffix(this IMutableModel model, string name)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.SequenceNameSuffix, name);
+
+	public static string SetSequenceNameSuffix(this IConventionModel model, string name, bool fromDataAnnotation = false)
+		=> (string)model.SetOrRemoveAnnotation(FbAnnotationNames.SequenceNameSuffix, name, fromDataAnnotation)?.Value;
+
+	public static ConfigurationSource? GetSequenceNameSuffixConfigurationSource(this IConventionModel model)
+		=> model.FindAnnotation(FbAnnotationNames.SequenceNameSuffix)?.GetConfigurationSource();
+
+	public static string GetSequenceSchema(this IReadOnlyModel model)
+		=> (string)model[FbAnnotationNames.SequenceSchema];
+
+	public static void SetSequenceSchema(this IMutableModel model, string value)
+		=> model.SetOrRemoveAnnotation(FbAnnotationNames.SequenceSchema, value);
+
+	public static string SetSequenceSchema(this IConventionModel model, string value, bool fromDataAnnotation = false)
+		=> (string)model.SetOrRemoveAnnotation(FbAnnotationNames.SequenceSchema, value, fromDataAnnotation)?.Value;
+
+	public static ConfigurationSource? GetSequenceSchemaConfigurationSource(this IConventionModel model)
+		=> model.FindAnnotation(FbAnnotationNames.SequenceSchema)?.GetConfigurationSource();
 }

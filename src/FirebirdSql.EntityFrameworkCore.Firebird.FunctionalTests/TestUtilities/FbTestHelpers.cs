@@ -24,7 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 
-public class FbTestHelpers : TestHelpers
+public class FbTestHelpers : RelationalTestHelpers
 {
 	protected FbTestHelpers()
 	{ }
@@ -34,7 +34,7 @@ public class FbTestHelpers : TestHelpers
 	public override IServiceCollection AddProviderServices(IServiceCollection services)
 		=> services.AddEntityFrameworkFirebird();
 
-	public override void UseProviderOptions(DbContextOptionsBuilder optionsBuilder)
+	public override DbContextOptionsBuilder UseProviderOptions(DbContextOptionsBuilder optionsBuilder)
 		=> optionsBuilder.UseFirebird(new FbConnection("database=localhost:_.fdb;user=sysdba;password=masterkey;charset=utf8"));
 
 #pragma warning disable EF1001

@@ -27,7 +27,7 @@ public abstract class EntityFrameworkTestsBase : FbTestsBase
 {
 	static EntityFrameworkTestsBase()
 	{
-#if NET6_0_OR_GREATER
+#if !NETFRAMEWORK
 		System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
 #endif
 		DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());

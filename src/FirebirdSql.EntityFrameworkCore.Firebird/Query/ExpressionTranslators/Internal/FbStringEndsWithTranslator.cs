@@ -64,7 +64,7 @@ class FbStringEndsWithTranslator : IMethodCallTranslator
 			: _fbSqlExpressionFactory.OrElse(
 				endsWithExpression,
 				_fbSqlExpressionFactory.Equal(
-					patternExpression,
-					_fbSqlExpressionFactory.Constant(string.Empty)));
+					_fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { patternExpression }, true, new[] { true }, typeof(int)),
+					_fbSqlExpressionFactory.Constant(0)));
 	}
 }

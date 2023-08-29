@@ -17,21 +17,19 @@
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class UpdatesFbFixture : UpdatesRelationalFixture
+public class CompositeKeysQueryFbFixture : CompositeKeysQueryRelationalFixtureBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 	{
 		base.OnModelCreating(modelBuilder, context);
-		ModelHelpers.SetStringLengths(modelBuilder);
-		ModelHelpers.SetPrimaryKeyGeneration(modelBuilder, FbValueGenerationStrategy.IdentityColumn, x => x.ClrType == typeof(Person));
+		ModelHelpers.SimpleTableNames(modelBuilder);
 	}
 }

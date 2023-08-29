@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<AssemblyTitle>NETProvider - Entity Framework Core Provider</AssemblyTitle>
-		<Copyright>(c) 2017-2021</Copyright>
+		<Copyright>(c) 2017-2023</Copyright>
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>FirebirdSql.EntityFrameworkCore.Firebird</PackageId>
@@ -29,8 +29,7 @@
 		<None Include="..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />

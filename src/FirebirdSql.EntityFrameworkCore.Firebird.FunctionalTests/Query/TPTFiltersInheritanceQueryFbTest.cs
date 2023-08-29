@@ -15,13 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
-using System.Data.Common;
-using System.Threading.Tasks;
-using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 

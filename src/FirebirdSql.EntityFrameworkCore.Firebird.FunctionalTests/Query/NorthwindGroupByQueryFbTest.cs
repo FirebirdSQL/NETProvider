@@ -89,6 +89,13 @@ public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<Northwi
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
+	public override Task Complex_query_with_groupBy_in_subquery4(bool async)
+	{
+		return base.Complex_query_with_groupBy_in_subquery4(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_nested_collection_with_groupby(bool async)
 	{
 		return base.Select_nested_collection_with_groupby(async);
@@ -101,17 +108,7 @@ public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<Northwi
 		return base.Select_uncorrelated_collection_with_groupby_when_outer_is_distinct(async);
 	}
 
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override async Task Complex_query_with_groupBy_in_subquery4(bool async)
-	{
-		var message = (await Assert.ThrowsAsync<InvalidOperationException>(
-			() => base.Complex_query_with_groupBy_in_subquery4(async))).Message;
-
-		Assert.Equal(RelationalStrings.InsufficientInformationToIdentifyElementOfCollectionJoin, message);
-	}
-
-	[Theory]
+	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override async Task Select_correlated_collection_after_GroupBy_aggregate_when_identifier_changes_to_complex(bool async)
 	{

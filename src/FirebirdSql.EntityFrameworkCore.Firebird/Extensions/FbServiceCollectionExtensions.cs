@@ -29,6 +29,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Inter
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using FirebirdSql.EntityFrameworkCore.Firebird.Update.Internal;
+using FirebirdSql.EntityFrameworkCore.Firebird.ValueGeneration.Internal;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -37,6 +38,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.EntityFrameworkCore;
@@ -59,13 +61,16 @@ public static class FbServiceCollectionExtensions
 		var builder = new EntityFrameworkRelationalServicesBuilder(serviceCollection)
 			.TryAdd<LoggingDefinitions, FbLoggingDefinitions>()
 			.TryAdd<IDatabaseProvider, DatabaseProvider<FbOptionsExtension>>()
+			.TryAdd<IValueGeneratorCache>(p => p.GetRequiredService<IFbValueGeneratorCache>())
 			.TryAdd<IRelationalDatabaseCreator, FbDatabaseCreator>()
 			.TryAdd<IRelationalTypeMappingSource, FbTypeMappingSource>()
 			.TryAdd<ISqlGenerationHelper, FbSqlGenerationHelper>()
 			.TryAdd<IRelationalAnnotationProvider, FbRelationalAnnotationProvider>()
+			.TryAdd<IModelValidator, FbModelValidator>()
 			.TryAdd<IProviderConventionSetBuilder, FbConventionSetBuilder>()
 			.TryAdd<IUpdateSqlGenerator>(p => p.GetService<IFbUpdateSqlGenerator>())
 			.TryAdd<IModificationCommandBatchFactory, FbModificationCommandBatchFactory>()
+			.TryAdd<IValueGeneratorSelector, FbValueGeneratorSelector>()
 			.TryAdd<IRelationalConnection>(p => p.GetService<IFbRelationalConnection>())
 			.TryAdd<IRelationalTransactionFactory, FbTransactionFactory>()
 			.TryAdd<IMigrationsSqlGenerator, FbMigrationsSqlGenerator>()
@@ -80,6 +85,8 @@ public static class FbServiceCollectionExtensions
 				.TryAddSingleton<IFbOptions, FbOptions>()
 				.TryAddSingleton<IFbMigrationSqlGeneratorBehavior, FbMigrationSqlGeneratorBehavior>()
 				.TryAddSingleton<IFbUpdateSqlGenerator, FbUpdateSqlGenerator>()
+				.TryAddSingleton<IFbValueGeneratorCache, FbValueGeneratorCache>()
+				.TryAddSingleton<IFbSequenceValueGeneratorFactory, FbSequenceValueGeneratorFactory>()
 				.TryAddScoped<IFbRelationalConnection, FbRelationalConnection>()
 				.TryAddScoped<IFbRelationalTransaction, FbRelationalTransaction>());
 

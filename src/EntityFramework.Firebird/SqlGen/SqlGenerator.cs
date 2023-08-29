@@ -2552,7 +2552,7 @@ internal sealed class SqlGenerator : DbExpressionVisitor<ISqlFragment>
 
 	private static ISqlFragment HandleCanonicalFunctionBitwiseNot(SqlGenerator sqlgen, DbFunctionExpression e)
 	{
-		throw new NotSupportedException("BitwiseNot is not supported by Firebird.");
+		return sqlgen.HandleFunctionDefaultGivenName(e, "BIN_NOT");
 	}
 
 	private static ISqlFragment HandleCanonicalFunctionBitwiseOr(SqlGenerator sqlgen, DbFunctionExpression e)

@@ -65,48 +65,48 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 		: base(dependencies, relationalDependencies)
 	{
 		_storeTypeMappings = new Dictionary<string, RelationalTypeMapping>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ "BOOLEAN", _boolean },
-				{ "SMALLINT", _smallint },
-				{ "INTEGER", _integer },
-				{ "BIGINT", _bigint },
-				{ "CHAR", _char },
-				{ "VARCHAR", _varchar },
-				{ "BLOB SUB_TYPE TEXT", _clob },
-				{ "BLOB SUB_TYPE BINARY", _binary },
-				{ "FLOAT", _float },
-				{ "DOUBLE PRECISION", _double },
-				{ "DECIMAL", _decimal },
-				{ "TIMESTAMP", _timestamp },
-				{ "DATE", _date },
-				{ "TIME", _timeSpan },
-				{ "CHAR(16) CHARACTER SET OCTETS", _guid },
-			};
+		{
+			{ "BOOLEAN", _boolean },
+			{ "SMALLINT", _smallint },
+			{ "INTEGER", _integer },
+			{ "BIGINT", _bigint },
+			{ "CHAR", _char },
+			{ "VARCHAR", _varchar },
+			{ "BLOB SUB_TYPE TEXT", _clob },
+			{ "BLOB SUB_TYPE BINARY", _binary },
+			{ "FLOAT", _float },
+			{ "DOUBLE PRECISION", _double },
+			{ "DECIMAL", _decimal },
+			{ "TIMESTAMP", _timestamp },
+			{ "DATE", _date },
+			{ "TIME", _timeSpan },
+			{ "CHAR(16) CHARACTER SET OCTETS", _guid },
+		};
 
 		_clrTypeMappings = new Dictionary<Type, RelationalTypeMapping>()
-			{
-				{ typeof(bool), _boolean },
-				{ typeof(short), _smallint },
-				{ typeof(int), _integer },
-				{ typeof(long), _bigint },
-				{ typeof(float), _float },
-				{ typeof(double), _double},
-				{ typeof(decimal), _decimal },
-				{ typeof(DateTime), _timestamp },
-				{ typeof(TimeSpan), _timeSpan },
-				{ typeof(Guid), _guid },
-				{ typeof(DateOnly), _dateOnly },
-				{ typeof(TimeOnly), _timeOnly },
-			};
+		{
+			{ typeof(bool), _boolean },
+			{ typeof(short), _smallint },
+			{ typeof(int), _integer },
+			{ typeof(long), _bigint },
+			{ typeof(float), _float },
+			{ typeof(double), _double},
+			{ typeof(decimal), _decimal },
+			{ typeof(DateTime), _timestamp },
+			{ typeof(TimeSpan), _timeSpan },
+			{ typeof(Guid), _guid },
+			{ typeof(DateOnly), _dateOnly },
+			{ typeof(TimeOnly), _timeOnly },
+		};
 
 		_disallowedMappings = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-			{
-					"CHARACTER",
-					"CHAR",
-					"VARCHAR",
-					"CHARACTER VARYING",
-					"CHAR VARYING",
-			};
+		{
+			"CHARACTER",
+			"CHAR",
+			"VARCHAR",
+			"CHARACTER VARYING",
+			"CHAR VARYING",
+		};
 	}
 
 	protected override RelationalTypeMapping FindMapping(in RelationalTypeMappingInfo mappingInfo)

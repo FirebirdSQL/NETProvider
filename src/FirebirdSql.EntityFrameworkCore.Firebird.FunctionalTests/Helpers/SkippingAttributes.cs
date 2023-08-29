@@ -93,3 +93,18 @@ public class LongExecutionTheoryAttribute : TheoryAttribute
 		Skip = "Long execution.";
 	}
 }
+
+public class NotSupportedByProviderFactAttribute : FactAttribute
+{
+	public NotSupportedByProviderFactAttribute()
+	{
+		Skip = "Not supported by provider.";
+	}
+}
+public class NotSupportedByProviderTheoryAttribute : TheoryAttribute
+{
+	public NotSupportedByProviderTheoryAttribute()
+	{
+		Skip = "Not supported by provider.";
+	}
+}

@@ -51,13 +51,23 @@ public class FbTestStore : RelationalTestStore
 	protected override string OpenDelimiter => "\"";
 	protected override string CloseDelimiter => "\"";
 
+	public Version ServerVersion { get; private set; }
+	public bool ServerLessThan4() => ServerVersion < new Version(4, 0, 0, 0);
+
 	protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
 	{
 		using (var context = createContext())
 		{
 			// create database explicitly to specify Page Size and Forced Writes
 			FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
-			context.Database.EnsureCreated();
+			try
+			{
+				context.Database.EnsureCreated();
+			}
+			catch (FbException ex) when (ServerLessThan4() && ex.Message.EndsWith("Name longer than database column size", StringComparison.Ordinal))
+			{
+				return;
+			}
 			clean?.Invoke(context);
 			Clean(context);
 			seed?.Invoke(context);
@@ -67,7 +77,8 @@ public class FbTestStore : RelationalTestStore
 	public override void OpenConnection()
 	{
 		base.OpenConnection();
-		if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+		ServerVersion = FbServerProperties.ParseServerVersion(Connection.ServerVersion);
+		if (ServerVersion >= new Version(4, 0, 0, 0))
 		{
 			using (var cmd = Connection.CreateCommand())
 			{

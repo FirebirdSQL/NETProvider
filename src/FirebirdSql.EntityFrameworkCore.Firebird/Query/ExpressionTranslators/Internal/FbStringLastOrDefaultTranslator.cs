@@ -50,6 +50,6 @@ public class FbStringLastOrDefaultTranslator : IMethodCallTranslator
 			new[] { argument, _fbSqlExpressionFactory.Constant(1) },
 			true,
 			new[] { true, false },
-			typeof(string));
+			method.ReturnType);
 	}
 }

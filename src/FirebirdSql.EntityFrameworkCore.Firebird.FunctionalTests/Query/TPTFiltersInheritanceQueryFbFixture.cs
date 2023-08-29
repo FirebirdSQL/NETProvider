@@ -15,11 +15,19 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class TPTFiltersInheritanceQueryFbFixture : TPTInheritanceQueryFbFixture
 {
 	protected override bool EnableFilters => true;
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	{
+		base.OnModelCreating(modelBuilder, context);
+		modelBuilder.Entity<Drink>().Property(x => x.Id).UseSequenceTrigger();
+		modelBuilder.Entity<Animal>().Property(x => x.Id).UseSequenceTrigger();
+	}
 }

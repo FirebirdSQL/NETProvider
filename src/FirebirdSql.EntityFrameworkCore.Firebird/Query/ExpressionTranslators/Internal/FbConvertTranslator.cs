@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
-using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
@@ -39,6 +38,7 @@ public class FbConvertTranslator : IMethodCallTranslator
 		nameof(Convert.ToInt32),
 		nameof(Convert.ToInt64),
 		nameof(Convert.ToString),
+		nameof(Convert.ToBoolean),
 	};
 
 	static readonly HashSet<Type> SupportedTypes = new HashSet<Type>

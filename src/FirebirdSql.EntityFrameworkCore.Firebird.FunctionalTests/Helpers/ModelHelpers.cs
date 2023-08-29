@@ -47,14 +47,23 @@ public static class ModelHelpers
 		{
 			if (entityType.BaseType != null)
 				continue;
-			var name = new string(entityType.GetTableName().Where(char.IsUpper).ToArray());
+			entityType.SetTableName(Simplify(entityType.GetTableName()));
+			foreach (var property in entityType.GetProperties())
+			{
+				property.SetColumnName(Simplify(property.Name));
+			}
+		}
+
+		string Simplify(string name)
+		{
+			name = new string(name.Where(char.IsUpper).ToArray());
 			var cnt = 1;
 			while (names.Contains(name))
 			{
 				name += cnt++;
 			}
 			names.Add(name);
-			entityType.SetTableName(name);
+			return name;
 		}
 	}
 
@@ -74,6 +83,29 @@ public static class ModelHelpers
 			{
 				property.SetValueGenerationStrategy(valueGenerationStrategy);
 			}
+		}
+	}
+
+	public static void ShortenMM(ModelBuilder modelBuilder)
+	{
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+		{
+			entityType.SetTableName(Shorten(entityType.ShortName()));
+			foreach (var property in entityType.GetProperties())
+			{
+				property.SetColumnName(Shorten(property.Name));
+			}
+		}
+
+		static string Shorten(string s)
+		{
+			return s
+				.Replace("UnidirectionalEntity", "UE")
+				.Replace("Unidirectional", "U")
+				.Replace("JoinOneToThree", "J1_3")
+				.Replace("EntityTableSharing", "ETS")
+				.Replace("GeneratedKeys", "GK")
+				.Replace("ImplicitManyToMany", "IMM");
 		}
 	}
 }

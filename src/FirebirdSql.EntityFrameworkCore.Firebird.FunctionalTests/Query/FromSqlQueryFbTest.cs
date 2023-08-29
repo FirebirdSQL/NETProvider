@@ -95,11 +95,11 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 			? await query.AnyAsync()
 			: query.Any();
 
-		Assert.Equal(
-			RelationalStrings.QueryFromSqlInsideExists,
-			async
-				? (await Assert.ThrowsAsync<InvalidOperationException>(() => query.AnyAsync())).Message
-				: Assert.Throws<InvalidOperationException>(() => query.Any()).Message);
+		var result2 = async
+			? await query.AnyAsync()
+			: query.Any();
+
+		Assert.Equal(result1, result2);
 	}
 
 	[Theory]
@@ -116,11 +116,11 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 			? await query.AnyAsync()
 			: query.Any();
 
-		Assert.Equal(
-			RelationalStrings.QueryFromSqlInsideExists,
-			async
-				? (await Assert.ThrowsAsync<InvalidOperationException>(() => query.AnyAsync())).Message
-				: Assert.Throws<InvalidOperationException>(() => query.Any()).Message);
+		var result2 = async
+			? await query.AnyAsync()
+			: query.Any();
+
+		Assert.Equal(result1, result2);
 	}
 
 	[Theory(Skip = "Provider does the casting.")]

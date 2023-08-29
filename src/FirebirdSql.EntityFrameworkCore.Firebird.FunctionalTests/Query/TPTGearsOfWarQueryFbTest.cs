@@ -313,13 +313,6 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 													 select w.IsAutomatic.ToString(), null, elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.InvariantCultureIgnoreCase)); }, assertOrder: false, 0, "ToString_boolean_property_non_nullable");
 	}
 
-	[Theory(Skip = "NETProvider#1009")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_Add_TimeSpan(bool async)
-	{
-		return base.Where_TimeOnly_Add_TimeSpan(async);
-	}
-
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_subtract_TimeOnly(bool async)
@@ -327,10 +320,31 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 		return base.Where_TimeOnly_subtract_TimeOnly(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(bool async)
+	{
+		return base.Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task DateTimeOffsetNow_minus_timespan(bool async)
+	{
+		return base.DateTimeOffsetNow_minus_timespan(async);
+	}
+
 	[Theory(Skip = "NETProvider#1008")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_IsBetween(bool async)
 	{
 		return base.Where_TimeOnly_IsBetween(async);
+	}
+
+	[Theory(Skip = "NETProvider#1009")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_TimeOnly_Add_TimeSpan(bool async)
+	{
+		return base.Where_TimeOnly_Add_TimeSpan(async);
 	}
 }

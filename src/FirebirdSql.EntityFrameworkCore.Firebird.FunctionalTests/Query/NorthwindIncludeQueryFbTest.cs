@@ -121,6 +121,20 @@ public class NorthwindIncludeQueryFbTest : NorthwindIncludeQueryTestBase<Northwi
 		return base.Repro9735(async);
 	}
 
+	[Theory(Skip = "Different implicit ordering on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Include_collection_OrderBy_empty_list_contains(bool async)
+	{
+		return base.Include_collection_OrderBy_empty_list_contains(async);
+	}
+
+	[Theory(Skip = "Different implicit ordering on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Include_collection_OrderBy_empty_list_does_not_contains(bool async)
+	{
+		return base.Include_collection_OrderBy_empty_list_does_not_contains(async);
+	}
+
 	[LongExecutionTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_Include_reference_GroupBy_Select(bool async)

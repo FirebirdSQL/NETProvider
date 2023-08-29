@@ -28,6 +28,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.I
 
 public class FbStringIndexOfTranslator : IMethodCallTranslator
 {
+	static readonly MethodInfo IndexOfMethodInfo
+	   = typeof(string).GetRuntimeMethod(nameof(string.IndexOf), new[] { typeof(string) });
+
+	static readonly MethodInfo IndexOfMethodInfoWithStartingPosition
+		= typeof(string).GetRuntimeMethod(nameof(string.IndexOf), new[] { typeof(string), typeof(int) });
+
 	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
 	public FbStringIndexOfTranslator(FbSqlExpressionFactory fbSqlExpressionFactory)
@@ -37,15 +43,21 @@ public class FbStringIndexOfTranslator : IMethodCallTranslator
 
 	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 	{
-		if (method.DeclaringType == typeof(string) && method.Name == nameof(string.IndexOf))
+		if (method.Equals(IndexOfMethodInfo))
 		{
 			var args = new List<SqlExpression>();
 			args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]));
 			args.Add(instance);
-			foreach (var a in arguments.Skip(1))
-			{
-				args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(a));
-			}
+			return _fbSqlExpressionFactory.Subtract(
+				_fbSqlExpressionFactory.Function("POSITION", args, true, Enumerable.Repeat(true, args.Count), typeof(int)),
+				_fbSqlExpressionFactory.Constant(1));
+		}
+		if (method.Equals(IndexOfMethodInfoWithStartingPosition))
+		{
+			var args = new List<SqlExpression>();
+			args.Add(_fbSqlExpressionFactory.ApplyDefaultTypeMapping(arguments[0]));
+			args.Add(instance);
+			args.Add(_fbSqlExpressionFactory.Add(arguments[1], _fbSqlExpressionFactory.Constant(1)));
 			return _fbSqlExpressionFactory.Subtract(
 				_fbSqlExpressionFactory.Function("POSITION", args, true, Enumerable.Repeat(true, args.Count), typeof(int)),
 				_fbSqlExpressionFactory.Constant(1));

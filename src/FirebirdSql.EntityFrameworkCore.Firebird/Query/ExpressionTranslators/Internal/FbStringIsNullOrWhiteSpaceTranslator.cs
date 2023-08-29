@@ -45,8 +45,9 @@ public class FbStringIsNullOrWhiteSpaceTranslator : IMethodCallTranslator
 		return _fbSqlExpressionFactory.OrElse(
 			_fbSqlExpressionFactory.IsNull(argument),
 			_fbSqlExpressionFactory.Equal(
-				_fbSqlExpressionFactory.Function("TRIM", new[] { argument }, true, new[] { true }, typeof(string)),
-				_fbSqlExpressionFactory.Constant(string.Empty))
+				_fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] {
+						_fbSqlExpressionFactory.Function("TRIM", new[] { argument }, true, new[] { true }, typeof(string)) }, true, new[] { true }, typeof(int)),
+					_fbSqlExpressionFactory.Constant(0))
 			);
 	}
 }

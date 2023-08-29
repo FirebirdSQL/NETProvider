@@ -161,6 +161,13 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
+	public override Task DateTimeOffsetNow_minus_timespan(bool async)
+	{
+		return base.DateTimeOffsetNow_minus_timespan(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collections_inner_subquery_predicate_references_outer_qsre(bool isAsync)
 	{
 		return base.Correlated_collections_inner_subquery_predicate_references_outer_qsre(isAsync);
@@ -376,18 +383,18 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 		return base.Where_TimeOnly_subtract_TimeOnly(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(bool async)
+	{
+		return base.Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
+	}
+
 	[Theory(Skip = "NETProvider#1008")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_IsBetween(bool async)
 	{
 		return base.Where_TimeOnly_IsBetween(async);
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_AddMinutes(bool async)
-	{
-		return base.Where_TimeOnly_AddMinutes(async);
 	}
 
 	[Theory(Skip = "NETProvider#1009")]
