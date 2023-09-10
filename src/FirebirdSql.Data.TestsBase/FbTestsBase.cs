@@ -195,8 +195,8 @@ end";
 		{
 			builder.Database = FbTestsSetup.Database(serverType, compression, wireCrypt);
 		}
-		builder.ServerType = serverType;
 		builder.Port = FbTestsSetup.Port;
+		builder.ServerType = serverType;
 		return builder;
 	}
 

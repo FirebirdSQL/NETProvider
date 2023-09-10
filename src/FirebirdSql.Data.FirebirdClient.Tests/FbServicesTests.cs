@@ -236,7 +236,7 @@ end";
 		};
 		await statisticalSvc.ExecuteAsync();
 		var statisticalOutput = sb.ToString();
-		Assert.IsTrue(statisticalOutput.Contains("Average record length"),"Record statistics not found");
+		Assert.IsTrue(statisticalOutput.Contains("Average record length"), "Record statistics not found");
 	}
 
 	[Test]
