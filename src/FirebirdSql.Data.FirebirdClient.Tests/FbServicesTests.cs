@@ -224,6 +224,22 @@ end";
 	}
 
 	[Test]
+	public async Task StatisticsRecordVersionTest()
+	{
+		var sb = new StringBuilder();
+		var statisticalSvc = new FbStatistical();
+		statisticalSvc.ConnectionString = BuildServicesConnectionString(ServerType, Compression, WireCrypt, true);
+		statisticalSvc.Options = FbStatisticalFlags.RecordVersionStatistics;
+		statisticalSvc.ServiceOutput += (object sender, ServiceOutputEventArgs e) =>
+		{
+			sb.AppendLine(e.Message);
+		};
+		await statisticalSvc.ExecuteAsync();
+		var statisticalOutput = sb.ToString();
+		Assert.IsTrue(statisticalOutput.Contains("Average record length"),"Record statistics not found");
+	}
+
+	[Test]
 	public async Task FbLogTest()
 	{
 		var logSvc = new FbLog();
