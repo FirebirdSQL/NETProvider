@@ -130,6 +130,7 @@ internal sealed class DbField
 	public Charset Charset
 	{
 		get { return _charset; }
+		set { _charset = value; }
 	}
 
 	public int CharCount

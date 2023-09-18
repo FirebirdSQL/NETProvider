@@ -1068,6 +1068,17 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 				{
 					batchParameter.NullFlag = 0;
 
+					if (commandParameter.Charset > 0 && Charset.TryGetByType(commandParameter.Charset, out var charset))
+					{
+						//if command parameter charset is explicitly set, and we can find it, apply it to the statement parameter
+						batchParameter.Charset = charset;
+					}
+					else if (!Connection.InnerConnection.Database.Charset.IsNoneCharset)
+					{
+						//if the database charset is not NONE (default), apply the charset to the statement parameter
+						batchParameter.Charset = Connection.InnerConnection.Database.Charset;
+					}
+
 					switch (batchParameter.DbDataType)
 					{
 						case DbDataType.Binary:
