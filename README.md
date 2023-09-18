@@ -29,7 +29,6 @@
 
 ## Builds
 
-[![TeamCity](https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:OpenSourceProjects_FirebirdClient_CiBuild)/statusIcon.svg)](https://teamcity.jetbrains.com/project.html?projectId=OpenSourceProjects_FirebirdClient)
 [![GitHub Actions](https://github.com/FirebirdSQL/NETProvider/workflows/CI/badge.svg)](https://github.com/FirebirdSQL/NETProvider/actions)
 
 ## Misc
