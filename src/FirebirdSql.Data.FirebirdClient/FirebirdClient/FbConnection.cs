@@ -311,8 +311,6 @@ public sealed class FbConnection : DbConnection, ICloneable
 				_disposed = true;
 				Close();
 				_innerConnection = null;
-				_options = null;
-				_connectionString = null;
 			}
 		}
 		base.Dispose(disposing);
@@ -325,8 +323,6 @@ public sealed class FbConnection : DbConnection, ICloneable
 			_disposed = true;
 			await CloseAsync().ConfigureAwait(false);
 			_innerConnection = null;
-			_options = null;
-			_connectionString = null;
 		}
 		await base.DisposeAsync().ConfigureAwait(false);
 	}
