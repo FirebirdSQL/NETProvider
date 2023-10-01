@@ -38,7 +38,7 @@ internal static class XsqldaMarshaler
 
 			for (var i = 0; i < xsqlda.sqln; i++)
 			{
-				var ptr = GetIntPtr(pNativeData, ComputeLength(i));
+				var ptr = IntPtr.Add(pNativeData, ComputeLength(i));
 
 				var sqlvar = new XSQLVAR();
 				MarshalXSQLVARNativeToManaged(ptr, sqlvar, true);
@@ -126,7 +126,7 @@ internal static class XsqldaMarshaler
 		for (var i = 0; i < xsqlvar.Length; i++)
 		{
 			var offset = ComputeLength(i);
-			Marshal.StructureToPtr(xsqlvar[i], GetIntPtr(ptr, offset), true);
+			Marshal.StructureToPtr(xsqlvar[i], IntPtr.Add(ptr, offset), true);
 		}
 
 		return ptr;
@@ -146,7 +146,7 @@ internal static class XsqldaMarshaler
 		var xsqlvar = new XSQLVAR();
 		for (var i = 0; i < xsqlda.sqln; i++)
 		{
-			var ptr = GetIntPtr(pNativeData, ComputeLength(i));
+			var ptr = IntPtr.Add(pNativeData, ComputeLength(i));
 			MarshalXSQLVARNativeToManaged(ptr, xsqlvar);
 
 			descriptor[i].DataType = xsqlvar.sqltype;
@@ -199,11 +199,6 @@ internal static class XsqldaMarshaler
 		}
 	}
 
-	private static IntPtr GetIntPtr(IntPtr ptr, int offset)
-	{
-		return new IntPtr(ptr.ToInt64() + offset);
-	}
-
 	private static int ComputeLength(int n)
 	{
 		var length = (SizeOfXSQLDA + n * SizeOfXSQLVAR);
@@ -227,7 +222,7 @@ internal static class XsqldaMarshaler
 			case IscCodes.SQL_VARYING:
 				{
 					var buffer = new byte[Marshal.ReadInt16(xsqlvar.sqldata)];
-					var tmp = GetIntPtr(xsqlvar.sqldata, 2);
+					var tmp = IntPtr.Add(xsqlvar.sqldata, 2);
 					Marshal.Copy(tmp, buffer, 0, buffer.Length);
 					return buffer;
 				}
