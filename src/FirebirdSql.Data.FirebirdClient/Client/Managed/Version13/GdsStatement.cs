@@ -131,7 +131,7 @@ internal class GdsStatement : Version12.GdsStatement
 		}
 	}
 
-	protected override object[] ReadRowObjectValues()
+	protected override object[] ReadRow()		
 	{
 		var row = new object[_fields.Count];
 		try
@@ -144,7 +144,7 @@ internal class GdsStatement : Version12.GdsStatement
 				{
 					if (nullBits.Get(i))
 					{
-						row[i] = DBNull.Value;
+						row[i] = null;
 					}
 					else
 					{
@@ -159,65 +159,8 @@ internal class GdsStatement : Version12.GdsStatement
 		}
 		return row;
 	}
-	protected override DbValue[] ReadRow()
-	{
-		var row = new DbValue[_fields.Count];
-		try
-		{
-			if (_fields.Count > 0)
-			{
-				var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
-				var nullBits = new BitArray(nullBytes);
-				for (var i = 0; i < _fields.Count; i++)
-				{
-					if (nullBits.Get(i))
-					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						var value = ReadRawValue(_database.Xdr, _fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-				}
-			}
-		}
-		catch (IOException ex)
-		{
-			throw IscException.ForIOException(ex);
-		}
-		return row;
-	}
-	protected override async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
-	{
-		var row = new DbValue[_fields.Count];
-		try
-		{
-			if (_fields.Count > 0)
-			{
-				var nullBytes = await _database.Xdr.ReadOpaqueAsync((int)Math.Ceiling(_fields.Count / 8d), cancellationToken).ConfigureAwait(false);
-				var nullBits = new BitArray(nullBytes);
-				for (var i = 0; i < _fields.Count; i++)
-				{
-					if (nullBits.Get(i))
-					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-				}
-			}
-		}
-		catch (IOException ex)
-		{
-			throw IscException.ForIOException(ex);
-		}
-		return row;
-	}
-	protected override async ValueTask<object[]> ReadRowObjectValuesAsync(CancellationToken cancellationToken = default)
+
+	protected override async ValueTask<object[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
 		var row = new object[_fields.Count];
 		try
@@ -230,7 +173,7 @@ internal class GdsStatement : Version12.GdsStatement
 				{
 					if (nullBits.Get(i))
 					{
-						row[i] = DBNull.Value;
+						row[i] = null;
 					}
 					else
 					{
