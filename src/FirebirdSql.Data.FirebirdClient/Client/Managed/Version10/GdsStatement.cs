@@ -111,7 +111,8 @@ internal class GdsStatement : StatementBase
 	{
 		_handle = IscCodes.INVALID_OBJECT;
 		_fetchSize = 200;
-		_rows = new Queue<object[]>();
+		//_rows = new Queue<DbValue[]>();
+		_rows = new Queue<object[]>();				// optimized
 		OutputParameters = new Queue<DbValue[]>();
 
 		_database = database;
@@ -376,10 +377,20 @@ internal class GdsStatement : StatementBase
 		}
 	}
 
+	protected DbValue[] _dbValues;				// optimized
+	protected void CreateDbValues()
+	{
+		_dbValues = new DbValue[_fields.Count];
+		for (int i = 0; i < _fields.Count; i++)
+		{
+			_dbValues[i] = new DbValue(this, _fields[i], null);
+		}
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	protected DbValue[] GetDbValues(object[] values)
 	{
-		for (int i = 0; i < _fields.Count; ++i)
+		for (int i=0; i < _fields.Count; ++i)
 		{
 			_dbValues[i].SetValue(values[i]);
 		}
@@ -423,15 +434,13 @@ internal class GdsStatement : StatementBase
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
-						var response = hasOperation
+						if ((hasOperation
 							? _database.ReadResponse(operation)
-							: _database.ReadResponse();
-						hasOperation = false;
-						if (response is FetchResponse fetchResponse)
+							: _database.ReadResponse()) is FetchResponse fetchResponse)
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
-								_rows.Enqueue(ReadRowObjectValues());
+								_rows.Enqueue(ReadRow());
 							}
 							else if (fetchResponse.Status == 100)
 							{
@@ -446,6 +455,7 @@ internal class GdsStatement : StatementBase
 						{
 							break;
 						}
+						hasOperation = false;
 					}
 				}
 				else
@@ -469,18 +479,6 @@ internal class GdsStatement : StatementBase
 			return null;
 		}
 	}
-
-	protected DbValue[] _dbValues;
-	protected void CreateDbValues()
-	{
-		_dbValues = new DbValue[_fields.Count];
-		for (int i = 0; i < _fields.Count; i++)
-		{
-			_dbValues[i] = new DbValue(this, _fields[i], null);
-		}
-	}
-
-
 	public override async ValueTask<DbValue[]> FetchAsync(CancellationToken cancellationToken = default)
 	{
 		EnsureNotDeallocated();
@@ -514,19 +512,16 @@ internal class GdsStatement : StatementBase
 				if (operation == IscCodes.op_fetch_response)
 				{
 					CreateDbValues();
-
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
-						var response = hasOperation
+						if ((hasOperation
 							? await _database.ReadResponseAsync(operation, cancellationToken).ConfigureAwait(false)
-							: await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-						hasOperation = false;
-						if (response is FetchResponse fetchResponse)
+							: await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false)) is FetchResponse fetchResponse)
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
-								_rows.Enqueue(await ReadRowObjectValuesAsync(cancellationToken).ConfigureAwait(false));
+								_rows.Enqueue(await ReadRowAsync(cancellationToken).ConfigureAwait(false));
 							}
 							else if (fetchResponse.Status == 100)
 							{
@@ -541,6 +536,7 @@ internal class GdsStatement : StatementBase
 						{
 							break;
 						}
+						hasOperation = false;
 					}
 				}
 				else
@@ -877,7 +873,8 @@ internal class GdsStatement : StatementBase
 		{
 			if (response.Count > 0)
 			{
-				OutputParameters.Enqueue(ReadRow());
+				CreateDbValues();
+				OutputParameters.Enqueue(GetDbValues(ReadRow()));
 			}
 		}
 		catch (IOException ex)
@@ -891,7 +888,8 @@ internal class GdsStatement : StatementBase
 		{
 			if (response.Count > 0)
 			{
-				OutputParameters.Enqueue(await ReadRowAsync(cancellationToken).ConfigureAwait(false));
+				CreateDbValues();
+				OutputParameters.Enqueue(GetDbValues(await ReadRowAsync(cancellationToken).ConfigureAwait(false)));
 			}
 		}
 		catch (IOException ex)
@@ -1762,7 +1760,7 @@ internal class GdsStatement : StatementBase
 		_fields = null;
 	}
 
-	protected virtual object[] ReadRowObjectValues()        // Optimized
+	protected virtual object[] ReadRow()		
 	{
 		var row = new object[_fields.Count];
 		try
@@ -1773,7 +1771,7 @@ internal class GdsStatement : StatementBase
 				var sqlInd = _database.Xdr.ReadInt32();
 				if (sqlInd == -1)
 				{
-					row[i] = DBNull.Value;
+					row[i] = null;
 				}
 				else if (sqlInd == 0)
 				{
@@ -1792,36 +1790,8 @@ internal class GdsStatement : StatementBase
 		return row;
 	}
 
-	protected virtual DbValue[] ReadRow()
-	{
-		var row = new DbValue[_fields.Count];
-		try
-		{
-			for (var i = 0; i < _fields.Count; i++)
-			{
-				var value = ReadRawValue(_database.Xdr, _fields[i]);
-				var sqlInd = _database.Xdr.ReadInt32();
-				if (sqlInd == -1)
-				{
-					row[i] = new DbValue(this, _fields[i], null);
-				}
-				else if (sqlInd == 0)
-				{
-					row[i] = new DbValue(this, _fields[i], value);
-				}
-				else
-				{
-					throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
-				}
-			}
-		}
-		catch (IOException ex)
-		{
-			throw IscException.ForIOException(ex);
-		}
-		return row;
-	}
-	protected virtual async ValueTask<object[]> ReadRowObjectValuesAsync(CancellationToken cancellationToken = default)
+
+	protected virtual async ValueTask<object[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
 		var row = new object[_fields.Count];
 		try
@@ -1832,41 +1802,11 @@ internal class GdsStatement : StatementBase
 				var sqlInd = await _database.Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
 				if (sqlInd == -1)
 				{
-					row[i] = DBNull.Value;
+					row[i] = null;
 				}
 				else if (sqlInd == 0)
 				{
 					row[i] = value;
-				}
-				else
-				{
-					throw IscException.ForStrParam($"Invalid {nameof(sqlInd)} value: {sqlInd}.");
-				}
-			}
-		}
-		catch (IOException ex)
-		{
-			throw IscException.ForIOException(ex);
-		}
-		return row;
-	}
-
-	protected virtual async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
-	{
-		var row = new DbValue[_fields.Count];
-		try
-		{
-			for (var i = 0; i < _fields.Count; i++)
-			{
-				var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
-				var sqlInd = await _database.Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
-				if (sqlInd == -1)
-				{
-					row[i] = new DbValue(this, _fields[i], null);
-				}
-				else if (sqlInd == 0)
-				{
-					row[i] = new DbValue(this, _fields[i], value);
 				}
 				else
 				{
