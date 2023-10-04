@@ -18,7 +18,6 @@
 using System;
 using System.Diagnostics;
 using FirebirdSql.Data.Types;
-using static FirebirdSql.Data.Common.BitHelpers;
 
 namespace FirebirdSql.Data.Common;
 
@@ -107,7 +106,7 @@ class DecimalCodec
 		_decimalFormat.ValidateByteLength(decBytes);
 
 		var firstByte = decBytes[0] & 0xff;
-		var signum = -1 * UnsignedRightShift(firstByte, 7) | 1;
+		var signum = -1 * (firstByte >>> 7) | 1;
 		var decimalType = DecimalTypeFromFirstByte(firstByte);
 		switch (decimalType)
 		{
@@ -124,13 +123,13 @@ class DecimalCodec
 					int firstDigit;
 					if ((firstByte & Combination2) != Combination2)
 					{
-						exponentMSB = UnsignedRightShift(firstByte, 3) & 0b01100 | (firstByte & 0b011);
-						firstDigit = UnsignedRightShift(firstByte, 2) & 0b0111;
+						exponentMSB = (firstByte >>> 3) & 0b01100 | (firstByte & 0b011);
+						firstDigit = (firstByte >>> 2) & 0b0111;
 					}
 					else
 					{
-						exponentMSB = UnsignedRightShift(firstByte, 1) & 0b01100 | (firstByte & 0b011);
-						firstDigit = 0b01000 | (UnsignedRightShift(firstByte, 2) & 0b01);
+						exponentMSB = (firstByte >>> 1) & 0b01100 | (firstByte & 0b011);
+						firstDigit = 0b01000 | ((firstByte >>> 2) & 0b01);
 					}
 					var exponentBitsRemaining = _decimalFormat.ExponentContinuationBits - 2;
 					Debug.Assert(exponentBitsRemaining == _decimalFormat.FormatBitLength - 8 - _decimalFormat.CoefficientContinuationBits, $"Unexpected exponent remaining length {exponentBitsRemaining}.");
@@ -175,8 +174,8 @@ class DecimalCodec
 		var biasedExponent = _decimalFormat.BiasedExponent(@decimal.Exponent);
 		var coefficient = @decimal.Coefficient;
 		var mostSignificantDigit = _coefficientCoder.EncodeValue(coefficient, decBytes);
-		var expMSB = UnsignedRightShift(biasedExponent, _decimalFormat.ExponentContinuationBits);
-		var expTwoBitCont = UnsignedRightShift(biasedExponent, _decimalFormat.ExponentContinuationBits - 2) & 0b011;
+		var expMSB = biasedExponent >>> _decimalFormat.ExponentContinuationBits;
+		var expTwoBitCont = (biasedExponent >>> _decimalFormat.ExponentContinuationBits - 2) & 0b011;
 		if (mostSignificantDigit <= 7)
 		{
 			decBytes[0] |= (byte)((expMSB << 5)
@@ -198,7 +197,7 @@ class DecimalCodec
 		var expByteIndex = 1;
 		while (expBitsRemaining > 8)
 		{
-			decBytes[expByteIndex++] = (byte)UnsignedRightShift(expAndBias, expBitsRemaining - 8);
+			decBytes[expByteIndex++] = (byte)(expAndBias >>> expBitsRemaining - 8);
 			expBitsRemaining -= 8;
 		}
 		if (expBitsRemaining > 0)
@@ -219,7 +218,8 @@ class DecimalCodec
 		}
 		if (exponentBitsRemaining > 0)
 		{
-			exponent = (exponent << exponentBitsRemaining) | (UnsignedRightShift(decBytes[byteIndex] & 0xFF, 8 - exponentBitsRemaining));
+			exponent = (exponent << exponentBitsRemaining)
+				| ((decBytes[byteIndex] & 0xFF) >>> (8 - exponentBitsRemaining));
 		}
 		return exponent;
 	}

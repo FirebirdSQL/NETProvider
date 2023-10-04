@@ -18,7 +18,6 @@
 using System;
 using System.Diagnostics;
 using System.Numerics;
-using static FirebirdSql.Data.Common.BitHelpers;
 
 namespace FirebirdSql.Data.Common;
 
@@ -309,7 +308,7 @@ class DenselyPackedDecimalCodec
 			var firstByteIndex = lsbIndex - digitBitsFromEnd / BitPerByte;
 
 			var dpdGroupBits = 0x3FF & (
-					UnsignedRightShift((decBytes[firstByteIndex] & 0xFF), firstByteBitOffset)
+					(decBytes[firstByteIndex] & 0xFF) >>> firstByteBitOffset
 							| decBytes[firstByteIndex - 1] << BitPerByte - firstByteBitOffset);
 
 			if (dpdGroupBits != 0)
@@ -343,7 +342,7 @@ class DenselyPackedDecimalCodec
 			decBytes[firstByteIndex] =
 					(byte)(decBytes[firstByteIndex] | (currentGroup << firstByteBitOffset));
 			decBytes[firstByteIndex - 1] =
-					(byte)(decBytes[firstByteIndex - 1] | UnsignedRightShift(currentGroup, BitPerByte - firstByteBitOffset));
+					(byte)(decBytes[firstByteIndex - 1] | (currentGroup >>> BitPerByte - firstByteBitOffset));
 		}
 		var mostSignificantDigit = (int)remainingValue;
 		Debug.Assert(0 <= mostSignificantDigit && mostSignificantDigit <= 9, $"{nameof(mostSignificantDigit)} out of range, was {mostSignificantDigit}.");
