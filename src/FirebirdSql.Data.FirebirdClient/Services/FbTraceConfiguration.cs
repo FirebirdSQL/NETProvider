@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -36,7 +37,7 @@ public abstract class FbTraceConfiguration
 
 	protected static string WriteNumber(int i)
 	{
-		return i.ToString();
+		return i.ToString(CultureInfo.InvariantCulture);
 	}
 
 	protected static string WriteRegEx(string re)
