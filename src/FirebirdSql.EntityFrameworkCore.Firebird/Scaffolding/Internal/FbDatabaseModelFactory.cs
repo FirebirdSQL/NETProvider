@@ -311,6 +311,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		@"SELECT
                trim(I.rdb$index_name) as INDEX_NAME,
                COALESCE(I.rdb$unique_flag, 0) as IS_UNIQUE,
+               Coalesce(I.rdb$index_type, 0) = 1 as IS_DESC,
                list(trim(sg.RDB$FIELD_NAME)) as COLUMNS
               FROM
                RDB$INDICES i
@@ -319,7 +320,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
               WHERE
                trim(i.rdb$relation_name) = '{0}'
               GROUP BY
-               INDEX_NAME, IS_UNIQUE ;";
+               INDEX_NAME, IS_UNIQUE, IS_DESC ;";
 
 	/// <remarks>
 	/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
@@ -343,9 +344,16 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 							IsUnique = reader.GetBoolean(1),
 						};
 
-						foreach (var column in reader.GetString(2).Split(','))
+						foreach (var column in reader.GetString(3).Split(','))
 						{
 							index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
+						}
+
+						if (reader.GetBoolean(2))
+						{
+							var isDescending = new bool[index.Columns.Count];
+							isDescending.AsSpan().Fill(true);
+							index.IsDescending = isDescending;
 						}
 
 						table.Indexes.Add(index);

@@ -201,6 +201,19 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 		{
 			builder.Append("UNIQUE ");
 		}
+
+		if (operation.IsDescending is not null && operation.IsDescending.Length > 0)
+		{
+			var isDescending = operation.IsDescending[0];
+			if (operation.IsDescending.Any(x => x != isDescending))
+				throw new NotSupportedException("Mixed order indices are not supported by Firebird.");
+
+			if (isDescending)
+			{
+				builder.Append("DESC ");
+			}
+		}
+
 		IndexTraits(operation, model, builder);
 		builder.Append("INDEX ");
 		builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
