@@ -44,7 +44,7 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 
 	public new virtual IFbValueGeneratorCache Cache => (IFbValueGeneratorCache)base.Cache;
 
-	public override ValueGenerator Select(IProperty property, IEntityType entityType)
+	public override ValueGenerator Select(IProperty property, ITypeBase entityType)
 	{
 		if (property.GetValueGeneratorFactory() != null
 			|| property.GetValueGenerationStrategy() != FbValueGenerationStrategy.HiLo)
@@ -90,7 +90,7 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 				nameof(FbSequenceValueGeneratorFactory), property.Name, property.DeclaringEntityType.DisplayName()));
 	}
 
-	protected override ValueGenerator FindForType(IProperty property, IEntityType entityType, Type clrType)
+	protected override ValueGenerator FindForType(IProperty property, ITypeBase entityType, Type clrType)
 		=> property.ClrType.UnwrapNullableType() == typeof(Guid)
 			? property.ValueGenerated == ValueGenerated.Never || property.GetDefaultValueSql() != null
 				? new TemporaryGuidValueGenerator()

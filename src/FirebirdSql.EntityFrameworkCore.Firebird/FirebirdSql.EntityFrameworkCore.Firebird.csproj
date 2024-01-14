@@ -29,7 +29,7 @@
 		<None Include="..\..\firebird-logo.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
