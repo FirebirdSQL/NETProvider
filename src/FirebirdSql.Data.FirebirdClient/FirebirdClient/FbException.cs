@@ -24,7 +24,9 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
+#if !NET8_0_OR_GREATER
 [Serializable]
+#endif
 public sealed class FbException : DbException
 {
 	#region Fields
@@ -50,22 +52,26 @@ public sealed class FbException : DbException
 		: base(message, innerException)
 	{ }
 
+#if !NET8_0_OR_GREATER
 	private FbException(SerializationInfo info, StreamingContext context)
 		: base(info, context)
 	{
 		_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
 	}
+#endif
 
 	#endregion
 
 	#region Methods
 
+#if !NET8_0_OR_GREATER
 	public override void GetObjectData(SerializationInfo info, StreamingContext context)
 	{
 		base.GetObjectData(info, context);
 
 		info.AddValue("errors", _errors);
 	}
+#endif
 
 	#endregion
 

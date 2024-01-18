@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!-- Figure out a way to run it on net4.8 (FirebirdSql.Data.TestsBase uses IAsyncDisposable) -->
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -12,7 +11,8 @@
 		<OutputType>Exe</OutputType>
 		<StartupObject>FirebirdSql.Data.TestsBase.Program</StartupObject>
 	</PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net7.0'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+		<!-- left in repo as an example/documentation for .NET Framework -->
 		<None Remove="app.config" />
 	</ItemGroup>
 	<ItemGroup>

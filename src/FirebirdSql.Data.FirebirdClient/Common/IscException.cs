@@ -27,7 +27,6 @@ using System.IO;
 
 namespace FirebirdSql.Data.Common;
 
-[Serializable]
 internal sealed class IscException : Exception
 {
 	private string _message;
@@ -117,25 +116,11 @@ internal sealed class IscException : Exception
 		return ForErrorCodes(new[] { IscCodes.isc_net_write_err, IscCodes.isc_net_read_err }, exception);
 	}
 
-	private IscException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
-	{
-		Errors = (List<IscError>)info.GetValue(nameof(Errors), typeof(List<IscError>));
-		ErrorCode = info.GetInt32(nameof(ErrorCode));
-	}
-
 	public void BuildExceptionData()
 	{
 		BuildErrorCode();
 		BuildSqlState();
 		BuildExceptionMessage();
-	}
-
-	public override void GetObjectData(SerializationInfo info, StreamingContext context)
-	{
-		base.GetObjectData(info, context);
-		info.AddValue(nameof(Errors), Errors);
-		info.AddValue(nameof(ErrorCode), ErrorCode);
 	}
 
 	private void BuildErrorCode()

@@ -28,6 +28,7 @@ public abstract class EntityFrameworkTestsBase : FbTestsBase
 	static EntityFrameworkTestsBase()
 	{
 #if !NETFRAMEWORK
+		// example/documentation for .NET Framework
 		System.Data.Common.DbProviderFactories.RegisterFactory(FbProviderServices.ProviderInvariantName, FirebirdClientFactory.Instance);
 #endif
 		DbConfiguration.SetConfiguration(new FbTestDbContext.Conf());

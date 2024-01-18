@@ -7,5 +7,5 @@ function Check-ExitCode() {
 }
 
 function Get-UsedTargetFramework() {
-	return 'net7.0'
+	return 'net8.0'
 }
