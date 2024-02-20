@@ -27,6 +27,7 @@ using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
+
 public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDisposable
 #if !(NET48 || NETSTANDARD2_0)
 		, IAsyncDisposable
