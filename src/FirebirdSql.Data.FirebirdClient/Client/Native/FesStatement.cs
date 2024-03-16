@@ -372,7 +372,7 @@ internal sealed class FesStatement : StatementBase
 
 		ClearStatusVector();
 		NativeHelpers.CallIfExists(
-			"set_timeout",
+			nameof(IFbClient.fb_dsql_set_timeout),
 			() =>
 			{
 				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint) timeout);
@@ -444,7 +444,7 @@ internal sealed class FesStatement : StatementBase
 
 		ClearStatusVector();
 		NativeHelpers.CallIfExists(
-			"set_timeout",
+			nameof(IFbClient.fb_dsql_set_timeout),
 			() =>
 			{
 				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint) timeout);

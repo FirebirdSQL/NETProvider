@@ -22,7 +22,7 @@ namespace FirebirdSql.Data.Common;
 
 internal static class NativeHelpers
 {
-	private static readonly ConcurrentDictionary<string, bool> _cache = new ConcurrentDictionary<string, bool>();
+	private static readonly ConcurrentDictionary<string, bool> _cache = new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
 
 	public static void CallIfExists(
         string actionId,
