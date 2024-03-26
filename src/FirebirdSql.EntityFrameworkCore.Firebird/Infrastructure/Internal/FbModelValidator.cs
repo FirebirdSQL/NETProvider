@@ -32,7 +32,7 @@ public class FbModelValidator : RelationalModelValidator
 
 	protected override void ValidateValueGeneration(IEntityType entityType, IKey key, IDiagnosticsLogger<DbLoggerCategory.Model.Validation> logger)
 	{
-		if (entityType.GetTableName() != null && (string)entityType[RelationalAnnotationNames.MappingStrategy] == RelationalAnnotationNames.TpcMappingStrategy)
+		if (entityType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy && entityType.BaseType == null)
 		{
 			foreach (var storeGeneratedProperty in key.Properties.Where(p => (p.ValueGenerated & ValueGenerated.OnAdd) != 0 && p.GetValueGenerationStrategy() == FbValueGenerationStrategy.IdentityColumn))
 			{
