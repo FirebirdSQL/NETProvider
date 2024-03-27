@@ -188,6 +188,22 @@ end";
 	}
 
 	[Test]
+	public async Task NamedParametersPublicAccessor()
+	{
+		await using (var command = new FbCommand("select * from test where int_field >= @x1 and int_field <= @x2", Connection))
+		{
+			Assert.IsNotNull(command.NamedParameters, "Unexpected null reference.");
+			Assert.IsTrue(command.NamedParameters.Count == 0, "Expected count 0 of named parameters before command prepare.");
+
+			await command.PrepareAsync();
+
+			Assert.IsTrue(command.NamedParameters.Count == 2, "Expected count 2 of named parameters after command prepare.");
+			Assert.AreEqual(command.NamedParameters[0], "@x1");
+			Assert.AreEqual(command.NamedParameters[1], "@x2");
+		}
+	}
+
+	[Test]
 	public async Task ExecuteStoredProcTest()
 	{
 		await using (var command = new FbCommand("EXECUTE PROCEDURE GETVARCHARFIELD(?)", Connection))
