@@ -199,10 +199,10 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	}
 
 	/// <summary>
-	/// Gets collection of parameters parsed from the query text by <see cref="NamedParametersParser"/> during command prepare.
+	/// Gets collection of parameters parsed from the query text during command prepare.
 	/// </summary>
-	[Category("Data")]
-	[DefaultValue(new string[] { })]
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 	public IReadOnlyList<string> NamedParameters
 	{
 		get { return _namedParameters; }
