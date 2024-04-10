@@ -192,6 +192,16 @@ public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDis
 		}
 	}
 
+	/// <summary>
+	/// Gets collection of parameters parsed from the query text during command prepare.
+	/// </summary>
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public IReadOnlyList<string> NamedParameters
+	{
+		get { return _namedParameters; }
+	}
+
 	#endregion
 
 	#region Internal Properties
