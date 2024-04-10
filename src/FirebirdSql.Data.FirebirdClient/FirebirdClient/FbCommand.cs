@@ -198,6 +198,16 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		}
 	}
 
+	/// <summary>
+	/// Gets collection of parameters parsed from the query text during command prepare.
+	/// </summary>
+	[Browsable(false)]
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public IReadOnlyList<string> NamedParameters
+	{
+		get { return _namedParameters; }
+	}
+
 	#endregion
 
 	#region Protected DbCommand Properties
