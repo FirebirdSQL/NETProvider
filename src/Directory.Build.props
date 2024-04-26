@@ -20,6 +20,9 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 	</PropertyGroup>
+	<PropertyGroup>
+		<CopyrightEndYear>2024</CopyrightEndYear>
+	</PropertyGroup>
 
 	<!-- SourceLink -->
 	<PropertyGroup Condition="'$(SkipSourceLink)'!='true'">

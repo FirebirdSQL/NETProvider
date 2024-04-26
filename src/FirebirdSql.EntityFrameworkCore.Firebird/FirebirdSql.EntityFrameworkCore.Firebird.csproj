@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<AssemblyTitle>NETProvider - Entity Framework Core Provider</AssemblyTitle>
-		<Copyright>(c) 2017-2023</Copyright>
+		<Copyright>(c) 2017-$(CopyrightEndYear)</Copyright>
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>FirebirdSql.EntityFrameworkCore.Firebird</PackageId>
