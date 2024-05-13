@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Linq;
+using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,13 @@ public class FunkyDataQueryFbTest : FunkyDataQueryTestBase<FunkyDataQueryFbTest.
 	public FunkyDataQueryFbTest(FunkyDataQueryFbFixture fixture)
 		: base(fixture)
 	{ }
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task String_contains_on_argument_with_wildcard_column(bool async)
+	{
+		return base.String_contains_on_argument_with_wildcard_column(async);
+	}
 
 	public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase
 	{

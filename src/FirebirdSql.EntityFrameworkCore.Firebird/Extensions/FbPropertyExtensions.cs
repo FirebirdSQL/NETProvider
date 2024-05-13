@@ -41,7 +41,7 @@ public static class FbPropertyExtensions
 			return FbValueGenerationStrategy.None;
 		}
 
-		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+		var modelStrategy = property.DeclaringType.Model.GetValueGenerationStrategy();
 
 		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
 		{
@@ -49,7 +49,7 @@ public static class FbPropertyExtensions
 		}
 		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn)
 		{
-			if (property.DeclaringEntityType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
+			if (property.DeclaringType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
 			{
 				return FbValueGenerationStrategy.SequenceTrigger;
 			}
@@ -83,7 +83,7 @@ public static class FbPropertyExtensions
 			return FbValueGenerationStrategy.None;
 		}
 
-		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+		var modelStrategy = property.DeclaringType.Model.GetValueGenerationStrategy();
 
 		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
 		{
@@ -91,7 +91,7 @@ public static class FbPropertyExtensions
 		}
 		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn)
 		{
-			if (property.DeclaringEntityType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
+			if (property.DeclaringType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
 			{
 				return FbValueGenerationStrategy.SequenceTrigger;
 			}
@@ -125,7 +125,7 @@ public static class FbPropertyExtensions
 			return FbValueGenerationStrategy.None;
 		}
 
-		var modelStrategy = property.DeclaringEntityType.Model.GetValueGenerationStrategy();
+		var modelStrategy = property.DeclaringType.Model.GetValueGenerationStrategy();
 
 		if (modelStrategy == FbValueGenerationStrategy.SequenceTrigger && IsCompatibleSequenceTrigger(property))
 		{
@@ -133,7 +133,7 @@ public static class FbPropertyExtensions
 		}
 		if (modelStrategy == FbValueGenerationStrategy.IdentityColumn)
 		{
-			if (property.DeclaringEntityType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
+			if (property.DeclaringType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy)
 			{
 				return FbValueGenerationStrategy.SequenceTrigger;
 			}
@@ -231,7 +231,7 @@ public static class FbPropertyExtensions
 
 	public static IReadOnlySequence FindHiLoSequence(this IReadOnlyProperty property)
 	{
-		var model = property.DeclaringEntityType.Model;
+		var model = property.DeclaringType.Model;
 
 		var sequenceName = property.GetHiLoSequenceName()
 			?? model.GetHiLoSequenceName();
@@ -244,7 +244,7 @@ public static class FbPropertyExtensions
 
 	public static IReadOnlySequence FindHiLoSequence(this IReadOnlyProperty property, in StoreObjectIdentifier storeObject)
 	{
-		var model = property.DeclaringEntityType.Model;
+		var model = property.DeclaringType.Model;
 
 		var sequenceName = property.GetHiLoSequenceName(storeObject)
 			?? model.GetHiLoSequenceName();
@@ -329,7 +329,7 @@ public static class FbPropertyExtensions
 
 	public static IReadOnlySequence FindSequence(this IReadOnlyProperty property)
 	{
-		var model = property.DeclaringEntityType.Model;
+		var model = property.DeclaringType.Model;
 
 		var sequenceName = property.GetSequenceName()
 			?? model.GetSequenceNameSuffix();
@@ -342,7 +342,7 @@ public static class FbPropertyExtensions
 
 	public static IReadOnlySequence FindSequence(this IReadOnlyProperty property, in StoreObjectIdentifier storeObject)
 	{
-		var model = property.DeclaringEntityType.Model;
+		var model = property.DeclaringType.Model;
 
 		var sequenceName = property.GetSequenceName(storeObject)
 			?? model.GetSequenceNameSuffix();

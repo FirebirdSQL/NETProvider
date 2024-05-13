@@ -176,18 +176,6 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		base.QF_CrossJoin_Parameter();
 	}
 
-	[Fact(Skip = "efcore#24228")]
-	public override void Nullable_navigation_property_access_preserves_schema_for_sql_function()
-	{
-		base.Nullable_navigation_property_access_preserves_schema_for_sql_function();
-	}
-
-	[Fact(Skip = "efcore#24228")]
-	public override void Compare_function_without_null_propagation_to_null()
-	{
-		base.Compare_function_without_null_propagation_to_null();
-	}
-
 	protected class FbUDFSqlContext : UDFSqlContext
 	{
 		public FbUDFSqlContext(DbContextOptions options)
@@ -317,6 +305,47 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                             end
                                                         end
                                                         return true;
+                                                    end");
+
+			context.Database.ExecuteSqlRaw(
+				@"create procedure ""GetTopTwoSellingProducts""
+                                                    returns
+                                                    (
+                                                        ""ProductId"" int not null,
+                                                        ""AmountSold"" int
+                                                    )
+                                                    as
+                                                    begin
+                                                        for select first 2 ""ProductId"", sum(""Quantity"") as ""TotalSold""
+                                                        from ""LineItem""
+                                                        group by ""ProductId""
+                                                        order by ""TotalSold"" desc
+                                                        into :""ProductId"", :""AmountSold"" do
+                                                        begin
+                                                            suspend;
+                                                        end
+                                                    end");
+
+			context.Database.ExecuteSqlRaw(
+				@"create procedure ""GetOrdersWithMultipleProducts""(customerId int)
+                                                    returns
+                                                    (
+                                                        ""OrderId"" int not null,
+                                                        ""CustomerId"" int not null,
+                                                        ""OrderDate"" timestamp
+                                                    )
+                                                    as
+                                                    begin
+                                                        for select o.""Id"", :customerId, ""OrderDate""
+                                                        from ""Orders"" o
+                                                        join ""LineItem"" li on o.""Id"" = li.""OrderId""
+                                                        where o.""CustomerId"" = :customerId
+                                                        group by o.""Id"", ""OrderDate""
+                                                        having count(""ProductId"") > 1
+                                                        into :""OrderId"", :""CustomerId"", :""OrderDate"" do
+                                                        begin
+                                                            suspend;
+                                                        end
                                                     end");
 
 			context.SaveChanges();

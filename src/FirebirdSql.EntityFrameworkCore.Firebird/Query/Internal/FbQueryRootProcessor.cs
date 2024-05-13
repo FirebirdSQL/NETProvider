@@ -15,21 +15,19 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 
-public class InheritanceQueryFbFixture : InheritanceQueryRelationalFixture
+public class FbQueryRootProcessor : RelationalQueryRootProcessor
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	public FbQueryRootProcessor(QueryTranslationPreprocessorDependencies dependencies, RelationalQueryTranslationPreprocessorDependencies relationalDependencies, QueryCompilationContext queryCompilationContext)
+		: base(dependencies, relationalDependencies, queryCompilationContext)
+	{ }
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	protected override bool ShouldConvertToParameterQueryRoot(ParameterExpression constantExpression)
 	{
-		base.OnModelCreating(modelBuilder, context);
-		modelBuilder.Entity<AnimalQuery>().ToSqlQuery(@"SELECT * FROM ""Animals""");
+		return false;
 	}
 }

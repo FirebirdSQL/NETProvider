@@ -1,11 +1,10 @@
 <Project>
+	<Import Project="Versions.props" />
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup>
-		<VersionPrefix>10.0.0</VersionPrefix>
-		<VersionSuffix></VersionSuffix>
 		<Company>FirebirdSQL</Company>
 		<Product>NETProvider</Product>
 		<Authors>FirebirdSQL</Authors>

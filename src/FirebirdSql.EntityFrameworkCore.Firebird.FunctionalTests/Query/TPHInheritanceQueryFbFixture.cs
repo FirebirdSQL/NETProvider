@@ -15,13 +15,21 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Xunit.Abstractions;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class TPCInheritanceQueryFbTest : TPCInheritanceQueryFbTestBase<TPCInheritanceQueryFbFixture>
+public class TPHInheritanceQueryFbFixture : TPHInheritanceQueryFixture
 {
-    public TPCInheritanceQueryFbTest(TPCInheritanceQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
-        : base(fixture, testOutputHelper)
-    { }
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+	{
+		base.OnModelCreating(modelBuilder, context);
+		modelBuilder.Entity<AnimalQuery>().ToSqlQuery(@"SELECT * FROM ""Animals""");
+	}
 }

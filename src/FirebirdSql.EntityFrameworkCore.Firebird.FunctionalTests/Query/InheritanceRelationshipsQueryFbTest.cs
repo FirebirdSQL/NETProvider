@@ -17,12 +17,15 @@
 
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class InheritanceRelationshipsQueryFbTest : InheritanceRelationshipsQueryTestBase<InheritanceRelationshipsQueryFbFixture>
+public class InheritanceRelationshipsQueryFbTest : InheritanceRelationshipsQueryTestBase<InheritanceRelationshipsQueryFbTest.InheritanceRelationshipsQueryFbFixture>
 {
 	public InheritanceRelationshipsQueryFbTest(InheritanceRelationshipsQueryFbFixture fixture)
 		: base(fixture)
@@ -360,5 +363,17 @@ public class InheritanceRelationshipsQueryFbTest : InheritanceRelationshipsQuery
 	public override Task Include_on_derived_type_with_queryable_Cast(bool async)
 	{
 		return base.Include_on_derived_type_with_queryable_Cast(async);
+	}
+
+	public class InheritanceRelationshipsQueryFbFixture : InheritanceRelationshipsQueryRelationalFixture
+	{
+		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+		{
+			base.OnModelCreating(modelBuilder, context);
+			ModelHelpers.SetPrimaryKeyGeneration(modelBuilder);
+			ModelHelpers.SimpleTableNames(modelBuilder);
+		}
 	}
 }

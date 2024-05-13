@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.GearsOfWarModel;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
@@ -30,6 +29,31 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 	public TPCGearsOfWarQueryFbTest(TPCGearsOfWarQueryFbFixture fixture)
 		: base(fixture)
 	{ }
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task ToString_boolean_property_non_nullable(bool async)
+	{
+		return AssertQuery(
+			async,
+			ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+	}
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task ToString_boolean_property_nullable(bool async)
+	{
+		return AssertQuery(
+			async,
+			ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+	}
+
+	[Theory(Skip = "Different implicit ordering on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Group_by_on_StartsWith_with_null_parameter_as_argument(bool async)
+	{
+		return base.Group_by_on_StartsWith_with_null_parameter_as_argument(async);
+	}
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
@@ -218,6 +242,13 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 	public override Task Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion_negated(bool async)
 	{
 		return base.Subquery_projecting_nullable_scalar_contains_nullable_value_needs_null_expansion_negated(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Subquery_inside_Take_argument(bool async)
+	{
+		return base.Subquery_inside_Take_argument(async);
 	}
 
 	[NotSupportedByProviderTheory]
@@ -416,20 +447,18 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 		return base.Where_TimeOnly_subtract_TimeOnly(async);
 	}
 
-	[Theory]
+	[NotSupportedByProviderTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task ToString_boolean_property_nullable(bool async)
+	public override Task DateTimeOffset_to_unix_time_milliseconds(bool async)
 	{
-		return AssertQuery(async, (ISetSource ss) => from lh in ss.Set<LocustHorde>()
-													 select ((object)lh.Eradicated).ToString(), null, elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.InvariantCultureIgnoreCase)); }, assertOrder: false, 0, "ToString_boolean_property_nullable");
+		return base.DateTimeOffset_to_unix_time_milliseconds(async);
 	}
 
-	[Theory]
+	[NotSupportedByProviderTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task ToString_boolean_property_non_nullable(bool async)
+	public override Task DateTimeOffset_to_unix_time_seconds(bool async)
 	{
-		return AssertQuery(async, (ISetSource ss) => from w in ss.Set<Weapon>()
-													 select w.IsAutomatic.ToString(), null, elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.InvariantCultureIgnoreCase)); }, assertOrder: false, 0, "ToString_boolean_property_non_nullable");
+		return base.DateTimeOffset_to_unix_time_seconds(async);
 	}
 
 	[Theory(Skip = "Different implicit ordering on Firebird.")]

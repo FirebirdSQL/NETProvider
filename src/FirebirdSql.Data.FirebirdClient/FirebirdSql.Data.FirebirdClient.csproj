@@ -10,6 +10,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<PropertyGroup>
+		<Version>$(ProviderVersion)</Version>
 		<AssemblyTitle>NETProvider - ADO.NET Data Provider</AssemblyTitle>
 		<Copyright>(c) 2002-$(CopyrightEndYear)</Copyright>
 	</PropertyGroup>

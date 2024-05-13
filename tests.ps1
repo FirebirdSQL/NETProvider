@@ -29,8 +29,9 @@ $FirebirdConfiguration = @{
 	}
 }
 
+$frameworkVersion = 'net8.0'
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
-$testsProviderDir = "$testsBaseDir\bin\$Configuration\$(Get-UsedTargetFramework)"
+$testsProviderDir = "$testsBaseDir\bin\$Configuration\$frameworkVersion"
 
 $firebirdProcess = $null
 
@@ -131,7 +132,7 @@ function Tests-FirebirdClient($serverType, $compression, $wireCrypt) {
 }
 
 function Tests-EF6() {
-	pushd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
+	pushd "$baseDir\src\EntityFramework.Firebird.Tests\bin\$Configuration\$frameworkVersion"
 	try {
 		.\EntityFramework.Firebird.Tests.exe --labels=All
 		Check-ExitCode
@@ -142,7 +143,7 @@ function Tests-EF6() {
 }
 
 function Tests-EFCore() {
-	pushd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$(Get-UsedTargetFramework)"
+	pushd "$baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird.Tests\bin\$Configuration\$frameworkVersion"
 	try {
 		.\FirebirdSql.EntityFrameworkCore.Firebird.Tests.exe --labels=All
 		Check-ExitCode

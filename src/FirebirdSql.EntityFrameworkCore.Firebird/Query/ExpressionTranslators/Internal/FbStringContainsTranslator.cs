@@ -50,14 +50,15 @@ public class FbStringContainsTranslator : IMethodCallTranslator
 				new[] { true, true },
 				typeof(int)),
 			_fbSqlExpressionFactory.Constant(0));
-		return patternExpression is SqlConstantExpression sqlConstantExpression
+		var matchingExpression = patternExpression is SqlConstantExpression sqlConstantExpression
 			? ((string)sqlConstantExpression.Value)?.Length == 0
 				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
-				: positionExpression
+				: (SqlExpression)positionExpression
 			: _fbSqlExpressionFactory.OrElse(
 				positionExpression,
 				_fbSqlExpressionFactory.Equal(
 					_fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { patternExpression }, true, new[] { true }, typeof(int)),
 					_fbSqlExpressionFactory.Constant(0)));
+		return _fbSqlExpressionFactory.AndAlso(matchingExpression, _fbSqlExpressionFactory.AndAlso(_fbSqlExpressionFactory.IsNotNull(instance), _fbSqlExpressionFactory.IsNotNull(patternExpression)));
 	}
 }

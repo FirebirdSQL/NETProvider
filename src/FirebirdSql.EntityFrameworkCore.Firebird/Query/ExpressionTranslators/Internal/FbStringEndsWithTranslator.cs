@@ -57,14 +57,13 @@ class FbStringEndsWithTranslator : IMethodCallTranslator
 					new[] { true, true },
 					instance.Type)),
 			patternExpression);
-		return patternExpression is SqlConstantExpression sqlConstantExpression
-			? (string)sqlConstantExpression.Value == string.Empty
-				? (SqlExpression)_fbSqlExpressionFactory.Constant(true)
-				: endsWithExpression
-			: _fbSqlExpressionFactory.OrElse(
+		var matchingExpression = patternExpression is SqlConstantExpression sqlConstantExpression
+			? (SqlExpression)((string)sqlConstantExpression.Value == string.Empty ? (SqlExpression)_fbSqlExpressionFactory.Constant(true) : endsWithExpression)
+			: (SqlExpression)_fbSqlExpressionFactory.OrElse(
 				endsWithExpression,
 				_fbSqlExpressionFactory.Equal(
 					_fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { patternExpression }, true, new[] { true }, typeof(int)),
 					_fbSqlExpressionFactory.Constant(0)));
+		return _fbSqlExpressionFactory.AndAlso(matchingExpression, _fbSqlExpressionFactory.AndAlso(_fbSqlExpressionFactory.IsNotNull(instance), _fbSqlExpressionFactory.IsNotNull(patternExpression)));
 	}
 }

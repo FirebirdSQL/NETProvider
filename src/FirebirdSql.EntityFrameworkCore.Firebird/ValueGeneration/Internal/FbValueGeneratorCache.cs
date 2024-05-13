@@ -33,7 +33,7 @@ public class FbValueGeneratorCache : ValueGeneratorCache, IFbValueGeneratorCache
 
 	public virtual FbSequenceValueGeneratorState GetOrAddSequenceState(IProperty property, IRelationalConnection connection)
 	{
-		var tableIdentifier = StoreObjectIdentifier.Create(property.DeclaringEntityType, StoreObjectType.Table);
+		var tableIdentifier = StoreObjectIdentifier.Create(property.DeclaringType, StoreObjectType.Table);
 		var sequence = tableIdentifier != null
 			? property.FindHiLoSequence(tableIdentifier.Value)
 			: property.FindHiLoSequence();

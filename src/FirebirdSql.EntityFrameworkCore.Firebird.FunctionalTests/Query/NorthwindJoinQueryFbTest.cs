@@ -114,4 +114,11 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 	{
 		return base.Unflattened_GroupJoin_composed_2(async);
 	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Join_local_collection_int_closure_is_cached_correctly(bool async)
+	{
+		return base.Join_local_collection_int_closure_is_cached_correctly(async);
+	}
 }

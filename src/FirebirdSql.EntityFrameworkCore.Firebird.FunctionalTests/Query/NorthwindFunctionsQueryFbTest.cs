@@ -108,6 +108,34 @@ public class NorthwindFunctionsQueryFbTest : NorthwindFunctionsQueryRelationalTe
 		return base.TrimStart_with_char_array_argument_in_predicate(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_math_degrees(bool async)
+	{
+		return base.Where_math_degrees(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_math_radians(bool async)
+	{
+		return base.Where_mathf_radians(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_mathf_degrees(bool async)
+	{
+		return base.Where_math_degrees(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_mathf_radians(bool async)
+	{
+		return base.Where_mathf_radians(async);
+	}
+
 	[NotSupportedByProviderTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Regex_IsMatch_MethodCall(bool async)
@@ -267,19 +295,5 @@ public class NorthwindFunctionsQueryFbTest : NorthwindFunctionsQueryRelationalTe
 	public override Task Datetime_subtraction_TotalDays(bool async)
 	{
 		return base.Datetime_subtraction_TotalDays(async);
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task String_FirstOrDefault_MethodCall(bool async)
-	{
-		return base.String_FirstOrDefault_MethodCall(async);
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task String_LastOrDefault_MethodCall(bool async)
-	{
-		return base.String_LastOrDefault_MethodCall(async);
 	}
 }

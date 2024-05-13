@@ -65,14 +65,13 @@ public class FbStringStartsWithTranslator : IMethodCallTranslator
 					new[] { true, true },
 					instance.Type)),
 				patternExpression));
-		return patternConstantExpression != null
-			? (string)patternConstantExpression.Value == string.Empty
-				? _fbSqlExpressionFactory.Constant(true)
-				: startsWithExpression
-			: _fbSqlExpressionFactory.OrElse(
+		var matchingExpression = patternConstantExpression != null
+			? (SqlExpression)((string)patternConstantExpression.Value == string.Empty ? _fbSqlExpressionFactory.Constant(true) : startsWithExpression)
+			: (SqlExpression)_fbSqlExpressionFactory.OrElse(
 				startsWithExpression,
 				_fbSqlExpressionFactory.Equal(
 					_fbSqlExpressionFactory.Function("CHAR_LENGTH", new[] { patternExpression }, true, new[] { true }, typeof(int)),
 					_fbSqlExpressionFactory.Constant(0)));
+		return _fbSqlExpressionFactory.AndAlso(matchingExpression, _fbSqlExpressionFactory.AndAlso(_fbSqlExpressionFactory.IsNotNull(instance), _fbSqlExpressionFactory.IsNotNull(patternExpression)));
 	}
 }

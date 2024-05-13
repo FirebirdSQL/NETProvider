@@ -168,7 +168,7 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 				var size = mappingInfo.Size ?? (mappingInfo.IsKeyOrIndex ? 256 : (int?)null);
 				var maxSize = isUnicode ? UnicodeVarcharMaxSize : VarcharMaxSize;
 
-				if (size > maxSize)
+				if (size < 0 || size > maxSize)
 				{
 					size = isFixedLength ? maxSize : (int?)null;
 				}

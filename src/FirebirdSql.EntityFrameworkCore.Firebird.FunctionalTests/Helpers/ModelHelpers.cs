@@ -30,12 +30,30 @@ public static class ModelHelpers
 	{
 		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 		{
-			foreach (var property in entityType.GetProperties())
+			HandleProperties(entityType.GetProperties());
+			HandleComplexProperties(entityType.GetComplexProperties());
+		}
+
+		void HandleProperties(IEnumerable<IMutableProperty> properties)
+		{
+			foreach (var property in properties)
 			{
-				if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
-				{
-					property.SetMaxLength(500);
-				}
+				SetStringLength(property);
+			}
+		}
+		void HandleComplexProperties(IEnumerable<IMutableComplexProperty> complexProperties)
+		{
+			foreach (var cp in complexProperties)
+			{
+				HandleProperties(cp.ComplexType.GetProperties());
+				HandleComplexProperties(cp.ComplexType.GetComplexProperties());
+			}
+		}
+		void SetStringLength(IMutableProperty property)
+		{
+			if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
+			{
+				property.SetMaxLength(500);
 			}
 		}
 	}

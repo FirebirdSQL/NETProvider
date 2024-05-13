@@ -15,9 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using Microsoft.EntityFrameworkCore.Query;
+using Xunit.Abstractions;
+
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class FiltersInheritanceQueryFbFixture : InheritanceQueryFbFixture
+public class TPHInheritanceQueryFbTest : TPHInheritanceQueryTestBase<TPHInheritanceQueryFbFixture>
 {
-	protected override bool EnableFilters => true;
+	public TPHInheritanceQueryFbTest(TPHInheritanceQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
+		: base(fixture, testOutputHelper)
+	{ }
 }

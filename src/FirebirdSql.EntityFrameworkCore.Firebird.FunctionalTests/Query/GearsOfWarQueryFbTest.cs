@@ -390,6 +390,27 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 		return base.Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Subquery_inside_Take_argument(bool async)
+	{
+		return base.Subquery_inside_Take_argument(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task DateTimeOffset_to_unix_time_milliseconds(bool async)
+	{
+		return base.DateTimeOffset_to_unix_time_milliseconds(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task DateTimeOffset_to_unix_time_seconds(bool async)
+	{
+		return base.DateTimeOffset_to_unix_time_seconds(async);
+	}
+
 	[Theory(Skip = "NETProvider#1008")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_IsBetween(bool async)
@@ -402,5 +423,12 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 	public override Task Where_TimeOnly_Add_TimeSpan(bool async)
 	{
 		return base.Where_TimeOnly_Add_TimeSpan(async);
+	}
+
+	[Theory(Skip = "Different implicit ordering on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task String_concat_with_null_conditional_argument(bool async)
+	{
+		return base.String_concat_with_null_conditional_argument(async);
 	}
 }

@@ -22,7 +22,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class TPTFiltersInheritanceQueryFbFixture : TPTInheritanceQueryFbFixture
 {
-	protected override bool EnableFilters => true;
+	public override bool EnableFilters => true;
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 	{

@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
@@ -29,7 +30,7 @@ public class NorthwindChangeTrackingQueryFbTest : NorthwindChangeTrackingQueryTe
 	{ }
 
 	protected override NorthwindContext CreateNoTrackingContext()
-		=> new NorthwindRelationalContext(
+		=> new NorthwindFbContext(
 			new DbContextOptionsBuilder(Fixture.CreateOptions())
 				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking).Options);
 }

@@ -272,8 +272,12 @@ public class FbMigrationsSqlGenerator : MigrationsSqlGenerator
 	{
 		builder.Append("ALTER SEQUENCE ");
 		builder.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name, operation.Schema));
-		builder.Append(" START WITH ");
-		builder.Append(operation.StartValue.ToString(CultureInfo.InvariantCulture));
+		builder.Append(" RESTART");
+		if (operation.StartValue != null)
+		{
+			builder.Append(" WITH ");
+			builder.Append(((long)operation.StartValue).ToString(CultureInfo.InvariantCulture));
+		}
 		TerminateStatement(builder);
 	}
 

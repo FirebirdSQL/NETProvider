@@ -15,15 +15,20 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
-using Xunit.Abstractions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.Internal;
 
-public abstract class TPCInheritanceQueryFbTestBase<TFixture> : TPCInheritanceQueryTestBase<TFixture>
-    where TFixture : TPCInheritanceQueryFbFixtureBase, new()
+public class FbQueryTranslationPreprocessor : RelationalQueryTranslationPreprocessor
 {
-	protected TPCInheritanceQueryFbTestBase(TFixture fixture, ITestOutputHelper testOutputHelper)
-		: base(fixture, testOutputHelper)
+	public FbQueryTranslationPreprocessor(QueryTranslationPreprocessorDependencies dependencies, RelationalQueryTranslationPreprocessorDependencies relationalDependencies, QueryCompilationContext queryCompilationContext)
+		: base(dependencies, relationalDependencies, queryCompilationContext)
 	{ }
+
+	protected override Expression ProcessQueryRoots(Expression expression)
+	{
+		return new FbQueryRootProcessor(Dependencies, RelationalDependencies, QueryCompilationContext)
+			.Visit(expression);
+	}
 }

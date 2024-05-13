@@ -65,31 +65,64 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 			Sql.Append(")");
 			return sqlBinaryExpression;
 		}
-		else if (sqlBinaryExpression.OperatorType == ExpressionType.And && sqlBinaryExpression.TypeMapping.ClrType != typeof(bool))
+		else if (sqlBinaryExpression.OperatorType == ExpressionType.And)
 		{
-			Sql.Append("BIN_AND(");
-			Visit(sqlBinaryExpression.Left);
-			Sql.Append(", ");
-			Visit(sqlBinaryExpression.Right);
-			Sql.Append(")");
+			if (sqlBinaryExpression.TypeMapping.ClrType == typeof(bool))
+			{
+				Sql.Append("IIF(BIN_AND(");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Right);
+				Sql.Append(") = 0, FALSE, TRUE)");
+			}
+			else
+			{
+				Sql.Append("BIN_AND(");
+				Visit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				Visit(sqlBinaryExpression.Right);
+				Sql.Append(")");
+			}
 			return sqlBinaryExpression;
 		}
-		else if (sqlBinaryExpression.OperatorType == ExpressionType.Or && sqlBinaryExpression.TypeMapping.ClrType != typeof(bool))
+		else if (sqlBinaryExpression.OperatorType == ExpressionType.Or)
 		{
-			Sql.Append("BIN_OR(");
-			Visit(sqlBinaryExpression.Left);
-			Sql.Append(", ");
-			Visit(sqlBinaryExpression.Right);
-			Sql.Append(")");
+			if (sqlBinaryExpression.TypeMapping.ClrType == typeof(bool))
+			{
+				Sql.Append("IIF(BIN_OR(");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Right);
+				Sql.Append(") = 0, FALSE, TRUE)");
+			}
+			else
+			{
+				Sql.Append("BIN_OR(");
+				Visit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				Visit(sqlBinaryExpression.Right);
+				Sql.Append(")");
+			}
 			return sqlBinaryExpression;
 		}
 		else if (sqlBinaryExpression.OperatorType == ExpressionType.ExclusiveOr)
 		{
-			Sql.Append("BIN_XOR(");
-			Visit(sqlBinaryExpression.Left);
-			Sql.Append(", ");
-			Visit(sqlBinaryExpression.Right);
-			Sql.Append(")");
+			if (sqlBinaryExpression.TypeMapping.ClrType == typeof(bool))
+			{
+				Sql.Append("IIF(BIN_XOR(");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				BooleanToIntegralAndVisit(sqlBinaryExpression.Right);
+				Sql.Append(") = 0, FALSE, TRUE)");
+			}
+			else
+			{
+				Sql.Append("BIN_XOR(");
+				Visit(sqlBinaryExpression.Left);
+				Sql.Append(", ");
+				Visit(sqlBinaryExpression.Right);
+				Sql.Append(")");
+			}
 			return sqlBinaryExpression;
 		}
 		else if (sqlBinaryExpression.OperatorType == ExpressionType.LeftShift)
@@ -113,6 +146,13 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		else
 		{
 			return base.VisitSqlBinary(sqlBinaryExpression);
+		}
+
+		void BooleanToIntegralAndVisit(SqlExpression expression)
+		{
+			Sql.Append("IIF(");
+			Visit(expression);
+			Sql.Append(", 1, 0)");
 		}
 	}
 

@@ -15,13 +15,13 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class InheritanceQueryFbTest : InheritanceRelationalQueryTestBase<InheritanceQueryFbFixture>
+public class OperatorsProceduralFbTest : OperatorsProceduralQueryTestBase
 {
-	public InheritanceQueryFbTest(InheritanceQueryFbFixture fixture)
-		: base(fixture)
-	{ }
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

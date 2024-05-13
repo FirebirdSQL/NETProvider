@@ -19,5 +19,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class TPCInheritanceQueryFbFixture : TPCInheritanceQueryFbFixtureBase
 {
-	protected override bool UseGeneratedKeys => true;
+	public override bool UseGeneratedKeys => true;
 }

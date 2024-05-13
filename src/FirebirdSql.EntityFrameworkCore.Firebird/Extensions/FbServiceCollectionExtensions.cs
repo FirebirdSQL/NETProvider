@@ -78,6 +78,7 @@ public static class FbServiceCollectionExtensions
 			.TryAdd<IMemberTranslatorProvider, FbMemberTranslatorProvider>()
 			.TryAdd<IMethodCallTranslatorProvider, FbMethodCallTranslatorProvider>()
 			.TryAdd<IQuerySqlGeneratorFactory, FbQuerySqlGeneratorFactory>()
+			.TryAdd<IQueryTranslationPreprocessorFactory, FbQueryTranslationPreprocessorFactory>()
 			.TryAdd<ISqlExpressionFactory, FbSqlExpressionFactory>()
 			.TryAdd<ISingletonOptions, IFbOptions>(p => p.GetService<IFbOptions>())
 			.TryAdd<IRelationalSqlTranslatingExpressionVisitorFactory, FbSqlTranslatingExpressionVisitorFactory>()

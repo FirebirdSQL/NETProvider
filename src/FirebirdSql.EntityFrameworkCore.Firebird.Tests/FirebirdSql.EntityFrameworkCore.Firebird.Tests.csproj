@@ -18,7 +18,6 @@
 		<PackageReference Include="NUnitLite" Version="3.13.3" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 		<ProjectReference Include="..\FirebirdSql.EntityFrameworkCore.Firebird\FirebirdSql.EntityFrameworkCore.Firebird.csproj" />
 	</ItemGroup>
 	<ItemGroup>

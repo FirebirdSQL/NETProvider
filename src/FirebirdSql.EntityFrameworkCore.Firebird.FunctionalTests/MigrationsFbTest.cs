@@ -129,8 +129,10 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 	[Fact(Skip = SkipReason)]
 	public override Task Add_column_with_collation() => base.Add_column_with_collation();
 
-	[Fact(Skip = SkipReason)]
-	public override Task Add_column_computed_with_collation() => base.Add_column_computed_with_collation();
+	[Theory(Skip = SkipReason)]
+	[InlineData(true)]
+	[InlineData(false)]
+	public override Task Add_column_computed_with_collation(bool stored) => base.Add_column_computed_with_collation(stored);
 
 	[Fact(Skip = SkipReason)]
 	public override Task Add_column_shared() => base.Add_column_shared();
@@ -323,6 +325,36 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 
 	[Fact(Skip = SkipReason)]
 	public override Task Drop_primary_key_string() => base.Drop_primary_key_string();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Alter_sequence_restart_with() => base.Alter_sequence_restart_with();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_column_with_unbounded_max_length() => base.Add_column_with_unbounded_max_length();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_optional_primitive_collection_to_existing_table() => base.Add_optional_primitive_collection_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitve_collection_to_existing_table() => base.Add_required_primitve_collection_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitve_collection_with_custom_converter_and_custom_default_value_to_existing_table() => base.Add_required_primitve_collection_with_custom_converter_and_custom_default_value_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitve_collection_with_custom_default_value_to_existing_table() => base.Add_required_primitve_collection_with_custom_default_value_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_complex_type_with_required_properties_on_derived_entity_in_TPH() => base.Create_table_with_complex_type_with_required_properties_on_derived_entity_in_TPH();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_optional_primitive_collection() => base.Create_table_with_optional_primitive_collection();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_required_primitive_collection() => base.Create_table_with_required_primitive_collection();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitve_collection_with_custom_default_value_sql_to_existing_table() => Task.CompletedTask;
 
 	public class MigrationsFbFixture : MigrationsFixtureBase
 	{

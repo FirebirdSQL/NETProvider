@@ -146,4 +146,11 @@ public class ComplexNavigationsCollectionsSplitSharedTypeQueryFbTest : ComplexNa
 	{
 		return base.Take_Select_collection_Take(async);
 	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Filtered_include_Skip_Take_with_another_Skip_Take_on_top_level(bool async)
+	{
+		return base.Filtered_include_Skip_Take_with_another_Skip_Take_on_top_level(async);
+	}
 }

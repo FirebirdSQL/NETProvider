@@ -8,7 +8,9 @@ $baseDir = Split-Path -Parent $PSCommandPath
 . "$baseDir\include.ps1"
 
 $outDir = "$baseDir\out"
-$version = ''
+$versionProvider = ''
+$versionEFCore = ''
+$versionEF6 = ''
 
 function Clean() {
 	if (Test-Path $outDir) {
@@ -29,19 +31,28 @@ function Build() {
 	b 'Restore' $False
 	b 'Restore'
 	b 'Build'
-	$script:version = (Get-Item $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\$(Get-UsedTargetFramework)\FirebirdSql.Data.FirebirdClient.dll).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?(.*)','$1.$2.$3$4'
+}
+
+function Versions() {
+	function v($file) {
+		return (Get-Item $file).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?.*','$1.$2.$3$4'
+	}
+	$script:versionProvider = v $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net8.0\FirebirdSql.Data.FirebirdClient.dll
+	$script:versionEFCore = v $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\net8.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
+	$script:versionEF6 = v $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net48\EntityFramework.Firebird.dll
 }
 
 function NuGets() {
-	cp $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\FirebirdSql.Data.FirebirdClient.$version.nupkg $outDir
-	cp $baseDir\src\EntityFramework.Firebird\bin\$Configuration\EntityFramework.Firebird.$version.nupkg $outDir
-	cp $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\FirebirdSql.EntityFrameworkCore.Firebird.$version.nupkg $outDir
+	cp $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\FirebirdSql.Data.FirebirdClient.$versionProvider.nupkg $outDir
+	cp $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\FirebirdSql.EntityFrameworkCore.Firebird.$versionEFCore.nupkg $outDir
+	cp $baseDir\src\EntityFramework.Firebird\bin\$Configuration\EntityFramework.Firebird.$versionEF6.nupkg $outDir
 
-	cp $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\FirebirdSql.Data.FirebirdClient.$version.snupkg $outDir
-	cp $baseDir\src\EntityFramework.Firebird\bin\$Configuration\EntityFramework.Firebird.$version.snupkg $outDir
-	cp $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\FirebirdSql.EntityFrameworkCore.Firebird.$version.snupkg $outDir
+	cp $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\FirebirdSql.Data.FirebirdClient.$versionProvider.snupkg $outDir
+	cp $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\FirebirdSql.EntityFrameworkCore.Firebird.$versionEFCore.snupkg $outDir
+	cp $baseDir\src\EntityFramework.Firebird\bin\$Configuration\EntityFramework.Firebird.$versionEF6.snupkg $outDir
 }
 
 Clean
 Build
+Versions
 NuGets

@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
@@ -35,13 +34,6 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 	public FromSqlQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
 	{ }
-
-	protected override DbParameter CreateDbParameter(string name, object value)
-		=> new FbParameter
-		{
-			ParameterName = name,
-			Value = value
-		};
 
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
@@ -164,4 +156,7 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 	{
 		return base.Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(async);
 	}
+
+	protected override DbParameter CreateDbParameter(string name, object value)
+		=> new FbParameter { ParameterName = name, Value = value };
 }

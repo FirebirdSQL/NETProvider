@@ -58,22 +58,7 @@ public class QueryFilterFuncletizationFbTest : QueryFilterFuncletizationTestBase
 		var fbTestStore = (FbTestStore)Fixture.TestStore;
 		if (fbTestStore.ServerLessThan4())
 			return;
-
-		using var context = CreateContext();
-		// Default value of TenantIds is null InExpression over null values throws
-		Assert.Throws<NullReferenceException>(() => context.Set<ListFilter>().ToList());
-
-		context.TenantIds = new List<int>();
-		var query = context.Set<ListFilter>().ToList();
-		Assert.Empty(query);
-
-		context.TenantIds = new List<int> { 1 };
-		query = context.Set<ListFilter>().ToList();
-		Assert.Single(query);
-
-		context.TenantIds = new List<int> { 2, 3 };
-		query = context.Set<ListFilter>().ToList();
-		Assert.Equal(2, query.Count);
+		base.DbContext_list_is_parameterized();
 	}
 
 	[Fact]
@@ -290,6 +275,15 @@ public class QueryFilterFuncletizationFbTest : QueryFilterFuncletizationTestBase
 		if (fbTestStore.ServerLessThan4())
 			return;
 		base.Using_multiple_context_in_filter_parametrize_only_current_context();
+	}
+
+	[Fact]
+	public override void Using_multiple_entities_with_filters_reuses_parameters()
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return;
+		base.Using_multiple_entities_with_filters_reuses_parameters();
 	}
 
 	public class QueryFilterFuncletizationFbFixture : QueryFilterFuncletizationRelationalFixture

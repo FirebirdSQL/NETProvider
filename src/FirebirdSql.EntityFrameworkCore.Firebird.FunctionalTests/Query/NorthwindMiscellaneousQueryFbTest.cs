@@ -133,4 +133,18 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 	{
 		return base.SelectMany_correlated_subquery_hard(async);
 	}
+
+	[Theory(Skip = "Different implicit ordering on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Entity_equality_orderby_subquery(bool async)
+	{
+		return base.Entity_equality_orderby_subquery(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Subquery_with_navigation_inside_inline_collection(bool async)
+	{
+		return base.Subquery_with_navigation_inside_inline_collection(async);
+	}
 }

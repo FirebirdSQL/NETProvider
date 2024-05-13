@@ -5,7 +5,3 @@ function Check-ExitCode() {
 		exit $exitCode
 	}
 }
-
-function Get-UsedTargetFramework() {
-	return 'net8.0'
-}

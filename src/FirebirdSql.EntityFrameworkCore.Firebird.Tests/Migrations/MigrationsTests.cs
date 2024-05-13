@@ -624,7 +624,20 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 		};
 		var batch = await Generate(new[] { operation });
 		Assert.AreEqual(1, batch.Count());
-		Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" START WITH 23;"), batch[0].CommandText);
+		Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" RESTART WITH 23;"), batch[0].CommandText);
+	}
+
+	[Test]
+	public async Task RestartSequenceNoValue()
+	{
+		var operation = new RestartSequenceOperation()
+		{
+			Name = "MySequence",
+			StartValue = null,
+		};
+		var batch = await Generate(new[] { operation });
+		Assert.AreEqual(1, batch.Count());
+		Assert.AreEqual(NewLineEnd(@"ALTER SEQUENCE ""MySequence"" RESTART;"), batch[0].CommandText);
 	}
 
 	[Test]
