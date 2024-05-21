@@ -1,18 +1,18 @@
 <Project>
 	<!-- Provider -->
 	<PropertyGroup>
-		<ProviderVersion>10.0.0</ProviderVersion>
+		<ProviderVersion>10.1.0</ProviderVersion>
 	</PropertyGroup>
 	<!-- EFCore -->
 	<PropertyGroup>
-		<EFCoreProviderVersion>11.0.0-beta2</EFCoreProviderVersion>
-		<EFCoreReferenceProviderVersion>10.0.0</EFCoreReferenceProviderVersion>
+		<EFCoreProviderVersion>11.0.0</EFCoreProviderVersion>
+		<EFCoreReferenceProviderVersion>10.1.0</EFCoreReferenceProviderVersion>
 		<EFCoreReferencePackageVersion>8.0.4</EFCoreReferencePackageVersion>
 	</PropertyGroup>
 	<!-- EF6 -->
 	<PropertyGroup>
-		<EF6ProviderVersion>10.0.0</EF6ProviderVersion>
-		<EF6ReferenceProviderVersion>10.0.0</EF6ReferenceProviderVersion>
+		<EF6ProviderVersion>10.0.1</EF6ProviderVersion>
+		<EF6ReferenceProviderVersion>10.1.0</EF6ReferenceProviderVersion>
 		<EF6ReferencePackageVersion>6.4.4</EF6ReferencePackageVersion>
 	</PropertyGroup>
 </Project>
