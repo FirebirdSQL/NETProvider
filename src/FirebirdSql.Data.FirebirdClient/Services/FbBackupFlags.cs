@@ -33,4 +33,5 @@ public enum FbBackupFlags
 	Convert = IscCodes.isc_spb_bkp_convert,
 	Expand = IscCodes.isc_spb_bkp_expand,
 	NoDatabaseTriggers = IscCodes.isc_spb_bkp_no_triggers,
+	Zip = IscCodes.isc_spb_bkp_zip,
 }

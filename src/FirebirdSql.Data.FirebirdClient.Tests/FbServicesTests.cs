@@ -61,6 +61,22 @@ public class FbServicesTests : FbTestsBase
 	}
 
 	[Test]
+	public async Task BackupRestoreZipTest()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(4, 0, 0, 0)))
+			return;
+
+		var backupName = $"{Guid.NewGuid()}.bak";
+		var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
+		var connectionString = csb.ToString();
+		await BackupPartHelper(backupName, connectionString, FbBackupFlags.Zip);
+		await RestorePartHelper(backupName, connectionString);
+		// test the database was actually restored fine
+		await Connection.OpenAsync();
+		await Connection.CloseAsync();
+	}
+
+	[Test]
 	public async Task BackupRestoreParallelTest()
 	{
 		if (!EnsureServerVersionAtLeast(new Version(5, 0, 0, 0)))
@@ -453,11 +469,11 @@ end";
 		Assert.DoesNotThrowAsync(() => Connection.OpenAsync());
 	}
 
-	static Task BackupPartHelper(string backupName, string connectionString)
+	static Task BackupPartHelper(string backupName, string connectionString, FbBackupFlags backupFlags = FbBackupFlags.IgnoreLimbo)
 	{
 		var backupSvc = new FbBackup();
 		backupSvc.ConnectionString = connectionString;
-		backupSvc.Options = FbBackupFlags.IgnoreLimbo;
+		backupSvc.Options = backupFlags;
 		backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 		backupSvc.Verbose = true;
 		backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
