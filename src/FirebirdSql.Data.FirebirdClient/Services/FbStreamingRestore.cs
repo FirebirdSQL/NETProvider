@@ -45,6 +45,7 @@ public class FbStreamingRestore : FbService
 
 	public Stream InputStream { get; set; }
 	public bool Verbose { get; set; }
+	public int? VerboseInterval { get; set; }
 	public int? PageBuffers { get; set; }
 	public bool ReadOnly { get; set; }
 	public string SkipData { get; set; }
@@ -68,9 +69,9 @@ public class FbStreamingRestore : FbService
 				startSpb.Append2(IscCodes.isc_spb_bkp_file, "stdin");
 				startSpb.Append2(IscCodes.isc_spb_dbname, ConnectionStringOptions.Database);
 				if (Verbose)
-				{
 					startSpb.Append(IscCodes.isc_spb_verbose);
-				}
+				if (VerboseInterval.HasValue)
+					startSpb.Append(IscCodes.isc_spb_verbint, (int)VerboseInterval);
 				if (PageBuffers.HasValue)
 					startSpb.Append(IscCodes.isc_spb_res_buffers, (int)PageBuffers);
 				if (_pageSize.HasValue)

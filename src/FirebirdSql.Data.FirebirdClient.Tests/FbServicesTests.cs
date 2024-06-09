@@ -69,8 +69,35 @@ public class FbServicesTests : FbTestsBase
 		var backupName = $"{Guid.NewGuid()}.bak";
 		var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
 		var connectionString = csb.ToString();
-		await BackupPartHelper(backupName, connectionString, FbBackupFlags.Zip);
+		await BackupPartHelper(backupName, connectionString, x =>
+		{
+			x.Options |= FbBackupFlags.Zip;
+		});
 		await RestorePartHelper(backupName, connectionString);
+		// test the database was actually restored fine
+		await Connection.OpenAsync();
+		await Connection.CloseAsync();
+	}
+
+	[Test]
+	public async Task BackupRestoreVerbIntTest()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
+			return;
+
+		var backupName = $"{Guid.NewGuid()}.bak";
+		var csb = BuildServicesConnectionStringBuilder(ServerType, Compression, WireCrypt, true);
+		var connectionString = csb.ToString();
+		await BackupPartHelper(backupName, connectionString, x =>
+		{
+			x.Verbose = true;
+			x.VerboseInterval = 1_000_000;
+		});
+		await RestorePartHelper(backupName, connectionString, x =>
+		{
+			x.Verbose = true;
+			x.VerboseInterval = 1_000_000;
+		});
 		// test the database was actually restored fine
 		await Connection.OpenAsync();
 		await Connection.CloseAsync();
@@ -469,18 +496,19 @@ end";
 		Assert.DoesNotThrowAsync(() => Connection.OpenAsync());
 	}
 
-	static Task BackupPartHelper(string backupName, string connectionString, FbBackupFlags backupFlags = FbBackupFlags.IgnoreLimbo)
+	static Task BackupPartHelper(string backupName, string connectionString, Action<FbBackup> configure = null)
 	{
 		var backupSvc = new FbBackup();
 		backupSvc.ConnectionString = connectionString;
-		backupSvc.Options = backupFlags;
+		backupSvc.Options = FbBackupFlags.IgnoreLimbo;
 		backupSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 		backupSvc.Verbose = true;
 		backupSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
 		backupSvc.ServiceOutput += ServiceOutput;
+		configure?.Invoke(backupSvc);
 		return backupSvc.ExecuteAsync();
 	}
-	static Task RestorePartHelper(string backupName, string connectionString)
+	static Task RestorePartHelper(string backupName, string connectionString, Action<FbRestore> configure = null)
 	{
 		var restoreSvc = new FbRestore();
 		restoreSvc.ConnectionString = connectionString;
@@ -490,6 +518,7 @@ end";
 		restoreSvc.Statistics = FbBackupRestoreStatistics.TotalTime | FbBackupRestoreStatistics.TimeDelta;
 		restoreSvc.BackupFiles.Add(new FbBackupFile(backupName, 2048));
 		restoreSvc.ServiceOutput += ServiceOutput;
+		configure?.Invoke(restoreSvc);
 		return restoreSvc.ExecuteAsync();
 	}
 

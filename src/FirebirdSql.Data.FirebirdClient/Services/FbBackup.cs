@@ -28,6 +28,7 @@ public sealed class FbBackup : FbService
 {
 	public FbBackupFileCollection BackupFiles { get; }
 	public bool Verbose { get; set; }
+	public int? VerboseInterval { get; set; }
 	public int Factor { get; set; }
 	public string SkipData { get; set; }
 	public FbBackupFlags Options { get; set; }
@@ -59,6 +60,8 @@ public sealed class FbBackup : FbService
 				}
 				if (Verbose)
 					startSpb.Append(IscCodes.isc_spb_verbose);
+				if (VerboseInterval.HasValue)
+					startSpb.Append(IscCodes.isc_spb_verbint, (int)VerboseInterval);
 				if (Factor > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
 				if (!string.IsNullOrEmpty(SkipData))
