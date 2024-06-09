@@ -1,7 +1,7 @@
 <Project>
 	<!-- Provider -->
 	<PropertyGroup>
-		<ProviderVersion>10.2.0</ProviderVersion>
+		<ProviderVersion>10.3.0</ProviderVersion>
 	</PropertyGroup>
 	<!-- EFCore -->
 	<PropertyGroup>
