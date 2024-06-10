@@ -179,7 +179,7 @@ public class FbStreamingRestore : FbService
 			if (requestedLength > 0)
 			{
 				var data = new byte[requestedLength];
-				var read = InputStream.Read(data, 0, requestedLength);
+				var read = await InputStream.ReadAsync(data, 0, requestedLength).ConfigureAwait(false);
 				if (read > 0)
 				{
 					Array.Resize(ref data, read);
