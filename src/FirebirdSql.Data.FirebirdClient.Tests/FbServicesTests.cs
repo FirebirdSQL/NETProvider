@@ -90,12 +90,12 @@ public class FbServicesTests : FbTestsBase
 		var connectionString = csb.ToString();
 		await BackupPartHelper(backupName, connectionString, x =>
 		{
-			x.Verbose = true;
+			x.Verbose = false;
 			x.VerboseInterval = 1_000_000;
 		});
 		await RestorePartHelper(backupName, connectionString, x =>
 		{
-			x.Verbose = true;
+			x.Verbose = false;
 			x.VerboseInterval = 1_000_000;
 		});
 		// test the database was actually restored fine

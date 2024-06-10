@@ -71,7 +71,7 @@ public sealed class FbBackup : FbService
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
-				if (Verbose)
+				if (Verbose || VerboseInterval.HasValue)
 				{
 					ProcessServiceOutput(new ServiceParameterBuffer2(Service.ParameterBufferEncoding));
 				}
@@ -106,6 +106,8 @@ public sealed class FbBackup : FbService
 				}
 				if (Verbose)
 					startSpb.Append(IscCodes.isc_spb_verbose);
+				if (VerboseInterval.HasValue)
+					startSpb.Append(IscCodes.isc_spb_verbint, (int)VerboseInterval);
 				if (Factor > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_factor, Factor);
 				if (!string.IsNullOrEmpty(SkipData))
@@ -115,7 +117,7 @@ public sealed class FbBackup : FbService
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);
-				if (Verbose)
+				if (Verbose || VerboseInterval.HasValue)
 				{
 					await ProcessServiceOutputAsync(new ServiceParameterBuffer2(Service.ParameterBufferEncoding), cancellationToken).ConfigureAwait(false);
 				}
