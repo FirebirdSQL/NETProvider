@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -225,76 +224,76 @@ public sealed class FbDatabaseInfo
 		return GetValueAsync<int>(IscCodes.isc_info_writes, cancellationToken);
 	}
 
-	public int GetBackoutCount()
+	public IDictionary<uint, ulong> GetBackoutCount()
 	{
-		return GetValue<int>(IscCodes.isc_info_backout_count);
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_backout_count );
 	}
-	public Task<int> GetBackoutCountAsync(CancellationToken cancellationToken = default)
+	public Task<IDictionary<uint, ulong>> GetBackoutCountAsync( CancellationToken cancellationToken = default )
 	{
-		return GetValueAsync<int>(IscCodes.isc_info_backout_count, cancellationToken);
-	}
-
-	public int GetDeleteCount()
-	{
-		return GetValue<int>(IscCodes.isc_info_delete_count);
-	}
-	public Task<int> GetDeleteCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<int>(IscCodes.isc_info_delete_count, cancellationToken);
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_backout_count, cancellationToken );
 	}
 
-	public int GetExpungeCount()
+	public IDictionary<uint, ulong> GetDeleteCount()
 	{
-		return GetValue<int>(IscCodes.isc_info_expunge_count);
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_delete_count );
 	}
-	public Task<int> GetExpungeCountAsync(CancellationToken cancellationToken = default)
+	public Task<IDictionary<uint, ulong>> GetDeleteCountAsync( CancellationToken cancellationToken = default )
 	{
-		return GetValueAsync<int>(IscCodes.isc_info_expunge_count, cancellationToken);
-	}
-
-	public int GetInsertCount()
-	{
-		return GetValue<int>(IscCodes.isc_info_insert_count);
-	}
-	public Task<int> GetInsertCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<int>(IscCodes.isc_info_insert_count, cancellationToken);
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_delete_count, cancellationToken );
 	}
 
-	public int GetPurgeCount()
+	public IDictionary<uint, ulong> GetExpungeCount()
 	{
-		return GetValue<int>(IscCodes.isc_info_purge_count);
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_expunge_count );
 	}
-	public Task<int> GetPurgeCountAsync(CancellationToken cancellationToken = default)
+	public Task<IDictionary<uint, ulong>> GetExpungeCountAsync( CancellationToken cancellationToken = default )
 	{
-		return GetValueAsync<int>(IscCodes.isc_info_purge_count, cancellationToken);
-	}
-
-	public long GetReadIdxCount()
-	{
-		return GetValue<long>(IscCodes.isc_info_read_idx_count);
-	}
-	public Task<long> GetReadIdxCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<long>(IscCodes.isc_info_read_idx_count, cancellationToken);
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_expunge_count, cancellationToken );
 	}
 
-	public long GetReadSeqCount()
+	public IDictionary<uint, ulong> GetInsertCount()
 	{
-		return GetValue<long>(IscCodes.isc_info_read_seq_count);
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_insert_count );
 	}
-	public Task<long> GetReadSeqCountAsync(CancellationToken cancellationToken = default)
+	public Task<IDictionary<uint, ulong>> GetInsertCountAsync( CancellationToken cancellationToken = default )
 	{
-		return GetValueAsync<long>(IscCodes.isc_info_read_seq_count, cancellationToken);
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_insert_count, cancellationToken );
 	}
 
-	public long GetUpdateCount()
+	public IDictionary<uint, ulong> GetPurgeCount()
 	{
-		return GetValue<long>(IscCodes.isc_info_update_count);
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_purge_count );
 	}
-	public Task<long> GetUpdateCountAsync(CancellationToken cancellationToken = default)
+	public Task<IDictionary<uint, ulong>> GetPurgeCountAsync( CancellationToken cancellationToken = default )
 	{
-		return GetValueAsync<long>(IscCodes.isc_info_update_count, cancellationToken);
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_purge_count, cancellationToken );
+	}
+
+	public IDictionary<uint, ulong> GetReadIdxCount()
+	{
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_read_idx_count );
+	}
+	public Task<IDictionary<uint, ulong>> GetReadIdxCountAsync( CancellationToken cancellationToken = default )
+	{
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_read_idx_count, cancellationToken );
+	}
+
+	public IDictionary<uint, ulong> GetReadSeqCount()
+	{
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_read_seq_count );
+	}
+	public Task<IDictionary<uint, ulong>> GetReadSeqCountAsync( CancellationToken cancellationToken = default )
+	{
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_read_seq_count, cancellationToken );
+	}
+
+	public IDictionary<uint, ulong> GetUpdateCount()
+	{
+		return GetValue<IDictionary<uint, ulong>>( IscCodes.isc_info_update_count );
+	}
+	public Task<IDictionary<uint, ulong>> GetUpdateCountAsync( CancellationToken cancellationToken = default )
+	{
+		return GetValueAsync<IDictionary<uint, ulong>>( IscCodes.isc_info_update_count, cancellationToken );
 	}
 
 	public int GetDatabaseSizeInPages()
