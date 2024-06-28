@@ -54,14 +54,6 @@ internal static class IscHelper
 				case IscCodes.isc_info_marks:
 				case IscCodes.isc_info_reads:
 				case IscCodes.isc_info_writes:
-				case IscCodes.isc_info_backout_count:
-				case IscCodes.isc_info_delete_count:
-				case IscCodes.isc_info_expunge_count:
-				case IscCodes.isc_info_insert_count:
-				case IscCodes.isc_info_purge_count:
-				case IscCodes.isc_info_read_idx_count:
-				case IscCodes.isc_info_read_seq_count:
-				case IscCodes.isc_info_update_count:
 				case IscCodes.isc_info_db_size_in_pages:
 				case IscCodes.isc_info_oldest_transaction:
 				case IscCodes.isc_info_oldest_active:
@@ -75,6 +67,17 @@ internal static class IscHelper
 				case IscCodes.fb_info_statement_timeout_db:
 				case IscCodes.fb_info_statement_timeout_att:
 					info.Add(VaxInteger(buffer, pos, length));
+					break;
+
+				case IscCodes.isc_info_backout_count:
+				case IscCodes.isc_info_delete_count:
+				case IscCodes.isc_info_expunge_count:
+				case IscCodes.isc_info_insert_count:
+				case IscCodes.isc_info_purge_count:
+				case IscCodes.isc_info_update_count:
+				case IscCodes.isc_info_read_seq_count:
+				case IscCodes.isc_info_read_idx_count:
+					info.Add( buffer.GetTableStatistic( length ) );
 					break;
 
 				case IscCodes.isc_info_no_reserve:
