@@ -17,7 +17,7 @@
 		<PackageId>EntityFramework.Firebird</PackageId>
 		<Title>Firebird Entity Framework Provider</Title>
 		<PackageDescription>The Entity Framework provider for Firebird enables you to develop .NET applications that connect to the Firebird database using Entity Framework.</PackageDescription>
-		<PackageTags>firebird;firebirsql;firebirdclient;entityframewor;adonet;database</PackageTags>
+		<PackageTags>firebird firebirsql firebirdclient entityframewor adonet database</PackageTags>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DefineConstants>EF6;TRACE</DefineConstants>
