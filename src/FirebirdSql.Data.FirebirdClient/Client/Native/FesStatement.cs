@@ -371,11 +371,13 @@ internal sealed class FesStatement : StatementBase
 		descriptorFiller.Fill(_parameters, 0);
 
 		ClearStatusVector();
-		NativeHelpers.CallIfExists(() =>
-		{
-			_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
-			_database.ProcessStatusVector(_statusVector);
-		});
+		NativeHelpers.CallIfExists(
+			nameof(IFbClient.fb_dsql_set_timeout),
+			() =>
+			{
+				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
+				_database.ProcessStatusVector(_statusVector);
+			});
 
 		ClearStatusVector();
 
@@ -441,11 +443,13 @@ internal sealed class FesStatement : StatementBase
 		await descriptorFiller.FillAsync(_parameters, 0, cancellationToken).ConfigureAwait(false);
 
 		ClearStatusVector();
-		NativeHelpers.CallIfExists(() =>
-		{
-			_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
-			_database.ProcessStatusVector(_statusVector);
-		});
+		NativeHelpers.CallIfExists(
+			nameof(IFbClient.fb_dsql_set_timeout),
+			() =>
+			{
+				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
+				_database.ProcessStatusVector(_statusVector);
+			});
 
 		ClearStatusVector();
 

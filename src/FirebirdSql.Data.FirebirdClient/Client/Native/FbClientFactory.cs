@@ -83,7 +83,7 @@ internal static class FbClientFactory
 				{
 					result = BuildFbClient(dllName);
 					cache.Add(dllName, result);
-					ShutdownHelper.RegisterFbClientShutdown(() => NativeHelpers.CallIfExists(() => result.fb_shutdown(0, 0)));
+					ShutdownHelper.RegisterFbClientShutdown(() => NativeHelpers.CallIfExists(nameof(IFbClient.fb_shutdown), () => result.fb_shutdown(0, 0)));
 					return result;
 				}
 				finally
