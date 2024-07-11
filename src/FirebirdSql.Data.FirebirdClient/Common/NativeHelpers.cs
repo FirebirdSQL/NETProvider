@@ -24,9 +24,7 @@ internal static class NativeHelpers
 {
 	private static readonly ConcurrentDictionary<string, bool> _cache = new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
 
-	public static void CallIfExists(
-        string actionId,
-        Action action)
+	public static void CallIfExists(string actionId, Action action)
 	{
 		if (!_cache.TryGetValue(actionId, out var executionAllowed))
 		{

@@ -375,7 +375,7 @@ internal sealed class FesStatement : StatementBase
 			nameof(IFbClient.fb_dsql_set_timeout),
 			() =>
 			{
-				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint) timeout);
+				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
 				_database.ProcessStatusVector(_statusVector);
 			});
 
@@ -447,7 +447,7 @@ internal sealed class FesStatement : StatementBase
 			nameof(IFbClient.fb_dsql_set_timeout),
 			() =>
 			{
-				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint) timeout);
+				_database.FbClient.fb_dsql_set_timeout(_statusVector, ref _handle, (uint)timeout);
 				_database.ProcessStatusVector(_statusVector);
 			});
 
