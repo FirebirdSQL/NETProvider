@@ -32,7 +32,7 @@ public sealed class FbBackup : FbService
 	public int Factor { get; set; }
 	public string SkipData { get; set; }
 	public FbBackupFlags Options { get; set; }
-	public FbBackupRestoreStatistics? Statistics { get; set; } = default(FbBackupRestoreStatistics);
+	public FbBackupRestoreStatistics? Statistics { get; set; }
 
 	public FbBackup(string connectionString = null)
 		: base(connectionString)
