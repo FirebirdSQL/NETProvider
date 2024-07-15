@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace FirebirdSql.Data.Common;
 
@@ -49,6 +51,22 @@ internal static class Extensions
 	public static string ToHexString(this byte[] b)
 	{
 		return BitConverter.ToString(b).Replace("-", string.Empty);
+	}
+
+	public static IDictionary<short, ulong> GetTableStatistic(this byte[] b, int aLength)
+	{
+		int capacity = aLength > 3 ?
+						   (aLength - 3) / 6 + 1 :
+						   0;
+		var tableStatistic = new Dictionary<short, ulong>(capacity);
+		for (var i = 3; i < aLength; i += 6)
+		{
+			var tableId = (short)IscHelper.VaxInteger(b, i, 2);
+			var count = (ulong)IscHelper.VaxInteger(b, i + 2, 4);
+			tableStatistic.Add(tableId, count);
+		}
+
+		return tableStatistic;
 	}
 
 	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
