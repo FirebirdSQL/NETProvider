@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
@@ -251,5 +252,69 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 			: null;
 		mapping ??= Dependencies.TypeMappingSource.GetMappingForValue(value);
 		commandStringBuilder.Append(mapping.GenerateProviderValueSqlLiteral(value));
+	}
+
+	public override ResultSetMapping AppendStoredProcedureCall(
+		StringBuilder commandStringBuilder,
+		IReadOnlyModificationCommand command,
+		int commandPosition,
+		out bool requiresTransaction)
+	{
+		var storedProcedure = command.StoreStoredProcedure;
+		var resultSetMapping = ResultSetMapping.NoResults;
+
+		foreach (var resultColumn in storedProcedure.ResultColumns)
+		{
+			resultSetMapping = ResultSetMapping.LastInResultSet;
+			if (resultColumn == command.RowsAffectedColumn)
+			{
+				resultSetMapping |= ResultSetMapping.ResultSetWithRowsAffectedOnly;
+			}
+			else
+			{
+				resultSetMapping = ResultSetMapping.LastInResultSet;
+				break;
+			}
+		}
+
+		commandStringBuilder.Append("EXECUTE PROCEDURE ");
+		SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, storedProcedure.Name);
+
+		if (storedProcedure.Parameters.Any())
+		{
+			commandStringBuilder.Append(" ");
+			var first = true;
+
+			for (var i = 0; i < command.ColumnModifications.Count; i++)
+			{
+				var columnModification = command.ColumnModifications[i];
+				if (columnModification.Column is not IStoreStoredProcedureParameter parameter)
+				{
+					continue;
+				}
+
+				if (parameter.Direction.HasFlag(ParameterDirection.Output))
+				{
+					continue;
+				}
+
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					commandStringBuilder.Append(", ");
+				}
+				SqlGenerationHelper.GenerateParameterNamePlaceholder(
+					commandStringBuilder, columnModification.UseOriginalValueParameter
+						? columnModification.OriginalParameterName!
+						: columnModification.ParameterName!);
+			}
+		}
+
+		commandStringBuilder.AppendLine(SqlGenerationHelper.StatementTerminator);
+		requiresTransaction = true;
+		return resultSetMapping;
 	}
 }
