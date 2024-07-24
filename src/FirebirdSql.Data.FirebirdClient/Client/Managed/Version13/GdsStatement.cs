@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -131,9 +131,9 @@ internal class GdsStatement : Version12.GdsStatement
 		}
 	}
 
-	protected override DbValue[] ReadRow()
+	protected override object[] ReadRow()		
 	{
-		var row = new DbValue[_fields.Count];
+		var row = new object[_fields.Count];
 		try
 		{
 			if (_fields.Count > 0)
@@ -144,12 +144,11 @@ internal class GdsStatement : Version12.GdsStatement
 				{
 					if (nullBits.Get(i))
 					{
-						row[i] = new DbValue(this, _fields[i], null);
+						row[i] = null;
 					}
 					else
 					{
-						var value = ReadRawValue(_database.Xdr, _fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
+						row[i] = ReadRawValue(_database.Xdr, _fields[i]);
 					}
 				}
 			}
@@ -160,9 +159,10 @@ internal class GdsStatement : Version12.GdsStatement
 		}
 		return row;
 	}
-	protected override async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
+
+	protected override async ValueTask<object[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
-		var row = new DbValue[_fields.Count];
+		var row = new object[_fields.Count];
 		try
 		{
 			if (_fields.Count > 0)
@@ -173,12 +173,11 @@ internal class GdsStatement : Version12.GdsStatement
 				{
 					if (nullBits.Get(i))
 					{
-						row[i] = new DbValue(this, _fields[i], null);
+						row[i] = null;
 					}
 					else
 					{
-						var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
-						row[i] = new DbValue(this, _fields[i], value);
+						row[i] = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
 					}
 				}
 			}
