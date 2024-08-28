@@ -277,12 +277,13 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 			}
 		}
 
-		commandStringBuilder.Append("EXECUTE PROCEDURE ");
+		commandStringBuilder.Append("SELECT * FROM ");
 		SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, storedProcedure.Name);
 
 		if (storedProcedure.Parameters.Any())
 		{
-			commandStringBuilder.Append(" ");
+			commandStringBuilder.Append("(");
+
 			var first = true;
 
 			for (var i = 0; i < command.ColumnModifications.Count; i++)
@@ -311,6 +312,8 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 						? columnModification.OriginalParameterName!
 						: columnModification.ParameterName!);
 			}
+
+			commandStringBuilder.Append(")");
 		}
 
 		commandStringBuilder.AppendLine(SqlGenerationHelper.StatementTerminator);
