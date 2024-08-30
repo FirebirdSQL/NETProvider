@@ -40,11 +40,11 @@ public class DeleteTestsUsingSP : EntityFrameworkCoreTestsBase
 			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
 			insertEntityConf.ToTable("TEST_DELETE_USP");
 			modelBuilder.Entity<DeleteEntity>().DeleteUsingStoredProcedure("SP_TEST_DELETE",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasRowsAffectedResultColumn();
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasRowsAffectedResultColumn();
+				});
 		}
 	}
 	class DeleteEntity
@@ -105,12 +105,12 @@ public class DeleteTestsUsingSP : EntityFrameworkCoreTestsBase
 				.IsRowVersion();
 			insertEntityConf.ToTable("TEST_DELETE_CONCURRENCY_USP");
 			modelBuilder.Entity<ConcurrencyDeleteEntity>().DeleteUsingStoredProcedure("SP_TEST_DELETE_CONCURRENCY",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
-				storedProcedureBuilder.HasRowsAffectedResultColumn();
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
+					storedProcedureBuilder.HasRowsAffectedResultColumn();
+				});
 		}
 	}
 	class ConcurrencyDeleteEntity
@@ -137,7 +137,8 @@ public class DeleteTestsUsingSP : EntityFrameworkCoreTestsBase
 					 begin
 					     delete from test_delete_concurrency_usp where id = :pid and stamp = :pstamp;
 					     rowcount = row_count;
-					     if (rowcount > 0) then suspend;
+					     if (rowcount > 0) then
+					         suspend;
 					 end
 					 """;
 			await db.Database.ExecuteSqlRawAsync(sp);

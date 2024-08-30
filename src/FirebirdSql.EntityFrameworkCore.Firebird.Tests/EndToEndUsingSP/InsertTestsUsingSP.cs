@@ -39,12 +39,12 @@ public class InsertTestsUsingSP : EntityFrameworkCoreTestsBase
 			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
 			insertEntityConf.ToTable("TEST_INSERT_USP");
 			modelBuilder.Entity<InsertEntity>().InsertUsingStoredProcedure("SP_TEST_INSERT",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Name);
-				storedProcedureBuilder.HasResultColumn(x => x.Id);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Name);
+					storedProcedureBuilder.HasResultColumn(x => x.Id);
+				});
 		}
 	}
 	class InsertEntity
@@ -94,11 +94,11 @@ public class InsertTestsUsingSP : EntityFrameworkCoreTestsBase
 			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
 			insertEntityConf.ToTable("TEST_INSERT_IDENTITY_USP");
 			modelBuilder.Entity<IdentityInsertEntity>().InsertUsingStoredProcedure("SP_TEST_INSERT_IDENTITY",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasParameter(x => x.Name);
-				storedProcedureBuilder.HasResultColumn(x => x.Id);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasParameter(x => x.Name);
+					storedProcedureBuilder.HasResultColumn(x => x.Id);
+				});
 		}
 	}
 	class IdentityInsertEntity
@@ -152,11 +152,11 @@ public class InsertTestsUsingSP : EntityFrameworkCoreTestsBase
 			insertEntityConf.Property(x => x.Name).HasColumnName("NAME");
 			insertEntityConf.ToTable("TEST_INSERT_SEQUENCE_USP");
 			modelBuilder.Entity<SequenceInsertEntity>().InsertUsingStoredProcedure("SP_TEST_INSERT_SEQUENCE",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasParameter(x => x.Name);
-				storedProcedureBuilder.HasResultColumn(x => x.Id);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasParameter(x => x.Name);
+					storedProcedureBuilder.HasResultColumn(x => x.Id);
+				});
 		}
 	}
 	class SequenceInsertEntity
@@ -211,11 +211,11 @@ public class InsertTestsUsingSP : EntityFrameworkCoreTestsBase
 				.ValueGeneratedOnAdd();
 			insertEntityConf.ToTable("TEST_INSERT_DEVAULTVALUES_USP");
 			modelBuilder.Entity<DefaultValuesInsertEntity>().InsertUsingStoredProcedure("SP_TEST_INSERT_DEFAULTVALUES",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasResultColumn(x => x.Id);
-				storedProcedureBuilder.HasResultColumn(x => x.Name);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasResultColumn(x => x.Id);
+					storedProcedureBuilder.HasResultColumn(x => x.Name);
+				});
 		}
 	}
 	class DefaultValuesInsertEntity
@@ -273,13 +273,13 @@ public class InsertTestsUsingSP : EntityFrameworkCoreTestsBase
 				.ValueGeneratedOnAddOrUpdate();
 			insertEntityConf.ToTable("TEST_INSERT_2COMPUTED_USP");
 			modelBuilder.Entity<TwoComputedInsertEntity>().InsertUsingStoredProcedure("SP_TEST_INSERT_2COMPUTED",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasParameter(x => x.Name);
-				storedProcedureBuilder.HasResultColumn(x => x.Id);
-				storedProcedureBuilder.HasResultColumn(x => x.Computed1);
-				storedProcedureBuilder.HasResultColumn(x => x.Computed2);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasParameter(x => x.Name);
+					storedProcedureBuilder.HasResultColumn(x => x.Id);
+					storedProcedureBuilder.HasResultColumn(x => x.Computed1);
+					storedProcedureBuilder.HasResultColumn(x => x.Computed2);
+				});
 		}
 	}
 	class TwoComputedInsertEntity

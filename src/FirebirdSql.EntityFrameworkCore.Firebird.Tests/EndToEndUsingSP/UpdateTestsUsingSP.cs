@@ -41,13 +41,13 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 			insertEntityConf.Property(x => x.Bar).HasColumnName("BAR");
 			insertEntityConf.ToTable("TEST_UPDATE_USP");
 			modelBuilder.Entity<UpdateEntity>().UpdateUsingStoredProcedure("SP_TEST_UPDATE",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Foo);
-				storedProcedureBuilder.HasParameter(x => x.Bar);
-				storedProcedureBuilder.HasRowsAffectedResultColumn();
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Foo);
+					storedProcedureBuilder.HasParameter(x => x.Bar);
+					storedProcedureBuilder.HasRowsAffectedResultColumn();
+				});
 		}
 	}
 	class UpdateEntity
@@ -88,7 +88,6 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 				.FirstAsync();
 			Assert.AreEqual("test", value.Foo);
 			Assert.AreEqual("test", value.Bar);
-			//Assert.AreNotEqual("test", value.Bar); //this has to fail
 		}
 	}
 
@@ -110,13 +109,13 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 				.ValueGeneratedOnAddOrUpdate();
 			insertEntityConf.ToTable("TEST_UPDATE_COMPUTED_USP");
 			modelBuilder.Entity<ComputedUpdateEntity>().UpdateUsingStoredProcedure("SP_TEST_UPDATE_COMPUTED",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Foo);
-				storedProcedureBuilder.HasParameter(x => x.Bar);
-				storedProcedureBuilder.HasResultColumn(x => x.Computed);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Foo);
+					storedProcedureBuilder.HasParameter(x => x.Bar);
+					storedProcedureBuilder.HasResultColumn(x => x.Computed);
+				});
 		}
 	}
 	class ComputedUpdateEntity
@@ -144,7 +143,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     update test_update_computed_usp set foo = :pfoo, bar = :pbar
 					     where id = :pid
 					     returning computed into :rcomputed;
-					     if (row_count > 0) then suspend;
+					     if (row_count > 0) then
+					        suspend;
 					 end
 					 """;
 			await db.Database.ExecuteSqlRawAsync(sp);
@@ -173,13 +173,13 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 				.IsRowVersion();
 			insertEntityConf.ToTable("TEST_UPDATE_CONCURRENCY_USP");
 			modelBuilder.Entity<ConcurrencyUpdateEntity>().UpdateUsingStoredProcedure("SP_TEST_UPDATE_CONCURRENCY",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Foo);
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
-				storedProcedureBuilder.HasResultColumn(x => x.Stamp);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Foo);
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
+					storedProcedureBuilder.HasResultColumn(x => x.Stamp);
+				});
 		}
 	}
 	class ConcurrencyUpdateEntity
@@ -206,7 +206,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     update test_update_concurrency_usp set foo = :pfoo, stamp = current_timestamp
 					     where id = :pid and stamp = :pstamp
 					     returning stamp into :rstamp;
-					     if (row_count > 0) then suspend;
+					     if (row_count > 0) then
+					         suspend;
 					 end
 					 """;
 			await db.Database.ExecuteSqlRawAsync(sp);
@@ -234,13 +235,13 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 				.IsConcurrencyToken();
 			insertEntityConf.ToTable("TEST_UPDATE_CONCURRENCY_NG_USP");
 			modelBuilder.Entity<ConcurrencyUpdateNoGeneratedEntity>().UpdateUsingStoredProcedure("SP_TEST_UPDATE_CONCURRENCY_NG",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Foo);
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
-				storedProcedureBuilder.HasRowsAffectedResultColumn();
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Foo);
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Stamp);
+					storedProcedureBuilder.HasRowsAffectedResultColumn();
+				});
 		}
 	}
 	class ConcurrencyUpdateNoGeneratedEntity
@@ -267,7 +268,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     update test_update_concurrency_ng_usp set foo = :pfoo, stamp = current_timestamp
 					     where id = :pid and stamp = :pstamp;
 					     rowcount = row_count;
-					     if (rowcount > 0) then suspend;
+					     if (rowcount > 0) then
+					         suspend;
 					 end
 					 """;
 			await db.Database.ExecuteSqlRawAsync(sp);
@@ -299,14 +301,14 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 				.ValueGeneratedOnAddOrUpdate();
 			insertEntityConf.ToTable("TEST_UPDATE_2COMPUTED_USP");
 			modelBuilder.Entity<TwoComputedUpdateEntity>().UpdateUsingStoredProcedure("SP_TEST_UPDATE_2COMPUTED",
-			storedProcedureBuilder =>
-			{
-				storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
-				storedProcedureBuilder.HasParameter(x => x.Foo);
-				storedProcedureBuilder.HasParameter(x => x.Bar);
-				storedProcedureBuilder.HasResultColumn(x => x.Computed1);
-				storedProcedureBuilder.HasResultColumn(x => x.Computed2);
-			});
+				storedProcedureBuilder =>
+				{
+					storedProcedureBuilder.HasOriginalValueParameter(x => x.Id);
+					storedProcedureBuilder.HasParameter(x => x.Foo);
+					storedProcedureBuilder.HasParameter(x => x.Bar);
+					storedProcedureBuilder.HasResultColumn(x => x.Computed1);
+					storedProcedureBuilder.HasResultColumn(x => x.Computed2);
+				});
 		}
 	}
 	class TwoComputedUpdateEntity
@@ -337,7 +339,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     update test_update_2computed_usp set foo = :pfoo, bar = :pbar
 					     where id = :pid
 					     returning computed1, computed2 into :rcomputed1, :rcomputed2;
-					     if (row_count > 0) then suspend;
+					     if (row_count > 0) then
+					         suspend;
 					 end
 					 """;
 			await db.Database.ExecuteSqlRawAsync(sp);
