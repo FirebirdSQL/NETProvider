@@ -66,8 +66,8 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_SELECT_Test()
 	{
-		IDictionary<string, short> tableNameList = GetTableNameList();
-		short tableIdTest = tableNameList["TEST"];
+		var tableNameList = GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
 		var insertCount = await dbInfo.GetInsertCountAsync();
@@ -93,8 +93,8 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_INSERT_Test()
 	{
-		IDictionary<string, short> tableNameList = GetTableNameList();
-		short tableIdTest = tableNameList["TEST"];
+		var tableNameList = GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
 		var insertCount = await dbInfo.GetInsertCountAsync();
@@ -120,8 +120,8 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_UPDATE_Test()
 	{
-		IDictionary<string, short> tableNameList = GetTableNameList();
-		short tableIdTest = tableNameList["TEST"];
+		var tableNameList = GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
 
 		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
 		fbCommand.ExecuteNonQuery();
@@ -151,11 +151,11 @@ public class FbDatabaseInfoTests : FbTestsBase
 	private IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> aStatisticInfoBefore, IDictionary<short, ulong> aStatisticInfoAfter)
 	{
 		var result = new Dictionary<short, ulong>();
-		foreach (KeyValuePair<short, ulong> keyValuePair in aStatisticInfoAfter)
+		foreach (var keyValuePair in aStatisticInfoAfter)
 		{
-			if (aStatisticInfoBefore.TryGetValue(keyValuePair.Key, out ulong value))
+			if (aStatisticInfoBefore.TryGetValue(keyValuePair.Key, out var value))
 			{
-				ulong counter = keyValuePair.Value - value;
+				var counter = keyValuePair.Value - value;
 				if (counter > 0)
 				{
 					result.Add(keyValuePair.Key, counter);
@@ -172,7 +172,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 		IDictionary<string, short> result = new Dictionary<string, short>();
 
 		var command = new FbCommand("select R.RDB$RELATION_ID, R.RDB$RELATION_NAME from RDB$RELATIONS R WHERE RDB$SYSTEM_FLAG = 0", Connection);
-		FbDataReader reader = command.ExecuteReader();
+		var reader = command.ExecuteReader();
 		while (reader.Read())
 		{
 			result.Add(reader.GetString(1).Trim(), reader.GetInt16(0));
