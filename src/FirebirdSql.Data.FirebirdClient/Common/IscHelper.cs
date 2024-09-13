@@ -77,7 +77,7 @@ internal static class IscHelper
 				case IscCodes.isc_info_update_count:
 				case IscCodes.isc_info_read_seq_count:
 				case IscCodes.isc_info_read_idx_count:
-					info.Add( buffer.GetTableStatistic( length ) );
+					info.Add(buffer.GetTableStatistic(length));
 					break;
 
 				case IscCodes.isc_info_no_reserve:
