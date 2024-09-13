@@ -148,12 +148,12 @@ public class FbDatabaseInfoTests : FbTestsBase
 		Assert.That(readIdxCount[tableIdTest], Is.EqualTo(1));
 	}
 
-	IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> aStatisticInfoBefore, IDictionary<short, ulong> aStatisticInfoAfter)
+	IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> statisticInfoBefore, IDictionary<short, ulong> statisticInfoAfter)
 	{
 		var result = new Dictionary<short, ulong>();
-		foreach (var keyValuePair in aStatisticInfoAfter)
+		foreach (var keyValuePair in statisticInfoAfter)
 		{
-			if (aStatisticInfoBefore.TryGetValue(keyValuePair.Key, out var value))
+			if (statisticInfoBefore.TryGetValue(keyValuePair.Key, out var value))
 			{
 				var counter = keyValuePair.Value - value;
 				if (counter > 0)
