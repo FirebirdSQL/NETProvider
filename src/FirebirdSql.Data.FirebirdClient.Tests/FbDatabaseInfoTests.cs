@@ -64,24 +64,24 @@ public class FbDatabaseInfoTests : FbTestsBase
 	}
 
 	[Test]
-	public void PerformanceAnalysis_SELECT_Test()
+	public async Task PerformanceAnalysis_SELECT_Test()
 	{
 		IDictionary<string, short> tableNameList = GetTableNameList();
 		short tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
-		IDictionary<short, ulong> insertCount = dbInfo.GetInsertCount();
-		IDictionary<short, ulong> updateCount = dbInfo.GetUpdateCount();
-		IDictionary<short, ulong> readSeqCount = dbInfo.GetReadSeqCount();
-		IDictionary<short, ulong> readIdxCount = dbInfo.GetReadIdxCount();
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
 
 		var fbCommand = new FbCommand("SELECT MAX(INT_FIELD) FROM TEST", Connection);
-		var maxIntField = fbCommand.ExecuteScalar() as int?;
+		var maxIntField = await fbCommand.ExecuteScalarAsync() as int?;
 
-		insertCount = GetAffectedTables(insertCount, dbInfo.GetInsertCount());
-		updateCount = GetAffectedTables(updateCount, dbInfo.GetUpdateCount());
-		readSeqCount = GetAffectedTables(readSeqCount, dbInfo.GetReadSeqCount());
-		readIdxCount = GetAffectedTables(readIdxCount, dbInfo.GetReadIdxCount());
+		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
 		Assert.That(updateCount.ContainsKey(tableIdTest), Is.False);
@@ -91,24 +91,24 @@ public class FbDatabaseInfoTests : FbTestsBase
 	}
 
 	[Test]
-	public void PerformanceAnalysis_INSERT_Test()
+	public async Task PerformanceAnalysis_INSERT_Test()
 	{
 		IDictionary<string, short> tableNameList = GetTableNameList();
 		short tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
-		IDictionary<short, ulong> insertCount = dbInfo.GetInsertCount();
-		IDictionary<short, ulong> updateCount = dbInfo.GetUpdateCount();
-		IDictionary<short, ulong> readSeqCount = dbInfo.GetReadSeqCount();
-		IDictionary<short, ulong> readIdxCount = dbInfo.GetReadIdxCount();
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
 
 		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
-		fbCommand.ExecuteNonQuery();
+		await fbCommand.ExecuteNonQueryAsync();
 
-		insertCount = GetAffectedTables(insertCount, dbInfo.GetInsertCount());
-		updateCount = GetAffectedTables(updateCount, dbInfo.GetUpdateCount());
-		readSeqCount = GetAffectedTables(readSeqCount, dbInfo.GetReadSeqCount());
-		readIdxCount = GetAffectedTables(readIdxCount, dbInfo.GetReadIdxCount());
+		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.True);
 		Assert.That(insertCount[tableIdTest], Is.EqualTo(1));
@@ -118,7 +118,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 	}
 
 	[Test]
-	public void PerformanceAnalysis_UPDATE_Test()
+	public async Task PerformanceAnalysis_UPDATE_Test()
 	{
 		IDictionary<string, short> tableNameList = GetTableNameList();
 		short tableIdTest = tableNameList["TEST"];
@@ -127,18 +127,18 @@ public class FbDatabaseInfoTests : FbTestsBase
 		fbCommand.ExecuteNonQuery();
 
 		var dbInfo = new FbDatabaseInfo(Connection);
-		IDictionary<short, ulong> insertCount = dbInfo.GetInsertCount();
-		IDictionary<short, ulong> updateCount = dbInfo.GetUpdateCount();
-		IDictionary<short, ulong> readSeqCount = dbInfo.GetReadSeqCount();
-		IDictionary<short, ulong> readIdxCount = dbInfo.GetReadIdxCount();
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
 
 		fbCommand.CommandText = "UPDATE TEST SET SMALLINT_FIELD = 900 WHERE (INT_FIELD = 900)";
-		fbCommand.ExecuteNonQuery();
+		await fbCommand.ExecuteNonQueryAsync();
 
-		insertCount = GetAffectedTables(insertCount, dbInfo.GetInsertCount());
-		updateCount = GetAffectedTables(updateCount, dbInfo.GetUpdateCount());
-		readSeqCount = GetAffectedTables(readSeqCount, dbInfo.GetReadSeqCount());
-		readIdxCount = GetAffectedTables(readIdxCount, dbInfo.GetReadIdxCount());
+		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
 		Assert.That(updateCount.ContainsKey(tableIdTest), Is.True);
@@ -157,7 +157,9 @@ public class FbDatabaseInfoTests : FbTestsBase
 			{
 				ulong counter = keyValuePair.Value - value;
 				if (counter > 0)
+				{
 					result.Add(keyValuePair.Key, counter);
+				}
 			}
 			else
 				result.Add(keyValuePair.Key, keyValuePair.Value);
