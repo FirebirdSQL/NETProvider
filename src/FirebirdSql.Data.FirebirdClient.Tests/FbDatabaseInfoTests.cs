@@ -148,7 +148,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 		Assert.That(readIdxCount[tableIdTest], Is.EqualTo(1));
 	}
 
-	private IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> aStatisticInfoBefore, IDictionary<short, ulong> aStatisticInfoAfter)
+	IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> aStatisticInfoBefore, IDictionary<short, ulong> aStatisticInfoAfter)
 	{
 		var result = new Dictionary<short, ulong>();
 		foreach (var keyValuePair in aStatisticInfoAfter)
@@ -167,7 +167,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 		return result;
 	}
 
-	private IDictionary<string, short> GetTableNameList()
+	IDictionary<string, short> GetTableNameList()
 	{
 		IDictionary<string, short> result = new Dictionary<string, short>();
 
