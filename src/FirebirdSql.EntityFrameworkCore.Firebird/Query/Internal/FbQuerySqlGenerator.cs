@@ -191,8 +191,9 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		base.VisitSqlConstant(sqlConstantExpression);
 		if (shouldExplicitStringLiteralTypes)
 		{
+			var isUnicode = FbTypeMappingSource.IsUnicode(sqlConstantExpression.TypeMapping);	
 			Sql.Append(" AS ");
-			Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string));
+			Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string, isUnicode));
 			Sql.Append(")");
 		}
 		return sqlConstantExpression;

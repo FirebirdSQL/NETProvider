@@ -27,11 +27,15 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		: base(dependencies)
 	{ }
 
-	public virtual string StringLiteralQueryType(string s)
+	public virtual string StringLiteralQueryType(string s, bool isUnicode = true)
 	{
 		var length = MinimumStringQueryTypeLength(s);
 		EnsureStringLiteralQueryTypeLength(length);
-		return $"VARCHAR({length}) CHARACTER SET UTF8";
+		if(isUnicode)
+		{
+			return $"VARCHAR({length}) CHARACTER SET UTF8";
+		}
+		return $"VARCHAR({length})";
 	}
 
 	public virtual string StringParameterQueryType(bool isUnicode)
