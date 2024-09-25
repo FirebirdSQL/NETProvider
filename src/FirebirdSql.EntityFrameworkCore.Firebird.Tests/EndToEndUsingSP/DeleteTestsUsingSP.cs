@@ -62,12 +62,13 @@ public class DeleteTestsUsingSP : EntityFrameworkCoreTestsBase
 			await db.Database.ExecuteSqlRawAsync("insert into test_delete_usp values (66, 'test')");
 			await db.Database.ExecuteSqlRawAsync("insert into test_delete_usp values (67, 'test')");
 			var sp = """
-					 create or alter procedure sp_test_delete (
+					 create procedure sp_test_delete (
 					     pid integer)
 					 returns (rowcount integer)
 					 as
 					 begin
-					     delete from test_delete_usp where id = :pid;
+					     delete from test_delete_usp
+					     where id = :pid;
 					     rowcount = row_count;
 					     suspend;
 					 end
@@ -129,13 +130,14 @@ public class DeleteTestsUsingSP : EntityFrameworkCoreTestsBase
 			await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency_usp values (66, 'test', current_timestamp)");
 			await db.Database.ExecuteSqlRawAsync("insert into test_delete_concurrency_usp values (67, 'test', current_timestamp)");
 			var sp = """
-					 create or alter procedure sp_test_delete_concurrency (
+					 create procedure sp_test_delete_concurrency (
 					     pid integer,
 					     pstamp timestamp)
 					 returns (rowcount integer)
 					 as
 					 begin
-					     delete from test_delete_concurrency_usp where id = :pid and stamp = :pstamp;
+					     delete from test_delete_concurrency_usp
+					     where id = :pid and stamp = :pstamp;
 					     rowcount = row_count;
 					     if (rowcount > 0) then
 					         suspend;

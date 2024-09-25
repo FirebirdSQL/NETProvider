@@ -277,7 +277,39 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 			}
 		}
 
-		commandStringBuilder.Append("SELECT * FROM ");
+		if (resultSetMapping == ResultSetMapping.NoResults)
+		{
+			commandStringBuilder.Append("EXECUTE PROCEDURE ");
+		}
+		else
+		{
+			commandStringBuilder.Append("SELECT ");
+
+			var first = true;
+
+			foreach (var resultColumn in storedProcedure.ResultColumns)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					commandStringBuilder.Append(", ");
+				}
+
+				if (resultColumn == command.RowsAffectedColumn || resultColumn.Name == "RowsAffected")
+				{
+					SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, "ROWCOUNT");
+				}
+				else
+				{
+					SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, resultColumn.Name);
+				}
+			}
+			commandStringBuilder.Append(" FROM ");
+		}
+
 		SqlGenerationHelper.DelimitIdentifier(commandStringBuilder, storedProcedure.Name);
 
 		if (storedProcedure.Parameters.Any())
@@ -296,7 +328,7 @@ public class FbUpdateSqlGenerator : UpdateSqlGenerator, IFbUpdateSqlGenerator
 
 				if (parameter.Direction.HasFlag(ParameterDirection.Output))
 				{
-					continue;
+					throw new InvalidOperationException("Output parameters are not supported in stored procedures");
 				}
 
 				if (first)

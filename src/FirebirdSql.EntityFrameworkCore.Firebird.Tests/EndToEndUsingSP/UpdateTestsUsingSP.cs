@@ -71,7 +71,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					 returns (rowcount integer)
 					 as
 					 begin
-					     update test_update_usp set foo = :pfoo, bar = :pbar
+					     update test_update_usp
+					     set foo = :pfoo, bar = :pbar
 					     where id = :pid;
 					     rowcount = row_count;
 					     suspend;
@@ -137,12 +138,14 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     pid integer,
 					     pfoo varchar(20),
 					     pbar varchar(20))
-					 returns (rcomputed varchar(50))
+					 returns (computed varchar(50))
 					 as
 					 begin
-					     update test_update_computed_usp set foo = :pfoo, bar = :pbar
+					     update test_update_computed_usp
+					     set foo = :pfoo, bar = :pbar
 					     where id = :pid
-					     returning computed into :rcomputed;
+					     returning computed
+					     into :computed;
 					     if (row_count > 0) then
 					        suspend;
 					 end
@@ -200,12 +203,14 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     pid integer,
 					     pfoo varchar(20),
 					     pstamp timestamp)
-					 returns (rstamp timestamp)
+					 returns (stamp timestamp)
 					 as
 					 begin
-					     update test_update_concurrency_usp set foo = :pfoo, stamp = current_timestamp
+					     update test_update_concurrency_usp
+					     set foo = :pfoo, stamp = current_timestamp
 					     where id = :pid and stamp = :pstamp
-					     returning stamp into :rstamp;
+					     returning stamp
+					     into :stamp;
 					     if (row_count > 0) then
 					         suspend;
 					 end
@@ -265,7 +270,8 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					 returns (rowcount integer)
 					 as
 					 begin
-					     update test_update_concurrency_ng_usp set foo = :pfoo, stamp = current_timestamp
+					     update test_update_concurrency_ng_usp
+					     set foo = :pfoo, stamp = current_timestamp
 					     where id = :pid and stamp = :pstamp;
 					     rowcount = row_count;
 					     if (rowcount > 0) then
@@ -332,13 +338,15 @@ public class UpdateTestsUsingSP : EntityFrameworkCoreTestsBase
 					     pfoo varchar(20),
 					     pbar varchar(20))
 					 returns (
-					     rcomputed1 varchar(50),
-					     rcomputed2 varchar(50))
+					     computed1 varchar(50),
+					     computed2 varchar(50))
 					 as
 					 begin
-					     update test_update_2computed_usp set foo = :pfoo, bar = :pbar
+					     update test_update_2computed_usp
+					     set foo = :pfoo, bar = :pbar
 					     where id = :pid
-					     returning computed1, computed2 into :rcomputed1, :rcomputed2;
+					     returning computed1, computed2
+					     into :computed1, :computed2;
 					     if (row_count > 0) then
 					         suspend;
 					 end
