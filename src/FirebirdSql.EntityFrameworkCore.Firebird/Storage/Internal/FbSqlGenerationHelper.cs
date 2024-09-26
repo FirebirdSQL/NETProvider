@@ -30,7 +30,7 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 	public virtual string StringLiteralQueryType(string s, bool isUnicode = true)
 	{
 		var length = MinimumStringQueryTypeLength(s);
-		var charset = isUnicode ? " CHARACTER SET UTF8" : "";
+		var charset = isUnicode ? " CHARACTER SET UTF8" : string.Empty;
 		return $"VARCHAR({length}){charset}";
 	}
 
