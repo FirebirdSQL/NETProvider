@@ -100,7 +100,15 @@ public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTim
 
 	public string ToString(IFormatProvider provider) => throw new InvalidCastException(nameof(String));
 
-	public object ToType(Type conversionType, IFormatProvider provider) => throw new InvalidCastException(nameof(conversionType));
+	public object ToType(Type conversionType, IFormatProvider provider)
+	{
+		if (ReferenceEquals(conversionType, typeof(FbZonedDateTime)))
+		{
+			return this;
+		}
+
+		throw new InvalidCastException(conversionType?.FullName);
+	}
 
 	public ushort ToUInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt16));
 
