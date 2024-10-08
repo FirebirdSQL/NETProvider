@@ -78,25 +78,25 @@ public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTim
 
 	bool IConvertible.ToBoolean(IFormatProvider provider) => throw new InvalidCastException(nameof(Boolean));
 
-	byte IConvertible. ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
+	byte IConvertible.ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
 
-	char IConvertible. ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
+	char IConvertible.ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
 
-	DateTime IConvertible. ToDateTime(IFormatProvider provider) => DateTime;
+	DateTime IConvertible.ToDateTime(IFormatProvider provider) => DateTime;
 
-	decimal IConvertible. ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
+	decimal IConvertible.ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
 
-	double IConvertible. ToDouble(IFormatProvider provider) => throw new InvalidCastException(nameof(Double));
+	double IConvertible.ToDouble(IFormatProvider provider) => throw new InvalidCastException(nameof(Double));
 
-	short IConvertible. ToInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(Int16));
+	short IConvertible.ToInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(Int16));
 
-	int IConvertible. ToInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(Int32));
+	int IConvertible.ToInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(Int32));
 
-	long IConvertible. ToInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(Int64));
+	long IConvertible.ToInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(Int64));
 
-	sbyte IConvertible. ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
+	sbyte IConvertible.ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
 
-	float IConvertible. ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
+	float IConvertible.ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
 
 	string IConvertible.ToString(IFormatProvider provider) => ToString();
 
