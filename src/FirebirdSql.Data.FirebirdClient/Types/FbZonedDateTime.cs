@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 namespace FirebirdSql.Data.Types;
 
 [StructLayout(LayoutKind.Auto)]
-public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
+public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTime>
 {
 	public DateTime DateTime { get; }
 	public string TimeZone { get; }
@@ -73,6 +73,40 @@ public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
 	}
 
 	public bool Equals(FbZonedDateTime other) => DateTime.Equals(other.DateTime) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
+
+	public TypeCode GetTypeCode() => TypeCode.Object;
+
+	public bool ToBoolean(IFormatProvider provider) => throw new InvalidCastException(nameof(Boolean));
+
+	public byte ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
+
+	public char ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
+
+	public DateTime ToDateTime(IFormatProvider provider) => DateTime;
+
+	public decimal ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
+
+	public double ToDouble(IFormatProvider provider) => throw new InvalidCastException(nameof(Double));
+
+	public short ToInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(Int16));
+
+	public int ToInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(Int32));
+
+	public long ToInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(Int64));
+
+	public sbyte ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
+
+	public float ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
+
+	public string ToString(IFormatProvider provider) => throw new InvalidCastException(nameof(String));
+
+	public object ToType(Type conversionType, IFormatProvider provider) => throw new InvalidCastException(nameof(conversionType));
+
+	public ushort ToUInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt16));
+
+	public uint ToUInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt32));
+
+	public ulong ToUInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt64));
 
 	public static bool operator ==(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
 
