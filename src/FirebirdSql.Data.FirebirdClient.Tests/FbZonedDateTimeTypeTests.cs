@@ -50,7 +50,7 @@ public class FbZonedDateTimeTypeTests
 	[Test]
 	public void ConvertToDateTimeShouldNotThrow()
 	{
-		FbZonedDateTime fbZonedDateTime = new(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC");
+		var fbZonedDateTime = new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC");
 		
 		Assert.DoesNotThrow(() => Convert.ChangeType(fbZonedDateTime, typeof(DateTime)));
 	}

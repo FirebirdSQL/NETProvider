@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 namespace FirebirdSql.Data.Types;
 
 [StructLayout(LayoutKind.Auto)]
-public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTime>
+public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>, IConvertible
 {
 	public DateTime DateTime { get; }
 	public string TimeZone { get; }
@@ -76,13 +76,18 @@ public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTim
 
 	TypeCode IConvertible.GetTypeCode() => TypeCode.Object;
 
+	DateTime IConvertible.ToDateTime(IFormatProvider provider) => DateTime;
+
+	string IConvertible.ToString(IFormatProvider provider) => ToString();
+
+	object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+		=> ReferenceEquals(conversionType, typeof(FbZonedDateTime)) ? this : throw new InvalidCastException(conversionType?.FullName);
+
 	bool IConvertible.ToBoolean(IFormatProvider provider) => throw new InvalidCastException(nameof(Boolean));
 
 	byte IConvertible.ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
 
 	char IConvertible.ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
-
-	DateTime IConvertible.ToDateTime(IFormatProvider provider) => DateTime;
 
 	decimal IConvertible.ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
 
@@ -97,18 +102,6 @@ public readonly struct FbZonedDateTime : IConvertible, IEquatable<FbZonedDateTim
 	sbyte IConvertible.ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
 
 	float IConvertible.ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
-
-	string IConvertible.ToString(IFormatProvider provider) => ToString();
-
-	object IConvertible.ToType(Type conversionType, IFormatProvider provider)
-	{
-		if (ReferenceEquals(conversionType, typeof(FbZonedDateTime)))
-		{
-			return this;
-		}
-
-		throw new InvalidCastException(conversionType?.FullName);
-	}
 
 	ushort IConvertible.ToUInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt16));
 
