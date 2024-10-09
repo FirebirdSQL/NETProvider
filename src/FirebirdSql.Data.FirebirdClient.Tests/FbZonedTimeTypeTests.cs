@@ -46,4 +46,12 @@ public class FbZonedTimeTypeTests
 	{
 		Assert.AreNotEqual(expected, actual);
 	}
+
+	[Test]
+	public void ConvertToTimeSpanShouldNotThrow()
+	{
+		var fbZonedTime = new FbZonedTime(TimeSpan.FromMinutes(142), "UTC");
+
+		Assert.DoesNotThrow(() => Convert.ChangeType(fbZonedTime, typeof(TimeSpan)));
+	}
 }
