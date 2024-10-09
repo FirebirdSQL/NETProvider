@@ -47,6 +47,14 @@ public class FbZonedDateTimeTypeTests
 		Assert.AreNotEqual(expected, actual);
 	}
 
+	[Test]
+	public void ConvertToDateTimeShouldNotThrow()
+	{
+		var fbZonedDateTime = new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC");
+		
+		Assert.DoesNotThrow(() => Convert.ChangeType(fbZonedDateTime, typeof(DateTime)));
+	}
+
 	public void DateTimeShouldBeUtc()
 	{
 		Assert.Throws<ArgumentException>(() =>
