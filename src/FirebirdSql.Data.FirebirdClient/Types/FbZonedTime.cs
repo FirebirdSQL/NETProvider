@@ -84,31 +84,18 @@ public readonly struct FbZonedTime : IEquatable<FbZonedTime>, IConvertible
 				: throw new InvalidCastException(conversionType?.FullName);
 
 	bool IConvertible.ToBoolean(IFormatProvider provider) => throw new InvalidCastException(nameof(Boolean));
-
 	byte IConvertible.ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
-
 	char IConvertible.ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
-
 	DateTime IConvertible.ToDateTime(IFormatProvider provider) => throw new InvalidCastException(nameof(DateTime));
-
 	decimal IConvertible.ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
-
 	double IConvertible.ToDouble(IFormatProvider provider) => throw new InvalidCastException(nameof(Double));
-
 	short IConvertible.ToInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(Int16));
-
 	int IConvertible.ToInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(Int32));
-
 	long IConvertible.ToInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(Int64));
-
 	sbyte IConvertible.ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
-
 	float IConvertible.ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
-
 	ushort IConvertible.ToUInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt16));
-
 	uint IConvertible.ToUInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt32));
-
 	ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt64));
 
 	public static bool operator ==(FbZonedTime lhs, FbZonedTime rhs) => lhs.Equals(rhs);
