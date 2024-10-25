@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -37,6 +37,9 @@ internal static class NamedParametersParser
 		var inSingleQuotes = false;
 		var inDoubleQuotes = false;
 		var inParam = false;
+		var inSingleLineComment = false;
+		var inMultiLineComment = false;
+
 		for (var i = 0; i < sql.Length; i++)
 		{
 			var sym = sql[i];
@@ -58,19 +61,45 @@ internal static class NamedParametersParser
 			}
 			else
 			{
-				if (sym == '\'' && !inDoubleQuotes)
+				var needsAdvance = false;
+				if ((sym == '\'') && (!(inDoubleQuotes || inSingleLineComment || inMultiLineComment)))
 				{
 					inSingleQuotes = !inSingleQuotes;
 				}
-				else if (sym == '\"' && !inSingleQuotes)
+				else if ((sym == '\"') && (!(inSingleQuotes || inSingleLineComment || inMultiLineComment)))
 				{
 					inDoubleQuotes = !inDoubleQuotes;
 				}
-				else if (!(inSingleQuotes || inDoubleQuotes) && sym == '@')
+				else if ((sym == '-') && (i < sql.Length - 1) && (sql[i + 1] == '-') && (!(inSingleQuotes || inDoubleQuotes || inSingleLineComment || inMultiLineComment)))
+				{
+					inSingleLineComment = true;
+					needsAdvance = true;
+				}
+				else if ((sym == '\n') && inSingleLineComment)
+				{
+					inSingleLineComment = false;
+				}
+				else if ((sym == '/') && (i < sql.Length - 1) && (sql[i + 1] == '*') && (!(inSingleQuotes || inDoubleQuotes || inSingleLineComment || inMultiLineComment)))
+				{
+					inMultiLineComment = true;
+					needsAdvance = true;
+				}
+				else if ((sym == '*') && (i < sql.Length - 1) && (sql[i + 1] == '/') && (inMultiLineComment))
+				{
+					inMultiLineComment = false;
+					needsAdvance = true;
+				}
+				else if ((!(inSingleQuotes || inDoubleQuotes || inSingleLineComment || inMultiLineComment)) && (sym == '@'))
 				{
 					inParam = true;
 					paramBuilder.Append(sym);
 					continue;
+				}
+
+				if (needsAdvance)
+				{
+					sqlBuilder.Append(sym);
+					sym = sql[++i];
 				}
 
 				sqlBuilder.Append(sym);
