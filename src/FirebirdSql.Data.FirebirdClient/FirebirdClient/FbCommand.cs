@@ -20,11 +20,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using FirebirdSql.Data.Trace;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
@@ -49,6 +51,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	private int? _commandTimeout;
 	private int _fetchSize;
 	private Type[] _expectedColumnTypes;
+	private Activity _currentActivity;
 
 	#endregion
 
@@ -1094,6 +1097,13 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			_statement.Dispose2();
 			_statement = null;
 		}
+
+		if (_currentActivity != null)
+		{
+			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
+			_currentActivity.Dispose();
+			_currentActivity = null;
+		}
 	}
 	Task IFbPreparedCommand.ReleaseAsync(CancellationToken cancellationToken) => ReleaseAsync(cancellationToken);
 	internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
@@ -1111,6 +1121,13 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		{
 			await _statement.Dispose2Async(cancellationToken).ConfigureAwait(false);
 			_statement = null;
+		}
+
+		if (_currentActivity != null)
+		{
+			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
+			_currentActivity.Dispose();
+			_currentActivity = null;
 		}
 	}
 
@@ -1332,6 +1349,26 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 
 	#endregion
 
+	#region Tracing
+
+	private void TraceCommandStart()
+	{
+		Debug.Assert(_currentActivity == null);
+		if (FbActivitySource.Source.HasListeners())
+			_currentActivity = FbActivitySource.CommandStart(this);
+	}
+
+	private void TraceCommandException(Exception e)
+	{
+		if (_currentActivity != null)
+		{
+			FbActivitySource.CommandException(_currentActivity, e);
+			_currentActivity = null;
+		}
+	}
+
+	#endregion Tracing
+
 	#region Private Methods
 
 	private void Prepare(bool returnsSet)
@@ -1476,57 +1513,73 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	private void ExecuteCommand(CommandBehavior behavior, bool returnsSet)
 	{
 		LogMessages.CommandExecution(Log, this);
-
-		Prepare(returnsSet);
-
-		if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
-			(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
-			(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
-			(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
-			behavior == CommandBehavior.Default)
+		TraceCommandStart();
+		try
 		{
-			// Set the fetch size
-			_statement.FetchSize = _fetchSize;
+			Prepare(returnsSet);
 
-			// Set if it's needed the Records Affected information
-			_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
-
-			// Validate input parameter count
-			if (_namedParameters.Count > 0 && !HasParameters)
+			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
+				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
+				(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
+				(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
+				behavior == CommandBehavior.Default)
 			{
-				throw FbException.Create("Must declare command parameters.");
-			}
+				// Set the fetch size
+				_statement.FetchSize = _fetchSize;
 
-			// Execute
-			_statement.Execute(CommandTimeout * 1000, this);
+				// Set if it's needed the Records Affected information
+				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
+
+				// Validate input parameter count
+				if (_namedParameters.Count > 0 && !HasParameters)
+				{
+					throw FbException.Create("Must declare command parameters.");
+				}
+
+				// Execute
+				_statement.Execute(CommandTimeout * 1000, this);
+			}
+		}
+		catch (Exception e)
+		{
+			TraceCommandException(e);
+			throw;
 		}
 	}
 	private async Task ExecuteCommandAsync(CommandBehavior behavior, bool returnsSet, CancellationToken cancellationToken = default)
 	{
 		LogMessages.CommandExecution(Log, this);
-
-		await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
-
-		if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
-			(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
-			(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
-			(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
-			behavior == CommandBehavior.Default)
+		TraceCommandStart();
+		try
 		{
-			// Set the fetch size
-			_statement.FetchSize = _fetchSize;
+			await PrepareAsync(returnsSet, cancellationToken).ConfigureAwait(false);
 
-			// Set if it's needed the Records Affected information
-			_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
-
-			// Validate input parameter count
-			if (_namedParameters.Count > 0 && !HasParameters)
+			if ((behavior & CommandBehavior.SequentialAccess) == CommandBehavior.SequentialAccess ||
+				(behavior & CommandBehavior.SingleResult) == CommandBehavior.SingleResult ||
+				(behavior & CommandBehavior.SingleRow) == CommandBehavior.SingleRow ||
+				(behavior & CommandBehavior.CloseConnection) == CommandBehavior.CloseConnection ||
+				behavior == CommandBehavior.Default)
 			{
-				throw FbException.Create("Must declare command parameters.");
-			}
+				// Set the fetch size
+				_statement.FetchSize = _fetchSize;
 
-			// Execute
-			await _statement.ExecuteAsync(CommandTimeout * 1000, this, cancellationToken).ConfigureAwait(false);
+				// Set if it's needed the Records Affected information
+				_statement.ReturnRecordsAffected = _connection.ConnectionOptions.ReturnRecordsAffected;
+
+				// Validate input parameter count
+				if (_namedParameters.Count > 0 && !HasParameters)
+				{
+					throw FbException.Create("Must declare command parameters.");
+				}
+
+				// Execute
+				await _statement.ExecuteAsync(CommandTimeout * 1000, this, cancellationToken).ConfigureAwait(false);
+			}
+		}
+		catch (Exception e)
+		{
+			TraceCommandException(e);
+			throw;
 		}
 	}
 
