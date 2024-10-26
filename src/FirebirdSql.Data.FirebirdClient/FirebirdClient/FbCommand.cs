@@ -26,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using FirebirdSql.Data.Metrics;
 using FirebirdSql.Data.Trace;
 using Microsoft.Extensions.Logging;
 
@@ -53,6 +54,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	private int _fetchSize;
 	private Type[] _expectedColumnTypes;
 	private Activity _currentActivity;
+	private long _startedAtTicks;
 
 	#endregion
 
@@ -1068,13 +1070,9 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			_statement = null;
 		}
 
-		if (_currentActivity != null)
-		{
-			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
-			_currentActivity.Dispose();
-			_currentActivity = null;
-		}
+		TraceCommandStop();
 	}
+
 	Task IFbPreparedCommand.ReleaseAsync(CancellationToken cancellationToken) => ReleaseAsync(cancellationToken);
 	internal async Task ReleaseAsync(CancellationToken cancellationToken = default)
 	{
@@ -1093,12 +1091,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			_statement = null;
 		}
 
-		if (_currentActivity != null)
-		{
-			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
-			_currentActivity.Dispose();
-			_currentActivity = null;
-		}
+		TraceCommandStop();
 	}
 
 	void IFbPreparedCommand.TransactionCompleted() => TransactionCompleted();
@@ -1326,6 +1319,21 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		Debug.Assert(_currentActivity == null);
 		if (FbActivitySource.Source.HasListeners())
 			_currentActivity = FbActivitySource.CommandStart(this);
+
+		_startedAtTicks = FbMetricsStore.CommandStart();
+	}
+
+	private void TraceCommandStop()
+	{
+		if (_currentActivity != null)
+		{
+			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
+			_currentActivity.Dispose();
+			_currentActivity = null;
+		}
+
+		FbMetricsStore.CommandStop(_startedAtTicks, Connection);
+		_startedAtTicks = 0;
 	}
 
 	private void TraceCommandException(Exception e)
