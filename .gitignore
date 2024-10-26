@@ -6,3 +6,4 @@ bin
 obj
 out/
 .idea
+/BenchmarkDotNet.Artifacts

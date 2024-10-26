@@ -21,9 +21,9 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
-using FirebirdSql.Data.FirebirdClient;
+using BenchmarkDotNet.Validators;
 
-namespace Perf;
+namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
 [Config(typeof(Config))]
 public partial class CommandBenchmark
@@ -34,30 +34,46 @@ public partial class CommandBenchmark
 		{
 			var baseJob = Job.Default
 				.WithWarmupCount(3)
-				.WithToolchain(CsProjCoreToolchain.NetCoreApp60)
 				.WithPlatform(Platform.X64)
 				.WithJit(Jit.RyuJit);
+
+			AddJob(
+				baseJob
+					.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
+					.WithCustomBuildConfiguration("ReleaseNuGet")
+					.WithId("NuGet80")
+					.AsBaseline()
+			);
+
+			AddJob(
+				baseJob
+					.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
+					.WithCustomBuildConfiguration("Release")
+					.WithId("Core80")
+			);
+
 			AddDiagnoser(MemoryDiagnoser.Default);
-			AddJob(baseJob.WithCustomBuildConfiguration("Release").WithId("Project"));
-			AddJob(baseJob.WithCustomBuildConfiguration("ReleaseNuGet").WithId("NuGet").AsBaseline());
+
+			AddValidator(BaselineValidator.FailOnError);
+			AddValidator(JitOptimizationsValidator.FailOnError);
 		}
 	}
 
 	protected const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
 
-	[Params("bigint", "varchar(10) character set utf8")]
+	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
 	public string DataType { get; set; }
 
 	[Params(100)]
 	public int Count { get; set; }
 
-	void GlobalSetupBase()
+	static void CreateDatabase()
 	{
 		FbConnection.CreateDatabase(ConnectionString, 16 * 1024, false, true);
 	}
 
 	[GlobalCleanup]
-	public void GlobalCleanup()
+	public static void GlobalCleanup()
 	{
 		FbConnection.ClearAllPools();
 		FbConnection.DropDatabase(ConnectionString);
