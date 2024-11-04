@@ -16,18 +16,31 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Concurrent;
 
 namespace FirebirdSql.Data.Common;
 
 internal static class NativeHelpers
 {
-	public static void CallIfExists(Action action)
+	private static readonly ConcurrentDictionary<string, bool> _cache = new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
+
+	public static void CallIfExists(string actionId, Action action)
 	{
-		try
+		if (!_cache.TryGetValue(actionId, out var executionAllowed))
+		{
+			try
+			{
+				action();
+				_cache.TryAdd(actionId, true);
+			}
+			catch (EntryPointNotFoundException)
+			{
+				_cache.TryAdd(actionId, false);
+			}
+		}
+		else if (executionAllowed)
 		{
 			action();
 		}
-		catch (EntryPointNotFoundException)
-		{ }
 	}
 }

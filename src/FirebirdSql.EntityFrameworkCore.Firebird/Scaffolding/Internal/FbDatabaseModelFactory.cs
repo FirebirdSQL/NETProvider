@@ -311,7 +311,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		@"SELECT
                trim(I.rdb$index_name) as INDEX_NAME,
                COALESCE(I.rdb$unique_flag, 0) as IS_UNIQUE,
-               Coalesce(I.rdb$index_type, 0) = 1 as IS_DESC,
+               Coalesce(I.rdb$index_type, 0) as IS_DESC,
                list(trim(sg.RDB$FIELD_NAME)) as COLUMNS
               FROM
                RDB$INDICES i

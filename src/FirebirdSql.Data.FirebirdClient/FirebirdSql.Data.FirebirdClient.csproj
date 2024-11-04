@@ -18,7 +18,7 @@
 		<PackageId>FirebirdSql.Data.FirebirdClient</PackageId>
 		<Title>Firebird ADO.NET Data provider</Title>
 		<PackageDescription>Firebird ADO.NET data provider</PackageDescription>
-		<PackageTags>firebird;firebirsql;firebirdclient;adonet;database</PackageTags>
+		<PackageTags>firebird firebirsql firebirdclient adonet database</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
