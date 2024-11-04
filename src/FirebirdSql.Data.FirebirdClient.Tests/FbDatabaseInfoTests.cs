@@ -66,7 +66,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_SELECT_Test()
 	{
-		var tableNameList = GetTableNameList();
+		var tableNameList = await GetTableNameList();
 		var tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
@@ -93,7 +93,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_INSERT_Test()
 	{
-		var tableNameList = GetTableNameList();
+		var tableNameList = await GetTableNameList();
 		var tableIdTest = tableNameList["TEST"];
 
 		var dbInfo = new FbDatabaseInfo(Connection);
@@ -120,7 +120,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 	[Test]
 	public async Task PerformanceAnalysis_UPDATE_Test()
 	{
-		var tableNameList = GetTableNameList();
+		var tableNameList = await GetTableNameList();
 		var tableIdTest = tableNameList["TEST"];
 
 		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
@@ -167,13 +167,12 @@ public class FbDatabaseInfoTests : FbTestsBase
 		return result;
 	}
 
-	IDictionary<string, short> GetTableNameList()
+	async Task<IDictionary<string, short>> GetTableNameList()
 	{
 		IDictionary<string, short> result = new Dictionary<string, short>();
-
 		var command = new FbCommand("select R.RDB$RELATION_ID, R.RDB$RELATION_NAME from RDB$RELATIONS R WHERE RDB$SYSTEM_FLAG = 0", Connection);
-		var reader = command.ExecuteReader();
-		while (reader.Read())
+		var reader = await command.ExecuteReaderAsync();
+		while (await reader.ReadAsync())
 		{
 			result.Add(reader.GetString(1).Trim(), reader.GetInt16(0));
 		}
