@@ -53,7 +53,7 @@ internal static class Extensions
 
 	public static IDictionary<short, ulong> GetTableStatistics(this byte[] b, int length)
 	{
-		int capacity = length > 3 ? (length - 3) / 6 + 1 : 0;
+		var capacity = length > 3 ? (length - 3) / 6 + 1 : 0;
 
 		var tableStatistics = new Dictionary<short, ulong>(capacity);
 		for (var i = 3; i < length; i += 6)
