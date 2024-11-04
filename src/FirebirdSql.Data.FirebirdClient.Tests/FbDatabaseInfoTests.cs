@@ -170,11 +170,15 @@ public class FbDatabaseInfoTests : FbTestsBase
 	async Task<IDictionary<string, short>> GetTableNameList()
 	{
 		IDictionary<string, short> result = new Dictionary<string, short>();
-		var command = new FbCommand("select R.RDB$RELATION_ID, R.RDB$RELATION_NAME from RDB$RELATIONS R WHERE RDB$SYSTEM_FLAG = 0", Connection);
-		var reader = await command.ExecuteReaderAsync();
-		while (await reader.ReadAsync())
+		await using (var command = new FbCommand("select R.RDB$RELATION_ID, R.RDB$RELATION_NAME from RDB$RELATIONS R WHERE RDB$SYSTEM_FLAG = 0", Connection))
 		{
-			result.Add(reader.GetString(1).Trim(), reader.GetInt16(0));
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				while (await reader.ReadAsync())
+				{
+					result.Add(reader.GetString(1).Trim(), reader.GetInt16(0));
+				}
+			}
 		}
 		return result;
 	}
