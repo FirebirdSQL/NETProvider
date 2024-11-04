@@ -53,19 +53,18 @@ internal static class Extensions
 		return BitConverter.ToString(b).Replace("-", string.Empty);
 	}
 
-	public static IDictionary<short, ulong> GetTableStatistic(this byte[] b, int length)
+	public static IDictionary<short, ulong> GetTableStatistics(this byte[] b, int length)
 	{
 		int capacity = length > 3 ? (length - 3) / 6 + 1 : 0;
 
-		var tableStatistic = new Dictionary<short, ulong>(capacity);
+		var tableStatistics = new Dictionary<short, ulong>(capacity);
 		for (var i = 3; i < length; i += 6)
 		{
 			var tableId = (short)IscHelper.VaxInteger(b, i, 2);
 			var count = (ulong)IscHelper.VaxInteger(b, i + 2, 4);
-			tableStatistic.Add(tableId, count);
+			tableStatistics.Add(tableId, count);
 		}
-
-		return tableStatistic;
+		return tableStatistics;
 	}
 
 	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
