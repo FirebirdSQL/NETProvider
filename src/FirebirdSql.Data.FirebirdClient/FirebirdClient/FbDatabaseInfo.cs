@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -225,76 +224,141 @@ public sealed class FbDatabaseInfo
 		return GetValueAsync<int>(IscCodes.isc_info_writes, cancellationToken);
 	}
 
-	public int GetBackoutCount()
+	/// <summary>
+	/// Returns the number of removals of a version of a record of the affected tables.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetBackoutCount()
 	{
-		return GetValue<int>(IscCodes.isc_info_backout_count);
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_backout_count);
 	}
-	public Task<int> GetBackoutCountAsync(CancellationToken cancellationToken = default)
+	/// <summary>
+	/// Returns the number of removals of a version of a record of the affected tables.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetBackoutCountAsync(CancellationToken cancellationToken = default)
 	{
-		return GetValueAsync<int>(IscCodes.isc_info_backout_count, cancellationToken);
-	}
-
-	public int GetDeleteCount()
-	{
-		return GetValue<int>(IscCodes.isc_info_delete_count);
-	}
-	public Task<int> GetDeleteCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<int>(IscCodes.isc_info_delete_count, cancellationToken);
-	}
-
-	public int GetExpungeCount()
-	{
-		return GetValue<int>(IscCodes.isc_info_expunge_count);
-	}
-	public Task<int> GetExpungeCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<int>(IscCodes.isc_info_expunge_count, cancellationToken);
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_backout_count, cancellationToken);
 	}
 
-	public int GetInsertCount()
+	/// <summary>
+	/// Returns the number of database deletes of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of deletes, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetDeleteCount()
 	{
-		return GetValue<int>(IscCodes.isc_info_insert_count);
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_delete_count);
 	}
-	public Task<int> GetInsertCountAsync(CancellationToken cancellationToken = default)
+	/// <summary>
+	/// Returns the number of database deletes of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of deletes, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetDeleteCountAsync(CancellationToken cancellationToken = default)
 	{
-		return GetValueAsync<int>(IscCodes.isc_info_insert_count, cancellationToken);
-	}
-
-	public int GetPurgeCount()
-	{
-		return GetValue<int>(IscCodes.isc_info_purge_count);
-	}
-	public Task<int> GetPurgeCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<int>(IscCodes.isc_info_purge_count, cancellationToken);
-	}
-
-	public long GetReadIdxCount()
-	{
-		return GetValue<long>(IscCodes.isc_info_read_idx_count);
-	}
-	public Task<long> GetReadIdxCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<long>(IscCodes.isc_info_read_idx_count, cancellationToken);
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_delete_count, cancellationToken);
 	}
 
-	public long GetReadSeqCount()
+	/// <summary>
+	/// Returns the number of removals of a record and all of its ancestors, for records whose deletions have been committed of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetExpungeCount()
 	{
-		return GetValue<long>(IscCodes.isc_info_read_seq_count);
-	}
-	public Task<long> GetReadSeqCountAsync(CancellationToken cancellationToken = default)
-	{
-		return GetValueAsync<long>(IscCodes.isc_info_read_seq_count, cancellationToken);
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_expunge_count);
 	}
 
-	public long GetUpdateCount()
+	/// <summary>
+	/// Returns the number of removals of a record and all of its ancestors, for records whose deletions have been committed of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetExpungeCountAsync(CancellationToken cancellationToken = default)
 	{
-		return GetValue<long>(IscCodes.isc_info_update_count);
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_expunge_count, cancellationToken);
 	}
-	public Task<long> GetUpdateCountAsync(CancellationToken cancellationToken = default)
+
+	/// <summary>
+	/// Returns the number of inserts into the database of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of inserts, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetInsertCount()
 	{
-		return GetValueAsync<long>(IscCodes.isc_info_update_count, cancellationToken);
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_insert_count);
+	}
+	/// <summary>
+	/// Returns the number of inserts into the database of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of inserts, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetInsertCountAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_insert_count, cancellationToken);
+	}
+
+	/// <summary>
+	/// Returns the number of removals of old versions of fully mature records (records that are committed, so that older ancestor versions are no longer needed) of the affected tables.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetPurgeCount()
+	{
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_purge_count);
+	}
+	/// <summary>
+	/// Returns the number of removals of old versions of fully mature records (records that are committed, so that older ancestor versions are no longer needed) of the affected tables.
+	/// </summary>
+	/// <returns>Dictionary with the number of removals, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetPurgeCountAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_purge_count, cancellationToken);
+	}
+
+	/// <summary>
+	/// Returns the number of reads done via an index of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of reads, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetReadIdxCount()
+	{
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_read_idx_count);
+	}
+	/// <summary>
+	/// Returns the number of reads done via an index of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of reads, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetReadIdxCountAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_read_idx_count, cancellationToken);
+	}
+
+	/// <summary>
+	/// Returns the number of sequential table scans (row reads) of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of reads, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetReadSeqCount()
+	{
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_read_seq_count);
+	}
+	/// <summary>
+	/// Returns the number of sequential table scans (row reads) of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of reads, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetReadSeqCountAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_read_seq_count, cancellationToken);
+	}
+
+	/// <summary>
+	/// Returns the number of database updates of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of updates, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public IDictionary<short, ulong> GetUpdateCount()
+	{
+		return GetValue<IDictionary<short, ulong>>(IscCodes.isc_info_update_count);
+	}
+	/// <summary>
+	/// Returns the number of database updates of the affected tables since the database was last attached.
+	/// </summary>
+	/// <returns>Dictionary with the number of updates, with table id (field RDB$RELATION_ID of the system table RDB$RELATIONS) as key.</returns>
+	public Task<IDictionary<short, ulong>> GetUpdateCountAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<IDictionary<short, ulong>>(IscCodes.isc_info_update_count, cancellationToken);
 	}
 
 	public int GetDatabaseSizeInPages()
