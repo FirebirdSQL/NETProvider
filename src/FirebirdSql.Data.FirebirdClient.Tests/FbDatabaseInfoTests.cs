@@ -78,10 +78,10 @@ public class FbDatabaseInfoTests : FbTestsBase
 		var fbCommand = new FbCommand("SELECT MAX(INT_FIELD) FROM TEST", Connection);
 		var maxIntField = await fbCommand.ExecuteScalarAsync() as int?;
 
-		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
-		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
-		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
-		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
 		Assert.That(updateCount.ContainsKey(tableIdTest), Is.False);
@@ -105,10 +105,10 @@ public class FbDatabaseInfoTests : FbTestsBase
 		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
 		await fbCommand.ExecuteNonQueryAsync();
 
-		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
-		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
-		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
-		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.True);
 		Assert.That(insertCount[tableIdTest], Is.EqualTo(1));
@@ -124,7 +124,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 		var tableIdTest = tableNameList["TEST"];
 
 		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
-		fbCommand.ExecuteNonQuery();
+		await fbCommand.ExecuteNonQueryAsync();
 
 		var dbInfo = new FbDatabaseInfo(Connection);
 		var insertCount = await dbInfo.GetInsertCountAsync();
@@ -135,10 +135,10 @@ public class FbDatabaseInfoTests : FbTestsBase
 		fbCommand.CommandText = "UPDATE TEST SET SMALLINT_FIELD = 900 WHERE (INT_FIELD = 900)";
 		await fbCommand.ExecuteNonQueryAsync();
 
-		insertCount = GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
-		updateCount = GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
-		readSeqCount = GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
-		readIdxCount = GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
 
 		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
 		Assert.That(updateCount.ContainsKey(tableIdTest), Is.True);
@@ -148,7 +148,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 		Assert.That(readIdxCount[tableIdTest], Is.EqualTo(1));
 	}
 
-	IDictionary<short, ulong> GetAffectedTables(IDictionary<short, ulong> statisticInfoBefore, IDictionary<short, ulong> statisticInfoAfter)
+	async Task<IDictionary<short, ulong>> GetAffectedTables(IDictionary<short, ulong> statisticInfoBefore, IDictionary<short, ulong> statisticInfoAfter)
 	{
 		var result = new Dictionary<short, ulong>();
 		foreach (var keyValuePair in statisticInfoAfter)
@@ -164,7 +164,7 @@ public class FbDatabaseInfoTests : FbTestsBase
 			else
 				result.Add(keyValuePair.Key, keyValuePair.Value);
 		}
-		return result;
+		return await Task.FromResult(result);
 	}
 
 	async Task<IDictionary<string, short>> GetTableNameList()
