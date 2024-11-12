@@ -225,7 +225,7 @@ internal sealed class GdsBlob : BlobBase
 
 			if (buffer.Length == 0)
 			{
-				// previous	segment	was	last, this has no data
+				// previous segment was last, this has no data
 				return;
 			}
 
@@ -380,7 +380,7 @@ internal sealed class GdsBlob : BlobBase
 
 			if (buffer.Length == 0)
 			{
-				// previous	segment	was	last, this has no data
+				// previous segment was last, this has no data
 				return Array.Empty<byte>();
 			}
 
