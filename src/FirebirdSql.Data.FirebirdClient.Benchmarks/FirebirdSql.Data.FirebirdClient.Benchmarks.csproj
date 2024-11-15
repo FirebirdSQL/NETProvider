@@ -5,7 +5,7 @@
 		<SkipSourceLink>true</SkipSourceLink>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -19,6 +19,6 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="$(Configuration.EndsWith('NuGet'))">
-		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="8.5.4" />
+		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.1" />
 	</ItemGroup>
 </Project>
