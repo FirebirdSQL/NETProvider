@@ -48,7 +48,11 @@ internal static class Extensions
 
 	public static string ToHexString(this byte[] b)
 	{
+#if NET5_0_OR_GREATER
+		return Convert.ToHexString(b);
+#else
 		return BitConverter.ToString(b).Replace("-", string.Empty);
+#endif
 	}
 
 	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
