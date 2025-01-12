@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common;
@@ -329,6 +330,21 @@ internal sealed class DbValue
 		}
 
 		return (byte[])_value;
+	}
+
+	public BlobStream GetBinaryStream()
+	{
+		if (_value is not long l)
+			throw new NotSupportedException();
+
+		return GetBlobStream(l);
+	}
+	public ValueTask<BlobStream> GetBinaryStreamAsync(CancellationToken cancellationToken = default)
+	{
+		if (_value is not long l)
+			throw new NotSupportedException();
+
+		return GetBlobStreamAsync(l, cancellationToken);
 	}
 
 	public int GetDate()
@@ -852,6 +868,17 @@ internal sealed class DbValue
 	{
 		var blob = _statement.CreateBlob(blobId);
 		return blob.ReadAsync(cancellationToken);
+	}
+
+	private BlobStream GetBlobStream(long blobId)
+	{
+		var blob = _statement.CreateBlob(blobId);
+		return new BlobStream(blob);
+	}
+	private ValueTask<BlobStream> GetBlobStreamAsync(long blobId, CancellationToken cancellationToken = default)
+	{
+		var blob = _statement.CreateBlob(blobId);
+		return ValueTask2.FromResult(new BlobStream(blob));
 	}
 
 	private Array GetArrayData(long handle)

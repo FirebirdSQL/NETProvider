@@ -941,6 +941,10 @@ internal static class IscCodes
 	public const int RBL_eof_pending = 4;
 	public const int RBL_create = 8;
 
+	public const int isc_blb_seek_from_head = 0;
+	public const int isc_blb_seek_relative =  1;
+	public const int isc_blb_seek_from_tail = 2;
+
 	#endregion
 
 	#region Blob Information

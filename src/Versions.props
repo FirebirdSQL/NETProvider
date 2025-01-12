@@ -1,7 +1,7 @@
 <Project>
 	<!-- Provider -->
 	<PropertyGroup>
-		<ProviderVersion>10.3.1</ProviderVersion>
+		<ProviderVersion>10.3.2</ProviderVersion>
 	</PropertyGroup>
 	<!-- EFCore -->
 	<PropertyGroup>
@@ -11,8 +11,8 @@
 	</PropertyGroup>
 	<!-- EF6 -->
 	<PropertyGroup>
-		<EF6ProviderVersion>10.0.1</EF6ProviderVersion>
-		<EF6ReferenceProviderVersion>10.1.0</EF6ReferenceProviderVersion>
-		<EF6ReferencePackageVersion>6.4.4</EF6ReferencePackageVersion>
+		<EF6ProviderVersion>10.1.0</EF6ProviderVersion>
+		<EF6ReferenceProviderVersion>10.3.2</EF6ReferenceProviderVersion>
+		<EF6ReferencePackageVersion>6.5.1</EF6ReferencePackageVersion>
 	</PropertyGroup>
 </Project>

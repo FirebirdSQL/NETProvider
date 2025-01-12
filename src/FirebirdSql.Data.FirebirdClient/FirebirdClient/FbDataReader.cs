@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -976,6 +977,15 @@ public sealed class FbDataReader : DbDataReader
 	public override DateTime GetDateTime(int i)
 	{
 		return GetFieldValue<DateTime>(i);
+	}
+
+	public override Stream GetStream(int i)
+	{
+		CheckState();
+		CheckPosition();
+		CheckIndex(i);
+
+		return _row[i].GetBinaryStream();
 	}
 
 	public override bool IsDBNull(int i)
