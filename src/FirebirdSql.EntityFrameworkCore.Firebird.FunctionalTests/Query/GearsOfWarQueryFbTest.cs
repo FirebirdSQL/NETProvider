@@ -411,6 +411,13 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 		return base.DateTimeOffset_to_unix_time_seconds(async);
 	}
 
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Non_string_concat_uses_appropriate_type_mapping(bool async)
+	{
+		return base.Non_string_concat_uses_appropriate_type_mapping(async);
+	}
+
 	[Theory(Skip = "NETProvider#1008")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_IsBetween(bool async)

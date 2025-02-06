@@ -52,7 +52,6 @@ public class FbMathTranslator : IMethodCallTranslator
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Log10), new[] { typeof(double) }), "LOG10" },
 
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Log), new[] { typeof(double) }), "LN" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Log), new[] { typeof(double), typeof(double) }), "LOG" },
 
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Sqrt), new[] { typeof(double) }), "SQRT" },
 
@@ -77,30 +76,6 @@ public class FbMathTranslator : IMethodCallTranslator
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Sign), new[] { typeof(double) }), "SIGN" },
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Sign), new[] { typeof(decimal) }), "SIGN" },
 			{ typeof(Math).GetRuntimeMethod(nameof(Math.Sign), new[] { typeof(short) }), "SIGN" },
-
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(float), typeof(float) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(sbyte), typeof(sbyte) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(ulong), typeof(ulong) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(uint), typeof(uint) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(long), typeof(long) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(ushort), typeof(ushort) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(short), typeof(short) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(double), typeof(double) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(decimal), typeof(decimal) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(byte), typeof(byte) }), "MAXVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Max), new[] { typeof(int), typeof(int) }), "MAXVALUE" },
-
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(float), typeof(float) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(sbyte), typeof(sbyte) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(ulong), typeof(ulong) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(uint), typeof(uint) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(long), typeof(long) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(ushort), typeof(ushort) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(short), typeof(short) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(double), typeof(double) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(decimal), typeof(decimal) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(byte), typeof(byte) }), "MINVALUE" },
-			{ typeof(Math).GetRuntimeMethod(nameof(Math.Min), new[] { typeof(int), typeof(int) }), "MINVALUE" },
 		};
 
 	static readonly HashSet<MethodInfo> TruncateMethodInfos = new HashSet<MethodInfo>
@@ -116,6 +91,8 @@ public class FbMathTranslator : IMethodCallTranslator
 			typeof(Math).GetRuntimeMethod(nameof(Math.Round), new[] { typeof(decimal), typeof(int) }),
 			typeof(Math).GetRuntimeMethod(nameof(Math.Round), new[] { typeof(double), typeof(int) })
 		};
+
+	static readonly MethodInfo LogNewBaseMethod = typeof(Math).GetRuntimeMethod(nameof(Math.Log), new[] { typeof(double), typeof(double) });
 
 	readonly FbSqlExpressionFactory _fbSqlExpressionFactory;
 
@@ -153,6 +130,10 @@ public class FbMathTranslator : IMethodCallTranslator
 				true,
 				nullability,
 				method.ReturnType));
+		}
+		if (LogNewBaseMethod == method)
+		{
+			return _fbSqlExpressionFactory.Function("LOG", arguments.Reverse(), true, arguments.Select(_ => true), method.ReturnType);
 		}
 		return null;
 	}

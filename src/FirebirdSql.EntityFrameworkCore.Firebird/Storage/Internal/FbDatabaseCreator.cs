@@ -22,6 +22,7 @@ using FirebirdSql.Data.FirebirdClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
@@ -163,4 +164,21 @@ AS
 BEGIN
 	execute statement 'alter character set ' || (select coalesce(trim(rdb$character_set_name), 'NONE') from rdb$database) || ' set default collation {collation}';
 END");
+
+	public override void CreateTables()
+	{
+		// we need to execute commands separately to avoid issues with inserts and transactions after creating a table
+		foreach (var command in GetCreateTablesCommands())
+		{
+			Dependencies.MigrationCommandExecutor.ExecuteNonQuery([command], Dependencies.Connection, new MigrationExecutionState(), commitTransaction: true);
+		}
+	}
+	public override async Task CreateTablesAsync(CancellationToken cancellationToken = default)
+	{
+		// we need to execute commands separately to avoid issues with inserts and transactions after creating a table
+		foreach (var command in GetCreateTablesCommands())
+		{
+			await Dependencies.MigrationCommandExecutor.ExecuteNonQueryAsync([command], Dependencies.Connection, new MigrationExecutionState(), commitTransaction: true, cancellationToken: cancellationToken);
+		}
+	}
 }

@@ -79,6 +79,27 @@ public class ComplexNavigationsSharedTypeQueryFbTest : ComplexNavigationsSharedT
 		return base.Prune_does_not_throw_null_ref(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Correlated_projection_with_first(bool async)
+	{
+		return base.Correlated_projection_with_first(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Multiple_select_many_in_projection(bool async)
+	{
+		return base.Multiple_select_many_in_projection(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Single_select_many_in_projection_with_take(bool async)
+	{
+		return base.Single_select_many_in_projection_with_take(async);
+	}
+
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Project_shadow_properties10(bool async)

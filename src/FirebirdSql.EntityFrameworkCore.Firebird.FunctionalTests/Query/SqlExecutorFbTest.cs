@@ -21,14 +21,13 @@ using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class SqlExecutorFbTest : SqlExecutorTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+public class SqlExecutorFbTest : SqlExecutorTestBase<NorthwindQueryFbFixture<SqlExecutorModelCustomizer>>
 {
-	public SqlExecutorFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
+	public SqlExecutorFbTest(NorthwindQueryFbFixture<SqlExecutorModelCustomizer> fixture)
 		: base(fixture)
 	{ }
 

@@ -25,7 +25,7 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Query.ExpressionTranslators.Internal;
 
-public class SqlServerDateOnlyMethodTranslator : IMethodCallTranslator
+public class FbDateOnlyMethodTranslator : IMethodCallTranslator
 {
 	readonly Dictionary<MethodInfo, string> _methodInfoDatePartMapping = new()
 	{
@@ -36,7 +36,7 @@ public class SqlServerDateOnlyMethodTranslator : IMethodCallTranslator
 
 	readonly ISqlExpressionFactory _sqlExpressionFactory;
 
-	public SqlServerDateOnlyMethodTranslator(ISqlExpressionFactory sqlExpressionFactory)
+	public FbDateOnlyMethodTranslator(ISqlExpressionFactory sqlExpressionFactory)
 	{
 		_sqlExpressionFactory = sqlExpressionFactory;
 	}

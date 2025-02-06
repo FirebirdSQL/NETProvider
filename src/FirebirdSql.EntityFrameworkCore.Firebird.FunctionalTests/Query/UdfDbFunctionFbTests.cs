@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -222,11 +223,11 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 		protected override Type ContextType { get; } = typeof(FbUDFSqlContext);
 
-		protected override void Seed(DbContext context)
+		protected override async Task SeedAsync(DbContext context)
 		{
-			base.Seed(context);
+			await base.SeedAsync(context);
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""CustomerOrderCount"" (customerId int)
                                                     returns int
                                                     as
@@ -234,7 +235,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return (select count(""Id"") from ""Orders"" where ""CustomerId"" = :customerId);
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""StarValue"" (starCount int, val varchar(1000))
                                                     returns varchar(1000)
                                                     as
@@ -242,7 +243,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return rpad('', :starCount, '*') || :val;
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""DollarValue"" (starCount int, val varchar(1000))
                                                     returns varchar(1000)
                                                     as
@@ -250,7 +251,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return rpad('', :starCount, '$') || :val;
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""GetReportingPeriodStartDate"" (period int)
                                                     returns timestamp
                                                     as
@@ -258,7 +259,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return cast('1998-01-01' as timestamp);
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""GetCustWithMostOrdersAfterDate"" (searchDate Date)
                                                     returns int
                                                     as
@@ -270,7 +271,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                                 order by count(""Id"") desc);
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""IsTopCustomer"" (customerId int)
                                                     returns boolean
                                                     as
@@ -281,7 +282,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return false;
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""IdentityString"" (customerName varchar(1000))
                                                     returns varchar(1000)
                                                     as
@@ -289,7 +290,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return :customerName;
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create function ""IsDate"" (val varchar(1000))
                                                     returns boolean
                                                     as
@@ -307,7 +308,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         return true;
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create procedure ""GetTopTwoSellingProducts""
                                                     returns
                                                     (
@@ -326,7 +327,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         end
                                                     end");
 
-			context.Database.ExecuteSqlRaw(
+			await context.Database.ExecuteSqlRawAsync(
 				@"create procedure ""GetOrdersWithMultipleProducts""(customerId int)
                                                     returns
                                                     (
@@ -348,7 +349,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         end
                                                     end");
 
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 		}
 	}
 }

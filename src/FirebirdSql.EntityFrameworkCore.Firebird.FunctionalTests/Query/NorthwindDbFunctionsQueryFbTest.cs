@@ -22,11 +22,14 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class NorthwindDbFunctionsQueryFbTest : NorthwindDbFunctionsQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+public class NorthwindDbFunctionsQueryFbTest : NorthwindDbFunctionsQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
 	public NorthwindDbFunctionsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
 	{ }
+
+	protected override string CaseInsensitiveCollation => "UNICODE_CI";
+	protected override string CaseSensitiveCollation => "UNICODE";
 
 	public override Task Like_literal(bool async)
 	{

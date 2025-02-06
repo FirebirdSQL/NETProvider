@@ -15,13 +15,21 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class ManyToManyHeterogeneousQueryFbTest : ManyToManyHeterogeneousQueryRelationalTestBase
+public class AdHocQueryFiltersQueryFbTest : AdHocQueryFiltersQueryRelationalTestBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	[Fact(Skip = "PK name collision and not easy way to override model.")]
+	public override Task Self_reference_in_query_filter_works()
+	{
+		return base.Self_reference_in_query_filter_works();
+	}
 }

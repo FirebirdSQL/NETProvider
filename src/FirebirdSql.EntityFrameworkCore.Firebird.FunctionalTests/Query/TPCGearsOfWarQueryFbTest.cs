@@ -36,7 +36,7 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 	{
 		return AssertQuery(
 			async,
-			ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+			ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()));
 	}
 
 	[Theory]
@@ -45,7 +45,7 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 	{
 		return AssertQuery(
 			async,
-			ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+			ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()));
 	}
 
 	[Theory(Skip = "Different implicit ordering on Firebird.")]
@@ -382,6 +382,13 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 	public override Task Where_datetimeoffset_year_component(bool async)
 	{
 		return base.Where_datetimeoffset_year_component(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Non_string_concat_uses_appropriate_type_mapping(bool async)
+	{
+		return base.Non_string_concat_uses_appropriate_type_mapping(async);
 	}
 
 	[NotSupportedByProviderTheory]

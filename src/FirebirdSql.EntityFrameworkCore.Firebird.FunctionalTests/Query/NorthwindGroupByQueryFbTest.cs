@@ -25,7 +25,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+public class NorthwindGroupByQueryFbTest : NorthwindGroupByQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
 	public NorthwindGroupByQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)

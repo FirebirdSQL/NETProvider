@@ -26,7 +26,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class SimpleQueryFbTest : SimpleQueryRelationalTestBase
+public class AdHocMiscellaneousQueryFbTest : AdHocMiscellaneousQueryRelationalTestBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
@@ -42,13 +42,6 @@ public class SimpleQueryFbTest : SimpleQueryRelationalTestBase
 	public override Task Multiple_different_entity_type_from_different_namespaces(bool async)
 	{
 		return base.Multiple_different_entity_type_from_different_namespaces(async);
-	}
-
-	[HasDataInTheSameTransactionAsDDLTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Multiple_nested_reference_navigations(bool async)
-	{
-		return base.Multiple_nested_reference_navigations(async);
 	}
 
 	[HasDataInTheSameTransactionAsDDLTheory]
@@ -77,5 +70,17 @@ public class SimpleQueryFbTest : SimpleQueryRelationalTestBase
 	public override Task Null_check_removal_in_ternary_maintain_appropriate_cast(bool async)
 	{
 		return base.Null_check_removal_in_ternary_maintain_appropriate_cast(async);
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Operators_combine_nullability_of_entity_shapers()
+	{
+		return base.Operators_combine_nullability_of_entity_shapers();
+	}
+
+	protected override async Task Seed2951(Context2951 context)
+	{
+		await context.Database.ExecuteSqlRawAsync("""CREATE TABLE "ZeroKey" ("Id" INT)""");
+		await context.Database.ExecuteSqlRawAsync("""INSERT INTO "ZeroKey" VALUES (NULL)""");
 	}
 }

@@ -15,9 +15,12 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
@@ -28,8 +31,6 @@ public class NorthwindFunctionsQueryFbTest : NorthwindFunctionsQueryRelationalTe
 	public NorthwindFunctionsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
 	{ }
-
-	protected override bool CanExecuteQueryString => false;
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
@@ -134,6 +135,13 @@ public class NorthwindFunctionsQueryFbTest : NorthwindFunctionsQueryRelationalTe
 	public override Task Where_mathf_radians(bool async)
 	{
 		return base.Where_mathf_radians(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task String_Join_non_aggregate(bool async)
+	{
+		return AssertTranslationFailed(() => base.String_Join_non_aggregate(async));
 	}
 
 	[NotSupportedByProviderTheory]

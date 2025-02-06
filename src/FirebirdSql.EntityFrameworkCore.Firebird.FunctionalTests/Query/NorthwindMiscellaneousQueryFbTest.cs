@@ -31,8 +31,6 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_DTO_constructor_distinct_with_collection_projection_translated_to_server_with_binding_after_client_eval(bool async)

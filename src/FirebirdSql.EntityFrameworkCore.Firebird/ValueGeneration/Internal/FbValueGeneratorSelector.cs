@@ -44,17 +44,30 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 
 	public new virtual IFbValueGeneratorCache Cache => (IFbValueGeneratorCache)base.Cache;
 
+	[Obsolete("Use TrySelect and throw if needed when the generator is not found.")]
 	public override ValueGenerator Select(IProperty property, ITypeBase entityType)
+	{
+		if (TrySelect(property, entityType, out var generator))
+		{
+			return generator;
+		}
+
+		throw new ArgumentException(
+			CoreStrings.InvalidValueGeneratorFactoryProperty(
+				nameof(FbSequenceValueGeneratorFactory), property.Name, property.DeclaringType.DisplayName()));
+	}
+
+	public override bool TrySelect(IProperty property, ITypeBase entityType, out ValueGenerator valueGenerator)
 	{
 		if (property.GetValueGeneratorFactory() != null
 			|| property.GetValueGenerationStrategy() != FbValueGenerationStrategy.HiLo)
 		{
-			return base.Select(property, entityType);
+			return base.TrySelect(property, entityType, out valueGenerator);
 		}
 
 		var propertyType = property.ClrType.UnwrapNullableType().UnwrapEnumType();
 
-		var generator = _sequenceFactory.TryCreate(
+		valueGenerator = _sequenceFactory.TryCreate(
 			property,
 			propertyType,
 			Cache.GetOrAddSequenceState(property, _connection),
@@ -62,16 +75,16 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 			_rawSqlCommandBuilder,
 			_commandLogger);
 
-		if (generator != null)
+		if (valueGenerator != null)
 		{
-			return generator;
+			return true;
 		}
 
 		var converter = property.GetTypeMapping().Converter;
 		if (converter != null
 			&& converter.ProviderClrType != propertyType)
 		{
-			generator = _sequenceFactory.TryCreate(
+			valueGenerator = _sequenceFactory.TryCreate(
 				property,
 				converter.ProviderClrType,
 				Cache.GetOrAddSequenceState(property, _connection),
@@ -79,15 +92,14 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 				_rawSqlCommandBuilder,
 				_commandLogger);
 
-			if (generator != null)
+			if (valueGenerator != null)
 			{
-				return generator.WithConverter(converter);
+				valueGenerator = valueGenerator.WithConverter(converter);
+				return true;
 			}
 		}
 
-		throw new ArgumentException(
-			CoreStrings.InvalidValueGeneratorFactoryProperty(
-				nameof(FbSequenceValueGeneratorFactory), property.Name, property.DeclaringType.DisplayName()));
+		return false;
 	}
 
 	protected override ValueGenerator FindForType(IProperty property, ITypeBase entityType, Type clrType)
