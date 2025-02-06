@@ -700,6 +700,13 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
 		return base.Project_inline_collection_with_Union(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Parameter_collection_ImmutableArray_of_ints_Contains_int(bool async)
+	{
+		return base.Parameter_collection_ImmutableArray_of_ints_Contains_int(async);
+	}
+
 	PrimitiveCollectionsContext CreateContext()
 	{
 		return Fixture.CreateContext();
