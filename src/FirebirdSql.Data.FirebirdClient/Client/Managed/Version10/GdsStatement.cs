@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -36,7 +37,7 @@ internal class GdsStatement : StatementBase
 	protected Descriptor _parameters;
 	protected Descriptor _fields;
 	protected bool _allRowsFetched;
-	private Queue<DbValue[]> _rows;
+	private Queue<object[]> _rows;
 	private int _fetchSize;
 
 	#endregion
@@ -110,7 +111,8 @@ internal class GdsStatement : StatementBase
 	{
 		_handle = IscCodes.INVALID_OBJECT;
 		_fetchSize = 200;
-		_rows = new Queue<DbValue[]>();
+		//_rows = new Queue<DbValue[]>();
+		_rows = new Queue<object[]>();				// optimized
 		OutputParameters = new Queue<DbValue[]>();
 
 		_database = database;
@@ -375,6 +377,26 @@ internal class GdsStatement : StatementBase
 		}
 	}
 
+	protected DbValue[] _dbValues;				// optimized
+	protected void CreateDbValues()
+	{
+		_dbValues = new DbValue[_fields.Count];
+		for (int i = 0; i < _fields.Count; i++)
+		{
+			_dbValues[i] = new DbValue(this, _fields[i], null);
+		}
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	protected DbValue[] GetDbValues(object[] values)
+	{
+		for (int i=0; i < _fields.Count; ++i)
+		{
+			_dbValues[i].SetValue(values[i]);
+		}
+		return _dbValues;
+	}
+
 	public override DbValue[] Fetch()
 	{
 		EnsureNotDeallocated();
@@ -407,14 +429,14 @@ internal class GdsStatement : StatementBase
 				var operation = _database.ReadOperation();
 				if (operation == IscCodes.op_fetch_response)
 				{
+					CreateDbValues();
+
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
-						var response = hasOperation
+						if ((hasOperation
 							? _database.ReadResponse(operation)
-							: _database.ReadResponse();
-						hasOperation = false;
-						if (response is FetchResponse fetchResponse)
+							: _database.ReadResponse()) is FetchResponse fetchResponse)
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
@@ -433,6 +455,7 @@ internal class GdsStatement : StatementBase
 						{
 							break;
 						}
+						hasOperation = false;
 					}
 				}
 				else
@@ -448,7 +471,7 @@ internal class GdsStatement : StatementBase
 
 		if (_rows != null && _rows.Count > 0)
 		{
-			return _rows.Dequeue();
+			return GetDbValues(_rows.Dequeue());
 		}
 		else
 		{
@@ -488,14 +511,13 @@ internal class GdsStatement : StatementBase
 				var operation = await _database.ReadOperationAsync(cancellationToken).ConfigureAwait(false);
 				if (operation == IscCodes.op_fetch_response)
 				{
+					CreateDbValues();
 					var hasOperation = true;
 					while (!_allRowsFetched)
 					{
-						var response = hasOperation
+						if ((hasOperation
 							? await _database.ReadResponseAsync(operation, cancellationToken).ConfigureAwait(false)
-							: await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
-						hasOperation = false;
-						if (response is FetchResponse fetchResponse)
+							: await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false)) is FetchResponse fetchResponse)
 						{
 							if (fetchResponse.Count > 0 && fetchResponse.Status == 0)
 							{
@@ -514,6 +536,7 @@ internal class GdsStatement : StatementBase
 						{
 							break;
 						}
+						hasOperation = false;
 					}
 				}
 				else
@@ -529,7 +552,7 @@ internal class GdsStatement : StatementBase
 
 		if (_rows != null && _rows.Count > 0)
 		{
-			return _rows.Dequeue();
+			return GetDbValues(_rows.Dequeue());
 		}
 		else
 		{
@@ -850,7 +873,8 @@ internal class GdsStatement : StatementBase
 		{
 			if (response.Count > 0)
 			{
-				OutputParameters.Enqueue(ReadRow());
+				CreateDbValues();
+				OutputParameters.Enqueue(GetDbValues(ReadRow()));
 			}
 		}
 		catch (IOException ex)
@@ -864,7 +888,8 @@ internal class GdsStatement : StatementBase
 		{
 			if (response.Count > 0)
 			{
-				OutputParameters.Enqueue(await ReadRowAsync(cancellationToken).ConfigureAwait(false));
+				CreateDbValues();
+				OutputParameters.Enqueue(GetDbValues(await ReadRowAsync(cancellationToken).ConfigureAwait(false)));
 			}
 		}
 		catch (IOException ex)
@@ -1735,9 +1760,9 @@ internal class GdsStatement : StatementBase
 		_fields = null;
 	}
 
-	protected virtual DbValue[] ReadRow()
+	protected virtual object[] ReadRow()		
 	{
-		var row = new DbValue[_fields.Count];
+		var row = new object[_fields.Count];
 		try
 		{
 			for (var i = 0; i < _fields.Count; i++)
@@ -1746,11 +1771,11 @@ internal class GdsStatement : StatementBase
 				var sqlInd = _database.Xdr.ReadInt32();
 				if (sqlInd == -1)
 				{
-					row[i] = new DbValue(this, _fields[i], null);
+					row[i] = null;
 				}
 				else if (sqlInd == 0)
 				{
-					row[i] = new DbValue(this, _fields[i], value);
+					row[i] = value;
 				}
 				else
 				{
@@ -1764,9 +1789,11 @@ internal class GdsStatement : StatementBase
 		}
 		return row;
 	}
-	protected virtual async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
+
+
+	protected virtual async ValueTask<object[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
-		var row = new DbValue[_fields.Count];
+		var row = new object[_fields.Count];
 		try
 		{
 			for (var i = 0; i < _fields.Count; i++)
@@ -1775,11 +1802,11 @@ internal class GdsStatement : StatementBase
 				var sqlInd = await _database.Xdr.ReadInt32Async(cancellationToken).ConfigureAwait(false);
 				if (sqlInd == -1)
 				{
-					row[i] = new DbValue(this, _fields[i], null);
+					row[i] = null;
 				}
 				else if (sqlInd == 0)
 				{
-					row[i] = new DbValue(this, _fields[i], value);
+					row[i] = value;
 				}
 				else
 				{
