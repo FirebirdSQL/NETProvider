@@ -61,6 +61,7 @@
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+	  <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="FirebirdClient\FbBatchCommand.cs" />
