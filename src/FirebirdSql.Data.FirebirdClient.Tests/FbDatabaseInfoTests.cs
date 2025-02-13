@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -60,5 +61,125 @@ public class FbDatabaseInfoTests : FbTestsBase
 
 			Assert.DoesNotThrowAsync(() => (Task)m.Invoke(dbInfo, new object[] { CancellationToken.None }), m.Name);
 		}
+	}
+
+	[Test]
+	public async Task PerformanceAnalysis_SELECT_Test()
+	{
+		var tableNameList = await GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
+
+		var dbInfo = new FbDatabaseInfo(Connection);
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
+
+		var fbCommand = new FbCommand("SELECT MAX(INT_FIELD) FROM TEST", Connection);
+		var maxIntField = await fbCommand.ExecuteScalarAsync() as int?;
+
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+
+		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(updateCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(readSeqCount.ContainsKey(tableIdTest), Is.True);
+		Assert.That(readSeqCount[tableIdTest], Is.EqualTo(maxIntField + 1));
+		Assert.That(readIdxCount.ContainsKey(tableIdTest), Is.False);
+	}
+
+	[Test]
+	public async Task PerformanceAnalysis_INSERT_Test()
+	{
+		var tableNameList = await GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
+
+		var dbInfo = new FbDatabaseInfo(Connection);
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
+
+		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
+		await fbCommand.ExecuteNonQueryAsync();
+
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+
+		Assert.That(insertCount.ContainsKey(tableIdTest), Is.True);
+		Assert.That(insertCount[tableIdTest], Is.EqualTo(1));
+		Assert.That(updateCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(readSeqCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(readIdxCount.ContainsKey(tableIdTest), Is.False);
+	}
+
+	[Test]
+	public async Task PerformanceAnalysis_UPDATE_Test()
+	{
+		var tableNameList = await GetTableNameList();
+		var tableIdTest = tableNameList["TEST"];
+
+		var fbCommand = new FbCommand("INSERT INTO TEST (INT_FIELD) VALUES (900)", Connection);
+		await fbCommand.ExecuteNonQueryAsync();
+
+		var dbInfo = new FbDatabaseInfo(Connection);
+		var insertCount = await dbInfo.GetInsertCountAsync();
+		var updateCount = await dbInfo.GetUpdateCountAsync();
+		var readSeqCount = await dbInfo.GetReadSeqCountAsync();
+		var readIdxCount = await dbInfo.GetReadIdxCountAsync();
+
+		fbCommand.CommandText = "UPDATE TEST SET SMALLINT_FIELD = 900 WHERE (INT_FIELD = 900)";
+		await fbCommand.ExecuteNonQueryAsync();
+
+		insertCount = await GetAffectedTables(insertCount, await dbInfo.GetInsertCountAsync());
+		updateCount = await GetAffectedTables(updateCount, await dbInfo.GetUpdateCountAsync());
+		readSeqCount = await GetAffectedTables(readSeqCount, await dbInfo.GetReadSeqCountAsync());
+		readIdxCount = await GetAffectedTables(readIdxCount, await dbInfo.GetReadIdxCountAsync());
+
+		Assert.That(insertCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(updateCount.ContainsKey(tableIdTest), Is.True);
+		Assert.That(updateCount[tableIdTest], Is.EqualTo(1));
+		Assert.That(readSeqCount.ContainsKey(tableIdTest), Is.False);
+		Assert.That(readIdxCount.ContainsKey(tableIdTest), Is.True);
+		Assert.That(readIdxCount[tableIdTest], Is.EqualTo(1));
+	}
+
+	async Task<IDictionary<short, ulong>> GetAffectedTables(IDictionary<short, ulong> statisticInfoBefore, IDictionary<short, ulong> statisticInfoAfter)
+	{
+		var result = new Dictionary<short, ulong>();
+		foreach (var keyValuePair in statisticInfoAfter)
+		{
+			if (statisticInfoBefore.TryGetValue(keyValuePair.Key, out var value))
+			{
+				var counter = keyValuePair.Value - value;
+				if (counter > 0)
+				{
+					result.Add(keyValuePair.Key, counter);
+				}
+			}
+			else
+				result.Add(keyValuePair.Key, keyValuePair.Value);
+		}
+		return await Task.FromResult(result);
+	}
+
+	async Task<IDictionary<string, short>> GetTableNameList()
+	{
+		IDictionary<string, short> result = new Dictionary<string, short>();
+		await using (var command = new FbCommand("select R.RDB$RELATION_ID, TRIM(R.RDB$RELATION_NAME) from RDB$RELATIONS R WHERE RDB$SYSTEM_FLAG = 0", Connection))
+		{
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				while (await reader.ReadAsync())
+				{
+					result.Add(reader.GetString(1), reader.GetInt16(0));
+				}
+			}
+		}
+		return result;
 	}
 }
