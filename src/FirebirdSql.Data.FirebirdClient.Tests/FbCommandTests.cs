@@ -695,6 +695,40 @@ end";
 	}
 
 	[Test]
+	public async Task HighLowSurrogatePassingTest()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			const string Value = "😊";
+			cmd.CommandText = "select cast(@value1 as varchar(1) character set utf8), cast(@value2 as char(1) character set utf8) from rdb$database";
+			cmd.Parameters.Add("value1", Value);
+			cmd.Parameters.Add("value2", Value);
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(Value, reader[0]);
+				Assert.AreEqual(Value, reader[1]);
+			}
+		}
+	}
+
+	[Test]
+	public async Task HighLowSurrogateReadingTest()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			const string Value = "😊";
+			cmd.CommandText = "select cast(x'F09F988A' as varchar(1) character set utf8), cast(x'F09F988A' as char(1) character set utf8) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(Value, reader[0]);
+				Assert.AreEqual(Value, reader[1]);
+			}
+		}
+	}
+
+	[Test]
 	public async Task ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDeleteTest()
 	{
 		await using (var cmd = Connection.CreateCommand())

@@ -427,7 +427,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = GetString();
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -463,7 +463,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = GetString();
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -642,7 +642,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -678,7 +678,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.Length > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}

@@ -1246,7 +1246,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1271,7 +1271,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1394,7 +1394,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1419,7 +1419,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.RuneCount() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1533,7 +1533,7 @@ internal class GdsStatement : StatementBase
 				{
 					var s = xdr.ReadString(innerCharset, field.Length);
 					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						s.Length > field.CharCount)
+						s.RuneCount() > field.CharCount)
 					{
 						return s.Substring(0, field.CharCount);
 					}
@@ -1630,7 +1630,7 @@ internal class GdsStatement : StatementBase
 				{
 					var s = await xdr.ReadStringAsync(innerCharset, field.Length, cancellationToken).ConfigureAwait(false);
 					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						s.Length > field.CharCount)
+						s.RuneCount() > field.CharCount)
 					{
 						return s.Substring(0, field.CharCount);
 					}

@@ -326,7 +326,7 @@ internal sealed class DbField
 							var s = Charset.GetString(buffer, 0, buffer.Length);
 
 							if ((Length % Charset.BytesPerCharacter) == 0 &&
-								s.Length > CharCount)
+								s.RuneCount() > CharCount)
 							{
 								s = s.Substring(0, CharCount);
 							}
