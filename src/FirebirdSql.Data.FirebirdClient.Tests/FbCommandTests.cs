@@ -647,7 +647,7 @@ end";
 	}
 
 	[Test]
-	public async Task ReadsTimeWithProperPrecision()
+	public async Task ReadsTimeWithProperPrecisionTest()
 	{
 		await using (var cmd = Connection.CreateCommand())
 		{
@@ -658,7 +658,7 @@ end";
 	}
 
 	[Test]
-	public async Task PassesTimeSpanWithProperPrecision()
+	public async Task PassesTimeSpanWithProperPrecisionTest()
 	{
 		var ts = TimeSpan.FromTicks(14321000);
 		await using (var cmd = Connection.CreateCommand())
@@ -671,7 +671,7 @@ end";
 	}
 
 	[Test]
-	public async Task ReadsDateTimeWithProperPrecision()
+	public async Task ReadsDateTimeWithProperPrecisionTest()
 	{
 		await using (var cmd = Connection.CreateCommand())
 		{
@@ -682,7 +682,7 @@ end";
 	}
 
 	[Test]
-	public async Task PassesDateTimeWithProperPrecision()
+	public async Task PassesDateTimeWithProperPrecisionTest()
 	{
 		var dt = new DateTime(635583639614321000);
 		await using (var cmd = Connection.CreateCommand())
@@ -695,7 +695,7 @@ end";
 	}
 
 	[Test]
-	public async Task ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDelete()
+	public async Task ExecuteNonQueryReturnsMinusOneOnNonInsertUpdateDeleteTest()
 	{
 		await using (var cmd = Connection.CreateCommand())
 		{
