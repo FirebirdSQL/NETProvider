@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Linq;
 using System.Numerics;
 using FirebirdSql.Data.Types;
 
@@ -325,10 +326,11 @@ internal sealed class DbField
 						{
 							var s = Charset.GetString(buffer, 0, buffer.Length);
 
+							var runes = s.EnumerateRunesEx().ToList();
 							if ((Length % Charset.BytesPerCharacter) == 0 &&
-								s.RuneCount() > CharCount)
+								runes.Count > CharCount)
 							{
-								s = s.Substring(0, CharCount);
+								s = new string([.. runes.Take(CharCount).SelectMany(x => x)]);
 							}
 
 							DbValue.SetValue(s);

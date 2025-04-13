@@ -67,25 +67,32 @@ internal static class Extensions
 	public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 #endif
 
-	public static int RuneCount(this string s)
+	public static IEnumerable<char[]> EnumerateRunesEx(this string s)
 	{
 		if (s == null)
 			throw new ArgumentNullException(nameof(s));
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET48
-		var cnt = 0;
 		for (var i = 0; i < s.Length; i++)
-        {
-            if (char.IsHighSurrogate(s[i]) && i + 1 < s.Length && char.IsLowSurrogate(s[i + 1]))
-            {
-                i++;
-            }
-			cnt++;
-        }
-		return cnt;
+		{
+			if (char.IsHighSurrogate(s[i]) && i + 1 < s.Length && char.IsLowSurrogate(s[i + 1]))
+			{
+				yield return new[] { s[i], s[i + 1] };
+				i++;
+			}
+			else
+			{
+				yield return new[] { s[i] };
+			}
+		}
 
 #else
-		return s.EnumerateRunes().Count();
+		return s.EnumerateRunes().Select(r =>
+		{
+			var result = new char[r.Utf16SequenceLength];
+			r.EncodeToUtf16(result);
+			return result;
+		});
 #endif
 	}
 }

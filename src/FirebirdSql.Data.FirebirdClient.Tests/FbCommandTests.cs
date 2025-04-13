@@ -699,8 +699,8 @@ end";
 	{
 		await using (var cmd = Connection.CreateCommand())
 		{
-			const string Value = "😊";
-			cmd.CommandText = "select cast(@value1 as varchar(1) character set utf8), cast(@value2 as char(1) character set utf8) from rdb$database";
+			const string Value = "😊!";
+			cmd.CommandText = "select cast(@value1 as varchar(2) character set utf8), cast(@value2 as char(2) character set utf8) from rdb$database";
 			cmd.Parameters.Add("value1", Value);
 			cmd.Parameters.Add("value2", Value);
 			await using (var reader = await cmd.ExecuteReaderAsync())
@@ -717,8 +717,8 @@ end";
 	{
 		await using (var cmd = Connection.CreateCommand())
 		{
-			const string Value = "😊";
-			cmd.CommandText = "select cast(x'F09F988A' as varchar(1) character set utf8), cast(x'F09F988A' as char(1) character set utf8) from rdb$database";
+			const string Value = "😊!";
+			cmd.CommandText = "select cast(x'F09F988A21' as varchar(2) character set utf8), cast(x'F09F988A21' as char(2) character set utf8) from rdb$database";
 			await using (var reader = await cmd.ExecuteReaderAsync())
 			{
 				await reader.ReadAsync();
