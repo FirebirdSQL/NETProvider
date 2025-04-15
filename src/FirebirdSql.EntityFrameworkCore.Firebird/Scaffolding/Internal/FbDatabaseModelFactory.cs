@@ -343,11 +343,18 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 							Name = reader.GetString(0).Trim(),
 							IsUnique = reader.GetBoolean(1),
 						};
-
+						bool skipIdx = false;
 						foreach (var column in reader.GetString(3).Split(','))
 						{
-							index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
+							var col = table.Columns.SingleOrDefault(y => y.Name == column.Trim());
+							if (col == null)
+							{
+								skipIdx = true;
+								break;
+							}
+							index.Columns.Add(col);
 						}
+						if(skipIdx) continue;
 
 						if (reader.GetBoolean(2))
 						{
