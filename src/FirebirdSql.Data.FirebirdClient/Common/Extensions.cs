@@ -55,6 +55,20 @@ internal static class Extensions
 #endif
 	}
 
+	public static IDictionary<short, ulong> GetTableStatistics(this byte[] b, int length)
+	{
+		var capacity = length > 3 ? (length - 3) / 6 + 1 : 0;
+
+		var tableStatistics = new Dictionary<short, ulong>(capacity);
+		for (var i = 3; i < length; i += 6)
+		{
+			var tableId = (short)IscHelper.VaxInteger(b, i, 2);
+			var count = (ulong)IscHelper.VaxInteger(b, i + 2, 4);
+			tableStatistics.Add(tableId, count);
+		}
+		return tableStatistics;
+	}
+
 	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
 	{
 		for (var i = 0; i < (float)array.Length / size; i++)
