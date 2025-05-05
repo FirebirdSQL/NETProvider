@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -280,29 +280,101 @@ public sealed class FbDataReader : DbDataReader
 		}
 	}
 
-	public override DataTable GetSchemaTable()
+	private FbCommand GetSchemaCommand()
 	{
-		CheckState();
-
-		if (_schemaTable != null)
+		var command = new FbCommand(string.Empty, _command.Connection, _command.Connection.InnerConnection.ActiveTransaction)
 		{
-			return _schemaTable;
-		}
+			FetchSize = 32767        // Singlerequest all Fields, single Transaction
+		};
 
+		// all relations, which used
+		foreach (var relation in Enumerable.Range(0, _fields.Count).Where(f => !string.IsNullOrEmpty(_fields[f].Relation)).Select(f => _fields[f].Relation).Distinct())
+		{
+			if (relation != string.Empty)
+			{
+				var par = new FbParameter
+				{
+					DbType = DbType.String,
+					Value = relation
+				};
+				command.Parameters.Add(par);
+			}
+		}
+		if (command.Parameters.Count > 0)
+		{
+			command.CommandText = string.Format(GetSchemaCommandSingleRequest(), string.Join(", ", Enumerable.Range(0, command.Parameters.Count).Select(p => "?")));
+			return command;
+		}
+		command.Dispose();
+		return null;
+	}
+
+	private async Task<DataTable> GetFieldsSchemaAsync(CancellationToken cancellationToken = default)
+	{
+		if (GetSchemaCommand() is FbCommand schemaCommand)
+		{
+			using (var reader = await schemaCommand.ExecuteReaderAsync(CommandBehavior.Default, cancellationToken).ConfigureAwait(false))
+			{
+				var fieldsSchema = new DataTable();
+				fieldsSchema.Columns.AddRange(Enumerable.Range(0, reader.FieldCount).Select(i =>
+					 new DataColumn(reader.GetName(i), reader.GetFieldType(i))
+					 {
+						 AllowDBNull = true
+					 }).ToArray());
+				var values = new object[reader.FieldCount];
+				fieldsSchema.BeginLoadData();
+				while (await reader.ReadAsync().ConfigureAwait(false))
+				{
+					reader.GetValues(values);
+					fieldsSchema.Rows.Add(values);
+				}
+				fieldsSchema.DefaultView.Sort = "base_table, base_field";
+				return fieldsSchema;
+			}
+		}
+		return null;
+	}
+
+	private DataTable GetFieldsSchema()
+	{
+		if (GetSchemaCommand() is FbCommand schemaCommand)
+		{
+			using (schemaCommand)
+			{
+				using (var reader = schemaCommand.ExecuteReader())
+				{
+					var fieldsSchema = new DataTable();
+					fieldsSchema.Columns.AddRange(Enumerable.Range(0, reader.FieldCount).Select(i =>
+						 new DataColumn(reader.GetName(i), reader.GetFieldType(i))
+						 {
+							 AllowDBNull = true
+						 }).ToArray());
+					var values = new object[reader.FieldCount];
+					fieldsSchema.BeginLoadData();
+					while (reader.Read())
+					{
+						reader.GetValues(values);
+						fieldsSchema.Rows.Add(values);
+					}
+					fieldsSchema.DefaultView.Sort = "base_table, base_field";
+					return fieldsSchema;
+				}
+			}
+		}
+		return null;
+	}
+
+	private DataTable LoadSchemaTable(DataTable fieldsTable)
+	{
 		DataRow schemaRow = null;
-		var tableCount = 0;
-		var currentTable = string.Empty;
+
+		// no of relations excluding calculated columns with no relation
+		var singleTable = Enumerable.Range(0, _fields.Count).Where(f => !string.IsNullOrEmpty(_fields[f].Relation)).Select(f => _fields[f].Relation).Distinct().Count() == 1;
 
 		_schemaTable = GetSchemaTableStructure();
 
-		/* Prepare statement for schema fields information	*/
-		var schemaCmd = new FbCommand(GetSchemaCommandText(), _command.Connection, _command.Connection.InnerConnection.ActiveTransaction);
 		try
 		{
-			schemaCmd.Parameters.Add("@TABLE_NAME", FbDbType.Char, 31);
-			schemaCmd.Parameters.Add("@COLUMN_NAME", FbDbType.Char, 31);
-			schemaCmd.Prepare();
-
 			_schemaTable.BeginLoadData();
 
 			for (var i = 0; i < _fields.Count; i++)
@@ -313,29 +385,19 @@ public sealed class FbDataReader : DbDataReader
 				var precision = 0;
 				var isExpression = false;
 
-				/* Get Schema data for the field	*/
-				schemaCmd.Parameters[0].Value = _fields[i].Relation;
-				schemaCmd.Parameters[1].Value = _fields[i].Name;
-
-				var reader = schemaCmd.ExecuteReader(CommandBehavior.Default);
-				try
+				if (fieldsTable != null)    // relation exists in result
 				{
-					if (reader.Read())
+					var rows = fieldsTable.DefaultView.FindRows(new object[] { _fields[i].Relation, _fields[i].Name });
+					if (rows.Length > 0)
 					{
-						isReadOnly = (IsReadOnly(reader) || IsExpression(reader)) ? true : false;
-						isKeyColumn = (reader.GetInt32(2) == 1) ? true : false;
-						isUnique = (reader.GetInt32(3) == 1) ? true : false;
-						precision = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
-						isExpression = IsExpression(reader);
+						isReadOnly = !TypeHelper.IsDBNull(rows[0][0]) || !TypeHelper.IsDBNull(rows[0][1]);
+						isKeyColumn = Convert.ToInt32(rows[0][2]) == 1;
+						isUnique = Convert.ToInt32(rows[0][3]) == 1;
+						precision = TypeHelper.IsDBNull(rows[0][4]) ? -1 : Convert.ToInt32(rows[0][4]);
+
+						// Same as readonly
+						isExpression = !TypeHelper.IsDBNull(rows[0][0]) || !TypeHelper.IsDBNull(rows[0][1]);
 					}
-				}
-				finally
-				{
-#if NET48 || NETSTANDARD2_0
-					reader.Dispose();
-#else
-					reader.Dispose();
-#endif
 				}
 
 				/* Create new row for the Schema Table	*/
@@ -369,39 +431,41 @@ public sealed class FbDataReader : DbDataReader
 				schemaRow["BaseTableName"] = _fields[i].Relation;
 				schemaRow["BaseColumnName"] = _fields[i].Name;
 
+				if (!singleTable)	// more than 1 or calculated columns
+				{
+					schemaRow["IsKey"] = false;
+					schemaRow["IsUnique"] = false;
+				}
+
 				_schemaTable.Rows.Add(schemaRow);
-
-				if (!string.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
-				{
-					tableCount++;
-					currentTable = _fields[i].Relation;
-				}
-
-				schemaCmd.Close();
 			}
-
-			if (tableCount > 1)
-			{
-				foreach (DataRow row in _schemaTable.Rows)
-				{
-					row["IsKey"] = false;
-					row["IsUnique"] = false;
-				}
-			}
-
 			_schemaTable.EndLoadData();
 		}
 		finally
 		{
 #if NET48 || NETSTANDARD2_0
-			schemaCmd.Dispose();
+			//schemaCmd.Dispose();
 #else
-			schemaCmd.Dispose();
+			//schemaCmd.Dispose();
 #endif
+			fieldsTable?.Dispose();
 		}
 
 		return _schemaTable;
 	}
+
+	public override DataTable GetSchemaTable()
+	{
+		CheckState();
+
+		if (_schemaTable != null)
+		{
+			return _schemaTable;
+		}
+
+		return LoadSchemaTable(GetFieldsSchema());
+	}
+
 #if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
 	public async Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
 #else
@@ -415,121 +479,10 @@ public sealed class FbDataReader : DbDataReader
 			return _schemaTable;
 		}
 
-		DataRow schemaRow = null;
-		var tableCount = 0;
-		var currentTable = string.Empty;
-
-		_schemaTable = GetSchemaTableStructure();
-
-		/* Prepare statement for schema fields information	*/
-		var schemaCmd = new FbCommand(GetSchemaCommandText(), _command.Connection, _command.Connection.InnerConnection.ActiveTransaction);
-		try
-		{
-			schemaCmd.Parameters.Add("@TABLE_NAME", FbDbType.Char, 31);
-			schemaCmd.Parameters.Add("@COLUMN_NAME", FbDbType.Char, 31);
-			await schemaCmd.PrepareAsync(cancellationToken).ConfigureAwait(false);
-
-			_schemaTable.BeginLoadData();
-
-			for (var i = 0; i < _fields.Count; i++)
-			{
-				var isKeyColumn = false;
-				var isUnique = false;
-				var isReadOnly = false;
-				var precision = 0;
-				var isExpression = false;
-
-				/* Get Schema data for the field	*/
-				schemaCmd.Parameters[0].Value = _fields[i].Relation;
-				schemaCmd.Parameters[1].Value = _fields[i].Name;
-
-				var reader = await schemaCmd.ExecuteReaderAsync(CommandBehavior.Default, cancellationToken).ConfigureAwait(false);
-				try
-				{
-					if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-					{
-						isReadOnly = IsReadOnly(reader) || IsExpression(reader);
-						isKeyColumn = reader.GetInt32(2) == 1;
-						isUnique = reader.GetInt32(3) == 1;
-						precision = reader.IsDBNull(4) ? -1 : reader.GetInt32(4);
-						isExpression = IsExpression(reader);
-					}
-				}
-				finally
-				{
-#if NET48 || NETSTANDARD2_0
-					reader.Dispose();
-#else
-					await reader.DisposeAsync().ConfigureAwait(false);
-#endif
-				}
-
-				/* Create new row for the Schema Table	*/
-				schemaRow = _schemaTable.NewRow();
-
-				schemaRow["ColumnName"] = GetName(i);
-				schemaRow["ColumnOrdinal"] = i;
-				schemaRow["ColumnSize"] = _fields[i].GetSize();
-				if (_fields[i].IsDecimal())
-				{
-					schemaRow["NumericPrecision"] = schemaRow["ColumnSize"];
-					if (precision > 0)
-					{
-						schemaRow["NumericPrecision"] = precision;
-					}
-					schemaRow["NumericScale"] = _fields[i].NumericScale * (-1);
-				}
-				schemaRow["DataType"] = GetFieldType(i);
-				schemaRow["ProviderType"] = GetProviderType(i);
-				schemaRow["IsLong"] = _fields[i].IsLong();
-				schemaRow["AllowDBNull"] = _fields[i].AllowDBNull();
-				schemaRow["IsRowVersion"] = false;
-				schemaRow["IsAutoIncrement"] = false;
-				schemaRow["IsReadOnly"] = isReadOnly;
-				schemaRow["IsKey"] = isKeyColumn;
-				schemaRow["IsUnique"] = isUnique;
-				schemaRow["IsAliased"] = _fields[i].IsAliased();
-				schemaRow["IsExpression"] = isExpression;
-				schemaRow["BaseSchemaName"] = DBNull.Value;
-				schemaRow["BaseCatalogName"] = DBNull.Value;
-				schemaRow["BaseTableName"] = _fields[i].Relation;
-				schemaRow["BaseColumnName"] = _fields[i].Name;
-
-				_schemaTable.Rows.Add(schemaRow);
-
-				if (!string.IsNullOrEmpty(_fields[i].Relation) && currentTable != _fields[i].Relation)
-				{
-					tableCount++;
-					currentTable = _fields[i].Relation;
-				}
-
-				await schemaCmd.CloseAsync().ConfigureAwait(false);
-			}
-
-			if (tableCount > 1)
-			{
-				foreach (DataRow row in _schemaTable.Rows)
-				{
-					row["IsKey"] = false;
-					row["IsUnique"] = false;
-				}
-			}
-
-			_schemaTable.EndLoadData();
-		}
-		finally
-		{
-#if NET48 || NETSTANDARD2_0
-			schemaCmd.Dispose();
-#else
-			await schemaCmd.DisposeAsync().ConfigureAwait(false);
-#endif
-		}
-
-		return _schemaTable;
+		return LoadSchemaTable(await GetFieldsSchemaAsync(cancellationToken).ConfigureAwait(false));
 	}
 
-	public override int GetOrdinal(string name)
+ 	public override int GetOrdinal(string name)
 	{
 		CheckState();
 
@@ -611,12 +564,22 @@ public sealed class FbDataReader : DbDataReader
 
 	public override int GetValues(object[] values)
 	{
+		CheckState();
+		CheckPosition();
+
 		var count = Math.Min(_fields.Count, values.Length);
-		for (var i = 0; i < count; i++)
+		try
 		{
-			values[i] = GetValue(i);
+			for (var i = 0; i < count; i++)
+			{
+				values[i] = _command.ExpectedColumnTypes != null ? GetValue(i) : _row[i].GetValue();
+			}
+			return count;
 		}
-		return count;
+		catch (IscException ex)
+		{
+			throw FbException.Create(ex);
+		}
 	}
 
 	public override T GetFieldValue<T>(int i)
@@ -1140,7 +1103,7 @@ public sealed class FbDataReader : DbDataReader
 		return schema;
 	}
 
-	private static string GetSchemaCommandText()
+	private static string GetSchemaCommandSingleRequest()
 	{
 		const string sql =
 			@"SELECT
@@ -1158,12 +1121,17 @@ public sealed class FbDataReader : DbDataReader
 					WHERE rel.rdb$constraint_type = 'UNIQUE'
 					  AND rel.rdb$relation_name = rfr.rdb$relation_name
 					  AND seg.rdb$field_name = rfr.rdb$field_name) AS unique_key,
-					fld.rdb$field_precision AS numeric_precision
+					fld.rdb$field_precision AS numeric_precision,
+
+                    rfr.rdb$relation_name   base_table,
+                    rfr.rdb$field_name      base_field
+
 				  FROM rdb$relation_fields rfr
 					INNER JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
-				  WHERE rfr.rdb$relation_name = ?
-					AND rfr.rdb$field_name = ?
-				  ORDER BY rfr.rdb$relation_name, rfr.rdb$field_position";
+
+					WHERE rfr.rdb$relation_name in ({0})";
+		// isn't necessary
+		//ORDER BY rfr.rdb$relation_name, rfr.rdb$field_position";
 
 		return sql;
 	}
