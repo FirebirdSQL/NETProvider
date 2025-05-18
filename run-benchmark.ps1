@@ -1,5 +1,5 @@
 param(
-	[ValidateSet('CommandBenchmark')]
+	[ValidateSet('CommandBenchmark','LargeFetchBenchmark')]
 	$Benchmark = 'CommandBenchmark'
 )
 
