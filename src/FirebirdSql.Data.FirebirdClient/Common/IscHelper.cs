@@ -206,6 +206,10 @@ internal static class IscHelper
 				case IscCodes.isc_info_error:
 					throw FbException.Create("Received error response.");
 
+				case IscCodes.isc_info_tra_id:
+					info.Add(VaxInteger(buffer, pos, length));
+					break;
+
 				case IscCodes.fb_info_tra_snapshot_number:
 					info.Add(VaxInteger(buffer, pos, length));
 					break;

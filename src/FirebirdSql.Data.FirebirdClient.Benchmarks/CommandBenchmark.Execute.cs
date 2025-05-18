@@ -16,44 +16,40 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using BenchmarkDotNet.Attributes;
-using FirebirdSql.Data.FirebirdClient;
 
-namespace Perf;
+namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
-partial class CommandBenchmark
+public partial class CommandBenchmark
 {
 	[GlobalSetup(Target = nameof(Execute))]
 	public void ExecuteGlobalSetup()
 	{
-		GlobalSetupBase();
-		using (var conn = new FbConnection(ConnectionString))
-		{
-			conn.Open();
-			using (var cmd = conn.CreateCommand())
-			{
-				cmd.CommandText = $"create table foobar (x {DataType})";
-				cmd.ExecuteNonQuery();
-			}
-		}
+		CreateDatabase();
+
+		using var conn = new FbConnection(ConnectionString);
+		conn.Open();
+
+		using var cmd = conn.CreateCommand();
+		cmd.CommandText = $"CREATE TABLE foobar (x {DataType})";
+		cmd.ExecuteNonQuery();
 	}
 
 	[Benchmark]
 	public void Execute()
 	{
-		using (var conn = new FbConnection(ConnectionString))
+		using var conn = new FbConnection(ConnectionString);
+		conn.Open();
+
+		using var cmd = conn.CreateCommand();
+		cmd.CommandText = @"INSERT INTO foobar (x) VALUES (@cnt)";
+
+		var p = new FbParameter() { ParameterName = "@cnt" };
+		cmd.Parameters.Add(p);
+
+		for (var i = 0; i < Count; i++)
 		{
-			conn.Open();
-			using (var cmd = conn.CreateCommand())
-			{
-				cmd.CommandText = @"insert into foobar values (@cnt)";
-				var p = new FbParameter() { ParameterName = "@cnt" };
-				cmd.Parameters.Add(p);
-				for (var i = 0; i < Count; i++)
-				{
-					p.Value = i;
-					cmd.ExecuteNonQuery();
-				}
-			}
+			p.Value = i;
+			cmd.ExecuteNonQuery();
 		}
 	}
 }
