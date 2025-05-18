@@ -22,12 +22,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 public sealed class FbTransaction : DbTransaction
 {
-	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbTransaction));
+	static readonly ILogger<FbTransaction> Log = FbLogManager.CreateLogger<FbTransaction>();
 
 	internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 

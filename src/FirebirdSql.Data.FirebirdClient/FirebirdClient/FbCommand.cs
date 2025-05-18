@@ -25,12 +25,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller, ICloneable
 {
-	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbCommand));
+	static readonly ILogger<FbCommand> Log = FbLogManager.CreateLogger<FbCommand>();
 
 	#region Fields
 
