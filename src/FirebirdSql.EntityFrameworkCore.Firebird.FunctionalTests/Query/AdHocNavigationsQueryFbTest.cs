@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
@@ -25,29 +26,31 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class FunkyDataQueryFbTest : FunkyDataQueryTestBase<FunkyDataQueryFbTest.FunkyDataQueryFbFixture>
+public class AdHocNavigationsQueryFbTest : AdHocNavigationsQueryRelationalTestBase
 {
-	public FunkyDataQueryFbTest(FunkyDataQueryFbFixture fixture)
-		: base(fixture)
-	{ }
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task String_contains_on_argument_with_wildcard_column(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Let_multiple_references_with_reference_to_outer()
 	{
-		return base.String_contains_on_argument_with_wildcard_column(async);
+		return base.Let_multiple_references_with_reference_to_outer();
 	}
 
-	public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase, ITestSqlLoggerFactory
+	[NotSupportedOnFirebirdFact]
+	public override Task Projection_with_multiple_includes_and_subquery_with_set_operation()
 	{
-		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+		return base.Projection_with_multiple_includes_and_subquery_with_set_operation();
+	}
 
-		public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
+	[NotSupportedOnFirebirdFact]
+	public override Task SelectMany_and_collection_in_projection_in_FirstOrDefault()
+	{
+		return base.SelectMany_and_collection_in_projection_in_FirstOrDefault();
+	}
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-		{
-			base.OnModelCreating(modelBuilder, context);
-			ModelHelpers.SetStringLengths(modelBuilder);
-		}
+	[NotSupportedOnFirebirdFact]
+	public override Task Correlated_collection_correctly_associates_entities_with_byte_array_keys()
+	{
+		return base.Correlated_collection_correctly_associates_entities_with_byte_array_keys();
 	}
 }

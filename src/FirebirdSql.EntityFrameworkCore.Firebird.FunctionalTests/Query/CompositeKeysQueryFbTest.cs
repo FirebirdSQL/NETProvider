@@ -24,7 +24,4 @@ public class CompositeKeysQueryFbTest : CompositeKeysQueryRelationalTestBase<Com
 	public CompositeKeysQueryFbTest(CompositeKeysQueryFbFixture fixture)
 		: base(fixture)
 	{ }
-
-	protected override bool CanExecuteQueryString => false;
-
 }

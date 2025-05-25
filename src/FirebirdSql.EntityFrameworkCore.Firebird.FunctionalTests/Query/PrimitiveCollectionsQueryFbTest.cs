@@ -197,6 +197,13 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
     }
 
 	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Count_with_predicate(bool async)
+	{
+		return base.Column_collection_Count_with_predicate(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
     [MemberData(nameof(IsAsyncData))]
     public override Task Column_collection_Length(bool async)
     {
@@ -469,13 +476,246 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
         return base.Nested_contains_with_arrays_and_no_inferred_type_mapping(async);
     }
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Contains_over_subquery(bool async)
+	{
+		return base.Column_collection_Contains_over_subquery(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_First(bool async)
+	{
+		return base.Column_collection_First(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_FirstOrDefault(bool async)
+	{
+		return base.Column_collection_FirstOrDefault(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_SelectMany(bool async)
+	{
+		return base.Column_collection_SelectMany(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_SelectMany_with_filter(bool async)
+	{
+		return base.Column_collection_SelectMany_with_filter(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_SelectMany_with_Select_to_anonymous_type(bool async)
+	{
+		return base.Column_collection_SelectMany_with_Select_to_anonymous_type(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Single(bool async)
+	{
+		return base.Column_collection_Single(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_SingleOrDefault(bool async)
+	{
+		return base.Column_collection_SingleOrDefault(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_Count(bool async)
+	{
+		return base.Column_collection_Where_Count(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_ElementAt(bool async)
+	{
+		return base.Column_collection_Where_ElementAt(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_Skip(bool async)
+	{
+		return base.Column_collection_Where_Skip(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_Skip_Take(bool async)
+	{
+		return base.Column_collection_Where_Skip_Take(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_Take(bool async)
+	{
+		return base.Column_collection_Where_Take(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Column_collection_Where_Union(bool async)
+	{
+		return base.Column_collection_Where_Union(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_Count_with_column_predicate_with_EF_Parameter(bool async)
+	{
+		return base.Inline_collection_Count_with_column_predicate_with_EF_Parameter(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_List_Max_with_three_values(bool async)
+	{
+		return base.Inline_collection_List_Max_with_three_values(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_List_Max_with_two_values(bool async)
+	{
+		return base.Inline_collection_List_Max_with_two_values(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_List_Min_with_two_values(bool async)
+	{
+		return base.Inline_collection_List_Min_with_two_values(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_List_value_index_Column(bool async)
+	{
+		return base.Inline_collection_List_value_index_Column(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_Max_with_three_values(bool async)
+	{
+		return base.Inline_collection_Max_with_three_values(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_Max_with_two_values(bool async)
+	{
+		return base.Inline_collection_Max_with_two_values(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_Min_with_three_values(bool async)
+	{
+		return base.Inline_collection_Min_with_three_values(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_Min_with_two_values(bool async)
+	{
+		return base.Inline_collection_Min_with_two_values(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_of_nullable_value_type_Max(bool async)
+	{
+		return base.Inline_collection_of_nullable_value_type_Max(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_of_nullable_value_type_Min(bool async)
+	{
+		return base.Inline_collection_of_nullable_value_type_Min(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_of_nullable_value_type_with_null_Max(bool async)
+	{
+		return base.Inline_collection_of_nullable_value_type_with_null_Max(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_of_nullable_value_type_with_null_Min(bool async)
+	{
+		return base.Inline_collection_of_nullable_value_type_with_null_Min(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_value_index_Column(bool async)
+	{
+		return base.Inline_collection_value_index_Column(async);
+	}
+	
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Inline_collection_with_single_parameter_element_Count(bool async)
+	{
+		return base.Inline_collection_with_single_parameter_element_Count(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Parameter_collection_Count_with_column_predicate_with_EF_Constant(bool async)
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_EF_Constant(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Parameter_collection_Where_with_EF_Constant_Where_Any(bool async)
+	{
+		return base.Parameter_collection_Where_with_EF_Constant_Where_Any(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Project_inline_collection_with_Union(bool async)
+	{
+		return base.Project_inline_collection_with_Union(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Parameter_collection_ImmutableArray_of_ints_Contains_int(bool async)
+	{
+		return base.Parameter_collection_ImmutableArray_of_ints_Contains_int(async);
+	}
+
 	PrimitiveCollectionsContext CreateContext()
 	{
 		return Fixture.CreateContext();
 	}
 
-	public class PrimitiveCollectionsQueryFbFixture : PrimitiveCollectionsQueryFixtureBase
+	public class PrimitiveCollectionsQueryFbFixture : PrimitiveCollectionsQueryFixtureBase, ITestSqlLoggerFactory
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 	}
 }

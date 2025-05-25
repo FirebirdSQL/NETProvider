@@ -201,11 +201,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 	protected override void GenerateEmptyProjection(SelectExpression selectExpression)
 	{
-		base.GenerateEmptyProjection(selectExpression);
-		if (selectExpression.Alias != null)
-		{
-			Sql.Append(" AS empty");
-		}
+		Sql.Append("1 AS dummy");
 	}
 
 	protected override void GenerateTop(SelectExpression selectExpression)
@@ -312,7 +308,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 	protected override Expression VisitTableValuedFunction(TableValuedFunctionExpression tableValuedFunctionExpression)
 	{
-		Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.StoreFunction.Name));
+		Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.Name));
 		if (tableValuedFunctionExpression.Arguments.Any())
 		{
 			Sql.Append("(");
@@ -333,7 +329,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		};
 	}
 
-	public virtual Expression VisitSpacedFunction(FbSpacedFunctionExpression spacedFunctionExpression)
+	protected virtual Expression VisitSpacedFunction(FbSpacedFunctionExpression spacedFunctionExpression)
 	{
 		Sql.Append(spacedFunctionExpression.Name);
 		Sql.Append("(");

@@ -30,8 +30,6 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Union_Select_scalar(bool async)
@@ -100,6 +98,20 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 	public override Task Union_Intersect(bool async)
 	{
 		return base.Union_Intersect(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Except_on_distinct(bool async)
+	{
+		return base.Except_on_distinct(async);
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Intersect_on_distinct(bool async)
+	{
+		return base.Intersect_on_distinct(async);
 	}
 
 	[Theory]

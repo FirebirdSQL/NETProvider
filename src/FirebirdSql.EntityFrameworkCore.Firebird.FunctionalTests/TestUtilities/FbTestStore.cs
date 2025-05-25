@@ -33,20 +33,8 @@ public class FbTestStore : RelationalTestStore
 		=> new FbTestStore(name, shared: true);
 
 	public FbTestStore(string name, bool shared)
-		: base(name, shared)
-	{
-		var csb = new FbConnectionStringBuilder
-		{
-			Database = $"EFCore_{name}.fdb",
-			DataSource = "localhost",
-			UserID = "sysdba",
-			Password = "masterkey",
-			Pooling = false,
-			Charset = "utf8"
-		};
-		ConnectionString = csb.ToString();
-		Connection = new FbConnection(ConnectionString);
-	}
+		: base(name, shared, CreateConnection(name, shared))
+	{ }
 
 	protected override string OpenDelimiter => "\"";
 	protected override string CloseDelimiter => "\"";
@@ -54,23 +42,28 @@ public class FbTestStore : RelationalTestStore
 	public Version ServerVersion { get; private set; }
 	public bool ServerLessThan4() => ServerVersion < new Version(4, 0, 0, 0);
 
-	protected override void Initialize(Func<DbContext> createContext, Action<DbContext> seed, Action<DbContext> clean)
+	protected override async Task InitializeAsync(Func<DbContext> createContext, Func<DbContext, Task> seed, Func<DbContext, Task> clean)
 	{
-		using (var context = createContext())
+		// create database explicitly to specify Page Size and Forced Writes
+		await FbConnection.CreateDatabaseAsync(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
+		await using (var context = createContext())
 		{
-			// create database explicitly to specify Page Size and Forced Writes
-			FbConnection.CreateDatabase(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
 			try
 			{
-				context.Database.EnsureCreated();
+				await context.Database.EnsureCreatedAsync();
 			}
 			catch (FbException ex) when (ServerLessThan4() && ex.Message.EndsWith("Name longer than database column size", StringComparison.Ordinal))
 			{
 				return;
 			}
-			clean?.Invoke(context);
-			Clean(context);
-			seed?.Invoke(context);
+			if (clean != null)
+			{
+				await clean(context);
+			}
+			if (seed != null)
+			{
+				await seed(context);
+			}
 		}
 	}
 
@@ -97,7 +90,7 @@ public class FbTestStore : RelationalTestStore
 		await base.OpenConnectionAsync();
 		if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
 		{
-			using (var cmd = Connection.CreateCommand())
+			await using (var cmd = Connection.CreateCommand())
 			{
 				cmd.CommandText = "set bind of decfloat to legacy";
 				await cmd.ExecuteNonQueryAsync();
@@ -113,6 +106,17 @@ public class FbTestStore : RelationalTestStore
 		=> builder.UseFirebird(Connection,
 			x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery));
 
-	public override void Clean(DbContext context)
-	{ }
+	static FbConnection CreateConnection(string name, bool shared)
+	{
+		var csb = new FbConnectionStringBuilder
+		{
+			Database = $"EFCore_{name}.fdb",
+			DataSource = "localhost",
+			UserID = "sysdba",
+			Password = "masterkey",
+			Pooling = false,
+			Charset = "utf8"
+		};
+		return new FbConnection(csb.ToString());
+	}
 }

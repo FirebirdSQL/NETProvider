@@ -29,8 +29,6 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_as_final_operator(bool async)

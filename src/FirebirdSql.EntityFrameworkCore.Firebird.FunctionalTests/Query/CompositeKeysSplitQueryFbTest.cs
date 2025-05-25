@@ -24,6 +24,4 @@ public class CompositeKeysSplitQueryFbTest : CompositeKeysSplitQueryRelationalTe
 	public CompositeKeysSplitQueryFbTest(CompositeKeysQueryFbFixture fixture)
 		: base(fixture)
 	{ }
-
-	protected override bool CanExecuteQueryString => false;
 }

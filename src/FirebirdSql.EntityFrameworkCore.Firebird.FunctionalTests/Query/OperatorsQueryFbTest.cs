@@ -36,18 +36,7 @@ public class OperatorsQueryFbTest : OperatorsQueryTestBase
 		return base.Concat_and_json_scalar(async);
 	}
 
-	protected override ContextFactory<TContext> Initialize<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Action<IServiceCollection> addServices = null, Action<TContext> seed = null, Func<string, bool> shouldLogCategory = null, Func<TestStore> createTestStore = null, bool usePooling = true)
-	{
-		return base.Initialize(
-			modelBuilder =>
-			{
-				ModelHelpers.SetStringLengths(modelBuilder);
-				onModelCreating?.Invoke(modelBuilder);
-			},
-			onConfiguring, addServices, seed, shouldLogCategory, createTestStore, usePooling);
-	}
-
-	protected override Task<ContextFactory<TContext>> InitializeAsync<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Action<IServiceCollection> addServices = null, Action<TContext> seed = null, Func<string, bool> shouldLogCategory = null, Func<TestStore> createTestStore = null, bool usePooling = true)
+	protected override Task<ContextFactory<TContext>> InitializeAsync<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Func<IServiceCollection, IServiceCollection> addServices = null, Action<ModelConfigurationBuilder> configureConventions = null, Func<TContext, Task> seed = null, Func<string, bool> shouldLogCategory = null, Func<Task<TestStore>> createTestStore = null, bool usePooling = true, bool useServiceProvider = true)
 	{
 		return base.InitializeAsync(
 			modelBuilder =>
@@ -55,7 +44,7 @@ public class OperatorsQueryFbTest : OperatorsQueryTestBase
 				ModelHelpers.SetStringLengths(modelBuilder);
 				onModelCreating?.Invoke(modelBuilder);
 			},
-			onConfiguring, addServices, seed, shouldLogCategory, createTestStore, usePooling);
+			onConfiguring, addServices, configureConventions, seed, shouldLogCategory, createTestStore, usePooling, useServiceProvider);
 	}
 
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;

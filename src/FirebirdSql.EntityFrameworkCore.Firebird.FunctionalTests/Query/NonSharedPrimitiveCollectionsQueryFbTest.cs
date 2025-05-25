@@ -18,6 +18,8 @@
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
@@ -25,6 +27,18 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class NonSharedPrimitiveCollectionsQueryFbTest : NonSharedPrimitiveCollectionsQueryRelationalTestBase
 {
+	protected override DbContextOptionsBuilder SetTranslateParameterizedCollectionsToConstants(DbContextOptionsBuilder optionsBuilder)
+	{
+		new FbDbContextOptionsBuilder(optionsBuilder).TranslateParameterizedCollectionsToConstants();
+		return optionsBuilder;
+	}
+
+	protected override DbContextOptionsBuilder SetTranslateParameterizedCollectionsToParameters(DbContextOptionsBuilder optionsBuilder)
+	{
+		new FbDbContextOptionsBuilder(optionsBuilder).TranslateParameterizedCollectionsToParameters();
+		return optionsBuilder;
+	}
+
 	[NotSupportedOnFirebirdFact]
 	public override Task Array_of_string()
 	{
@@ -146,12 +160,6 @@ public class NonSharedPrimitiveCollectionsQueryFbTest : NonSharedPrimitiveCollec
 	}
 
 	[NotSupportedOnFirebirdFact]
-	public override Task Array_of_array_is_not_supported()
-	{
-		return base.Array_of_array_is_not_supported();
-	}
-
-	[NotSupportedOnFirebirdFact]
     public override Task Multidimensional_array_is_not_supported()
     {
         return base.Multidimensional_array_is_not_supported();
@@ -186,6 +194,30 @@ public class NonSharedPrimitiveCollectionsQueryFbTest : NonSharedPrimitiveCollec
     {
         return base.Column_collection_inside_json_owned_entity();
     }
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_constants()
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_default_constants();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_constants_EF_Parameter()
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_default_constants_EF_Parameter();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_parameters()
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_default_parameters();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_parameters_EF_Constant()
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_default_parameters_EF_Constant();
+	}
 
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

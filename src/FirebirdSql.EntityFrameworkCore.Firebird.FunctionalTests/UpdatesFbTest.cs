@@ -17,12 +17,14 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.EntityFrameworkCore.Update;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests;
@@ -55,7 +57,7 @@ public class UpdatesFbTest : UpdatesRelationalTestBase<UpdatesFbTest.UpdatesFbFi
 	}
 
 	[Fact(Skip = "Uses type of filtered index that is not supported on Firebird.")]
-	public override void Swap_filtered_unique_index_values() => base.Swap_filtered_unique_index_values();
+	public override Task Swap_filtered_unique_index_values() => base.Swap_filtered_unique_index_values();
 
 	public class UpdatesFbFixture : UpdatesRelationalFixture
 	{

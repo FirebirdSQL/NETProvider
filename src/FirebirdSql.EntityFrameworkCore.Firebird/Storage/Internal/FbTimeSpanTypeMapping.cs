@@ -48,7 +48,7 @@ public class FbTimeSpanTypeMapping : TimeSpanTypeMapping
 		switch (_fbDbType)
 		{
 			case FbDbType.Time:
-				return $"CAST('{value:hh\\:mm\\:ss\\.ffff}' AS TIME)";
+				return $"CAST('{value:hh\\:mm\\:ss.ffff}' AS TIME)";
 			default:
 				throw new ArgumentOutOfRangeException(nameof(_fbDbType), $"{nameof(_fbDbType)}={_fbDbType}");
 		}

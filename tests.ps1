@@ -6,7 +6,6 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' # Faster downloads with Invoke-RestMethod -- https://stackoverflow.com/a/43477248/33244
 
-
 $baseDir = Split-Path -Parent $PSCommandPath
 
 . "$baseDir\include.ps1"
@@ -29,7 +28,7 @@ $FirebirdConfiguration = @{
 	}
 }
 
-$frameworkVersion = 'net8.0'
+$frameworkVersion = 'net9.0'
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
 $testsProviderDir = "$testsBaseDir\bin\$Configuration\$frameworkVersion"
 

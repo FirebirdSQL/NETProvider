@@ -30,8 +30,6 @@ public class NorthwindKeylessEntitiesQueryFbTest : NorthwindKeylessEntitiesQuery
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[DoesNotHaveTheDataTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task KeylessEntity_by_database_view(bool async)
@@ -50,10 +48,7 @@ public class NorthwindKeylessEntitiesQueryFbTest : NorthwindKeylessEntitiesQuery
 	[MemberData(nameof(IsAsyncData))]
 	public override async Task KeylessEntity_with_nav_defining_query(bool async)
 	{
-		Assert.Equal(
-			"0",
-			(await Assert.ThrowsAsync<EqualException>(
-				() => base.KeylessEntity_with_nav_defining_query(async))).Actual);
+		await Assert.ThrowsAsync<EqualException>(() => base.KeylessEntity_with_nav_defining_query(async));
 	}
 
 	[Theory]

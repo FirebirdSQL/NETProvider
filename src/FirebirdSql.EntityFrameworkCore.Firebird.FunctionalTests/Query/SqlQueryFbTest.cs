@@ -143,6 +143,13 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 		return base.SqlQuery_queryable_multiple_composed_with_parameters_and_closure_parameters_interpolated(async);
 	}
 
+	[Theory(Skip = "Firebird matches the casing exactly. Frankly the test is weird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task SqlQueryRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(bool async)
+	{
+		return base.SqlQueryRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(async);
+	}
+
 	protected override DbParameter CreateDbParameter(string name, object value)
 		=> new FbParameter { ParameterName = name, Value = value };
 }

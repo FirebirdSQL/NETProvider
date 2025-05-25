@@ -356,6 +356,57 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 	[Fact(Skip = SkipReason)]
 	public override Task Add_required_primitve_collection_with_custom_default_value_sql_to_existing_table() => Task.CompletedTask;
 
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitive_collection_with_custom_default_value_sql_to_existing_table() => Task.CompletedTask;
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_json_columns_to_existing_table() => base.Add_json_columns_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitive_collection_to_existing_table() => base.Add_required_primitive_collection_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitive_collection_with_custom_converter_and_custom_default_value_to_existing_table() => base.Add_required_primitive_collection_with_custom_converter_and_custom_default_value_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitive_collection_with_custom_converter_to_existing_table() => base.Add_required_primitive_collection_with_custom_converter_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitive_collection_with_custom_default_value_to_existing_table() => base.Add_required_primitive_collection_with_custom_default_value_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Add_required_primitve_collection_with_custom_converter_to_existing_table() => base.Add_required_primitve_collection_with_custom_converter_to_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Convert_json_entities_to_regular_owned() => base.Convert_json_entities_to_regular_owned();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Convert_regular_owned_entities_to_json() => base.Convert_regular_owned_entities_to_json();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Convert_string_column_to_a_json_column_containing_collection() => base.Convert_string_column_to_a_json_column_containing_collection();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Convert_string_column_to_a_json_column_containing_reference() => base.Convert_string_column_to_a_json_column_containing_reference();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Convert_string_column_to_a_json_column_containing_required_reference() => base.Convert_string_column_to_a_json_column_containing_required_reference();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_json_column() => base.Create_table_with_json_column();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_json_column_explicit_json_column_names() => base.Create_table_with_json_column_explicit_json_column_names();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Drop_json_columns_from_existing_table() => base.Drop_json_columns_from_existing_table();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Rename_json_column() => base.Rename_json_column();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Rename_table_with_json_column() => base.Rename_table_with_json_column();
+
 	public class MigrationsFbFixture : MigrationsFixtureBase
 	{
 		protected override string StoreName => nameof(MigrationsFbTest);

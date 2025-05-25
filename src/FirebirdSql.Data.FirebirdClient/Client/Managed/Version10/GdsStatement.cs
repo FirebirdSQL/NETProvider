@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -1246,7 +1247,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1271,7 +1272,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1394,7 +1395,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1419,7 +1420,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.Length > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1532,10 +1533,11 @@ internal class GdsStatement : StatementBase
 				else
 				{
 					var s = xdr.ReadString(innerCharset, field.Length);
+					var runes = s.EnumerateRunesEx().ToList();
 					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						s.Length > field.CharCount)
+						runes.Count > field.CharCount)
 					{
-						return s.Substring(0, field.CharCount);
+						return new string([.. runes.Take(field.CharCount).SelectMany(x => x)]);
 					}
 					else
 					{
@@ -1629,10 +1631,11 @@ internal class GdsStatement : StatementBase
 				else
 				{
 					var s = await xdr.ReadStringAsync(innerCharset, field.Length, cancellationToken).ConfigureAwait(false);
+					var runes = s.EnumerateRunesEx().ToList();
 					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						s.Length > field.CharCount)
+						runes.Count > field.CharCount)
 					{
-						return s.Substring(0, field.CharCount);
+						return new string([.. runes.Take(field.CharCount).SelectMany(x => x)]);
 					}
 					else
 					{

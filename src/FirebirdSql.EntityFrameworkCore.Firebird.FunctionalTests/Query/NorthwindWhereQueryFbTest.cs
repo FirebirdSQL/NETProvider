@@ -88,13 +88,6 @@ public class NorthwindWhereQueryFbTest : NorthwindWhereQueryRelationalTestBase<N
 
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_bitwise_xor(bool async)
-	{
-		return AssertTranslationFailed(() => base.Where_bitwise_xor(async));
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_compare_constructed_equal(bool async)
 	{
 		return AssertTranslationFailed(() => base.Where_compare_constructed_equal(async));

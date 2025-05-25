@@ -157,6 +157,13 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 		return base.Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(async);
 	}
 
+	[Theory(Skip = "Firebird matches the casing exactly. Frankly the test is weird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task FromSqlRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(bool async)
+	{
+		return base.FromSqlRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(async);
+	}
+
 	protected override DbParameter CreateDbParameter(string name, object value)
 		=> new FbParameter { ParameterName = name, Value = value };
 }
