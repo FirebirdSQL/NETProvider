@@ -169,8 +169,18 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 			Sql.Append(" AS ");
 			if (sqlParameterExpression.Type == typeof(string))
 			{
-				var isUnicode = FbTypeMappingSource.IsUnicode(sqlParameterExpression.TypeMapping);
-				Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringParameterQueryType(isUnicode));
+				var storeTypeNameBase = sqlParameterExpression.TypeMapping.StoreTypeNameBase;
+				var size = sqlParameterExpression.TypeMapping.Size;
+
+				if (storeTypeNameBase != null && size != null)
+				{
+					Sql.Append($"{storeTypeNameBase}({size})");
+				}
+				else
+				{
+					var isUnicode = FbTypeMappingSource.IsUnicode(sqlParameterExpression.TypeMapping);
+					Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringParameterQueryType(isUnicode));
+				}
 			}
 			else
 			{
@@ -191,9 +201,19 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		base.VisitSqlConstant(sqlConstantExpression);
 		if (shouldExplicitStringLiteralTypes)
 		{
-			var isUnicode = FbTypeMappingSource.IsUnicode(sqlConstantExpression.TypeMapping);	
-			Sql.Append(" AS ");
-			Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string, isUnicode));
+			var storeTypeNameBase = sqlConstantExpression.TypeMapping.StoreTypeNameBase;
+			var size = sqlConstantExpression.TypeMapping.Size;
+
+			if (storeTypeNameBase != null && size != null)
+			{
+				Sql.Append($"{storeTypeNameBase}({size})");
+			}
+			else
+			{
+				var isUnicode = FbTypeMappingSource.IsUnicode(sqlConstantExpression.TypeMapping);
+				Sql.Append(" AS ");
+				Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string, isUnicode));
+			}
 			Sql.Append(")");
 		}
 		return sqlConstantExpression;
