@@ -27,17 +27,19 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		: base(dependencies)
 	{ }
 
-	public virtual string StringLiteralQueryType(string s, bool isUnicode = true)
+	public virtual string StringLiteralQueryType(string s, bool isUnicode = true, string? storeTypeNameBase = null, int? size = null)
 	{
-		var length = MinimumStringQueryTypeLength(s);
+		var length = size ?? MinimumStringQueryTypeLength(s);
 		var charset = isUnicode ? " CHARACTER SET UTF8" : string.Empty;
-		return $"VARCHAR({length}){charset}";
+		var storeTypeName = storeTypeNameBase ?? "VARCHAR";
+		return $"{storeTypeName}({length}){charset}";
 	}
 
-	public virtual string StringParameterQueryType(bool isUnicode)
+	public virtual string StringParameterQueryType(bool isUnicode, string? storeTypeNameBase = null, int? size = null)
 	{
-		var size = isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize;
-		return $"VARCHAR({size})";
+		var maxSize = size ?? (isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize);
+		var storeTypeName = storeTypeNameBase ?? "VARCHAR";
+		return $"{storeTypeName}({size})";
 	}
 
 	public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
