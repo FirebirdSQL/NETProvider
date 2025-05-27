@@ -22,8 +22,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 {
-	string StringLiteralQueryType(string s, bool isUnicode, string? storeTypeNameBase = null, int? size = null);
-	string StringParameterQueryType(bool isUnicode, string? storeTypeNameBase = null, int? size = null);
+	string StringLiteralQueryType(string s, bool isUnicode, string storeTypeNameBase = "", int size = 0);
+	string StringParameterQueryType(bool isUnicode, string storeTypeNameBase = "", int size = 0);
 	void GenerateBlockParameterName(StringBuilder builder, string name);
 	string AlternativeStatementTerminator { get; }
 }
