@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Client.Managed.Srp;
 using FirebirdSql.Data.Client.Managed.Sspi;
+using FirebirdSql.Data.Client.Managed.Legacy;
 using FirebirdSql.Data.Common;
 using WireCryptOption = FirebirdSql.Data.Client.Managed.Version13.WireCryptOption;
 
@@ -33,6 +34,7 @@ sealed class AuthBlock
 	Srp256Client _srp256;
 	SrpClient _srp;
 	SspiHelper _sspi;
+	Legacy.LegacyClient _legacy;
 
 	public GdsConnection Connection { get; }
 	public string User { get; }
@@ -57,6 +59,7 @@ sealed class AuthBlock
 		_srp256 = new Srp256Client();
 		_srp = new SrpClient();
 		_sspi = new SspiHelper();
+		_legacy = new LegacyClient();
 
 		Connection = connection;
 		User = user;
@@ -96,7 +99,7 @@ sealed class AuthBlock
 				var specificData = Encoding.UTF8.GetBytes(_srp256.PublicKeyHex);
 				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
-				var plugins = string.Join(",", new[] { _srp256.Name, _srp.Name });
+				var plugins = string.Join(",", new[] { _srp256.Name, _srp.Name, _legacy.PluginName });
 				var pluginsBytes = Encoding.UTF8.GetBytes(plugins);
 				result.WriteByte(IscCodes.CNCT_plugin_list);
 				result.WriteByte((byte)pluginsBytes.Length);
@@ -282,6 +285,10 @@ sealed class AuthBlock
 			SessionKey = _srp.SessionKey;
 			SessionKeyName = _srp.SessionKeyName;
 		}
+		else if (AcceptPluginName.Equals(_legacy.PluginName, StringComparison.Ordinal))
+		{
+			ClientData = _legacy.ClientProof(Password);
+		}
 		else if (AcceptPluginName.Equals(_sspi.Name, StringComparison.Ordinal))
 		{
 			if (hasServerData)
@@ -307,6 +314,7 @@ sealed class AuthBlock
 		_srp = null;
 		_sspi?.Dispose();
 		_sspi = null;
+		_legacy = null;
 	}
 
 	static void WriteMultiPartHelper(Stream stream, byte code, byte[] data)
