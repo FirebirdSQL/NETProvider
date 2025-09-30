@@ -251,56 +251,56 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 		return base.Subquery_inside_Take_argument(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_AddDays(bool async)
 	{
 		return base.Where_DateOnly_AddDays(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_AddMonths(bool async)
 	{
 		return base.Where_DateOnly_AddMonths(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_AddYears(bool async)
 	{
 		return base.Where_DateOnly_AddYears(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_Day(bool async)
 	{
 		return base.Where_DateOnly_Day(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_DayOfWeek(bool async)
 	{
 		return base.Where_DateOnly_DayOfWeek(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_DayOfYear(bool async)
 	{
 		return base.Where_DateOnly_DayOfYear(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_Month(bool async)
 	{
 		return base.Where_DateOnly_Month(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_DateOnly_Year(bool async)
 	{
@@ -398,21 +398,21 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 		return base.Where_TimeOnly_Add_TimeSpan(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_AddHours(bool async)
 	{
 		return base.Where_TimeOnly_AddHours(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_AddMinutes(bool async)
 	{
 		return base.Where_TimeOnly_AddMinutes(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_Hour(bool async)
 	{
@@ -426,21 +426,21 @@ public class TPCGearsOfWarQueryFbTest : TPCGearsOfWarQueryRelationalTestBase<TPC
 		return base.Where_TimeOnly_IsBetween(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_Millisecond(bool async)
 	{
 		return base.Where_TimeOnly_Millisecond(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_Minute(bool async)
 	{
 		return base.Where_TimeOnly_Minute(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_TimeOnly_Second(bool async)
 	{
