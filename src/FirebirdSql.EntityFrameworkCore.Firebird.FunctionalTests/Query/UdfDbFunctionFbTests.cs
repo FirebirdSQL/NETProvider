@@ -51,7 +51,7 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		base.Udf_with_argument_being_comparison_of_nullable_columns();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections()
 	{
 		base.QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections();
