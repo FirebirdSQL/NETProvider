@@ -146,12 +146,12 @@ abstract class SrpClientBase
 
 	private static BigInteger BigIntegerFromByteArray(byte[] b)
 	{
-		return new BigInteger(b.Reverse().Concat(new byte[] { 0 }).ToArray());
+		return new BigInteger(b.AsEnumerable().Reverse().Concat(new byte[] { 0 }).ToArray());
 	}
 
 	private static byte[] BigIntegerToByteArray(BigInteger n)
 	{
-		return n.ToByteArray().Reverse().SkipWhile((e, i) => i == 0 && e == 0).ToArray();
+		return n.ToByteArray().AsEnumerable().Reverse().SkipWhile((e, i) => i == 0 && e == 0).ToArray();
 	}
 
 	private static byte[] ComputeSHA1Hash(params byte[][] ba)
