@@ -37,6 +37,14 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 		return base.Union_Select_scalar(async);
 	}
 
+	// Not supported on FB 3 and 4
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Union_inside_Concat(bool async)
+	{
+		return base.Union_inside_Concat(async);
+	}
+
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_Except_reference_projection(bool async)
@@ -119,5 +127,12 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 	public override Task Client_eval_Union_FirstOrDefault(bool async)
 	{
 		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Client_eval_Union_FirstOrDefault(async));
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Except_nested2(bool async)
+	{
+		return base.Except_nested2(async);
 	}
 }

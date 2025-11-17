@@ -276,6 +276,27 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 	public override Task UpdateDataOperation_composite_key() => base.UpdateDataOperation_composite_key();
 
 	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_complex_properties_mapped_to_json() => base.Create_table_with_complex_properties_mapped_to_json();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_complex_properties_with_nested_collection_mapped_to_json() => base.Create_table_with_complex_properties_with_nested_collection_mapped_to_json();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Create_table_with_optional_complex_type_with_required_properties() => base.Create_table_with_optional_complex_type_with_required_properties();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Multiop_create_table_and_drop_it_in_one_migration() => base.Multiop_create_table_and_drop_it_in_one_migration();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Multiop_drop_table_and_create_the_same_table_in_one_migration() => base.Multiop_drop_table_and_create_the_same_table_in_one_migration();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Multiop_rename_table_and_create_new_table_with_the_old_name() => base.Multiop_rename_table_and_create_new_table_with_the_old_name();
+
+	[Fact(Skip = SkipReason)]
+	public override Task Multiop_rename_table_and_drop() => base.Multiop_rename_table_and_drop();
+
+	[Fact(Skip = SkipReason)]
 	public override Task UpdateDataOperation_multiple_columns() => base.UpdateDataOperation_multiple_columns();
 
 	[Fact(Skip = SkipReason)]
