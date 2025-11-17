@@ -7,7 +7,7 @@
 	<PropertyGroup>
 		<EFCoreProviderVersion>12.0.0</EFCoreProviderVersion>
 		<EFCoreReferenceProviderVersion>10.3.2</EFCoreReferenceProviderVersion>
-		<EFCoreReferencePackageVersion>9.0.1</EFCoreReferencePackageVersion>
+		<EFCoreReferencePackageVersion>10.0.0</EFCoreReferencePackageVersion>
 	</PropertyGroup>
 	<!-- EF6 -->
 	<PropertyGroup>
