@@ -37,8 +37,8 @@ function Versions() {
 	function v($file) {
 		return (Get-Item $file).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?.*','$1.$2.$3$4'
 	}
-	$script:versionProvider = v $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net8.0\FirebirdSql.Data.FirebirdClient.dll
-	$script:versionEFCore = v $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\net8.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
+	$script:versionProvider = v $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net10.0\FirebirdSql.Data.FirebirdClient.dll
+	$script:versionEFCore = v $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\net10.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
 	$script:versionEF6 = v $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net48\EntityFramework.Firebird.dll
 }
 
