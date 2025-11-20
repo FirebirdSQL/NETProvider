@@ -20,17 +20,8 @@ function Clean() {
 }
 
 function Build() {
-	function b($target, $check=$True) {
-		dotnet msbuild /t:$target /p:Configuration=$Configuration /p:ContinuousIntegrationBuild=true "$baseDir\src\NETProvider.sln" /v:m /m
-		if ($check) {
-			Check-ExitCode
-		}
-	}
-	b 'Clean'
-	# this sometimes fails on CI
-	b 'Restore' $False
-	b 'Restore'
-	b 'Build'
+	dotnet clean "$baseDir\src\NETProvider.slnx" -c $Configuration -v m
+	dotnet build "$baseDir\src\NETProvider.slnx" -c $Configuration -p:ContinuousIntegrationBuild=true -v m
 }
 
 function Versions() {
