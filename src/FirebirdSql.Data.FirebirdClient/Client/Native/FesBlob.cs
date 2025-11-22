@@ -114,7 +114,7 @@ internal sealed class FesBlob : BlobBase
 
 		RblAddValue(IscCodes.RBL_create);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Open()
@@ -157,7 +157,7 @@ internal sealed class FesBlob : BlobBase
 
 		_isOpen = true;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override int GetLength()
@@ -201,7 +201,7 @@ internal sealed class FesBlob : BlobBase
 		var length = IscHelper.VaxInteger(buffer, 1, 2);
 		var size = IscHelper.VaxInteger(buffer, 3, (int)length);
 
-		return ValueTask2.FromResult((int)size);
+		return ValueTask.FromResult((int)size);
 	}
 
 	public override void GetSegment(Stream stream)
@@ -263,7 +263,7 @@ internal sealed class FesBlob : BlobBase
 		if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 		{
 			RblAddValue(IscCodes.RBL_eof_pending);
-			return ValueTask2.CompletedTask;
+			return ValueTask.CompletedTask;
 		}
 		else
 		{
@@ -279,7 +279,7 @@ internal sealed class FesBlob : BlobBase
 
 		stream.Write(tmp, 0, segmentLength);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override byte[] GetSegment()
@@ -348,7 +348,7 @@ internal sealed class FesBlob : BlobBase
 		if (_statusVector[1] == new IntPtr(IscCodes.isc_segstr_eof))
 		{
 			RblAddValue(IscCodes.RBL_eof_pending);
-			return ValueTask2.FromResult(Array.Empty<byte>());
+			return ValueTask.FromResult(Array.Empty<byte>());
 		}
 		else
 		{
@@ -370,7 +370,7 @@ internal sealed class FesBlob : BlobBase
 			actualSegment = tmp;
 		}
 
-		return ValueTask2.FromResult(actualSegment);
+		return ValueTask.FromResult(actualSegment);
 	}
 
 	public override void PutSegment(byte[] buffer)
@@ -397,7 +397,7 @@ internal sealed class FesBlob : BlobBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Seek(int position, int seekOperation)
@@ -428,7 +428,7 @@ internal sealed class FesBlob : BlobBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Close()
@@ -447,7 +447,7 @@ internal sealed class FesBlob : BlobBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Cancel()
@@ -466,7 +466,7 @@ internal sealed class FesBlob : BlobBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	#endregion

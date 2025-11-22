@@ -29,21 +29,21 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_as_final_operator(bool async)
 	{
 		return base.GroupJoin_as_final_operator(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_SelectMany_subquery_with_filter_orderby(bool async)
 	{
 		return base.GroupJoin_SelectMany_subquery_with_filter_orderby(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_SelectMany_subquery_with_filter_orderby_and_DefaultIfEmpty(bool async)
 	{
@@ -99,14 +99,14 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 		return base.Take_in_collection_projection_with_FirstOrDefault_on_top_level(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Unflattened_GroupJoin_composed(bool async)
 	{
 		return base.Unflattened_GroupJoin_composed(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Unflattened_GroupJoin_composed_2(bool async)
 	{

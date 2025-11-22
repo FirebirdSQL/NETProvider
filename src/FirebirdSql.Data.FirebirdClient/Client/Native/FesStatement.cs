@@ -184,7 +184,7 @@ internal sealed class FesStatement : StatementBase
 	public override ValueTask<ArrayBase> CreateArrayAsync(ArrayDesc descriptor, CancellationToken cancellationToken = default)
 	{
 		var array = new FesArray(descriptor);
-		return ValueTask2.FromResult<ArrayBase>(array);
+		return ValueTask.FromResult<ArrayBase>(array);
 	}
 
 	public override ArrayBase CreateArray(string tableName, string fieldName)
@@ -687,7 +687,7 @@ internal sealed class FesStatement : StatementBase
 		// an execute procedure	statement.
 		if (StatementType == DbStatementType.StoredProcedure && option == IscCodes.DSQL_close)
 		{
-			return ValueTask2.CompletedTask;
+			return ValueTask.CompletedTask;
 		}
 
 		ClearStatusVector();
@@ -708,7 +708,7 @@ internal sealed class FesStatement : StatementBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	protected override void TransactionUpdated(object sender, EventArgs e)
@@ -757,7 +757,7 @@ internal sealed class FesStatement : StatementBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask2.FromResult(buffer);
+		return ValueTask.FromResult(buffer);
 	}
 
 	#endregion

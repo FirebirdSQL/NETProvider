@@ -128,7 +128,7 @@ internal static class ClientFactory
 	{
 		var charset = GetCharset(options);
 
-		return ValueTask2.FromResult<DatabaseBase>(new Native.FesDatabase(options.ClientLibrary, charset, options.PacketSize, options.Dialect));
+		return ValueTask.FromResult<DatabaseBase>(new Native.FesDatabase(options.ClientLibrary, charset, options.PacketSize, options.Dialect));
 	}
 
 	private static ServiceManagerBase CreateManagedServiceManager(ConnectionString options)
@@ -194,7 +194,7 @@ internal static class ClientFactory
 	{
 		var charset = GetCharset(options);
 
-		return ValueTask2.FromResult<ServiceManagerBase>(new Native.FesServiceManager(options.ClientLibrary, charset));
+		return ValueTask.FromResult<ServiceManagerBase>(new Native.FesServiceManager(options.ClientLibrary, charset));
 	}
 
 	private static Exception UnsupportedProtocolException() => new NotSupportedException("Protocol not supported.");
