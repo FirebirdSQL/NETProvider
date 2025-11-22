@@ -229,7 +229,7 @@ internal sealed class FesTransaction : TransactionBase
 			}
 		}
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Commit()
@@ -264,7 +264,7 @@ internal sealed class FesTransaction : TransactionBase
 
 		State = TransactionState.NoTransaction;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Rollback()
@@ -299,7 +299,7 @@ internal sealed class FesTransaction : TransactionBase
 
 		State = TransactionState.NoTransaction;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void CommitRetaining()
@@ -326,7 +326,7 @@ internal sealed class FesTransaction : TransactionBase
 
 		State = TransactionState.Active;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void RollbackRetaining()
@@ -353,21 +353,21 @@ internal sealed class FesTransaction : TransactionBase
 
 		State = TransactionState.Active;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Prepare()
 	{ }
 	public override ValueTask PrepareAsync(CancellationToken cancellationToken = default)
 	{
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Prepare(byte[] buffer)
 	{ }
 	public override ValueTask PrepareAsync(byte[] buffer, CancellationToken cancellationToken = default)
 	{
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override List<object> GetTransactionInfo(byte[] items)
@@ -393,7 +393,7 @@ internal sealed class FesTransaction : TransactionBase
 
 		TransactionInfo(items, buffer, buffer.Length);
 
-		return ValueTask2.FromResult(IscHelper.ParseTransactionInfo(buffer, _database.Charset));
+		return ValueTask.FromResult(IscHelper.ParseTransactionInfo(buffer, _database.Charset));
 	}
 
 	#endregion

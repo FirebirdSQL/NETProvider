@@ -172,7 +172,7 @@ internal class GdsBatch : BatchBase
 	{ }
 	protected ValueTask ProcessReleaseResponseAsync(IResponse response, CancellationToken cancellationToken = default)
 	{
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	protected ExecuteResultItem[] BuildResult(BatchCompletionStateResponse response)

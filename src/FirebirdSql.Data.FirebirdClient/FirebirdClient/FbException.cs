@@ -18,24 +18,14 @@
 using System;
 using System.ComponentModel;
 using System.Data.Common;
-using System.Runtime.Serialization;
 
 using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
-#if !NET8_0_OR_GREATER
-[Serializable]
-#endif
 public sealed class FbException : DbException
 {
-	#region Fields
-
 	private FbErrorCollection _errors;
-
-	#endregion
-
-	#region Properties
 
 	[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 	public FbErrorCollection Errors => _errors ??= new FbErrorCollection();
@@ -44,38 +34,9 @@ public sealed class FbException : DbException
 
 	public string SQLSTATE => (InnerException as IscException)?.SQLSTATE;
 
-	#endregion
-
-	#region Constructors
-
 	private FbException(string message, Exception innerException)
 		: base(message, innerException)
 	{ }
-
-#if !NET8_0_OR_GREATER
-	private FbException(SerializationInfo info, StreamingContext context)
-		: base(info, context)
-	{
-		_errors = (FbErrorCollection)info.GetValue("errors", typeof(FbErrorCollection));
-	}
-#endif
-
-	#endregion
-
-	#region Methods
-
-#if !NET8_0_OR_GREATER
-	public override void GetObjectData(SerializationInfo info, StreamingContext context)
-	{
-		base.GetObjectData(info, context);
-
-		info.AddValue("errors", _errors);
-	}
-#endif
-
-	#endregion
-
-	#region Private Methods
 
 	private void ProcessIscExceptionErrors(IscException innerException)
 	{
@@ -84,8 +45,6 @@ public sealed class FbException : DbException
 			Errors.Add(error.Message, error.ErrorCode);
 		}
 	}
-
-	#endregion
 
 	internal static Exception Create(string message) => Create(message, null);
 	internal static Exception Create(Exception innerException) => Create(null, innerException);

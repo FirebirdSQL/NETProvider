@@ -23,10 +23,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
-public sealed class FbRemoteEvent : IDisposable
-#if !(NET48 || NETSTANDARD2_0)
-		, IAsyncDisposable
-#endif
+public sealed class FbRemoteEvent : IDisposable, IAsyncDisposable
 {
 	private FbConnectionInternal _connection;
 	private RemoteEvent _revent;
@@ -70,12 +67,10 @@ public sealed class FbRemoteEvent : IDisposable
 	{
 		_connection.Disconnect();
 	}
-#if !(NET48 || NETSTANDARD2_0)
 	public ValueTask DisposeAsync()
 	{
 		return new ValueTask(_connection.DisconnectAsync(CancellationToken.None));
 	}
-#endif
 
 	public void QueueEvents(ICollection<string> events)
 	{

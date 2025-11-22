@@ -383,7 +383,6 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		}
 		base.Dispose(disposing);
 	}
-#if !(NET48 || NETSTANDARD2_0)
 	public override async ValueTask DisposeAsync()
 	{
 		if (!_disposed)
@@ -410,7 +409,6 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		}
 		await base.DisposeAsync().ConfigureAwait(false);
 	}
-#endif
 
 	#endregion
 
@@ -478,11 +476,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			}
 		}
 	}
-#if NET48 || NETSTANDARD2_0
-	public async Task PrepareAsync(CancellationToken cancellationToken = default)
-#else
 	public override async Task PrepareAsync(CancellationToken cancellationToken = default)
-#endif
 	{
 		CheckCommand();
 
@@ -791,11 +785,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	{
 		if (_activeReader != null)
 		{
-#if NET48 || NETSTANDARD2_0
 			_activeReader.Dispose();
-#else
-			_activeReader.Dispose();
-#endif
 			_activeReader = null;
 		}
 	}
@@ -803,12 +793,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 	{
 		if (_activeReader != null)
 		{
-#if NET48 || NETSTANDARD2_0
-			_activeReader.Dispose();
-			await Task.CompletedTask.ConfigureAwait(false);
-#else
 			await _activeReader.DisposeAsync().ConfigureAwait(false);
-#endif
 			_activeReader = null;
 		}
 	}
@@ -941,11 +926,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			{
 				if (_transaction != null)
 				{
-#if NET48 || NETSTANDARD2_0
 					_transaction.Dispose();
-#else
-					_transaction.Dispose();
-#endif
 					_transaction = null;
 					_implicitTransaction = false;
 				}
@@ -975,11 +956,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			{
 				if (_transaction != null)
 				{
-#if NET48 || NETSTANDARD2_0
-					_transaction.Dispose();
-#else
 					await _transaction.DisposeAsync().ConfigureAwait(false);
-#endif
 					_transaction = null;
 					_implicitTransaction = false;
 				}
@@ -1011,11 +988,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			}
 			finally
 			{
-#if NET48 || NETSTANDARD2_0
 				_transaction.Dispose();
-#else
-				_transaction.Dispose();
-#endif
 				_transaction = null;
 				_implicitTransaction = false;
 
@@ -1045,11 +1018,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			}
 			finally
 			{
-#if NET48 || NETSTANDARD2_0
-				_transaction.Dispose();
-#else
 				await _transaction.DisposeAsync().ConfigureAwait(false);
-#endif
 				_transaction = null;
 				_implicitTransaction = false;
 

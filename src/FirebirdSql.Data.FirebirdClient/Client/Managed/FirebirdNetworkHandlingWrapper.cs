@@ -129,7 +129,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	{
 		for (var i = offset; i < count; i++)
 			_outputBuffer.Enqueue(buffer[offset + i]);
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public void Flush()
