@@ -22,10 +22,7 @@ using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.ComplexTableSplitting;
 
-public class ComplexTableSplittingBulkUpdateFbTest(
-	ComplexTableSplittingFbFixture fixture,
-	ITestOutputHelper testOutputHelper)
-	: ComplexTableSplittingBulkUpdateRelationalTestBase<ComplexTableSplittingFbFixture>(fixture, testOutputHelper)
+public class ComplexTableSplittingBulkUpdateFbTest(ComplexTableSplittingFbFixture fixture, ITestOutputHelper testOutputHelper) : ComplexTableSplittingBulkUpdateRelationalTestBase<ComplexTableSplittingFbFixture>(fixture, testOutputHelper)
 {
 	[NotSupportedByProviderFact]
 	public override Task Update_inside_primitive_collection()
