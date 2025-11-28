@@ -476,7 +476,6 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
 		return base.Project_empty_collection_of_nullables_and_collection_only_containing_nulls();
 	}
 
-	// Uses OUTER JOIN
 	[NotSupportedByProviderFact]
 	public override Task Project_inline_collection_with_Union()
 	{

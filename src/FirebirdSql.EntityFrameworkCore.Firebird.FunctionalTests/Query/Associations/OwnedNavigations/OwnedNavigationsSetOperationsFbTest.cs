@@ -32,7 +32,6 @@ public class OwnedNavigationsSetOperationsFbTest : OwnedNavigationsSetOperations
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	// Uses OUTER JOIN
 	[NotSupportedByProviderTheory]
 	[MemberData(nameof(TrackingData))]
 	public override Task Over_associate_collection_projected(QueryTrackingBehavior queryTrackingBehavior)

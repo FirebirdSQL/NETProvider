@@ -17,6 +17,7 @@
 
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Associations.OwnedNavigations;
 using Xunit;
@@ -32,19 +33,23 @@ public class OwnedNavigationsProjectionFbTest : OwnedNavigationsProjectionRelati
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	// Uses OUTER JOIN
-	[NotSupportedOnFirebirdTheory]
+	[Theory]
 	[MemberData(nameof(TrackingData))]
 	public override Task Select_subquery_optional_related_FirstOrDefault(QueryTrackingBehavior queryTrackingBehavior)
 	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return Task.CompletedTask;
 		return base.Select_subquery_optional_related_FirstOrDefault(queryTrackingBehavior);
 	}
 
-	// Uses OUTER JOIN
-	[NotSupportedByProviderTheory]
+	[Theory]
 	[MemberData(nameof(TrackingData))]
 	public override Task Select_subquery_required_related_FirstOrDefault(QueryTrackingBehavior queryTrackingBehavior)
 	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return Task.CompletedTask;
 		return base.Select_subquery_required_related_FirstOrDefault(queryTrackingBehavior);
 	}
 }
