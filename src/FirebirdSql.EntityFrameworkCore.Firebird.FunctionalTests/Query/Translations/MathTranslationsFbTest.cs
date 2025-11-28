@@ -34,12 +34,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Acos()
-	{
-		return base.Acos();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Acos_float()
 	{
 		return base.Acos_float();
@@ -49,12 +43,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	public override Task Acosh()
 	{
 		return base.Acosh();
-	}
-
-	[NotSupportedByProviderFact]
-	public override Task Asin()
-	{
-		return base.Asin();
 	}
 
 	[NotSupportedByProviderFact]
@@ -70,12 +58,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Atan()
-	{
-		return base.Atan();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Atan_float()
 	{
 		return base.Atan_float();
@@ -88,12 +70,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Atan2()
-	{
-		return base.Atan2();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Atan2_float()
 	{
 		return base.Atan2_float();
@@ -103,12 +79,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	public override Task Ceiling_float()
 	{
 		return base.Ceiling_float();
-	}
-
-	[NotSupportedByProviderFact]
-	public override Task Cos()
-	{
-		return base.Cos();
 	}
 
 	[NotSupportedByProviderFact]
@@ -136,12 +106,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Exp()
-	{
-		return base.Exp();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Exp_float()
 	{
 		return base.Exp_float();
@@ -154,33 +118,15 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Log()
-	{
-		return base.Log();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Log_float()
 	{
 		return base.Log_float();
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Log_with_newBase()
-	{
-		return base.Log_with_newBase();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Log_with_newBase_float()
 	{
 		return base.Log_with_newBase_float();
-	}
-
-	[NotSupportedByProviderFact]
-	public override Task Log10()
-	{
-		return base.Log10();
 	}
 
 	[NotSupportedByProviderFact]
@@ -232,12 +178,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	}
 
 	[NotSupportedByProviderFact]
-	public override Task Sin()
-	{
-		return base.Sin();
-	}
-
-	[NotSupportedByProviderFact]
 	public override Task Sin_float()
 	{
 		return base.Sin_float();
@@ -253,12 +193,6 @@ public class MathTranslationsFbTest : MathTranslationsTestBase<BasicTypesQueryFb
 	public override Task Sqrt_float()
 	{
 		return base.Sqrt_float();
-	}
-
-	[NotSupportedByProviderFact]
-	public override Task Tan()
-	{
-		return base.Tan();
 	}
 
 	[NotSupportedByProviderFact]
