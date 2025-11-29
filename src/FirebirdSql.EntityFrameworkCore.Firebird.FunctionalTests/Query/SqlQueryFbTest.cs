@@ -31,6 +31,14 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 		: base(fixture)
 	{ }
 
+	// Uses INTERSECT
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Multiple_occurrences_of_SqlQuery_with_db_parameter_adds_two_parameters(bool async)
+	{
+		return base.Multiple_occurrences_of_SqlQuery_with_db_parameter_adds_two_parameters(async);
+	}
+
 	[Theory(Skip = "Provider does the casting.")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Bad_data_error_handling_invalid_cast(bool async)
@@ -64,13 +72,6 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 	public override Task SqlQueryRaw_queryable_simple_projection_composed(bool async)
 	{
 		return base.SqlQueryRaw_queryable_simple_projection_composed(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Multiple_occurrences_of_SqlQuery_with_db_parameter_adds_parameter_only_once(bool async)
-	{
-		return base.Multiple_occurrences_of_SqlQuery_with_db_parameter_adds_parameter_only_once(async);
 	}
 
 	[DoesNotHaveTheDataTheory]

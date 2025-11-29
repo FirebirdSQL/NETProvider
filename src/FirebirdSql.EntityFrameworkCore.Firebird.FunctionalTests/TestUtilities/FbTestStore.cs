@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Data;
 using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
@@ -42,8 +43,15 @@ public class FbTestStore : RelationalTestStore
 	public Version ServerVersion { get; private set; }
 	public bool ServerLessThan4() => ServerVersion < new Version(4, 0, 0, 0);
 
+	public bool ServerLessThan5() => ServerVersion < new Version(5, 0, 0, 0);
+
 	protected override async Task InitializeAsync(Func<DbContext> createContext, Func<DbContext, Task> seed, Func<DbContext, Task> clean)
 	{
+		if (Connection.State != ConnectionState.Closed)
+		{
+			// Connections are maintained between tests, they have to be closed to create a new database
+			await Connection.CloseAsync();
+		}
 		// create database explicitly to specify Page Size and Forced Writes
 		await FbConnection.CreateDatabaseAsync(ConnectionString, pageSize: 16384, forcedWrites: false, overwrite: true);
 		await using (var context = createContext())

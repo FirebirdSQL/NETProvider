@@ -145,4 +145,18 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 	{
 		return base.Subquery_with_navigation_inside_inline_collection(async);
 	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(bool async)
+	{
+		return base.SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_nanosecond_and_microsecond_component(bool async)
+	{
+		return base.Where_nanosecond_and_microsecond_component(async);
+	}
 }

@@ -18,13 +18,14 @@
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class OwnedEntityQueryFbTest : OwnedEntityQueryRelationalTestBase
+public class OwnedEntityQueryFbTest(NonSharedFixture fixture) : OwnedEntityQueryRelationalTestBase(fixture)
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 

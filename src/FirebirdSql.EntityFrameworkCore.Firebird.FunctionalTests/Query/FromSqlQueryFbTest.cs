@@ -150,18 +150,18 @@ public class FromSqlQueryFbTest : FromSqlQueryTestBase<NorthwindQueryFbFixture<N
 		return base.FromSqlRaw_queryable_simple_projection_composed(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(bool async)
-	{
-		return base.Multiple_occurrences_of_FromSql_with_db_parameter_adds_parameter_only_once(async);
-	}
-
 	[Theory(Skip = "Firebird matches the casing exactly. Frankly the test is weird.")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task FromSqlRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(bool async)
 	{
 		return base.FromSqlRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(async);
+	}
+
+	[Theory(Skip = "Provider doesn't support INTERSECT")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Multiple_occurrences_of_FromSql_with_db_parameter_adds_two_parameters(bool async)
+	{
+		return base.Multiple_occurrences_of_FromSql_with_db_parameter_adds_two_parameters(async);
 	}
 
 	protected override DbParameter CreateDbParameter(string name, object value)

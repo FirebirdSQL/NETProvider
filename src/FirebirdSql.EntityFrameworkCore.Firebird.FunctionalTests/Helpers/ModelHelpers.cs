@@ -76,10 +76,11 @@ public static class ModelHelpers
 		{
 			name = new string(name.Where(char.IsUpper).ToArray());
 			var cnt = 1;
-			while (names.Contains(name))
+			while (names.Contains(name + cnt))
 			{
-				name += cnt++;
+				cnt++;
 			}
+			name += cnt;
 			names.Add(name);
 			return name;
 		}

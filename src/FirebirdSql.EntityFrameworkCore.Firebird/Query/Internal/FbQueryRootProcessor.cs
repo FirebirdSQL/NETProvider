@@ -26,7 +26,7 @@ public class FbQueryRootProcessor : RelationalQueryRootProcessor
 		: base(dependencies, relationalDependencies, queryCompilationContext)
 	{ }
 
-	protected override bool ShouldConvertToParameterQueryRoot(ParameterExpression constantExpression)
+	protected override bool ShouldConvertToParameterQueryRoot(QueryParameterExpression constantExpression)
 	{
 		return false;
 	}

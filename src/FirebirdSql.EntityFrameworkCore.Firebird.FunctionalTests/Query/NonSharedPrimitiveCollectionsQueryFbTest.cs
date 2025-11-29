@@ -22,20 +22,16 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class NonSharedPrimitiveCollectionsQueryFbTest : NonSharedPrimitiveCollectionsQueryRelationalTestBase
+public class NonSharedPrimitiveCollectionsQueryFbTest(NonSharedFixture fixture) : NonSharedPrimitiveCollectionsQueryRelationalTestBase(fixture)
 {
-	protected override DbContextOptionsBuilder SetTranslateParameterizedCollectionsToConstants(DbContextOptionsBuilder optionsBuilder)
+	protected override DbContextOptionsBuilder SetParameterizedCollectionMode(DbContextOptionsBuilder optionsBuilder,
+		ParameterTranslationMode parameterizedCollectionMode)
 	{
-		new FbDbContextOptionsBuilder(optionsBuilder).TranslateParameterizedCollectionsToConstants();
-		return optionsBuilder;
-	}
-
-	protected override DbContextOptionsBuilder SetTranslateParameterizedCollectionsToParameters(DbContextOptionsBuilder optionsBuilder)
-	{
-		new FbDbContextOptionsBuilder(optionsBuilder).TranslateParameterizedCollectionsToParameters();
+		new FbDbContextOptionsBuilder(optionsBuilder).UseParameterizedCollectionMode(parameterizedCollectionMode);
 		return optionsBuilder;
 	}
 
@@ -195,28 +191,49 @@ public class NonSharedPrimitiveCollectionsQueryFbTest : NonSharedPrimitiveCollec
         return base.Column_collection_inside_json_owned_entity();
     }
 
-	[NotSupportedOnFirebirdFact]
-	public override Task Parameter_collection_Count_with_column_predicate_with_default_constants()
+	[NotSupportedByProviderTheory]
+#pragma warning disable xUnit1016
+	[MemberData(nameof(ParameterTranslationModeValues))]
+#pragma warning restore xUnit1016
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_mode(ParameterTranslationMode mode)
 	{
-		return base.Parameter_collection_Count_with_column_predicate_with_default_constants();
+		return base.Parameter_collection_Count_with_column_predicate_with_default_mode(mode);
 	}
 
-	[NotSupportedOnFirebirdFact]
-	public override Task Parameter_collection_Count_with_column_predicate_with_default_constants_EF_Parameter()
+	[NotSupportedByProviderTheory]
+#pragma warning disable xUnit1016
+	[MemberData(nameof(ParameterTranslationModeValues))]
+#pragma warning restore xUnit1016
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_mode_EF_Constant(ParameterTranslationMode mode)
 	{
-		return base.Parameter_collection_Count_with_column_predicate_with_default_constants_EF_Parameter();
+		return base.Parameter_collection_Count_with_column_predicate_with_default_mode_EF_Constant(mode);
 	}
 
-	[NotSupportedOnFirebirdFact]
-	public override Task Parameter_collection_Count_with_column_predicate_with_default_parameters()
+	[NotSupportedByProviderTheory]
+#pragma warning disable xUnit1016
+	[MemberData(nameof(ParameterTranslationModeValues))]
+#pragma warning restore xUnit1016
+	public override Task Parameter_collection_Contains_with_default_mode_EF_Constant(ParameterTranslationMode mode)
 	{
-		return base.Parameter_collection_Count_with_column_predicate_with_default_parameters();
+		return base.Parameter_collection_Contains_with_default_mode_EF_Constant(mode);
 	}
 
-	[NotSupportedOnFirebirdFact]
-	public override Task Parameter_collection_Count_with_column_predicate_with_default_parameters_EF_Constant()
+	[NotSupportedByProviderTheory]
+#pragma warning disable xUnit1016
+	[MemberData(nameof(ParameterTranslationModeValues))]
+#pragma warning restore xUnit1016
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_mode_EF_Parameter(ParameterTranslationMode mode)
 	{
-		return base.Parameter_collection_Count_with_column_predicate_with_default_parameters_EF_Constant();
+		return base.Parameter_collection_Count_with_column_predicate_with_default_mode_EF_Parameter(mode);
+	}
+
+	[NotSupportedByProviderTheory]
+#pragma warning disable xUnit1016
+	[MemberData(nameof(ParameterTranslationModeValues))]
+#pragma warning restore xUnit1016
+	public override Task Parameter_collection_Count_with_column_predicate_with_default_mode_EF_MultipleParameters(ParameterTranslationMode mode)
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_default_mode_EF_MultipleParameters(mode);
 	}
 
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;

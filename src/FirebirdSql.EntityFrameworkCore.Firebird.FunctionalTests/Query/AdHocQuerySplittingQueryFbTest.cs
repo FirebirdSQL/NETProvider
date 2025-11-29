@@ -28,7 +28,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class AdHocQuerySplittingQueryFbTest : AdHocQuerySplittingQueryTestBase
+public class AdHocQuerySplittingQueryFbTest(NonSharedFixture fixture) : AdHocQuerySplittingQueryTestBase(fixture)
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
