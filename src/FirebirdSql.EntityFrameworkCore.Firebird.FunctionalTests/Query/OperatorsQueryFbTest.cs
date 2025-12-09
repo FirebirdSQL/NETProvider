@@ -27,24 +27,13 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class OperatorsQueryFbTest : OperatorsQueryTestBase
+public class OperatorsQueryFbTest(NonSharedFixture fixture) : OperatorsQueryTestBase(fixture)
 {
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Concat_and_json_scalar(bool async)
 	{
 		return base.Concat_and_json_scalar(async);
-	}
-
-	protected override Task<ContextFactory<TContext>> InitializeAsync<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Func<IServiceCollection, IServiceCollection> addServices = null, Action<ModelConfigurationBuilder> configureConventions = null, Func<TContext, Task> seed = null, Func<string, bool> shouldLogCategory = null, Func<Task<TestStore>> createTestStore = null, bool usePooling = true, bool useServiceProvider = true)
-	{
-		return base.InitializeAsync(
-			modelBuilder =>
-			{
-				ModelHelpers.SetStringLengths(modelBuilder);
-				onModelCreating?.Invoke(modelBuilder);
-			},
-			onConfiguring, addServices, configureConventions, seed, shouldLogCategory, createTestStore, usePooling, useServiceProvider);
 	}
 
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;

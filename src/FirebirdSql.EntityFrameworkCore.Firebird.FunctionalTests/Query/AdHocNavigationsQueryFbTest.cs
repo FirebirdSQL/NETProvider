@@ -26,7 +26,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class AdHocNavigationsQueryFbTest : AdHocNavigationsQueryRelationalTestBase
+public class AdHocNavigationsQueryFbTest(NonSharedFixture fixture) : AdHocNavigationsQueryRelationalTestBase(fixture)
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 

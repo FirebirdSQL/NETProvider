@@ -15,13 +15,23 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class AdHocComplexTypeQueryFbTest : AdHocComplexTypeQueryTestBase
+public class AdHocComplexTypeQueryFbTest(NonSharedFixture fixture) : AdHocComplexTypeQueryTestBase(fixture)
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+	// Uses a custom type mapping DateTime to "datetime" which doesn't exist in Firebird.
+	[NotSupportedByProviderFact]
+	public override Task Complex_type_equality_with_non_default_type_mapping()
+	{
+		return base.Complex_type_equality_with_non_default_type_mapping();
+	}
 }

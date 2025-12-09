@@ -28,6 +28,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.ApiConsistencyTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BadDataJsonDeserializationTestBase),
 		typeof(Microsoft.EntityFrameworkCore.BuiltInDataTypesTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.ComplexTypesTrackingRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.ComplexTypesTrackingTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.CompositeKeyEndToEndTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.ConcurrencyDetectorDisabledTestBase<>),
@@ -47,6 +48,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.InterceptionTestBase),
 		typeof(Microsoft.EntityFrameworkCore.JsonTypesTestBase),
 		typeof(Microsoft.EntityFrameworkCore.KeysWithConvertersTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.LazyLoadProxyRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.LazyLoadProxyTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.LoadTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.LoggingTestBase),
@@ -60,6 +62,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.NotificationEntitiesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.OptimisticConcurrencyTestBase<,>),
 		typeof(Microsoft.EntityFrameworkCore.OverzealousInitializationTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.PropertyValuesRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.PropertyValuesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.QueryExpressionInterceptionTestBase),
 		typeof(Microsoft.EntityFrameworkCore.AdHocManyToManyQueryTestBase),
@@ -92,6 +95,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.TransactionTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.TwoDatabasesTestBase),
 
+		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.ComplexCollectionTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.ComplexTypeTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.ModelBuilderTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.InheritanceTestBase),
@@ -102,6 +106,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.OneToOneTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.ModelBuilderTest.OwnedTypesTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalNonRelationshipTestBase),
+		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalComplexCollectionTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalComplexTypeTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalInheritanceTestBase),
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalOneToManyTestBase),
@@ -111,12 +116,10 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.ModelBuilding.RelationalModelBuilderTest.RelationalOwnedTypesTestBase),
 
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.BulkUpdatesTestBase<>),
-		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.ComplexTypeBulkUpdatesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.FiltersInheritanceBulkUpdatesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.InheritanceBulkUpdatesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.NonSharedModelBulkUpdatesTestBase),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.NorthwindBulkUpdatesTestBase<>),
-		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.ComplexTypeBulkUpdatesRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.FiltersInheritanceBulkUpdatesRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.InheritanceBulkUpdatesRelationalTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.NonSharedModelBulkUpdatesRelationalTestBase),
@@ -127,6 +130,7 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.TPTFiltersInheritanceBulkUpdatesTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.BulkUpdates.TPTInheritanceBulkUpdatesTestBase<>),
 
+		typeof(Microsoft.EntityFrameworkCore.Update.ComplexCollectionJsonUpdateTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.Update.JsonUpdateTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.Update.NonSharedModelUpdatesTestBase),
 		typeof(Microsoft.EntityFrameworkCore.Update.StoredProcedureUpdateTestBase),
@@ -142,7 +146,21 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		// JSON not supported on FB
 		typeof(Microsoft.EntityFrameworkCore.Query.JsonQueryTestBase<>),
 		typeof(Microsoft.EntityFrameworkCore.Query.JsonQueryRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.AdHocJsonQueryRelationalTestBase),
 		typeof(Microsoft.EntityFrameworkCore.Query.AdHocJsonQueryTestBase),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonBulkUpdateRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonMiscellaneousRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonPrimitiveCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonProjectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonSetOperationsRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson.ComplexJsonStructuralEqualityRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonBulkUpdateRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonMiscellaneousRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonPrimitiveCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonProjectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedJson.OwnedJsonStructuralEqualityRelationalTestBase<>),
 
 		// Spatial not supported on FB
 		typeof(Microsoft.EntityFrameworkCore.Query.SpatialQueryTestBase<>),
@@ -152,6 +170,19 @@ public class ComplianceFbTest : Microsoft.EntityFrameworkCore.RelationalComplian
 		typeof(Microsoft.EntityFrameworkCore.Query.AdHocPrecompiledQueryRelationalTestBase),
 		typeof(Microsoft.EntityFrameworkCore.Query.PrecompiledQueryRelationalTestBase),
 		typeof(Microsoft.EntityFrameworkCore.Query.PrecompiledSqlPregenerationQueryRelationalTestBase),
+
+		// Tests for JSON Types in queries
+		typeof(Microsoft.EntityFrameworkCore.Types.RelationalTypeTestBase<,>),
+		typeof(Microsoft.EntityFrameworkCore.Types.TypeTestBase<,>),
+
+		// Uses Complex Types with collections (JSON Arrays)
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexProperties.ComplexPropertiesPrimitiveCollectionTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexProperties.ComplexPropertiesCollectionTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexProperties.ComplexPropertiesSetOperationsTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting.ComplexTableSplittingPrimitiveCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedNavigations.OwnedNavigationsPrimitiveCollectionTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedNavigations.OwnedNavigationsPrimitiveCollectionRelationalTestBase<>),
+		typeof(Microsoft.EntityFrameworkCore.Query.Associations.OwnedTableSplitting.OwnedTableSplittingPrimitiveCollectionRelationalTestBase<>),
 	];
 
 	protected override Assembly TargetAssembly { get; } = typeof(ComplianceFbTest).Assembly;
