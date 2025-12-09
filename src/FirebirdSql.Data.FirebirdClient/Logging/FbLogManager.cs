@@ -22,18 +22,15 @@ namespace FirebirdSql.Data.Logging;
 
 public static class FbLogManager
 {
-	internal static ILoggerFactory LoggerFactory = NullLoggerFactory.Instance;
-	internal static bool IsParameterLoggingEnabled = false;
+	public static bool IsParameterLoggingEnabled { get; private set; } = false;
 
-	public static void UseLoggerFactory(ILoggerFactory loggerFactory)
-	{
+	private static ILoggerFactory LoggerFactory = NullLoggerFactory.Instance;
+
+	public static void UseLoggerFactory(ILoggerFactory loggerFactory) =>
 		LoggerFactory = loggerFactory;
-	}
 
-	public static void EnableParameterLogging(bool enable = true)
-	{
+	public static void EnableParameterLogging(bool enable = true) =>
 		IsParameterLoggingEnabled = enable;
-	}
 
 	internal static ILogger<T> CreateLogger<T>() =>
 		LoggerFactory.CreateLogger<T>();

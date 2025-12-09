@@ -33,14 +33,15 @@ static class LogMessages
 			return;
 		}
 
-		if (!FbLogManager.IsParameterLoggingEnabled || !command.HasParameters)
+		if (FbLogManager.IsParameterLoggingEnabled && command.HasParameters)
+		{
+			var parameters = FbParameterCollectionToDictionary(command.Parameters);
+			log.LogDebug("Command execution: {command}, {parameters}", command.CommandText, parameters);
+		}
+		else
 		{
 			log.LogDebug("Command execution: {command}", command.CommandText);
-			return;
 		}
-
-		var parameters = FbParameterCollectionToDictionary(command.Parameters);
-		log.LogDebug("Command execution: {command}, {parameters}", command.CommandText, parameters);
 	}
 
 	public static void CommandExecution(ILogger log, FbBatchCommand command)
@@ -50,14 +51,15 @@ static class LogMessages
 			return;
 		}
 
-		if (!FbLogManager.IsParameterLoggingEnabled || !command.HasParameters)
+		if (FbLogManager.IsParameterLoggingEnabled && command.HasParameters)
+		{
+			var parameters = command.BatchParameters.SelectMany(FbParameterCollectionToDictionary);
+			log.LogDebug("Command execution: {command}, {parameters}", command.CommandText, parameters);
+		}
+		else
 		{
 			log.LogDebug("Command execution: {command}", command.CommandText);
-			return;
 		}
-
-		var parameters = command.BatchParameters.SelectMany(FbParameterCollectionToDictionary);
-		log.LogDebug("Command execution: {command}, {parameters}", command.CommandText, parameters);
 	}
 
 	public static void ConnectionOpening(ILogger log, FbConnection connection) =>
@@ -129,7 +131,6 @@ static class LogMessages
 	private static Dictionary<string, object> FbParameterCollectionToDictionary(FbParameterCollection parameters) =>
 		parameters
 			.Cast<DbParameter>()
-			.ToList()
 			.ToDictionary(
 				p => p.ParameterName,
 				p => NormalizeDbNull(p.Value)
