@@ -19,18 +19,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Common;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 public sealed class FbBatchCommand : IFbPreparedCommand, IDescriptorFiller, IDisposable, IAsyncDisposable
 {
-	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbBatchCommand));
+	static readonly ILogger<FbBatchCommand> Log = FbLogManager.CreateLogger<FbBatchCommand>();
 
 	private const int DefaultBatchBufferSize = 16 * 1024 * 1024;
 
