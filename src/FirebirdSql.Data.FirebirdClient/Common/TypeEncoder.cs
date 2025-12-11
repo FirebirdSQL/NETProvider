@@ -114,8 +114,8 @@ internal static class TypeEncoder
 			b[0], b[1],
 			c[0], c[1],
 			data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]
-    };
-  }
+		};
+	}
 
 	public static void EncodeGuid(Guid value, Span<byte> destination)
 	{

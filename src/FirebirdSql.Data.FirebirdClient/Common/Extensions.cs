@@ -103,14 +103,18 @@ internal static class Extensions
 		}
 	}
 
-	public static int CountRunes(this ReadOnlySpan<char> text) {
+	public static int CountRunes(this ReadOnlySpan<char> text)
+	{
 		var count = 0;
 		var i = 0;
-		while(i < text.Length) {
-			if(char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])) {
+		while(i < text.Length)
+		{
+			if(char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+			{
 				i += 2;
 			}
-			else {
+			else
+			{
 				i++;
 			}
 			count++;
@@ -118,19 +122,24 @@ internal static class Extensions
 		return count;
 	}
 
-	public static ReadOnlySpan<char> TruncateStringToRuneCount(this ReadOnlySpan<char> text, int maxRuneCount) {
+	public static ReadOnlySpan<char> TruncateStringToRuneCount(this ReadOnlySpan<char> text, int maxRuneCount)
+	{
 		var count = 0;
 		var i = 0;
-		while(i < text.Length && count < maxRuneCount) {
+		while(i < text.Length && count < maxRuneCount)
+		{
 			var nextI = i;
-			if(char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])) {
+			if(char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+			{
 				nextI += 2;
 			}
-			else {
+			else
+			{
 				nextI++;
 			}
 			count++;
-			if(count <= maxRuneCount) {
+			if(count <= maxRuneCount)
+			{
 				i = nextI;
 			}
 		}

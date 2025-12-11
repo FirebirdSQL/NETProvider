@@ -146,7 +146,8 @@ internal class GdsBatch : BatchBase
 	public override int ComputeBatchSize(int count, IDescriptorFiller descriptorFiller)
 	{
 		var total = 0;
-		for(var i = 0; i < count; i++) {
+		for(var i = 0; i < count; i++)
+		{
 			var item = _statement.GetParameterData(descriptorFiller, i);
 			total += item.Length;
 		}
@@ -155,7 +156,8 @@ internal class GdsBatch : BatchBase
 	public override async ValueTask<int> ComputeBatchSizeAsync(int count, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
 	{
 		var total = 0;
-		for(var i = 0; i < count; i++) {
+		for(var i = 0; i < count; i++)
+		{
 			var item = await _statement.GetParameterDataAsync(descriptorFiller, i, cancellationToken).ConfigureAwait(false);
 			total += item.Length;
 		}

@@ -191,10 +191,10 @@ internal sealed class GdsArray : ArrayBase
 
 	protected override Array DecodeSlice(byte[] slice)
 	{
-				var systemType = GetSystemType();
+		var systemType = GetSystemType();
 		var lengths = new int[Descriptor.Dimensions];
 		var lowerBounds = new int[Descriptor.Dimensions];
-				var index = 0;
+		var index = 0;
 
 		for (var i = 0; i < Descriptor.Dimensions; i++)
 		{
@@ -213,7 +213,7 @@ internal sealed class GdsArray : ArrayBase
 		int type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 		DbDataType dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
-				using (var ms = new MemoryStream(slice))
+		using (var ms = new MemoryStream(slice))
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 			while (ms.Position < ms.Length)
@@ -284,10 +284,10 @@ internal sealed class GdsArray : ArrayBase
 	}
 	protected override async ValueTask<Array> DecodeSliceAsync(byte[] slice, CancellationToken cancellationToken = default)
 	{
-				var systemType = GetSystemType();
+		var systemType = GetSystemType();
 		var lengths = new int[Descriptor.Dimensions];
 		var lowerBounds = new int[Descriptor.Dimensions];
-				var index = 0;
+		var index = 0;
 
 		for (var i = 0; i < Descriptor.Dimensions; i++)
 		{
@@ -306,7 +306,7 @@ internal sealed class GdsArray : ArrayBase
 		int type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 		DbDataType dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, 0, Descriptor.Scale);
 
-				using (var ms = new MemoryStream(slice))
+		using (var ms = new MemoryStream(slice))
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 			while (ms.Position < ms.Length)
@@ -532,16 +532,16 @@ internal sealed class GdsArray : ArrayBase
 
 	private byte[] EncodeSliceArray(Array sourceArray)
 	{
-				var charset = _database.Charset;
+		var charset = _database.Charset;
 		var subType = (Descriptor.Scale < 0) ? 2 : 0;
-				using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream())
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
 			int type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			DbDataType dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
-						foreach (var source in sourceArray)
+			foreach (var source in sourceArray)
 			{
 				switch (dbType)
 				{
@@ -602,16 +602,16 @@ internal sealed class GdsArray : ArrayBase
 	}
 	private async ValueTask<byte[]> EncodeSliceArrayAsync(Array sourceArray, CancellationToken cancellationToken = default)
 	{
-				var charset = _database.Charset;
+		var charset = _database.Charset;
 		var subType = (Descriptor.Scale < 0) ? 2 : 0;
-				using (var ms = new MemoryStream())
+		using (var ms = new MemoryStream())
 		{
 			var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
 			int type = TypeHelper.GetSqlTypeFromBlrType(Descriptor.DataType);
 			DbDataType dbType = TypeHelper.GetDbDataTypeFromBlrType(Descriptor.DataType, subType, Descriptor.Scale);
 
-						foreach (var source in sourceArray)
+			foreach (var source in sourceArray)
 			{
 				switch (dbType)
 				{

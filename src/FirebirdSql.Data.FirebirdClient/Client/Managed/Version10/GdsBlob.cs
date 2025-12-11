@@ -237,7 +237,7 @@ internal sealed class GdsBlob : BlobBase
 			var srcpos = 0;
 
 			while (srcpos < buffer.Length)
-				{ 
+			{
 				len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
 				srcpos += 2;
 
@@ -286,7 +286,7 @@ internal sealed class GdsBlob : BlobBase
 			var srcpos = 0;
 
 			while (srcpos < buffer.Length)
-				{
+			{
 				len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
 				srcpos += 2;
 
@@ -337,7 +337,7 @@ internal sealed class GdsBlob : BlobBase
 
 			var tmp = new byte[requested * 2];
 			while (posInInput < buffer.Length)
-				{
+			{
 				var len = (int)IscHelper.VaxInteger(buffer, posInInput, 2);
 				posInInput += 2;
 
@@ -393,7 +393,7 @@ internal sealed class GdsBlob : BlobBase
 
 			var tmp = new byte[requested * 2];
 			while (posInInput < buffer.Length)
-				{
+			{
 				var len = (int)IscHelper.VaxInteger(buffer, posInInput, 2);
 				posInInput += 2;
 

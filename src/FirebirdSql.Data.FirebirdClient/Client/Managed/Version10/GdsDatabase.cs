@@ -32,7 +32,7 @@ internal class GdsDatabase : DatabaseBase
 	protected const int PartnerIdentification = 0;
 	protected const int AddressOfAstRoutine = 0;
 	protected const int ArgumentToAstRoutine = 0;
-protected internal const int DatabaseObjectId = 0;
+	protected internal const int DatabaseObjectId = 0;
 	protected internal const int Incarnation = 0;
 	const int StackallocThreshold = 512;
 
@@ -73,9 +73,9 @@ protected internal const int DatabaseObjectId = 0;
 		get { return _connection.AuthBlock; }
 	}
 
-		#endregion
+	#endregion
 
-		#region Constructors
+	#region Constructors
 
 	public GdsDatabase(GdsConnection connection)
 		: base(connection.Charset, connection.PacketSize, connection.Dialect)
@@ -84,11 +84,11 @@ protected internal const int DatabaseObjectId = 0;
 		_handle = -1;
 	}
 
-		#endregion
+	#endregion
 
-		#region Attach/Detach Methods
+	#region Attach/Detach Methods
 
-		public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+	public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
 	{
 		try
 		{

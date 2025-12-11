@@ -315,7 +315,7 @@ internal class GdsStatement : StatementBase
 			}
 
 			var executeResponse = (GenericResponse)_database.ReadResponse();
-						ProcessExecuteResponse(executeResponse);
+			ProcessExecuteResponse(executeResponse);
 
 			if (DoRecordsAffected)
 			{
@@ -669,7 +669,7 @@ internal class GdsStatement : StatementBase
 			return;
 
 		DoFreePacket(option);
-				ProcessFreeResponse(_database.ReadResponse());
+		ProcessFreeResponse(_database.ReadResponse());
 	}
 	protected override async ValueTask FreeAsync(int option, CancellationToken cancellationToken = default)
 	{
@@ -1194,14 +1194,14 @@ internal class GdsStatement : StatementBase
 
 					default:
 						throw IscException.ForErrorCode(IscCodes.isc_dsql_sqlda_err);
-								}
-						}
-				// just to get out of the loop
-				BreakSpan:
-						{ }
 				}
-				return rowDescs;
+			}
+			// just to get out of the loop
+			BreakSpan:
+					{ }
 		}
+		return rowDescs;
+	}
 
 	private ValueTask<Descriptor[]> ParseTruncSqlInfoAsync(byte[] info, ReadOnlyMemory<byte> items, Descriptor[] rowDescs, CancellationToken cancellationToken) =>		
 		ParseTruncSqlInfoSpanAsync(info.AsMemory(), items, rowDescs, cancellationToken);
@@ -1351,7 +1351,7 @@ internal class GdsStatement : StatementBase
 				var field = _parameters[i];
 				try
 				{
-										WriteRawParameter(xdr, field);
+					WriteRawParameter(xdr, field);
 					xdr.Write(field.NullFlag);
 				}
 				catch (IOException ex)

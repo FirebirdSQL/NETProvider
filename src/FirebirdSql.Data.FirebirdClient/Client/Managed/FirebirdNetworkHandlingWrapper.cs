@@ -90,21 +90,27 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public int Read(Span<byte> buffer, int offset, int count)
 	{
-		if (_inputBuffer.Count < count) {
+		if (_inputBuffer.Count < count)
+		{
 			var readBuffer = _readBuffer;
 			int read;
-			try {
+			try
+			{
 				read = _dataProvider.Read(readBuffer, 0, readBuffer.Length);
 			}
-			catch (IOException) {
+			catch (IOException)
+			{
 				IOFailed = true;
 				throw;
 			}
-			if (read != 0) {
-				if (_decryptor != null) {
+			if (read != 0)
+			{
+				if (_decryptor != null)
+				{
 					_decryptor.ProcessBytes(readBuffer, 0, read, readBuffer, 0);
 				}
-				if (_decompressor != null) {
+				if (_decompressor != null)
+				{
 					read = HandleDecompression(readBuffer, read);
 					readBuffer = _compressionBuffer;
 				}
@@ -182,7 +188,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		var span = buffer.Span.Slice(offset, count);
 		foreach (var b in span)
 			_outputBuffer.Enqueue(b);
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public void Flush()

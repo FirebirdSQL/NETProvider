@@ -328,7 +328,8 @@ internal sealed class DbField
 							if((Length % Charset.BytesPerCharacter) == 0)
 							{ 
 								var runes = s.CountRunes();
-								if(runes > CharCount) {
+								if(runes > CharCount)
+								{
 									s = new string(s.TruncateStringToRuneCount(CharCount));
 								}
 							}

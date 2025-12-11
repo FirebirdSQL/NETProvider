@@ -44,7 +44,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		_smallBuffer = new byte[8];
 	}
 
-		public XdrReaderWriter(IDataProvider dataProvider)
+	public XdrReaderWriter(IDataProvider dataProvider)
 		: this(dataProvider, Charset.DefaultCharset)
 	{ }
 
@@ -74,14 +74,18 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public void ReadBytes(Span<byte> dst, int count)
 	{
-		if (count > 0) {
+		if (count > 0)
+		{
 			var toRead = count;
 			var currentlyRead = -1;
-			while (toRead > 0 && currentlyRead != 0) {
+			while (toRead > 0 && currentlyRead != 0)
+			{
 				toRead -= (currentlyRead = _dataProvider.Read(dst, count - toRead, toRead));
 			}
-			if (currentlyRead == 0) {
-				if (_dataProvider is ITracksIOFailure tracksIOFailure) {
+			if (currentlyRead == 0)
+			{
+				if (_dataProvider is ITracksIOFailure tracksIOFailure)
+				{
 					tracksIOFailure.IOFailed = true;
 				}
 				throw new IOException($"Missing {toRead} bytes to fill total {count}.");
@@ -785,7 +789,8 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	{
 		var length = buffer.Length;
 		Write(length);
-		if (length > 0) {
+		if (length > 0)
+		{
 			_dataProvider.Write(buffer);
 			WritePad((4 - length) & 3);
 		}
@@ -890,13 +895,15 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	{
 		int length;
 		Span<byte> typeByte = stackalloc byte[1];
-		if (buffer == null) {
+		if (buffer == null)
+		{
 			Write(1);
 			typeByte[0] = (byte)type;
 			_dataProvider.Write(typeByte);
 			length = 1;
 		}
-		else {
+		else
+		{
 			length = buffer.Length + 1;
 			Write(length);
 			typeByte[0] = (byte)type;

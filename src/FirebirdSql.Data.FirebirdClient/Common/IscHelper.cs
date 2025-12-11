@@ -238,7 +238,8 @@ internal static class IscHelper
 		var value = 0L;
 		var shift = 0;
 		var i = index;
-		while(--length >= 0) {
+		while(--length >= 0)
+		{
 			value += (buffer[i++] & 0xffL) << shift;
 			shift += 8;
 		}

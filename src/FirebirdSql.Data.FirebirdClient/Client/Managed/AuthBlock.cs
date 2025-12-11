@@ -66,7 +66,7 @@ sealed class AuthBlock
 		WireCrypt = wireCrypt;
 	}
 
-		public byte[] UserIdentificationData()
+	public byte[] UserIdentificationData()
 	{
 		using (var result = new MemoryStream(256))
 		{
