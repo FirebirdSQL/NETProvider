@@ -78,7 +78,7 @@ internal sealed class Descriptor
 		_version = IscCodes.SQLDA_VERSION1;
 		_count = n;
 		_actualCount = n;
-		_fields = new DbField[n];
+		_fields = n > 0 ? new DbField[n] : Array.Empty<DbField>();
 
 		for (var i = 0; i < n; i++)
 		{

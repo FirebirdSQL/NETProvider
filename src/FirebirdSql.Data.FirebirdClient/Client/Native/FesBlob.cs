@@ -28,8 +28,8 @@ internal sealed class FesBlob : BlobBase
 {
 	#region Fields
 
-	private FesDatabase _database;
-	private IntPtr[] _statusVector;
+	private readonly FesDatabase _database;
+	private readonly IntPtr[] _statusVector;
 	private BlobHandle _blobHandle;
 
 	#endregion
@@ -84,7 +84,7 @@ internal sealed class FesBlob : BlobBase
 			ref _blobHandle,
 			ref _blobId,
 			0,
-			new byte[0]);
+			Array.Empty<byte>());
 
 		_database.ProcessStatusVector(_statusVector);
 
@@ -106,7 +106,7 @@ internal sealed class FesBlob : BlobBase
 			ref _blobHandle,
 			ref _blobId,
 			0,
-			new byte[0]);
+			Array.Empty<byte>());
 
 		_database.ProcessStatusVector(_statusVector);
 
@@ -131,7 +131,7 @@ internal sealed class FesBlob : BlobBase
 			ref _blobHandle,
 			ref _blobId,
 			0,
-			new byte[0]);
+			Array.Empty<byte>());
 
 		_database.ProcessStatusVector(_statusVector);
 
@@ -151,7 +151,7 @@ internal sealed class FesBlob : BlobBase
 			ref _blobHandle,
 			ref _blobId,
 			0,
-			new byte[0]);
+			Array.Empty<byte>());
 
 		_database.ProcessStatusVector(_statusVector);
 

@@ -34,7 +34,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	readonly Charset _charset;
 
 	byte[] _smallBuffer;
-    const int StackallocThreshold = 1024;
+	const int StackallocThreshold = 1024;
 
 	public XdrReaderWriter(IDataProvider dataProvider, Charset charset)
 	{
@@ -134,7 +134,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public byte[] ReadOpaque(int length)
 	{
-		var buffer = length > 0 ? new byte[length] : _emptyBuf;
+		var buffer = length > 0 ? new byte[length] : Array.Empty<byte>();
 		ReadBytes(buffer, length);
 		ReadPad((4 - length) & 3);
 		return buffer;
@@ -148,7 +148,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public async ValueTask<byte[]> ReadOpaqueAsync(int length, CancellationToken cancellationToken = default)
 	{
-		var buffer = length > 0 ? new byte[length] : _emptyBuf;
+		var buffer = length > 0 ? new byte[length] : Array.Empty<byte>();
 		await ReadBytesAsync(buffer, length, cancellationToken).ConfigureAwait(false);
 		await ReadPadAsync((4 - length) & 3, cancellationToken).ConfigureAwait(false);
 		return buffer;
