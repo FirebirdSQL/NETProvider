@@ -25,6 +25,9 @@ namespace FirebirdSql.Data.Client.Managed.Version10;
 
 internal class GdsServiceManager : ServiceManagerBase
 {
+	private static readonly byte[] zeroIntBuf = TypeEncoder.EncodeInt32(0);
+	private static readonly byte[] bufOpServiceStart = TypeEncoder.EncodeInt32(IscCodes.op_service_start);
+
 	#region Fields
 
 	private GdsConnection _connection;
@@ -185,9 +188,9 @@ internal class GdsServiceManager : ServiceManagerBase
 	{
 		try
 		{
-			_database.Xdr.Write(IscCodes.op_service_start);
+			_database.Xdr.WriteBytes(bufOpServiceStart);
 			_database.Xdr.Write(Handle);
-			_database.Xdr.Write(0);
+			_database.Xdr.WriteBytes(zeroIntBuf);
 			_database.Xdr.WriteBuffer(spb.ToArray(), spb.Length);
 			_database.Xdr.Flush();
 
@@ -209,9 +212,9 @@ internal class GdsServiceManager : ServiceManagerBase
 	{
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_service_start, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpServiceStart, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(Handle, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteBufferAsync(spb.ToArray(), spb.Length, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -252,7 +255,7 @@ internal class GdsServiceManager : ServiceManagerBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{
@@ -281,7 +284,7 @@ internal class GdsServiceManager : ServiceManagerBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{

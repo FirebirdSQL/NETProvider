@@ -18,6 +18,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
@@ -26,6 +27,8 @@ namespace FirebirdSql.Data.Client.Managed.Version13;
 
 internal class GdsStatement : Version12.GdsStatement
 {
+	const int STACKALLOC_LIMIT = 1024;
+
 	#region Constructors
 
 	public GdsStatement(GdsDatabase database)
@@ -51,20 +54,25 @@ internal class GdsStatement : Version12.GdsStatement
 			{
 				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
-				var bits = new BitArray(_parameters.Count);
-				for (var i = 0; i < _parameters.Count; i++)
+				var count = _parameters.Count;
+				var bytesLen = (int)Math.Ceiling(count / 8d);
+				byte[] rented = null;
+				Span<byte> buffer = bytesLen > STACKALLOC_LIMIT
+					? (rented = ArrayPool<byte>.Shared.Rent(bytesLen)).AsSpan(0, bytesLen)
+					: stackalloc byte[bytesLen];
+				buffer.Clear();
+				for (var i = 0; i < count; i++)
 				{
-					var field = _parameters[i];
-					bits.Set(i, field.DbValue.IsDBNull());
-				}
-				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-				for (var i = 0; i < buffer.Length * 8; i++)
-				{
-					var index = i / 8;
-					// LSB
-					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
+					if (_parameters[i].DbValue.IsDBNull())
+					{
+						buffer[i / 8] |= (byte)(1 << (i % 8));
+					}
 				}
 				xdr.WriteOpaque(buffer);
+				if (rented != null)
+				{
+					ArrayPool<byte>.Shared.Return(rented);
+				}
 
 				for (var i = 0; i < _parameters.Count; i++)
 				{
@@ -96,20 +104,25 @@ internal class GdsStatement : Version12.GdsStatement
 			{
 				var xdr = new XdrReaderWriter(new DataProviderStreamWrapper(ms), _database.Charset);
 
-				var bits = new BitArray(_parameters.Count);
-				for (var i = 0; i < _parameters.Count; i++)
-				{
-					var field = _parameters[i];
-					bits.Set(i, field.DbValue.IsDBNull());
-				}
-				var buffer = new byte[(int)Math.Ceiling(_parameters.Count / 8d)];
-				for (var i = 0; i < buffer.Length * 8; i++)
-				{
-					var index = i / 8;
-					// LSB
-					buffer[index] = (byte)((buffer[index] >> 1) | (bits.Length > i && bits[i] ? 1 << 7 : 0));
-				}
-				await xdr.WriteOpaqueAsync(buffer, cancellationToken).ConfigureAwait(false);
+            var count = _parameters.Count;
+            var len = (int)Math.Ceiling(count / 8d);
+            var buffer = ArrayPool<byte>.Shared.Rent(len);
+            Array.Clear(buffer, 0, len);
+            for (var i = 0; i < count; i++)
+            {
+                if (_parameters[i].DbValue.IsDBNull())
+                {
+                    buffer[i / 8] |= (byte)(1 << (i % 8));
+                }
+            }
+            try
+            {
+                await xdr.WriteOpaqueAsync(buffer, len, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
 
 				for (var i = 0; i < _parameters.Count; i++)
 				{
@@ -133,25 +146,34 @@ internal class GdsStatement : Version12.GdsStatement
 
 	protected override DbValue[] ReadRow()
 	{
-		var row = new DbValue[_fields.Count];
+		var row = _fields.Count > 0 ? new DbValue[_fields.Count] : Array.Empty<DbValue>();
 		try
 		{
 			if (_fields.Count > 0)
 			{
-				var nullBytes = _database.Xdr.ReadOpaque((int)Math.Ceiling(_fields.Count / 8d));
-				var nullBits = new BitArray(nullBytes);
-				for (var i = 0; i < _fields.Count; i++)
-				{
-					if (nullBits.Get(i))
-					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						var value = ReadRawValue(_database.Xdr, _fields[i]);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-				}
+            var len = (int)Math.Ceiling(_fields.Count / 8d);
+            var rented = ArrayPool<byte>.Shared.Rent(len);
+            try
+            {
+                _database.Xdr.ReadOpaque(rented.AsSpan(0, len), len);
+                for (var i = 0; i < _fields.Count; i++)
+                {
+                    var isNull = (rented[i / 8] & (1 << (i % 8))) != 0;
+                    if (isNull)
+                    {
+                        row[i] = new DbValue(this, _fields[i], null);
+                    }
+                    else
+                    {
+                        var value = ReadRawValue(_database.Xdr, _fields[i]);
+                        row[i] = new DbValue(this, _fields[i], value);
+                    }
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rented);
+            }
 			}
 		}
 		catch (IOException ex)
@@ -162,25 +184,34 @@ internal class GdsStatement : Version12.GdsStatement
 	}
 	protected override async ValueTask<DbValue[]> ReadRowAsync(CancellationToken cancellationToken = default)
 	{
-		var row = new DbValue[_fields.Count];
+		var row = _fields.Count > 0 ? new DbValue[_fields.Count] : Array.Empty<DbValue>();
 		try
 		{
 			if (_fields.Count > 0)
 			{
-				var nullBytes = await _database.Xdr.ReadOpaqueAsync((int)Math.Ceiling(_fields.Count / 8d), cancellationToken).ConfigureAwait(false);
-				var nullBits = new BitArray(nullBytes);
-				for (var i = 0; i < _fields.Count; i++)
-				{
-					if (nullBits.Get(i))
-					{
-						row[i] = new DbValue(this, _fields[i], null);
-					}
-					else
-					{
-						var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
-						row[i] = new DbValue(this, _fields[i], value);
-					}
-				}
+            var len = (int)Math.Ceiling(_fields.Count / 8d);
+            var rented = ArrayPool<byte>.Shared.Rent(len);
+            try
+            {
+                await _database.Xdr.ReadOpaqueAsync(rented.AsMemory(0, len), len, cancellationToken).ConfigureAwait(false);
+                for (var i = 0; i < _fields.Count; i++)
+                {
+                    var isNull = (rented[i / 8] & (1 << (i % 8))) != 0;
+                    if (isNull)
+                    {
+                        row[i] = new DbValue(this, _fields[i], null);
+                    }
+                    else
+                    {
+                        var value = await ReadRawValueAsync(_database.Xdr, _fields[i], cancellationToken).ConfigureAwait(false);
+                        row[i] = new DbValue(this, _fields[i], value);
+                    }
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rented);
+            }
 			}
 		}
 		catch (IOException ex)

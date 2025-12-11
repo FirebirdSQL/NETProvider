@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -31,8 +32,9 @@ internal class GdsDatabase : DatabaseBase
 	protected const int PartnerIdentification = 0;
 	protected const int AddressOfAstRoutine = 0;
 	protected const int ArgumentToAstRoutine = 0;
-	protected internal const int DatabaseObjectId = 0;
+protected internal const int DatabaseObjectId = 0;
 	protected internal const int Incarnation = 0;
+	const int StackallocThreshold = 512;
 
 	#region Fields
 
@@ -71,9 +73,9 @@ internal class GdsDatabase : DatabaseBase
 		get { return _connection.AuthBlock; }
 	}
 
-	#endregion
+		#endregion
 
-	#region Constructors
+		#region Constructors
 
 	public GdsDatabase(GdsConnection connection)
 		: base(connection.Charset, connection.PacketSize, connection.Dialect)
@@ -82,11 +84,11 @@ internal class GdsDatabase : DatabaseBase
 		_handle = -1;
 	}
 
-	#endregion
+		#endregion
 
-	#region Attach/Detach Methods
+		#region Attach/Detach Methods
 
-	public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
+		public override void Attach(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
 	{
 		try
 		{
@@ -419,31 +421,38 @@ internal class GdsDatabase : DatabaseBase
 
 			var auxHandle = Xdr.ReadInt32();
 
-			var garbage1 = new byte[8];
+			Span<byte> garbage1 = stackalloc byte[8];
 			Xdr.ReadBytes(garbage1, 8);
 
 			var respLen = Xdr.ReadInt32();
 			respLen += respLen % 4;
 
-			var sin_family = new byte[2];
+			Span<byte> sin_family = stackalloc byte[2];
 			Xdr.ReadBytes(sin_family, 2);
 			respLen -= 2;
 
-			var sin_port = new byte[2];
+			Span<byte> sin_port = stackalloc byte[2];
 			Xdr.ReadBytes(sin_port, 2);
-			var portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port, 0));
+			var portNumber = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(sin_port));
 			respLen -= 2;
 
 			// * The address returned by the server may be incorrect if it is behind a NAT box
 			// * so we must use the address that was used to connect the main socket, not the
 			// * address reported by the server.
-			var sin_addr = new byte[4];
+			Span<byte> sin_addr = stackalloc byte[4];
 			Xdr.ReadBytes(sin_addr, 4);
 			var ipAddress = _connection.IPAddress.ToString();
 			respLen -= 4;
 
-			var garbage2 = new byte[respLen];
+			byte[] rented = null;
+			Span<byte> garbage2 = respLen > StackallocThreshold
+				? (rented = ArrayPool<byte>.Shared.Rent(respLen)).AsSpan(0, respLen)
+				: stackalloc byte[respLen];
 			Xdr.ReadBytes(garbage2, respLen);
+			if (rented != null)
+			{
+				ArrayPool<byte>.Shared.Return(rented);
+			}
 
 			Xdr.ReadStatusVector();
 
@@ -904,7 +913,7 @@ internal class GdsDatabase : DatabaseBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{
@@ -932,7 +941,7 @@ internal class GdsDatabase : DatabaseBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{

@@ -52,6 +52,8 @@ sealed class AuthBlock
 
 	public bool WireCryptInitialized { get; private set; }
 
+	private const int STACKALLOC_LIMIT = 512;
+
 	public AuthBlock(GdsConnection connection, string user, string password, WireCryptOption wireCrypt)
 	{
 		_srp256 = new Srp256Client();
@@ -64,64 +66,164 @@ sealed class AuthBlock
 		WireCrypt = wireCrypt;
 	}
 
-	public byte[] UserIdentificationData()
+		public byte[] UserIdentificationData()
 	{
 		using (var result = new MemoryStream(256))
 		{
-			var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
-			var user = Encoding.UTF8.GetBytes(userString);
-			result.WriteByte(IscCodes.CNCT_user);
-			result.WriteByte((byte)user.Length);
-			result.Write(user, 0, user.Length);
+			{
+				var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
+				var slen = Encoding.UTF8.GetByteCount(userString);
+				byte[] rented = null;
+				Span<byte> user = slen > STACKALLOC_LIMIT
+					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+					: stackalloc byte[slen];
+				int real_len = Encoding.UTF8.GetBytes(userString, user);
+				result.WriteByte(IscCodes.CNCT_user);
+				result.WriteByte((byte)real_len);
+				result.Write(user);
+				if (rented != null)
+				{
+					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+				}
+			}
 
-			var host = Encoding.UTF8.GetBytes(Dns.GetHostName());
-			result.WriteByte(IscCodes.CNCT_host);
-			result.WriteByte((byte)host.Length);
-			result.Write(host, 0, host.Length);
+			{
+				var hostName = Dns.GetHostName();
+				var slen = Encoding.UTF8.GetByteCount(hostName);
+				byte[] rented = null;
+				Span<byte> host = slen > STACKALLOC_LIMIT
+					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+					: stackalloc byte[slen];
+				int real_len = Encoding.UTF8.GetBytes(hostName, host);
+				result.WriteByte(IscCodes.CNCT_host);
+				result.WriteByte((byte)real_len);
+				result.Write(host);
+				if (rented != null)
+				{
+					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+				}
+			}
 
 			result.WriteByte(IscCodes.CNCT_user_verification);
 			result.WriteByte(0);
 
 			if (!string.IsNullOrEmpty(User))
 			{
-				var login = Encoding.UTF8.GetBytes(User);
-				result.WriteByte(IscCodes.CNCT_login);
-				result.WriteByte((byte)login.Length);
-				result.Write(login, 0, login.Length);
+				{
+					var slen = Encoding.UTF8.GetByteCount(User);
+					byte[] rented = null;
+					Span<byte> bytes = slen > STACKALLOC_LIMIT
+						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+						: stackalloc byte[slen];
+					int real_len = Encoding.UTF8.GetBytes(User, bytes);
+					result.WriteByte(IscCodes.CNCT_login);
+					result.WriteByte((byte)real_len);
+					result.Write(bytes);
+					if (rented != null)
+					{
+						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+					}
+				}
+				{
+					var slen = Encoding.UTF8.GetByteCount(_srp256.Name);
+					byte[] rented = null;
+					Span<byte> bytes = slen > STACKALLOC_LIMIT
+						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+						: stackalloc byte[slen];
+					int real_len = Encoding.UTF8.GetBytes(_srp256.Name, bytes);
+					result.WriteByte(IscCodes.CNCT_plugin_name);
+					result.WriteByte((byte)real_len);
+					result.Write(bytes[..real_len]);
+					if (rented != null)
+					{
+						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+					}
+				}
+				{
+					var slen = Encoding.UTF8.GetByteCount(_srp256.PublicKeyHex);
+					byte[] rented = null;
+					Span<byte> specificData = slen > STACKALLOC_LIMIT
+						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+						: stackalloc byte[slen];
+					Encoding.UTF8.GetBytes(_srp256.PublicKeyHex.AsSpan(), specificData);
+					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
+					if (rented != null)
+					{
+						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+					}
+				}
+				{
+					var slen1 = Encoding.UTF8.GetByteCount(_srp256.Name);
+					byte[] rented1 = null;
+					Span<byte> bytes1 = slen1 > STACKALLOC_LIMIT
+						? (rented1 = System.Buffers.ArrayPool<byte>.Shared.Rent(slen1)).AsSpan(0, slen1)
+						: stackalloc byte[slen1];
+					Span<byte> bytes2 = stackalloc byte[1];
+					var slen3 = Encoding.UTF8.GetByteCount(_srp.Name);
+					byte[] rented3 = null;
+					Span<byte> bytes3 = slen3 > STACKALLOC_LIMIT
+						? (rented3 = System.Buffers.ArrayPool<byte>.Shared.Rent(slen3)).AsSpan(0, slen3)
+						: stackalloc byte[slen3];
+					int l1 = Encoding.UTF8.GetBytes(_srp256.Name.AsSpan(), bytes1);
+					int l2 = Encoding.UTF8.GetBytes(",".AsSpan(), bytes2);
+					int l3 = Encoding.UTF8.GetBytes(_srp.Name.AsSpan(), bytes3);
+					result.WriteByte(IscCodes.CNCT_plugin_list);
+					result.WriteByte((byte)(l1+l2+l3));
+					result.Write(bytes1);
+					result.Write(bytes2);
+					result.Write(bytes3);
+					if (rented1 != null)
+					{
+						System.Buffers.ArrayPool<byte>.Shared.Return(rented1, clearArray: true);
+					}
+					if (rented3 != null)
+					{
+						System.Buffers.ArrayPool<byte>.Shared.Return(rented3, clearArray: true);
+					}
+				}
 
-				var pluginNameBytes = Encoding.UTF8.GetBytes(_srp256.Name);
-				result.WriteByte(IscCodes.CNCT_plugin_name);
-				result.WriteByte((byte)pluginNameBytes.Length);
-				result.Write(pluginNameBytes, 0, pluginNameBytes.Length);
-				var specificData = Encoding.UTF8.GetBytes(_srp256.PublicKeyHex);
-				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
-
-				var plugins = string.Join(",", new[] { _srp256.Name, _srp.Name });
-				var pluginsBytes = Encoding.UTF8.GetBytes(plugins);
-				result.WriteByte(IscCodes.CNCT_plugin_list);
-				result.WriteByte((byte)pluginsBytes.Length);
-				result.Write(pluginsBytes, 0, pluginsBytes.Length);
-
-				result.WriteByte(IscCodes.CNCT_client_crypt);
-				result.WriteByte(4);
-				result.Write(TypeEncoder.EncodeInt32(WireCryptOptionValue(WireCrypt)), 0, 4);
+				{
+					result.WriteByte(IscCodes.CNCT_client_crypt);
+					result.WriteByte(4);
+					Span<byte> bytes = stackalloc byte[4];
+					if (!BitConverter.TryWriteBytes(bytes, IPAddress.NetworkToHostOrder(WireCryptOptionValue(WireCrypt))))
+					{
+						throw new InvalidOperationException("Failed to write wire crypt option bytes.");
+					}
+					result.Write(bytes);
+				}
 			}
 			else
 			{
-				var pluginNameBytes = Encoding.UTF8.GetBytes(_sspi.Name);
+				var slen = Encoding.UTF8.GetByteCount(_sspi.Name);
+				byte[] rented = null;
+				Span<byte> pluginNameBytes = slen > STACKALLOC_LIMIT
+					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
+					: stackalloc byte[slen];
+				int pluginNameLen = Encoding.UTF8.GetBytes(_sspi.Name.AsSpan(), pluginNameBytes);
 				result.WriteByte(IscCodes.CNCT_plugin_name);
-				result.WriteByte((byte)pluginNameBytes.Length);
-				result.Write(pluginNameBytes, 0, pluginNameBytes.Length);
+				result.WriteByte((byte)pluginNameLen);
+				result.Write(pluginNameBytes[..pluginNameLen]);
+
 				var specificData = _sspi.InitializeClientSecurity();
 				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
 				result.WriteByte(IscCodes.CNCT_plugin_list);
-				result.WriteByte((byte)pluginNameBytes.Length);
-				result.Write(pluginNameBytes, 0, pluginNameBytes.Length);
+				result.WriteByte((byte)pluginNameLen);
+				result.Write(pluginNameBytes[..pluginNameLen]);
 
 				result.WriteByte(IscCodes.CNCT_client_crypt);
 				result.WriteByte(4);
-				result.Write(TypeEncoder.EncodeInt32(IscCodes.WIRE_CRYPT_DISABLED), 0, 4);
+				Span<byte> wireCryptBytes = stackalloc byte[4];
+				if (!BitConverter.TryWriteBytes(wireCryptBytes, IPAddress.NetworkToHostOrder(IscCodes.WIRE_CRYPT_DISABLED)))
+				{
+					throw new InvalidOperationException("Failed to write wire crypt disabled bytes.");
+				}
+				result.Write(wireCryptBytes);
+				if (rented != null)
+				{
+					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+				}
 			}
 
 			return result.ToArray();
@@ -309,7 +411,21 @@ sealed class AuthBlock
 		_sspi = null;
 	}
 
-	static void WriteMultiPartHelper(Stream stream, byte code, byte[] data)
+	static void WriteMultiPartHelper(MemoryStream stream, byte code, byte[] data)
+	{
+		const int MaxLength = 255 - 1;
+		var part = 0;
+		for (var i = 0; i < data.Length; i += MaxLength) {
+			stream.WriteByte(code);
+			var length = Math.Min(data.Length - i, MaxLength);
+			stream.WriteByte((byte)(length + 1));
+			stream.WriteByte((byte)part);
+			stream.Write(data, i, length);
+			part++;
+		}
+	}
+
+	static void WriteMultiPartHelper(MemoryStream stream, byte code, ReadOnlySpan<byte> data)
 	{
 		const int MaxLength = 255 - 1;
 		var part = 0;
@@ -319,7 +435,7 @@ sealed class AuthBlock
 			var length = Math.Min(data.Length - i, MaxLength);
 			stream.WriteByte((byte)(length + 1));
 			stream.WriteByte((byte)part);
-			stream.Write(data, i, length);
+			stream.Write(data[i..(i+length)]);
 			part++;
 		}
 	}

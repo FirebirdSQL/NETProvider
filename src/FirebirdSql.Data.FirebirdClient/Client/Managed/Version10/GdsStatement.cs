@@ -398,10 +398,10 @@ internal class GdsStatement : StatementBase
 		{
 			try
 			{
-				_database.Xdr.Write(IscCodes.op_fetch);
+				_database.Xdr.WriteBytes(bufOpFetch);
 				_database.Xdr.Write(_handle);
 				_database.Xdr.WriteBuffer(_fields.ToBlr().Data);
-				_database.Xdr.Write(0); // p_sqldata_message_number
+				_database.Xdr.WriteBytes(zeroIntBuf); // p_sqldata_message_number
 				_database.Xdr.Write(_fetchSize); // p_sqldata_messages
 				_database.Xdr.Flush();
 
@@ -479,10 +479,10 @@ internal class GdsStatement : StatementBase
 		{
 			try
 			{
-				await _database.Xdr.WriteAsync(IscCodes.op_fetch, cancellationToken).ConfigureAwait(false);
+				await _database.Xdr.WriteBytesAsync(bufOpFetch, 4, cancellationToken).ConfigureAwait(false);
 				await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
 				await _database.Xdr.WriteBufferAsync(_fields.ToBlr().Data, cancellationToken).ConfigureAwait(false);
-				await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // p_sqldata_message_number
+				await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false); // p_sqldata_message_number
 				await _database.Xdr.WriteAsync(_fetchSize, cancellationToken).ConfigureAwait(false); // p_sqldata_messages
 				await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -546,36 +546,50 @@ internal class GdsStatement : StatementBase
 	#region op_prepare methods
 	protected void SendPrepareToBuffer(string commandText)
 	{
-		_database.Xdr.Write(IscCodes.op_prepare_statement);
+		_database.Xdr.WriteBytes(bufOpPrepare);
 		_database.Xdr.Write(_transaction.Handle);
 		_database.Xdr.Write(_handle);
 		_database.Xdr.Write((int)_database.Dialect);
 		_database.Xdr.Write(commandText);
 		_database.Xdr.WriteBuffer(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length);
-		_database.Xdr.Write(IscCodes.PREPARE_INFO_BUFFER_SIZE);
+		_database.Xdr.WriteBytes(bufPrepareInfoSize);
 	}
 	protected async ValueTask SendPrepareToBufferAsync(string commandText, CancellationToken cancellationToken = default)
 	{
-		await _database.Xdr.WriteAsync(IscCodes.op_prepare_statement, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteBytesAsync(bufOpPrepare, 4, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(_transaction.Handle, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync((int)_database.Dialect, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(commandText, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteBufferAsync(DescribeInfoAndBindInfoItems, DescribeInfoAndBindInfoItems.Length, cancellationToken).ConfigureAwait(false);
-		await _database.Xdr.WriteAsync(IscCodes.PREPARE_INFO_BUFFER_SIZE, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteBytesAsync(bufPrepareInfoSize, 4, cancellationToken).ConfigureAwait(false);
 	}
 
 	protected void ProcessPrepareResponse(GenericResponse response)
 	{
-		var descriptors = ParseSqlInfo(response.Data, DescribeInfoAndBindInfoItems, new Descriptor[] { null, null });
+		var info = response.Data.AsSpan();
+		var descriptors = ParseSqlInfoSpan(info, DescribeInfoAndBindInfoItems, new Descriptor[] { null, null });
 		_fields = descriptors[0];
 		_parameters = descriptors[1];
 	}
+
 	protected async ValueTask ProcessPrepareResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
-		var descriptors = await ParseSqlInfoAsync(response.Data, DescribeInfoAndBindInfoItems, new Descriptor[] { null, null }, cancellationToken).ConfigureAwait(false);
+		var info = response.Data;
+		var descriptors = await ParseSqlInfoSpanAsync(info, DescribeInfoAndBindInfoItems.AsMemory(), new Descriptor[] { null, null }, cancellationToken).ConfigureAwait(false);
 		_fields = descriptors[0];
 		_parameters = descriptors[1];
+	}
+
+	// Span-based parsing to avoid intermediate arrays when possible
+	private Descriptor[] ParseSqlInfoSpan(ReadOnlySpan<byte> info, ReadOnlySpan<byte> items, Descriptor[] rowDescs)
+	{
+		return ParseTruncSqlInfoSpan(info, items, rowDescs);
+	}
+
+	private ValueTask<Descriptor[]> ParseSqlInfoSpanAsync(ReadOnlyMemory<byte> info, ReadOnlyMemory<byte> items, Descriptor[] rowDescs, CancellationToken cancellationToken)
+	{
+		return ParseTruncSqlInfoSpanAsync(info, items, rowDescs, cancellationToken);
 	}
 	#endregion
 
@@ -618,30 +632,31 @@ internal class GdsStatement : StatementBase
 
 	protected void SendInfoSqlToBuffer(byte[] items, int bufferLength)
 	{
-		_database.Xdr.Write(IscCodes.op_info_sql);
+		_database.Xdr.WriteBytes(bufOpInfoSql);
 		_database.Xdr.Write(_handle);
-		_database.Xdr.Write(0);
+		_database.Xdr.WriteBytes(zeroIntBuf);
 		_database.Xdr.WriteBuffer(items, items.Length);
 		_database.Xdr.Write(bufferLength);
 	}
 	protected async ValueTask SendInfoSqlToBufferAsync(byte[] items, int bufferLength, CancellationToken cancellationToken = default)
 	{
-		await _database.Xdr.WriteAsync(IscCodes.op_info_sql, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteBytesAsync(bufOpInfoSql, 4, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
-		await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteBufferAsync(items, items.Length, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(bufferLength, cancellationToken).ConfigureAwait(false);
 	}
 
-	protected byte[] ProcessInfoSqlResponse(GenericResponse response)
+	protected static byte[] ProcessInfoSqlResponse(GenericResponse response)
 	{
-		Debug.Assert(response.Data != null && response.Data.Length > 0);
+		Debug.Assert(response.Data.Length > 0);
 
-		return response.Data;
+		return response.Data.ToArray();
 	}
-	protected ValueTask<byte[]> ProcessInfoSqlResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
+
+	protected static ValueTask<byte[]> ProcessInfoSqlResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
-		Debug.Assert(response.Data != null && response.Data.Length > 0);
+		Debug.Assert(response.Data.Length > 0);
 
 		return ValueTask.FromResult(response.Data);
 	}
@@ -682,7 +697,7 @@ internal class GdsStatement : StatementBase
 	{
 		try
 		{
-			_database.Xdr.Write(IscCodes.op_free_statement);
+			_database.Xdr.WriteBytes(bufOpFreeStatement);
 			_database.Xdr.Write(_handle);
 			_database.Xdr.Write(option);
 			_database.Xdr.Flush();
@@ -705,7 +720,7 @@ internal class GdsStatement : StatementBase
 	{
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_free_statement, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpFreeStatement, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(option, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -725,9 +740,9 @@ internal class GdsStatement : StatementBase
 		}
 	}
 
-	protected void ProcessFreeResponse(IResponse response)
+	protected static void ProcessFreeResponse(IResponse response)
 	{ }
-	protected ValueTask ProcessFreeResponseAsync(IResponse response, CancellationToken cancellationToken = default)
+	protected static ValueTask ProcessFreeResponseAsync(IResponse response, CancellationToken cancellationToken = default)
 	{
 		return ValueTask.CompletedTask;
 	}
@@ -736,12 +751,12 @@ internal class GdsStatement : StatementBase
 	#region op_allocate_statement methods
 	protected void SendAllocateToBuffer()
 	{
-		_database.Xdr.Write(IscCodes.op_allocate_statement);
+		_database.Xdr.WriteBytes(bufOpAllocStatement);
 		_database.Xdr.Write(_database.Handle);
 	}
 	protected async ValueTask SendAllocateToBufferAsync(CancellationToken cancellationToken = default)
 	{
-		await _database.Xdr.WriteAsync(IscCodes.op_allocate_statement, cancellationToken).ConfigureAwait(false);
+		await _database.Xdr.WriteBytesAsync(bufOpAllocStatement, 4, cancellationToken).ConfigureAwait(false);
 		await _database.Xdr.WriteAsync(_database.Handle, cancellationToken).ConfigureAwait(false);
 	}
 
@@ -763,18 +778,34 @@ internal class GdsStatement : StatementBase
 	#endregion
 
 	#region op_execute/op_execute2 methods
+
+	private static readonly byte[] zeroIntBuf = TypeEncoder.EncodeInt32(0);
+	private static readonly byte[] oneIntBuf = TypeEncoder.EncodeInt32(1);
+	private static readonly byte[] bufOpEx1 = TypeEncoder.EncodeInt32(IscCodes.op_execute);
+	private static readonly byte[] bufOpEx2 = TypeEncoder.EncodeInt32(IscCodes.op_execute2);
+	private static readonly byte[] bufOpFetch = TypeEncoder.EncodeInt32(IscCodes.op_fetch);
+	private static readonly byte[] bufOpPrepare = TypeEncoder.EncodeInt32(IscCodes.op_prepare_statement);
+	private static readonly byte[] bufOpInfoSql = TypeEncoder.EncodeInt32(IscCodes.op_info_sql);
+	private static readonly byte[] bufOpFreeStatement = TypeEncoder.EncodeInt32(IscCodes.op_free_statement);
+	private static readonly byte[] bufOpAllocStatement = TypeEncoder.EncodeInt32(IscCodes.op_allocate_statement);
+	private static readonly byte[] bufPrepareInfoSize = TypeEncoder.EncodeInt32(IscCodes.PREPARE_INFO_BUFFER_SIZE);
+
 	protected virtual void SendExecuteToBuffer(int timeout, IDescriptorFiller descriptorFiller)
 	{
+		ReadOnlySpan<byte> boe1 = bufOpEx1;
+		ReadOnlySpan<byte> boe2 = bufOpEx2;
+		ReadOnlySpan<byte> bzero = zeroIntBuf;
+		ReadOnlySpan<byte> bone = oneIntBuf;
 		// this may throw error, so it needs to be before any writing
 		var parametersData = GetParameterData(descriptorFiller, 0);
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
-			_database.Xdr.Write(IscCodes.op_execute2);
+			_database.Xdr.WriteBytes(boe2);
 		}
 		else
 		{
-			_database.Xdr.Write(IscCodes.op_execute);
+			_database.Xdr.WriteBytes(boe1);
 		}
 
 		_database.Xdr.Write(_handle);
@@ -783,21 +814,21 @@ internal class GdsStatement : StatementBase
 		if (_parameters != null)
 		{
 			_database.Xdr.WriteBuffer(_parameters.ToBlr().Data);
-			_database.Xdr.Write(0); // Message number
-			_database.Xdr.Write(1); // Number of messages
+			_database.Xdr.WriteBytes(bzero); // Message number
+			_database.Xdr.WriteBytes(bone); // Number of messages
 			_database.Xdr.WriteBytes(parametersData, parametersData.Length);
 		}
 		else
 		{
 			_database.Xdr.WriteBuffer(null);
-			_database.Xdr.Write(0);
-			_database.Xdr.Write(0);
+			_database.Xdr.WriteBytes(bzero);
+			_database.Xdr.WriteBytes(bzero);
 		}
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
 			_database.Xdr.WriteBuffer(_fields?.ToBlr().Data);
-			_database.Xdr.Write(0); // Output message number
+			_database.Xdr.WriteBytes(bzero);
 		}
 	}
 	protected virtual async ValueTask SendExecuteToBufferAsync(int timeout, IDescriptorFiller descriptorFiller, CancellationToken cancellationToken = default)
@@ -807,11 +838,11 @@ internal class GdsStatement : StatementBase
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_execute2, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpEx2, 4, cancellationToken).ConfigureAwait(false);
 		}
 		else
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_execute, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpEx1, 4, cancellationToken).ConfigureAwait(false);
 		}
 
 		await _database.Xdr.WriteAsync(_handle, cancellationToken).ConfigureAwait(false);
@@ -820,27 +851,27 @@ internal class GdsStatement : StatementBase
 		if (_parameters != null)
 		{
 			await _database.Xdr.WriteBufferAsync(_parameters.ToBlr().Data, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // Message number
-			await _database.Xdr.WriteAsync(1, cancellationToken).ConfigureAwait(false); // Number of messages
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false); // Message number
+			await _database.Xdr.WriteBytesAsync(oneIntBuf, 4, cancellationToken).ConfigureAwait(false); // Number of messages
 			await _database.Xdr.WriteBytesAsync(parametersData, parametersData.Length, cancellationToken).ConfigureAwait(false);
 		}
 		else
 		{
 			await _database.Xdr.WriteBufferAsync(null, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
 		}
 
 		if (StatementType == DbStatementType.StoredProcedure)
 		{
 			await _database.Xdr.WriteBufferAsync(_fields?.ToBlr().Data, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false); // Output message number
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false); // Output message number
 		}
 	}
 
-	protected void ProcessExecuteResponse(GenericResponse response)
+	protected static void ProcessExecuteResponse(GenericResponse response)
 	{ }
-	protected ValueTask ProcessExecuteResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
+	protected static ValueTask ProcessExecuteResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
 		return ValueTask.CompletedTask;
 	}
@@ -1033,7 +1064,7 @@ internal class GdsStatement : StatementBase
 		}
 		return rowDescs;
 	}
-	protected async ValueTask<Descriptor[]> ParseTruncSqlInfoAsync(byte[] info, byte[] items, Descriptor[] rowDescs, CancellationToken cancellationToken = default)
+	private Descriptor[] ParseTruncSqlInfoSpan(ReadOnlySpan<byte> info, ReadOnlySpan<byte> items, Descriptor[] rowDescs)
 	{
 		var currentPosition = 0;
 		var currentDescriptorIndex = -1;
@@ -1068,11 +1099,12 @@ internal class GdsStatement : StatementBase
 							newItems.Add(items[i]);
 						}
 
-						info = await GetSqlInfoAsync(newItems.ToArray(), info.Length, cancellationToken).ConfigureAwait(false);
+						var refreshed = GetSqlInfo(newItems.ToArray(), info.Length);
+						info = refreshed;
 
 						currentPosition = 0;
 						currentDescriptorIndex = -1;
-						goto Break;
+						goto BreakSpan;
 
 					case IscCodes.isc_info_sql_select:
 					case IscCodes.isc_info_sql_bind:
@@ -1091,7 +1123,7 @@ internal class GdsStatement : StatementBase
 							if (n == 0)
 							{
 								currentPosition += len;
-								goto Break;
+								goto BreakSpan;
 							}
 						}
 						currentPosition += len;
@@ -1135,37 +1167,172 @@ internal class GdsStatement : StatementBase
 					case IscCodes.isc_info_sql_field:
 						len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 						currentPosition += 2;
-						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = _database.Charset.GetString(info, currentPosition, len);
+						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = _database.Charset.GetString(info.Slice(currentPosition, len));
 						currentPosition += len;
 						break;
 
 					case IscCodes.isc_info_sql_relation:
 						len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 						currentPosition += 2;
-						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = _database.Charset.GetString(info, currentPosition, len);
+						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = _database.Charset.GetString(info.Slice(currentPosition, len));
 						currentPosition += len;
 						break;
 
 					case IscCodes.isc_info_sql_owner:
 						len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 						currentPosition += 2;
-						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = _database.Charset.GetString(info, currentPosition, len);
+						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = _database.Charset.GetString(info.Slice(currentPosition, len));
 						currentPosition += len;
 						break;
 
 					case IscCodes.isc_info_sql_alias:
 						len = (int)IscHelper.VaxInteger(info, currentPosition, 2);
 						currentPosition += 2;
-						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = _database.Charset.GetString(info, currentPosition, len);
+						rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = _database.Charset.GetString(info.Slice(currentPosition, len));
 						currentPosition += len;
 						break;
 
 					default:
 						throw IscException.ForErrorCode(IscCodes.isc_dsql_sqlda_err);
+								}
+						}
+				// just to get out of the loop
+				BreakSpan:
+						{ }
+				}
+				return rowDescs;
+		}
+
+	private ValueTask<Descriptor[]> ParseTruncSqlInfoAsync(byte[] info, ReadOnlyMemory<byte> items, Descriptor[] rowDescs, CancellationToken cancellationToken) =>		
+		ParseTruncSqlInfoSpanAsync(info.AsMemory(), items, rowDescs, cancellationToken);
+
+	private async ValueTask<Descriptor[]> ParseTruncSqlInfoSpanAsync(ReadOnlyMemory<byte> info, ReadOnlyMemory<byte> items, Descriptor[] rowDescs, CancellationToken cancellationToken)
+	{
+		var currentPosition = 0;
+		var currentDescriptorIndex = -1;
+		var currentItemIndex = 0;
+		while(info.Span[currentPosition] != IscCodes.isc_info_end) {
+			byte item;
+			while((item = info.Span[currentPosition++]) != IscCodes.isc_info_sql_describe_end) {
+				switch(item) {
+				case IscCodes.isc_info_truncated:
+					currentItemIndex--;
+
+					var newItems = new List<byte>(items.Length);
+					var part = 0;
+					var chock = 0;
+					for(var i = 0; i < items.Length; i++) {
+						if(items.Span[i] == IscCodes.isc_info_sql_describe_end) {
+							newItems.Insert(chock, IscCodes.isc_info_sql_sqlda_start);
+							newItems.Insert(chock + 1, 2);
+
+							var processedItems = (rowDescs[part] != null ? rowDescs[part].Count : (short)0);
+							newItems.Insert(chock + 2, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) & 255));
+							newItems.Insert(chock + 3, (byte)((part == currentDescriptorIndex ? currentItemIndex : processedItems) >> 8));
+
+							part++;
+							chock = i + 4 + 1;
+						}
+						newItems.Add(items.Span[i]);
+					}
+
+					var refreshed = await GetSqlInfoAsync(newItems.ToArray(), info.Length, cancellationToken).ConfigureAwait(false);
+					info = refreshed;
+
+					currentPosition = 0;
+					currentDescriptorIndex = -1;
+					goto BreakAsync;
+
+				case IscCodes.isc_info_sql_select:
+				case IscCodes.isc_info_sql_bind:
+					currentDescriptorIndex++;
+
+					if(info.Span[currentPosition] == IscCodes.isc_info_truncated)
+						break;
+
+					currentPosition++;
+					var len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					if(rowDescs[currentDescriptorIndex] == null) {
+						var n = IscHelper.VaxInteger(info.Span, currentPosition, len);
+						rowDescs[currentDescriptorIndex] = new Descriptor((short)n);
+						if(n == 0) {
+							currentPosition += len;
+							goto BreakAsync;
+						}
+					}
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_sqlda_seq:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					currentItemIndex = (int)IscHelper.VaxInteger(info.Span, currentPosition, len);
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_type:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].DataType = (short)IscHelper.VaxInteger(info.Span, currentPosition, len);
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_sub_type:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].SubType = (short)IscHelper.VaxInteger(info.Span, currentPosition, len);
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_scale:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].NumericScale = (short)IscHelper.VaxInteger(info.Span, currentPosition, len);
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_length:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].Length = (short)IscHelper.VaxInteger(info.Span, currentPosition, len);
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_field:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].Name = _database.Charset.GetString(info.Span.Slice(currentPosition, len));
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_relation:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].Relation = _database.Charset.GetString(info.Span.Slice(currentPosition, len));
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_owner:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].Owner = _database.Charset.GetString(info.Span.Slice(currentPosition, len));
+					currentPosition += len;
+					break;
+
+				case IscCodes.isc_info_sql_alias:
+					len = (int)IscHelper.VaxInteger(info.Span, currentPosition, 2);
+					currentPosition += 2;
+					rowDescs[currentDescriptorIndex][currentItemIndex - 1].Alias = _database.Charset.GetString(info.Span.Slice(currentPosition, len));
+					currentPosition += len;
+					break;
+
+				default:
+					throw IscException.ForErrorCode(IscCodes.isc_dsql_sqlda_err);
 				}
 			}
 			// just to get out of the loop
-			Break:
+			BreakAsync:
 			{ }
 		}
 		return rowDescs;
@@ -1222,7 +1389,7 @@ internal class GdsStatement : StatementBase
 		}
 	}
 
-	protected void WriteRawParameter(IXdrWriter xdr, DbField field)
+	protected static void WriteRawParameter(IXdrWriter xdr, DbField field)
 	{
 		if (field.DbDataType != DbDataType.Null)
 		{
@@ -1235,23 +1402,38 @@ internal class GdsStatement : StatementBase
 					{
 						xdr.WriteOpaque(field.DbValue.GetBinary(), field.Length);
 					}
-					else if (field.Charset.IsNoneCharset)
-					{
-						var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
-						if (bvalue.Length > field.Length)
-						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-						}
-						xdr.WriteOpaque(bvalue, field.Length);
-					}
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunes().Count() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
-						xdr.WriteOpaque(field.Charset.GetBytes(svalue), field.Length);
+						var encoding = field.Charset.Encoding;
+						var byteCount = encoding.GetByteCount(svalue);
+						if (byteCount > field.Length)
+						{
+							throw IscException.ForErrorCodes([IscCodes.isc_arith_except, IscCodes.isc_string_truncation]);
+					}
+						Span<byte> stack = byteCount <= 512 ? stackalloc byte[byteCount] : Span<byte>.Empty;
+						if (!stack.IsEmpty)
+						{
+							encoding.GetBytes(svalue.AsSpan(), stack);
+							xdr.WriteOpaque(stack, field.Length);
+						}
+					else
+					{
+							var rented = System.Buffers.ArrayPool<byte>.Shared.Rent(byteCount);
+							try
+						{
+								var written = encoding.GetBytes(svalue, 0, svalue.Length, rented, 0);
+								xdr.WriteOpaque(rented.AsSpan(0, written), field.Length);
+						}
+							finally
+							{
+								System.Buffers.ArrayPool<byte>.Shared.Return(rented);
+					}
+						}
 					}
 					break;
 
@@ -1260,23 +1442,34 @@ internal class GdsStatement : StatementBase
 					{
 						xdr.WriteBuffer(field.DbValue.GetBinary());
 					}
-					else if (field.Charset.IsNoneCharset)
-					{
-						var bvalue = field.Charset.GetBytes(field.DbValue.GetString());
-						if (bvalue.Length > field.Length)
-						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-						}
-						xdr.WriteBuffer(bvalue);
-					}
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunes().Count() > field.CharCount)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							throw IscException.ForErrorCodes([IscCodes.isc_arith_except, IscCodes.isc_string_truncation]);
 						}
-						xdr.WriteBuffer(field.Charset.GetBytes(svalue));
+						var encoding = field.Charset.Encoding;
+						var byteCount = encoding.GetByteCount(svalue);
+						Span<byte> stack = byteCount <= 512 ? stackalloc byte[byteCount] : Span<byte>.Empty;
+						if (!stack.IsEmpty)
+						{
+							encoding.GetBytes(svalue.AsSpan(), stack);
+							xdr.WriteBuffer(stack);
+					}
+					else
+					{
+							var rented = System.Buffers.ArrayPool<byte>.Shared.Rent(byteCount);
+							try
+							{
+								var written = encoding.GetBytes(svalue, 0, svalue.Length, rented, 0);
+								xdr.WriteBuffer(rented.AsSpan(0, written));
+							}
+							finally
+						{
+								System.Buffers.ArrayPool<byte>.Shared.Return(rented);
+							}
+						}
 					}
 					break;
 
@@ -1370,7 +1563,7 @@ internal class GdsStatement : StatementBase
 			}
 		}
 	}
-	protected async ValueTask WriteRawParameterAsync(IXdrWriter xdr, DbField field, CancellationToken cancellationToken = default)
+	protected static async ValueTask WriteRawParameterAsync(IXdrWriter xdr, DbField field, CancellationToken cancellationToken = default)
 	{
 		if (field.DbDataType != DbDataType.Null)
 		{
@@ -1383,23 +1576,31 @@ internal class GdsStatement : StatementBase
 					{
 						await xdr.WriteOpaqueAsync(await field.DbValue.GetBinaryAsync(cancellationToken).ConfigureAwait(false), field.Length, cancellationToken).ConfigureAwait(false);
 					}
-					else if (field.Charset.IsNoneCharset)
-					{
-						var bvalue = field.Charset.GetBytes(await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false));
-						if (bvalue.Length > field.Length)
-						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-						}
-						await xdr.WriteOpaqueAsync(bvalue, field.Length, cancellationToken).ConfigureAwait(false);
-					}
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunes().Count() > field.CharCount)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							throw IscException.ForErrorCodes([IscCodes.isc_arith_except, IscCodes.isc_string_truncation]);
 						}
-						await xdr.WriteOpaqueAsync(field.Charset.GetBytes(svalue), field.Length, cancellationToken).ConfigureAwait(false);
+						var encoding = field.Charset.Encoding;
+						var byteCount = encoding.GetByteCount(svalue);
+						if (byteCount > field.Length)
+						{
+							throw IscException.ForErrorCodes([IscCodes.isc_arith_except, IscCodes.isc_string_truncation]);
+					}
+						{
+							var rented = System.Buffers.ArrayPool<byte>.Shared.Rent(byteCount);
+							try
+					{
+								var written = encoding.GetBytes(svalue, 0, svalue.Length, rented, 0);
+								await xdr.WriteOpaqueAsync(rented.AsMemory(0, written), written, cancellationToken).ConfigureAwait(false);
+							}
+							finally
+						{
+								System.Buffers.ArrayPool<byte>.Shared.Return(rented);
+							}
+						}
 					}
 					break;
 
@@ -1408,23 +1609,27 @@ internal class GdsStatement : StatementBase
 					{
 						await xdr.WriteBufferAsync(await field.DbValue.GetBinaryAsync(cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
 					}
-					else if (field.Charset.IsNoneCharset)
-					{
-						var bvalue = field.Charset.GetBytes(await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false));
-						if (bvalue.Length > field.Length)
-						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
-						}
-						await xdr.WriteBufferAsync(bvalue, cancellationToken).ConfigureAwait(false);
-					}
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunes().Count() > field.CharCount)
 						{
-							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
+							throw IscException.ForErrorCodes([IscCodes.isc_arith_except, IscCodes.isc_string_truncation]);
 						}
-						await xdr.WriteBufferAsync(field.Charset.GetBytes(svalue), cancellationToken).ConfigureAwait(false);
+						var encoding = field.Charset.Encoding;
+						var byteCount = encoding.GetByteCount(svalue);
+						{
+							var rented = System.Buffers.ArrayPool<byte>.Shared.Rent(byteCount);
+							try
+					{
+								var written = encoding.GetBytes(svalue, 0, svalue.Length, rented, 0);
+								await xdr.WriteBufferAsync(rented.AsMemory(0, written), cancellationToken).ConfigureAwait(false);
+							}
+							finally
+						{
+								System.Buffers.ArrayPool<byte>.Shared.Return(rented);
+							}
+						}
 					}
 					break;
 

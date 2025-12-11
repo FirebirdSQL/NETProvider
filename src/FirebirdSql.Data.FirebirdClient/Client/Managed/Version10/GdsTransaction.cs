@@ -450,7 +450,7 @@ internal class GdsTransaction : TransactionBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{
@@ -478,7 +478,7 @@ internal class GdsTransaction : TransactionBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			response.Data.AsSpan().Slice(0, responseLength).CopyTo(buffer.AsSpan(0, responseLength));
 		}
 		catch (IOException ex)
 		{

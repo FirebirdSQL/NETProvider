@@ -87,6 +87,33 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		var dataLength = ReadFromInputBuffer(buffer, offset, count);
 		return dataLength;
 	}
+
+	public int Read(Span<byte> buffer, int offset, int count)
+	{
+		if (_inputBuffer.Count < count) {
+			var readBuffer = _readBuffer;
+			int read;
+			try {
+				read = _dataProvider.Read(readBuffer, 0, readBuffer.Length);
+			}
+			catch (IOException) {
+				IOFailed = true;
+				throw;
+			}
+			if (read != 0) {
+				if (_decryptor != null) {
+					_decryptor.ProcessBytes(readBuffer, 0, read, readBuffer, 0);
+				}
+				if (_decompressor != null) {
+					read = HandleDecompression(readBuffer, read);
+					readBuffer = _compressionBuffer;
+				}
+				WriteToInputBuffer(readBuffer, read);
+			}
+		}
+		var dataLength = ReadFromInputBuffer(buffer, offset, count);
+		return dataLength;
+	}
 	public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
 		if (_inputBuffer.Count < count)
@@ -120,6 +147,24 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		return dataLength;
 	}
 
+    public async ValueTask<int> ReadAsync(Memory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
+    {
+        var rented = new byte[count];
+        try
+        {
+            var read = await ReadAsync(rented, 0, count, cancellationToken).ConfigureAwait(false);
+            rented.AsSpan(0, read).CopyTo(buffer.Span.Slice(offset, read));
+            return read;
+        }
+        finally { }
+    }
+
+	public void Write(ReadOnlySpan<byte> buffer)
+	{
+		foreach (var b in buffer)
+			_outputBuffer.Enqueue(b);
+	}
+
 	public void Write(byte[] buffer, int offset, int count)
 	{
 		for (var i = offset; i < count; i++)
@@ -130,6 +175,14 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		for (var i = offset; i < count; i++)
 			_outputBuffer.Enqueue(buffer[offset + i]);
 		return ValueTask.CompletedTask;
+	}
+
+	public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
+	{
+		var span = buffer.Span.Slice(offset, count);
+		foreach (var b in span)
+			_outputBuffer.Enqueue(b);
+		return ValueTask2.CompletedTask;
 	}
 
 	public void Flush()
@@ -202,6 +255,15 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		for (var i = 0; i < read; i++)
 		{
 			buffer[offset + i] = _inputBuffer.Dequeue();
+		}
+		return read;
+	}
+
+	int ReadFromInputBuffer(Span<byte> buffer, int offset, int count)
+	{
+		var read = Math.Min(count, _inputBuffer.Count);
+		for (var i = 0; i < read; i++) {
+			buffer[offset+i] = _inputBuffer.Dequeue();
 		}
 		return read;
 	}

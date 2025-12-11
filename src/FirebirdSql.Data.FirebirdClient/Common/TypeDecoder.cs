@@ -98,13 +98,17 @@ internal static class TypeDecoder
 		return value[0] != 0;
 	}
 
+	public static bool DecodeBoolean(ReadOnlySpan<byte> value)
+	{
+		return value[0] != 0;
+	}
+
 	public static Guid DecodeGuid(byte[] value)
 	{
 		var a = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));
 		var b = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value, 4));
 		var c = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value, 6));
-		var d = new[] { value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15] };
-		return new Guid(a, b, c, d);
+		return new Guid(a, b, c, value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15]);
 	}
 
 	public static int DecodeInt32(byte[] value)

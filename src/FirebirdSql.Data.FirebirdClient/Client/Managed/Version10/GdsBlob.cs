@@ -28,6 +28,12 @@ internal sealed class GdsBlob : BlobBase
 	const int DataSegment = 0;
 	const int SeekMode = 0;
 
+	private static readonly byte[] zeroIntBuf = TypeEncoder.EncodeInt32(0);
+	private static readonly byte[] bufOpInfoBlob = TypeEncoder.EncodeInt32(IscCodes.op_info_blob);
+	private static readonly byte[] bufOpGetSegment = TypeEncoder.EncodeInt32(IscCodes.op_get_segment);
+	private static readonly byte[] bufOpBatchSegments = TypeEncoder.EncodeInt32(IscCodes.op_batch_segments);
+	private static readonly byte[] bufOpSeekBlob = TypeEncoder.EncodeInt32(IscCodes.op_seek_blob);
+
 	#region Fields
 
 	private readonly GdsDatabase _database;
@@ -125,12 +131,11 @@ internal sealed class GdsBlob : BlobBase
 				Open();
 
 			var bufferLength = 20;
-			var buffer = new byte[bufferLength];
 
-			_database.Xdr.Write(IscCodes.op_info_blob);
+			_database.Xdr.WriteBytes(bufOpInfoBlob);
 			_database.Xdr.Write(_blobHandle);
-			_database.Xdr.Write(0);
-			_database.Xdr.WriteBuffer(new byte[] { IscCodes.isc_info_blob_total_length }, 1);
+			_database.Xdr.WriteBytes(zeroIntBuf);
+			_database.Xdr.WriteBuffer([IscCodes.isc_info_blob_total_length], 1);
 			_database.Xdr.Write(bufferLength);
 
 			_database.Xdr.Flush();
@@ -144,7 +149,7 @@ internal sealed class GdsBlob : BlobBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			var buffer = response.Data.AsSpan()[..responseLength];
 
 			var length = IscHelper.VaxInteger(buffer, 1, 2);
 			var size = IscHelper.VaxInteger(buffer, 3, (int)length);
@@ -165,12 +170,11 @@ internal sealed class GdsBlob : BlobBase
 				await OpenAsync(cancellationToken).ConfigureAwait(false);
 
 			var bufferLength = 20;
-			var buffer = new byte[bufferLength];
 
-			await _database.Xdr.WriteAsync(IscCodes.op_info_blob, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpInfoBlob, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(0, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteBufferAsync(new byte[] { IscCodes.isc_info_blob_total_length }, 1, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBufferAsync([IscCodes.isc_info_blob_total_length], 1, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(bufferLength, cancellationToken).ConfigureAwait(false);
 
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -184,7 +188,7 @@ internal sealed class GdsBlob : BlobBase
 				responseLength = response.Data.Length;
 			}
 
-			Buffer.BlockCopy(response.Data, 0, buffer, 0, responseLength);
+			var buffer = response.Data.AsSpan()[..responseLength];
 
 			var length = IscHelper.VaxInteger(buffer, 1, 2);
 			var size = IscHelper.VaxInteger(buffer, 3, (int)length);
@@ -203,10 +207,10 @@ internal sealed class GdsBlob : BlobBase
 
 		try
 		{
-			_database.Xdr.Write(IscCodes.op_get_segment);
+			_database.Xdr.WriteBytes(bufOpGetSegment);
 			_database.Xdr.Write(_blobHandle);
 			_database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
-			_database.Xdr.Write(DataSegment);
+			_database.Xdr.WriteBytes(zeroIntBuf);
 			_database.Xdr.Flush();
 
 			var response = (GenericResponse)_database.ReadResponse();
@@ -221,7 +225,7 @@ internal sealed class GdsBlob : BlobBase
 				RblAddValue(IscCodes.RBL_eof_pending);
 			}
 
-			var buffer = response.Data;
+			var buffer = response.Data.AsSpan();
 
 			if (buffer.Length == 0)
 			{
@@ -233,11 +237,11 @@ internal sealed class GdsBlob : BlobBase
 			var srcpos = 0;
 
 			while (srcpos < buffer.Length)
-			{
+				{ 
 				len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
 				srcpos += 2;
 
-				stream.Write(buffer, srcpos, len);
+				stream.Write(buffer.Slice(srcpos, len));
 				srcpos += len;
 			}
 		}
@@ -252,10 +256,10 @@ internal sealed class GdsBlob : BlobBase
 
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_get_segment, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpGetSegment, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(DataSegment, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(zeroIntBuf, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
 			var response = (GenericResponse)await _database.ReadResponseAsync(cancellationToken).ConfigureAwait(false);
@@ -270,7 +274,7 @@ internal sealed class GdsBlob : BlobBase
 				RblAddValue(IscCodes.RBL_eof_pending);
 			}
 
-			var buffer = response.Data;
+			var buffer = response.Data.AsSpan();
 
 			if (buffer.Length == 0)
 			{
@@ -282,11 +286,11 @@ internal sealed class GdsBlob : BlobBase
 			var srcpos = 0;
 
 			while (srcpos < buffer.Length)
-			{
+				{
 				len = (int)IscHelper.VaxInteger(buffer, srcpos, 2);
 				srcpos += 2;
 
-				stream.Write(buffer, srcpos, len);
+				stream.Write(buffer.Slice(srcpos, len));
 				srcpos += len;
 			}
 		}
@@ -320,7 +324,7 @@ internal sealed class GdsBlob : BlobBase
 				RblAddValue(IscCodes.RBL_eof_pending);
 			}
 
-			var buffer = response.Data;
+			var buffer = response.Data.AsSpan();
 
 			if (buffer.Length == 0)
 			{
@@ -333,11 +337,11 @@ internal sealed class GdsBlob : BlobBase
 
 			var tmp = new byte[requested * 2];
 			while (posInInput < buffer.Length)
-			{
+				{
 				var len = (int)IscHelper.VaxInteger(buffer, posInInput, 2);
 				posInInput += 2;
 
-				Array.Copy(buffer, posInInput, tmp, posInOutput, len);
+				buffer.Slice(posInInput, len).CopyTo(tmp.AsSpan(posInOutput, len));
 				posInOutput += len;
 				posInInput += len;
 			}
@@ -358,7 +362,7 @@ internal sealed class GdsBlob : BlobBase
 
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_get_segment, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpGetSegment, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(DataSegment, cancellationToken).ConfigureAwait(false);
@@ -376,7 +380,7 @@ internal sealed class GdsBlob : BlobBase
 				RblAddValue(IscCodes.RBL_eof_pending);
 			}
 
-			var buffer = response.Data;
+			var buffer = response.Data.AsSpan();
 
 			if (buffer.Length == 0)
 			{
@@ -389,11 +393,11 @@ internal sealed class GdsBlob : BlobBase
 
 			var tmp = new byte[requested * 2];
 			while (posInInput < buffer.Length)
-			{
+				{
 				var len = (int)IscHelper.VaxInteger(buffer, posInInput, 2);
 				posInInput += 2;
 
-				Array.Copy(buffer, posInInput, tmp, posInOutput, len);
+				buffer.Slice(posInInput, len).CopyTo(tmp.AsSpan(posInOutput, len));
 				posInOutput += len;
 				posInInput += len;
 			}
@@ -413,7 +417,7 @@ internal sealed class GdsBlob : BlobBase
 	{
 		try
 		{
-			_database.Xdr.Write(IscCodes.op_batch_segments);
+			_database.Xdr.WriteBytes(bufOpBatchSegments);
 			_database.Xdr.Write(_blobHandle);
 			_database.Xdr.WriteBlobBuffer(buffer);
 			_database.Xdr.Flush();
@@ -429,7 +433,7 @@ internal sealed class GdsBlob : BlobBase
 	{
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_batch_segments, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpBatchSegments, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteBlobBufferAsync(buffer, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -446,7 +450,7 @@ internal sealed class GdsBlob : BlobBase
 	{
 		try
 		{
-			_database.Xdr.Write(IscCodes.op_seek_blob);
+			_database.Xdr.WriteBytes(bufOpSeekBlob);
 			_database.Xdr.Write(_blobHandle);
 			_database.Xdr.Write(seekMode);
 			_database.Xdr.Write(offset);
@@ -465,7 +469,7 @@ internal sealed class GdsBlob : BlobBase
 	{
 		try
 		{
-			await _database.Xdr.WriteAsync(IscCodes.op_seek_blob, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteBytesAsync(bufOpSeekBlob, 4, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(seekMode, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(offset, cancellationToken).ConfigureAwait(false);
