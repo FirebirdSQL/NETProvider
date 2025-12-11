@@ -52,7 +52,7 @@ internal class GdsServiceManager : Version12.GdsServiceManager
 				var genericResponse = (GenericResponse)response;
 				base.ProcessAttachResponse(genericResponse);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					Database.AuthBlock.SendWireCryptToBuffer();
 					Database.Xdr.Flush();
@@ -98,7 +98,7 @@ internal class GdsServiceManager : Version12.GdsServiceManager
 				var genericResponse = (GenericResponse)response;
 				await base.ProcessAttachResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					await Database.AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 					await Database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);

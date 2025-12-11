@@ -51,7 +51,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 				var genericResponse = (GenericResponse)response;
 				ProcessAttachResponse(genericResponse);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					AuthBlock.SendWireCryptToBuffer();
 					Xdr.Flush();
@@ -100,7 +100,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 				var genericResponse = (GenericResponse)response;
 				await ProcessAttachResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -183,7 +183,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 				var genericResponse = (GenericResponse)response;
 				ProcessCreateResponse(genericResponse);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					AuthBlock.SendWireCryptToBuffer();
 					Xdr.Flush();
@@ -223,7 +223,7 @@ internal class GdsDatabase : Version12.GdsDatabase
 				var genericResponse = (GenericResponse)response;
 				await ProcessCreateResponseAsync(genericResponse, cancellationToken).ConfigureAwait(false);
 
-				if (genericResponse.Data.Any())
+				if (genericResponse.Data.Length > 0)
 				{
 					await AuthBlock.SendWireCryptToBufferAsync(cancellationToken).ConfigureAwait(false);
 					await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
