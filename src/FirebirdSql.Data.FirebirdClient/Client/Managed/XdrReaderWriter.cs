@@ -446,13 +446,13 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public bool ReadBoolean()
 	{
-		Span<byte> bytes = stackalloc byte[1];
-		ReadOpaque(bytes, 1);
+		Span<byte> bytes = stackalloc byte[4];
+		ReadBytes(bytes, 4);
 		return TypeDecoder.DecodeBoolean(bytes);
 	}
 	public async ValueTask<bool> ReadBooleanAsync(CancellationToken cancellationToken = default)
 	{
-		await ReadOpaqueAsync(_boolbuffer, 1, cancellationToken).ConfigureAwait(false);
+		await ReadBytesAsync(_boolbuffer, 4, cancellationToken).ConfigureAwait(false);
 		return TypeDecoder.DecodeBoolean(_boolbuffer);
 	}
 
