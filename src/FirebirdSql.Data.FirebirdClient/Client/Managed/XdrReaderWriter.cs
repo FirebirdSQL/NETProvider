@@ -34,7 +34,6 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	readonly Charset _charset;
 
 	byte[] _smallBuffer;
-	byte[] _boolbuffer;
 	const int StackallocThreshold = 1024;
 
 	public XdrReaderWriter(IDataProvider dataProvider, Charset charset)
@@ -43,7 +42,6 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		_charset = charset;
 
 		_smallBuffer = new byte[8];
-		_boolbuffer = new byte[1];
 	}
 
 	public XdrReaderWriter(IDataProvider dataProvider)
@@ -452,8 +450,8 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	}
 	public async ValueTask<bool> ReadBooleanAsync(CancellationToken cancellationToken = default)
 	{
-		await ReadBytesAsync(_boolbuffer, 4, cancellationToken).ConfigureAwait(false);
-		return TypeDecoder.DecodeBoolean(_boolbuffer);
+		await ReadBytesAsync(_smallBuffer, 4, cancellationToken).ConfigureAwait(false);
+		return TypeDecoder.DecodeBoolean(_smallBuffer);
 	}
 
 	public FbZonedDateTime ReadZonedDateTime(bool isExtended)
