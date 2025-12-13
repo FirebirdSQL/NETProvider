@@ -52,7 +52,7 @@ sealed class AuthBlock
 
 	public bool WireCryptInitialized { get; private set; }
 
-	private const int STACKALLOC_LIMIT = 512;
+	private const byte SEPARATOR_BYTE = (byte)',';
 
 	public AuthBlock(GdsConnection connection, string user, string password, WireCryptOption wireCrypt)
 	{
@@ -70,164 +70,70 @@ sealed class AuthBlock
 	{
 		using (var result = new MemoryStream(256))
 		{
-			{
-				var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
-				var slen = Encoding.UTF8.GetByteCount(userString);
-				byte[] rented = null;
-				Span<byte> user = slen > STACKALLOC_LIMIT
-					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-					: stackalloc byte[slen];
-				int real_len = Encoding.UTF8.GetBytes(userString, user);
-				result.WriteByte(IscCodes.CNCT_user);
-				result.WriteByte((byte)real_len);
-				result.Write(user);
-				if (rented != null)
-				{
-					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-				}
-			}
-
-			{
-				var hostName = Dns.GetHostName();
-				var slen = Encoding.UTF8.GetByteCount(hostName);
-				byte[] rented = null;
-				Span<byte> host = slen > STACKALLOC_LIMIT
-					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-					: stackalloc byte[slen];
-				int real_len = Encoding.UTF8.GetBytes(hostName, host);
-				result.WriteByte(IscCodes.CNCT_host);
-				result.WriteByte((byte)real_len);
-				result.Write(host);
-				if (rented != null)
-				{
-					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-				}
-			}
+			Span<byte> scratchpad = stackalloc byte[258];
+			var userString = Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER") ?? string.Empty;
+			WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_user, userString);
+			var hostName = Dns.GetHostName();
+			WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_host, hostName);
 
 			result.WriteByte(IscCodes.CNCT_user_verification);
 			result.WriteByte(0);
 
 			if (!string.IsNullOrEmpty(User))
 			{
-				{
-					var slen = Encoding.UTF8.GetByteCount(User);
-					byte[] rented = null;
-					Span<byte> bytes = slen > STACKALLOC_LIMIT
-						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-						: stackalloc byte[slen];
-					int real_len = Encoding.UTF8.GetBytes(User, bytes);
-					result.WriteByte(IscCodes.CNCT_login);
-					result.WriteByte((byte)real_len);
-					result.Write(bytes);
-					if (rented != null)
-					{
-						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-					}
-				}
-				{
-					var slen = Encoding.UTF8.GetByteCount(_srp256.Name);
-					byte[] rented = null;
-					Span<byte> bytes = slen > STACKALLOC_LIMIT
-						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-						: stackalloc byte[slen];
-					int real_len = Encoding.UTF8.GetBytes(_srp256.Name, bytes);
-					result.WriteByte(IscCodes.CNCT_plugin_name);
-					result.WriteByte((byte)real_len);
-					result.Write(bytes[..real_len]);
-					if (rented != null)
-					{
-						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-					}
-				}
-				{
-					var slen = Encoding.UTF8.GetByteCount(_srp256.PublicKeyHex);
-					byte[] rented = null;
-					Span<byte> specificData = slen > STACKALLOC_LIMIT
-						? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-						: stackalloc byte[slen];
-					Encoding.UTF8.GetBytes(_srp256.PublicKeyHex.AsSpan(), specificData);
-					WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
-					if (rented != null)
-					{
-						System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-					}
-				}
-				{
-					var slen1 = Encoding.UTF8.GetByteCount(_srp256.Name);
-					byte[] rented1 = null;
-					Span<byte> bytes1 = slen1 > STACKALLOC_LIMIT
-						? (rented1 = System.Buffers.ArrayPool<byte>.Shared.Rent(slen1)).AsSpan(0, slen1)
-						: stackalloc byte[slen1];
-					Span<byte> bytes2 = stackalloc byte[1];
-					var slen3 = Encoding.UTF8.GetByteCount(_srp.Name);
-					byte[] rented3 = null;
-					Span<byte> bytes3 = slen3 > STACKALLOC_LIMIT
-						? (rented3 = System.Buffers.ArrayPool<byte>.Shared.Rent(slen3)).AsSpan(0, slen3)
-						: stackalloc byte[slen3];
-					int l1 = Encoding.UTF8.GetBytes(_srp256.Name.AsSpan(), bytes1);
-					int l2 = Encoding.UTF8.GetBytes(",".AsSpan(), bytes2);
-					int l3 = Encoding.UTF8.GetBytes(_srp.Name.AsSpan(), bytes3);
-					result.WriteByte(IscCodes.CNCT_plugin_list);
-					result.WriteByte((byte)(l1+l2+l3));
-					result.Write(bytes1);
-					result.Write(bytes2);
-					result.Write(bytes3);
-					if (rented1 != null)
-					{
-						System.Buffers.ArrayPool<byte>.Shared.Return(rented1, clearArray: true);
-					}
-					if (rented3 != null)
-					{
-						System.Buffers.ArrayPool<byte>.Shared.Return(rented3, clearArray: true);
-					}
-				}
+				WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_login, User);
+				WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_plugin_name, _srp256.Name);
 
+				var len = Encoding.UTF8.GetBytes(_srp256.PublicKeyHex, scratchpad);
+				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, scratchpad[..len]);
+
+				WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_plugin_list, _srp256.Name, _srp.Name);
+
+				result.WriteByte(IscCodes.CNCT_client_crypt);
+				result.WriteByte(4);
+				if (!BitConverter.TryWriteBytes(scratchpad, IPAddress.NetworkToHostOrder(WireCryptOptionValue(WireCrypt))))
 				{
-					result.WriteByte(IscCodes.CNCT_client_crypt);
-					result.WriteByte(4);
-					Span<byte> bytes = stackalloc byte[4];
-					if (!BitConverter.TryWriteBytes(bytes, IPAddress.NetworkToHostOrder(WireCryptOptionValue(WireCrypt))))
-					{
-						throw new InvalidOperationException("Failed to write wire crypt option bytes.");
-					}
-					result.Write(bytes);
+					throw new InvalidOperationException("Failed to write wire crypt option bytes.");
 				}
+				result.Write(scratchpad[..4]);
 			}
 			else
 			{
-				var slen = Encoding.UTF8.GetByteCount(_sspi.Name);
-				byte[] rented = null;
-				Span<byte> pluginNameBytes = slen > STACKALLOC_LIMIT
-					? (rented = System.Buffers.ArrayPool<byte>.Shared.Rent(slen)).AsSpan(0, slen)
-					: stackalloc byte[slen];
-				int pluginNameLen = Encoding.UTF8.GetBytes(_sspi.Name.AsSpan(), pluginNameBytes);
-				result.WriteByte(IscCodes.CNCT_plugin_name);
-				result.WriteByte((byte)pluginNameLen);
-				result.Write(pluginNameBytes[..pluginNameLen]);
+				WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_plugin_name, _sspi.Name);
 
 				var specificData = _sspi.InitializeClientSecurity();
 				WriteMultiPartHelper(result, IscCodes.CNCT_specific_data, specificData);
 
-				result.WriteByte(IscCodes.CNCT_plugin_list);
-				result.WriteByte((byte)pluginNameLen);
-				result.Write(pluginNameBytes[..pluginNameLen]);
+				WriteUserIdentificationParams(result, scratchpad, IscCodes.CNCT_plugin_list, _sspi.Name);
 
 				result.WriteByte(IscCodes.CNCT_client_crypt);
 				result.WriteByte(4);
-				Span<byte> wireCryptBytes = stackalloc byte[4];
-				if (!BitConverter.TryWriteBytes(wireCryptBytes, IPAddress.NetworkToHostOrder(IscCodes.WIRE_CRYPT_DISABLED)))
+				if (!BitConverter.TryWriteBytes(scratchpad, IPAddress.NetworkToHostOrder(IscCodes.WIRE_CRYPT_DISABLED)))
 				{
 					throw new InvalidOperationException("Failed to write wire crypt disabled bytes.");
 				}
-				result.Write(wireCryptBytes);
-				if (rented != null)
-				{
-					System.Buffers.ArrayPool<byte>.Shared.Return(rented, clearArray: true);
-				}
+				result.Write(scratchpad[..4]);
 			}
-
+			scratchpad.Clear();
 			return result.ToArray();
 		}
+	}
+
+	static void WriteUserIdentificationParams(MemoryStream result, Span<byte> scratchpad, byte type, params ReadOnlySpan<string> strings)
+	{
+		scratchpad[0] = type;
+		int len = 2;
+		if(strings.Length > 0)
+		{
+			len += Encoding.UTF8.GetBytes(strings[0], scratchpad[len..]);
+			for(int i = 1; i < strings.Length; i++)
+			{
+				scratchpad[len++] = SEPARATOR_BYTE;
+				len += Encoding.UTF8.GetBytes(strings[i], scratchpad[len..]);
+			}
+		}
+		scratchpad[1] = (byte)(len - 2);
+		result.Write(scratchpad[..len]);
 	}
 
 	public void SendContAuthToBuffer()
