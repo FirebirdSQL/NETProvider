@@ -408,7 +408,7 @@ internal sealed class FesStatement : StatementBase
 		{
 			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_database.Charset, outSqlda, true);
 
-			var values = new DbValue[descriptor.Count];
+			var values = descriptor.Count > 0 ? new DbValue[descriptor.Count] : Array.Empty<DbValue>();
 
 			for (var i = 0; i < values.Length; i++)
 			{
@@ -480,7 +480,7 @@ internal sealed class FesStatement : StatementBase
 		{
 			var descriptor = XsqldaMarshaler.MarshalNativeToManaged(_database.Charset, outSqlda, true);
 
-			var values = new DbValue[descriptor.Count];
+			var values = descriptor.Count > 0 ? new DbValue[descriptor.Count] : Array.Empty<DbValue>();
 
 			for (var i = 0; i < values.Length; i++)
 			{
@@ -569,7 +569,7 @@ internal sealed class FesStatement : StatementBase
 
 			_database.ProcessStatusVector(_statusVector);
 
-			var row = new DbValue[_fields.ActualCount];
+			var row = _fields.ActualCount > 0 ? new DbValue[_fields.ActualCount] : Array.Empty<DbValue>();
 			for (var i = 0; i < row.Length; i++)
 			{
 				var d = _fields[i];
@@ -639,7 +639,7 @@ internal sealed class FesStatement : StatementBase
 
 			_database.ProcessStatusVector(_statusVector);
 
-			var row = new DbValue[_fields.ActualCount];
+			var row = _fields.ActualCount > 0 ? new DbValue[_fields.ActualCount] : Array.Empty<DbValue>();
 			for (var i = 0; i < row.Length; i++)
 			{
 				var d = _fields[i];
