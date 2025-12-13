@@ -269,8 +269,9 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public int ReadInt32()
 	{
-		ReadBytes(_smallBuffer, 4);
-		return TypeDecoder.DecodeInt32(_smallBuffer);
+		Span<byte> bytes = stackalloc byte[4];
+		ReadBytes(bytes, 4);
+		return TypeDecoder.DecodeInt32(bytes);
 	}
 	public async ValueTask<int> ReadInt32Async(CancellationToken cancellationToken = default)
 	{
@@ -280,8 +281,9 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public long ReadInt64()
 	{
-		ReadBytes(_smallBuffer, 8);
-		return TypeDecoder.DecodeInt64(_smallBuffer);
+		Span<byte> bytes = stackalloc byte[8];
+		ReadBytes(bytes, 8);
+		return TypeDecoder.DecodeInt64(bytes);
 	}
 	public async ValueTask<long> ReadInt64Async(CancellationToken cancellationToken = default)
 	{

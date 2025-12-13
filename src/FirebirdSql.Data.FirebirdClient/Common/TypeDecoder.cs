@@ -124,9 +124,17 @@ internal static class TypeDecoder
 		return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));
 	}
 
+	public static int DecodeInt32(Span<byte> value) {
+		return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value));
+	}
+
 	public static long DecodeInt64(byte[] value)
 	{
 		return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(value, 0));
+	}
+
+	public static long DecodeInt64(Span<byte> value) {
+		return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(value));
 	}
 
 	public static FbDecFloat DecodeDec16(byte[] value)
