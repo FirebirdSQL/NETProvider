@@ -111,6 +111,14 @@ internal static class TypeDecoder
 		return new Guid(a, b, c, value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15]);
 	}
 
+	public static Guid DecodeGuidSpan(Span<byte> value)
+	{
+		var a = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value[..4]));
+		var b = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value[4..6]));
+		var c = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value[6..8]));
+		return new Guid(a, b, c, value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15]);
+	}
+
 	public static int DecodeInt32(byte[] value)
 	{
 		return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));

@@ -299,16 +299,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		{
 			Span<byte> buf = stackalloc byte[16];
 			ReadOpaque(buf, 16);
-			var rented = ArrayPool<byte>.Shared.Rent(16);
-			try
-			{
-				buf.CopyTo(rented);
-				return TypeDecoder.DecodeGuid(rented);
-			}
-			finally
-			{
-				ArrayPool<byte>.Shared.Return(rented);
-			}
+			return TypeDecoder.DecodeGuidSpan(buf);
 		}
 	}
 	public async ValueTask<Guid> ReadGuidAsync(int sqlType, CancellationToken cancellationToken = default)
