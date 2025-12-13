@@ -41,7 +41,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		_dataProvider = dataProvider;
 		_charset = charset;
 
-		_smallBuffer = new byte[8];
+		_smallBuffer = new byte[16];
 	}
 
 	public XdrReaderWriter(IDataProvider dataProvider)
@@ -309,17 +309,9 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 			return TypeDecoder.DecodeGuid(await ReadBufferAsync(cancellationToken).ConfigureAwait(false));
 		}
 	else
-		{
-			var rented = ArrayPool<byte>.Shared.Rent(16);
-			try
-			{
-				await ReadBytesAsync(rented, 16, cancellationToken).ConfigureAwait(false);
-				return TypeDecoder.DecodeGuid(rented);
-			}
-			finally
-			{
-				ArrayPool<byte>.Shared.Return(rented);
-			}
+		{			
+			await ReadBytesAsync(_smallBuffer, 16, cancellationToken).ConfigureAwait(false);
+			return TypeDecoder.DecodeGuid(_smallBuffer);			
 		}
 	}
 
@@ -480,56 +472,24 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public FbDecFloat ReadDec34()
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(16);
-		try
-		{
-			ReadBytes(rented, 16);
-			return TypeDecoder.DecodeDec34(rented);
-		}
-		finally
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-		}
+		ReadBytes(_smallBuffer, 16);
+		return TypeDecoder.DecodeDec34(_smallBuffer);
 	}
 	public async ValueTask<FbDecFloat> ReadDec34Async(CancellationToken cancellationToken = default)
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(16);
-		try
-		{
-			await ReadBytesAsync(rented, 16, cancellationToken).ConfigureAwait(false);
-			return TypeDecoder.DecodeDec34(rented);
-		}
-		finally
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-		}
+		await ReadBytesAsync(_smallBuffer, 16, cancellationToken).ConfigureAwait(false);
+		return TypeDecoder.DecodeDec34(_smallBuffer);
 	}
 
 	public BigInteger ReadInt128()
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(16);
-		try
-		{
-			ReadBytes(rented, 16);
-			return TypeDecoder.DecodeInt128(rented);
-		}
-		finally
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-		}
+		ReadBytes(_smallBuffer, 16);
+		return TypeDecoder.DecodeInt128(_smallBuffer);
 	}
 	public async ValueTask<BigInteger> ReadInt128Async(CancellationToken cancellationToken = default)
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(16);
-		try
-		{
-			await ReadBytesAsync(rented, 16, cancellationToken).ConfigureAwait(false);
-			return TypeDecoder.DecodeInt128(rented);
-		}
-		finally
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-		}
+		await ReadBytesAsync(_smallBuffer, 16, cancellationToken).ConfigureAwait(false);
+		return TypeDecoder.DecodeInt128(_smallBuffer);
 	}
 
 	public IscException ReadStatusVector()
