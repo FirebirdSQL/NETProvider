@@ -1026,48 +1026,42 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		return ReturnAfter(task, rented);
 	}
 
-	public void Write(float value)
+	static int Float2Int(float value)
 	{
-		Span<byte> buffer = stackalloc byte[4];
-		if (!BitConverter.TryWriteBytes(buffer, value))
+		Span<byte> bytes = stackalloc byte[4];
+		if (!BitConverter.TryWriteBytes(bytes, value))
 		{
 			throw new InvalidOperationException("Failed to write Single bytes.");
 		}
-		Write(BitConverter.ToInt32(buffer));
+		return BitConverter.ToInt32(bytes);
+	}
+
+	public void Write(float value)
+	{
+		Write(Float2Int(value));
 	}
 	public ValueTask WriteAsync(float value, CancellationToken cancellationToken = default)
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(4);
-		if (!BitConverter.TryWriteBytes(rented, value))
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-			throw new InvalidOperationException("Failed to write Single bytes.");
-		}
-		var intVal = BitConverter.ToInt32(rented, 0);
-		ArrayPool<byte>.Shared.Return(rented);
-		return WriteAsync(intVal, cancellationToken);
+		return WriteAsync(Float2Int(value), cancellationToken);
 	}
 
-	public void Write(double value)
+	static long Double2Long(double value)
 	{
 		Span<byte> buffer = stackalloc byte[8];
 		if (!BitConverter.TryWriteBytes(buffer, value))
 		{
 			throw new InvalidOperationException("Failed to write Double bytes.");
 		}
-		Write(BitConverter.ToInt64(buffer));
+		return BitConverter.ToInt64(buffer);
+	}
+
+	public void Write(double value)
+	{
+		Write(Double2Long(value));
 	}
 	public ValueTask WriteAsync(double value, CancellationToken cancellationToken = default)
 	{
-		var rented = ArrayPool<byte>.Shared.Rent(8);
-		if (!BitConverter.TryWriteBytes(rented, value))
-		{
-			ArrayPool<byte>.Shared.Return(rented);
-			throw new InvalidOperationException("Failed to write Double bytes.");
-		}
-		var longVal = BitConverter.ToInt64(rented, 0);
-		ArrayPool<byte>.Shared.Return(rented);
-		return WriteAsync(longVal, cancellationToken);
+		return WriteAsync(Double2Long(value), cancellationToken);
 	}
 
 	public void Write(decimal value, int type, int scale)
