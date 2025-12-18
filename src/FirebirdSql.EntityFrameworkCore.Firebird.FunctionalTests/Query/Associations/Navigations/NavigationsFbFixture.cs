@@ -13,11 +13,16 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net)
+//$Authors = Niek Schoemaker (@niekschoemaker)
 
-namespace FirebirdSql.Data.Logging;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
-public interface IFbLoggingProvider
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
+
+public class NavigationsFbFixture : NavigationsRelationalFixtureBase
 {
-	IFbLogger CreateLogger(string name);
+	protected override ITestStoreFactory TestStoreFactory
+		=> FbTestStoreFactory.Instance;
 }

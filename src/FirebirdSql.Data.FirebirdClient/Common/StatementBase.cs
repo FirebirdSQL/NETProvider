@@ -115,7 +115,7 @@ internal abstract class StatementBase
 	{ }
 	public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
 	{
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	#endregion

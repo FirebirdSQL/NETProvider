@@ -285,6 +285,60 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		}
 	}
 
+	// Adapted from Npgsql Entity Framework Core provider
+	// (https://github.com/npgsql/efcore.pg)
+	// Copyright (c) 2002-2021, Npgsql
+	protected override Expression VisitCrossApply(CrossApplyExpression crossApplyExpression)
+	{
+		Sql.Append("JOIN LATERAL ");
+
+		if (crossApplyExpression.Table is TableExpression table)
+		{
+			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
+			// will sometimes generate that.
+			Sql
+				.Append("(SELECT * FROM ")
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
+				.Append(")")
+				.Append(AliasSeparator)
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
+		}
+		else
+		{
+			Visit(crossApplyExpression.Table);
+		}
+
+		Sql.Append(" ON TRUE");
+		return crossApplyExpression;
+	}
+
+	// Adapted from Npgsql Entity Framework Core provider
+	// (https://github.com/npgsql/efcore.pg)
+	// Copyright (c) 2002-2021, Npgsql
+	protected override Expression VisitOuterApply(OuterApplyExpression outerApplyExpression)
+	{
+		Sql.Append("LEFT JOIN LATERAL ");
+
+		if (outerApplyExpression.Table is TableExpression table)
+		{
+			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
+			// will sometimes generate that.
+			Sql
+				.Append("(SELECT * FROM ")
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
+				.Append(")")
+				.Append(AliasSeparator)
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
+		}
+		else
+		{
+			Visit(outerApplyExpression.Table);
+		}
+
+		Sql.Append(" ON TRUE");
+		return outerApplyExpression;
+	}
+
 	protected override void GeneratePseudoFromClause()
 	{
 		Sql.Append(" FROM RDB$DATABASE");

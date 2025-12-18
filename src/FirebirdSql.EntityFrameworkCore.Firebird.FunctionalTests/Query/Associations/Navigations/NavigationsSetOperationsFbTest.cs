@@ -13,18 +13,18 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net)
+//$Authors = Niek Schoemaker (@niekschoemaker)
 
-using System;
+using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
+using Xunit.Abstractions;
 
-namespace FirebirdSql.Data.Common;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
 
-internal static class DateTime2
+public class NavigationsSetOperationsFbTest : NavigationsSetOperationsRelationalTestBase<NavigationsFbFixture>
 {
-	public static DateTime UnixEpoch =>
-#if NET48 || NETSTANDARD2_0
-			new DateTime(621355968000000000);
-#else
-			DateTime.UnixEpoch;
-#endif
+	public NavigationsSetOperationsFbTest(NavigationsFbFixture fixture, ITestOutputHelper testOutputHelper) : base(fixture, testOutputHelper)
+	{
+		Fixture.TestSqlLoggerFactory.Clear();
+		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
+	}
 }

@@ -35,132 +35,6 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddDays(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddDays(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddHours(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddHours(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddMilliseconds(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddMilliseconds(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddMinutes(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddMinutes(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddMonths(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddMonths(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddSeconds(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddSeconds(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_DateAdd_AddYears(bool isAsync)
-	{
-		return base.DateTimeOffset_DateAdd_AddYears(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_date_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_date_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_dayofyear_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_dayofyear_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_day_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_day_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_hour_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_hour_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_millisecond_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_millisecond_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_minute_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_minute_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_month_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_month_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_now(bool isAsync)
-	{
-		return base.Where_datetimeoffset_now(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_second_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_second_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_utcnow(bool isAsync)
-	{
-		return base.Where_datetimeoffset_utcnow(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_year_component(bool isAsync)
-	{
-		return base.Where_datetimeoffset_year_component(isAsync);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task DateTimeOffsetNow_minus_timespan(bool async)
 	{
 		return base.DateTimeOffsetNow_minus_timespan(async);
@@ -287,13 +161,6 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Array_access_on_byte_array(bool async)
-	{
-		return base.Array_access_on_byte_array(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_distinct_3_levels(bool async)
 	{
 		return base.Correlated_collection_after_distinct_3_levels(async);
@@ -371,20 +238,6 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task First_on_byte_array(bool async)
-	{
-		return base.First_on_byte_array(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_subtract_TimeOnly(bool async)
-	{
-		return base.Where_TimeOnly_subtract_TimeOnly(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(bool async)
 	{
 		return base.Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
@@ -399,37 +252,9 @@ public class GearsOfWarQueryFbTest : GearsOfWarQueryRelationalTestBase<GearsOfWa
 
 	[NotSupportedByProviderTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_to_unix_time_milliseconds(bool async)
-	{
-		return base.DateTimeOffset_to_unix_time_milliseconds(async);
-	}
-
-	[NotSupportedByProviderTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_to_unix_time_seconds(bool async)
-	{
-		return base.DateTimeOffset_to_unix_time_seconds(async);
-	}
-
-	[NotSupportedByProviderTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Non_string_concat_uses_appropriate_type_mapping(bool async)
 	{
 		return base.Non_string_concat_uses_appropriate_type_mapping(async);
-	}
-
-	[Theory(Skip = "NETProvider#1008")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_IsBetween(bool async)
-	{
-		return base.Where_TimeOnly_IsBetween(async);
-	}
-
-	[Theory(Skip = "NETProvider#1009")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_Add_TimeSpan(bool async)
-	{
-		return base.Where_TimeOnly_Add_TimeSpan(async);
 	}
 
 	[Theory(Skip = "Different implicit ordering on Firebird.")]

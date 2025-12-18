@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SkipSourceLink>true</SkipSourceLink>
@@ -16,7 +16,7 @@
 		<Using Include="NUnit.Framework.Legacy.CollectionAssert" Alias="CollectionAssert" />
 		<Using Include="NUnit.Framework.Legacy.StringAssert" Alias="StringAssert" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
 		<!-- left in repo as an example/documentation for .NET Framework -->
 		<None Remove="app.config" />
 	</ItemGroup>

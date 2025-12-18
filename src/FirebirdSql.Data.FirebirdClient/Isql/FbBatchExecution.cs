@@ -219,11 +219,7 @@ public sealed class FbBatchExecution
 						}
 						finally
 						{
-#if NET48 || NETSTANDARD2_0
 							dataReader.Dispose();
-#else
-							dataReader.Dispose();
-#endif
 						}
 						break;
 
@@ -470,11 +466,7 @@ public sealed class FbBatchExecution
 						}
 						finally
 						{
-#if NET48 || NETSTANDARD2_0
-							dataReader.Dispose();
-#else
 							await dataReader.DisposeAsync().ConfigureAwait(false);
-#endif
 						}
 						break;
 
@@ -1002,11 +994,7 @@ public sealed class FbBatchExecution
 		if (_sqlTransaction != null)
 		{
 			_sqlTransaction.Commit();
-#if NET48 || NETSTANDARD2_0
 			_sqlTransaction.Dispose();
-#else
-			_sqlTransaction.Dispose();
-#endif
 			_sqlTransaction = null;
 		}
 	}
@@ -1015,11 +1003,7 @@ public sealed class FbBatchExecution
 		if (_sqlTransaction != null)
 		{
 			await _sqlTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-#if NET48 || NETSTANDARD2_0
-			_sqlTransaction.Dispose();
-#else
 			await _sqlTransaction.DisposeAsync().ConfigureAwait(false);
-#endif
 			_sqlTransaction = null;
 		}
 	}
@@ -1029,11 +1013,7 @@ public sealed class FbBatchExecution
 		if (_sqlTransaction != null)
 		{
 			_sqlTransaction.Rollback();
-#if NET48 || NETSTANDARD2_0
 			_sqlTransaction.Dispose();
-#else
-			_sqlTransaction.Dispose();
-#endif
 			_sqlTransaction = null;
 		}
 	}
@@ -1042,11 +1022,7 @@ public sealed class FbBatchExecution
 		if (_sqlTransaction != null)
 		{
 			await _sqlTransaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-#if NET48 || NETSTANDARD2_0
-			_sqlTransaction.Dispose();
-#else
 			await _sqlTransaction.DisposeAsync().ConfigureAwait(false);
-#endif
 			_sqlTransaction = null;
 		}
 	}
@@ -1070,23 +1046,14 @@ public sealed class FbBatchExecution
 	{
 		if (_sqlCommand != null)
 		{
-#if NET48 || NETSTANDARD2_0
 			_sqlCommand.Dispose();
-#else
-			_sqlCommand.Dispose();
-#endif
 		}
 	}
 	private async Task DisposeCommandAsync(CancellationToken cancellationToken = default)
 	{
 		if (_sqlCommand != null)
 		{
-#if NET48 || NETSTANDARD2_0
-			_sqlCommand.Dispose();
-			await Task.CompletedTask.ConfigureAwait(false);
-#else
 			await _sqlCommand.DisposeAsync().ConfigureAwait(false);
-#endif
 		}
 	}
 

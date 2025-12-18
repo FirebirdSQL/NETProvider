@@ -212,12 +212,10 @@ public sealed class BlobStream : Stream
 		_blobHandle.Close();
 	}
 
-#if !(NET48 || NETSTANDARD2_0)
 	public override ValueTask DisposeAsync()
 	{
 		return _blobHandle.CloseAsync();
 	}
-#endif
 
 	private static void ValidateBufferSize(byte[] buffer, int offset, int count)
 	{

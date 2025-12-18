@@ -428,12 +428,7 @@ internal class FbConnectionInternal
 	{
 		if (_activeTransaction != null && !IsEnlisted)
 		{
-#if NET48 || NETSTANDARD2_0
-			_activeTransaction.Dispose();
-			await Task.CompletedTask.ConfigureAwait(false);
-#else
 			await _activeTransaction.DisposeAsync().ConfigureAwait(false);
-#endif
 			_activeTransaction = null;
 		}
 	}
@@ -665,50 +660,17 @@ internal class FbConnectionInternal
 		{
 			return options.ApplicationName;
 		}
-		return GetSystemWebHostingPath() ?? GetRealProcessName() ?? string.Empty;
-	}
-
-
-	private static string GetSystemWebHostingPath()
-	{
-#if NET48
-		var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GetName().Name.Equals("System.Web", StringComparison.Ordinal)).FirstOrDefault();
-		if (assembly == null)
-			return null;
-		// showing ApplicationPhysicalPath may be wrong because of connection pooling
-		// better idea?
-		return (string)assembly.GetType("System.Web.Hosting.HostingEnvironment").GetProperty("ApplicationPhysicalPath").GetValue(null, null);
-#else
-		return null;
-#endif
+		return GetRealProcessName() ?? string.Empty;
 	}
 
 	private static string GetRealProcessName()
 	{
-		static string FromProcess()
-		{
-			try
-			{
-				return Process.GetCurrentProcess().MainModule.FileName;
-			}
-			catch (InvalidOperationException)
-			{
-				return null;
-			}
-		}
-		return Assembly.GetEntryAssembly()?.Location ?? FromProcess();
+		return Assembly.GetEntryAssembly()?.Location ?? Environment.ProcessPath;
 	}
 
 	private static int GetProcessId()
 	{
-		try
-		{
-			return Process.GetCurrentProcess().Id;
-		}
-		catch (InvalidOperationException)
-		{
-			return -1;
-		}
+		return Environment.ProcessId;
 	}
 
 	private static string GetClientVersion()

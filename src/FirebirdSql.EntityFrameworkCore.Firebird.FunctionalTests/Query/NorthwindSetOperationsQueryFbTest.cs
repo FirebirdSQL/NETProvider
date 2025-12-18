@@ -18,6 +18,7 @@
 using System;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -35,6 +36,16 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 	public override Task Union_Select_scalar(bool async)
 	{
 		return base.Union_Select_scalar(async);
+	}
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Union_inside_Concat(bool async)
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan5())
+			return Task.CompletedTask;
+		return base.Union_inside_Concat(async);
 	}
 
 	[NotSupportedOnFirebirdTheory]
@@ -119,5 +130,12 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 	public override Task Client_eval_Union_FirstOrDefault(bool async)
 	{
 		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Client_eval_Union_FirstOrDefault(async));
+	}
+
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Except_nested2(bool async)
+	{
+		return base.Except_nested2(async);
 	}
 }

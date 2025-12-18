@@ -122,14 +122,14 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void Write(byte[] buffer, int offset, int count)
 	{
-		for (var i = offset; i < count; i++)
+		for (var i = 0; i < count; i++)
 			_outputBuffer.Enqueue(buffer[offset + i]);
 	}
 	public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
-		for (var i = offset; i < count; i++)
+		for (var i = 0; i < count; i++)
 			_outputBuffer.Enqueue(buffer[offset + i]);
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public void Flush()

@@ -102,7 +102,7 @@ internal sealed class FesDatabase : DatabaseBase
 
 		ProcessStatusVector(Charset.DefaultCharset);
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
@@ -134,7 +134,7 @@ internal sealed class FesDatabase : DatabaseBase
 
 		_handle.Dispose();
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	#endregion
@@ -268,7 +268,7 @@ internal sealed class FesDatabase : DatabaseBase
 		_statusVector = null;
 		TransactionCount = 0;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	#endregion
@@ -318,7 +318,7 @@ internal sealed class FesDatabase : DatabaseBase
 		catch (IscException ex) when (ex.ErrorCode == IscCodes.isc_nothing_to_cancel)
 		{ }
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	#endregion
@@ -381,7 +381,7 @@ internal sealed class FesDatabase : DatabaseBase
 
 		DatabaseInfo(items, buffer, buffer.Length);
 
-		return ValueTask2.FromResult(IscHelper.ParseDatabaseInfo(buffer, Charset));
+		return ValueTask.FromResult(IscHelper.ParseDatabaseInfo(buffer, Charset));
 	}
 
 	#endregion
