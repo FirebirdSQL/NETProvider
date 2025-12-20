@@ -34,6 +34,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	readonly Charset _charset;
 
 	byte[] _smallBuffer;
+	byte[] _smallBuffer8;
 	const int StackallocThreshold = 1024;
 
 	public XdrReaderWriter(IDataProvider dataProvider, Charset charset)
@@ -42,6 +43,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		_charset = charset;
 
 		_smallBuffer = new byte[16];
+		_smallBuffer8 = new byte[8];
 	}
 
 	public XdrReaderWriter(IDataProvider dataProvider)
@@ -443,13 +445,13 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 
 	public FbDecFloat ReadDec16()
 	{
-		ReadBytes(_smallBuffer, 8);
-		return TypeDecoder.DecodeDec16(_smallBuffer);
+		ReadBytes(_smallBuffer8, 8);
+		return TypeDecoder.DecodeDec16(_smallBuffer8);
 	}
 	public async ValueTask<FbDecFloat> ReadDec16Async(CancellationToken cancellationToken = default)
 	{
-		await ReadBytesAsync(_smallBuffer, 8, cancellationToken).ConfigureAwait(false);
-		return TypeDecoder.DecodeDec16(_smallBuffer);
+		await ReadBytesAsync(_smallBuffer8, 8, cancellationToken).ConfigureAwait(false);
+		return TypeDecoder.DecodeDec16(_smallBuffer8);
 	}
 
 	public FbDecFloat ReadDec34()
