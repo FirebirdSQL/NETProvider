@@ -31,9 +31,9 @@ public class SrpClientTests
 		var user = "SYSDBA";
 		var password = "masterkey";
 		var client = new SrpClient();
-		var salt = client.GetSalt();
+		var salt = SrpClient.GetSalt();
 		var serverKeyPair = client.ServerSeed(user, password, salt);
-		var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
+		var serverSessionKey = SrpClient.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
 		client.ClientProof(user, password, salt, serverKeyPair.Item1);
 		Assert.AreEqual(serverSessionKey.ToString(), client.SessionKey.ToString());
 	}

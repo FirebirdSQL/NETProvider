@@ -97,6 +97,11 @@ internal static class TypeEncoder
 		return new[] { (byte)(value ? 1 : 0) };
 	}
 
+	public static void EncodeBoolean(bool value, Span<byte> destination)
+	{
+		destination[0] = (byte)(value ? 1 : 0);
+	}
+
 	public static byte[] EncodeGuid(Guid value)
 	{
 		var data = value.ToByteArray();
@@ -112,14 +117,61 @@ internal static class TypeEncoder
 		};
 	}
 
+	public static void EncodeGuid(Guid value, Span<byte> destination)
+	{
+		Span<byte> data = stackalloc byte[16];
+		if (!value.TryWriteBytes(data))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+
+		Span<byte> a = stackalloc byte[4];
+		Span<byte> b = stackalloc byte[2];
+		Span<byte> c = stackalloc byte[2];
+
+		if (!BitConverter.TryWriteBytes(a, IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data[..4]))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+		if (!BitConverter.TryWriteBytes(b, IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data.Slice(4, 2)))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+		if (!BitConverter.TryWriteBytes(c, IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data.Slice(6, 2)))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+
+		a.CopyTo(destination[..4]);
+		b.CopyTo(destination.Slice(4, 2));
+		c.CopyTo(destination.Slice(6, 2));
+		data.Slice(8, 8).CopyTo(destination[8..]);
+	}
+
 	public static byte[] EncodeInt32(int value)
 	{
 		return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
 	}
 
+	public static void EncodeInt32(int value, Span<byte> destination)
+	{
+		if (!BitConverter.TryWriteBytes(destination, IPAddress.NetworkToHostOrder(value)))
+		{
+			throw new InvalidOperationException("Failed to write Int32 bytes.");
+		}
+	}
+
 	public static byte[] EncodeInt64(long value)
 	{
 		return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
+	}
+
+	public static void EncodeInt64(long value, Span<byte> destination)
+	{
+		if (!BitConverter.TryWriteBytes(destination, IPAddress.NetworkToHostOrder(value)))
+		{
+			throw new InvalidOperationException("Failed to write Int64 bytes.");
+		}
 	}
 
 	public static byte[] EncodeDec16(FbDecFloat value)

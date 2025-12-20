@@ -31,9 +31,9 @@ public class Srp256ClientTests
 		var user = "SYSDBA";
 		var password = "masterkey";
 		var client = new Srp256Client();
-		var salt = client.GetSalt();
+		var salt = Srp256Client.GetSalt();
 		var serverKeyPair = client.ServerSeed(user, password, salt);
-		var serverSessionKey = client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
+		var serverSessionKey = Srp256Client.GetServerSessionKey(user, password, salt, client.PublicKey, serverKeyPair.Item1, serverKeyPair.Item2);
 		client.ClientProof(user, password, salt, serverKeyPair.Item1);
 		Assert.AreEqual(serverSessionKey.ToString(), client.SessionKey.ToString());
 	}
