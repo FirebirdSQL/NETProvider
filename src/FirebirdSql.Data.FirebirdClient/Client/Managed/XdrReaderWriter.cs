@@ -317,42 +317,22 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		}
 	}
 
-	public float Int2Single(int sqlType)
-	{
-		Span<byte> bytes = stackalloc byte[4];
-		if (!BitConverter.TryWriteBytes(bytes, sqlType))
-		{
-			throw new InvalidOperationException("Failed to write Single bytes.");
-		}
-		return BitConverter.ToSingle(bytes);
-	}
-
 	public float ReadSingle()
 	{
-		return Int2Single(ReadInt32());
+		return BitConverter.Int32BitsToSingle(ReadInt32());
 	}
 	public async ValueTask<float> ReadSingleAsync(CancellationToken cancellationToken = default)
 	{
-		return Int2Single(await ReadInt32Async(cancellationToken).ConfigureAwait(false));
-	}
-
-	public double Long2Double(long sqlType)
-	{
-		Span<byte> bytes = stackalloc byte[8];
-		if (!BitConverter.TryWriteBytes(bytes, sqlType))
-		{
-			throw new InvalidOperationException("Failed to write Double bytes.");
-		}
-		return BitConverter.ToDouble(bytes);
+		return BitConverter.Int32BitsToSingle(await ReadInt32Async(cancellationToken).ConfigureAwait(false));
 	}
 
 	public double ReadDouble()
 	{
-		return Long2Double(ReadInt64());
+		return BitConverter.Int64BitsToDouble(ReadInt64());
 	}
 	public async ValueTask<double> ReadDoubleAsync(CancellationToken cancellationToken = default)
 	{
-		return Long2Double(await ReadInt64Async(cancellationToken).ConfigureAwait(false));
+		return BitConverter.Int64BitsToDouble(await ReadInt64Async(cancellationToken).ConfigureAwait(false));
 	}
 
 	public DateTime ReadDateTime()
@@ -1026,42 +1006,22 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 		return ReturnAfter(task, rented);
 	}
 
-	static int Float2Int(float value)
-	{
-		Span<byte> bytes = stackalloc byte[4];
-		if (!BitConverter.TryWriteBytes(bytes, value))
-		{
-			throw new InvalidOperationException("Failed to write Single bytes.");
-		}
-		return BitConverter.ToInt32(bytes);
-	}
-
 	public void Write(float value)
 	{
-		Write(Float2Int(value));
+		Write(BitConverter.SingleToInt32Bits(value));
 	}
 	public ValueTask WriteAsync(float value, CancellationToken cancellationToken = default)
 	{
-		return WriteAsync(Float2Int(value), cancellationToken);
-	}
-
-	static long Double2Long(double value)
-	{
-		Span<byte> buffer = stackalloc byte[8];
-		if (!BitConverter.TryWriteBytes(buffer, value))
-		{
-			throw new InvalidOperationException("Failed to write Double bytes.");
-		}
-		return BitConverter.ToInt64(buffer);
+		return WriteAsync(BitConverter.SingleToInt32Bits(value), cancellationToken);
 	}
 
 	public void Write(double value)
 	{
-		Write(Double2Long(value));
+		Write(BitConverter.DoubleToInt64Bits(value));
 	}
 	public ValueTask WriteAsync(double value, CancellationToken cancellationToken = default)
 	{
-		return WriteAsync(Double2Long(value), cancellationToken);
+		return WriteAsync(BitConverter.DoubleToInt64Bits(value), cancellationToken);
 	}
 
 	public void Write(decimal value, int type, int scale)
