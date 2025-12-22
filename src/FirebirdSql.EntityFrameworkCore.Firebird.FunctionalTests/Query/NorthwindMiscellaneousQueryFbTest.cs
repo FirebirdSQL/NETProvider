@@ -178,7 +178,7 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		var ids = new[] { "ALFKIContactName", "ANATRContactName" };
 
 		var query = context.Customers
-			.Where(c => ids.Contains(c.CustomerID + c.ContactName));
+			.Where(c => ids.Contains(c.CustomerID.Trim() + c.ContactName.Trim()));
 
 		List<Customer> customers;
 		if (async)
