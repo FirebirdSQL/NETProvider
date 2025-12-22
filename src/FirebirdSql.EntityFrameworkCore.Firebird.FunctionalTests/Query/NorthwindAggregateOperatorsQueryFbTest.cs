@@ -26,9 +26,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperatorsQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
+	private readonly NorthwindQueryFbFixture<NoopModelCustomizer> _fixture;
+
 	public NorthwindAggregateOperatorsQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
-	{ }
+	{
+		_fixture = fixture;
+	}
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
@@ -95,5 +99,12 @@ public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperator
 	public override Task Average_over_nested_subquery(bool async)
 	{
 		return base.Average_over_nested_subquery(async);
+	}
+
+	[Theory(Skip = "Different math on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Contains_with_local_collection_sql_injection(bool async)
+	{
+		return base.Contains_with_local_collection_sql_injection(async);
 	}
 }

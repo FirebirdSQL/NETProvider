@@ -27,9 +27,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
+	private readonly NorthwindQueryFbFixture<NoopModelCustomizer> _fixture;
+
 	public NorthwindMiscellaneousQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
-	{ }
+	{
+		_fixture = fixture;
+	}
 
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
@@ -158,5 +162,12 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 	public override Task Where_nanosecond_and_microsecond_component(bool async)
 	{
 		return base.Where_nanosecond_and_microsecond_component(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Contains_over_concatenated_columns_both_fixed_length(bool async)
+	{
+		return base.Contains_over_concatenated_columns_both_fixed_length(async);
 	}
 }

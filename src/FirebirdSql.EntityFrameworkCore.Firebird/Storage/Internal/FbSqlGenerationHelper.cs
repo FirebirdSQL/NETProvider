@@ -27,17 +27,38 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		: base(dependencies)
 	{ }
 
-	public virtual string StringLiteralQueryType(string s, bool isUnicode = true)
+	public virtual string StringLiteralQueryType(string s, bool isUnicode = true, string storeTypeNameBase = "", int size = 0)
 	{
-		var length = MinimumStringQueryTypeLength(s);
+		var maxSize = MinimumStringQueryTypeLength(s);
+		string typeName;
+		if (storeTypeNameBase.Equals("BLOB SUB_TYPE TEXT", StringComparison.OrdinalIgnoreCase))
+		{
+			typeName = "VARCHAR";
+		}
+		else
+		{
+			typeName = IsEmpty(storeTypeNameBase) ? "VARCHAR" : storeTypeNameBase;
+		}
+
 		var charset = isUnicode ? " CHARACTER SET UTF8" : string.Empty;
-		return $"VARCHAR({length}){charset}";
+		return $"{typeName}({maxSize}){charset}";
 	}
 
-	public virtual string StringParameterQueryType(bool isUnicode)
+	public virtual string StringParameterQueryType(bool isUnicode, string storeTypeNameBase = "", int size = 0)
 	{
-		var size = isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize;
-		return $"VARCHAR({size})";
+		int maxSize;
+		string typeName;
+		if (storeTypeNameBase.Equals("BLOB SUB_TYPE TEXT", StringComparison.OrdinalIgnoreCase))
+		{
+			maxSize = (isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize);
+			typeName = "VARCHAR";
+		}
+		else
+		{
+			maxSize = size > 0 ? size : (isUnicode ? FbTypeMappingSource.UnicodeVarcharMaxSize : FbTypeMappingSource.VarcharMaxSize);
+			typeName = IsEmpty(storeTypeNameBase) ? "VARCHAR" : storeTypeNameBase;
+		}
+		return $"{typeName}({maxSize})";
 	}
 
 	public virtual void GenerateBlockParameterName(StringBuilder builder, string name)
@@ -47,7 +68,7 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 
 	public virtual string AlternativeStatementTerminator => "~";
 
-	static int MinimumStringQueryTypeLength(string s)
+	private int MinimumStringQueryTypeLength(string s)
 	{
 		var length = s?.Length ?? 0;
 		if (length == 0)
@@ -55,9 +76,8 @@ public class FbSqlGenerationHelper : RelationalSqlGenerationHelper, IFbSqlGenera
 		return length;
 	}
 
-	static void EnsureStringLiteralQueryTypeLength(int length)
+	private bool IsEmpty(string storeTypeNameBase)
 	{
-		if (length > FbTypeMappingSource.UnicodeVarcharMaxSize)
-			throw new ArgumentOutOfRangeException(nameof(length));
+		return (storeTypeNameBase == null || string.IsNullOrEmpty(storeTypeNameBase) || string.IsNullOrWhiteSpace(storeTypeNameBase));
 	}
 }
