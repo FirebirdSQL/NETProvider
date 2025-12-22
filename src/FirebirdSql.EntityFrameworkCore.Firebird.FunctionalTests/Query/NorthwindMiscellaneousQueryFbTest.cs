@@ -16,10 +16,14 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
@@ -27,9 +31,13 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
+	private readonly NorthwindQueryFbFixture<NoopModelCustomizer> _fixture;
+
 	public NorthwindMiscellaneousQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
-	{ }
+	{
+		_fixture = fixture;
+	}
 
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
@@ -158,5 +166,40 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 	public override Task Where_nanosecond_and_microsecond_component(bool async)
 	{
 		return base.Where_nanosecond_and_microsecond_component(async);
+	}
+
+	[ConditionalFact]
+
+	public override async Task Contains_over_concatenated_columns_both_fixed_length(bool async)
+	{
+		using var context = _fixture.CreateContext();
+
+		// Coleção local com valores concatenados
+		var ids = new[] { "ALFKIContactName", "ANATRContactName" };
+
+		var query = context.Customers
+			.Where(c => ids.Contains(c.CustomerID + c.ContactName));
+
+		List<Customer> customers;
+		if (async)
+		{
+			// Materializa assíncrono sem ToListAsync()
+			customers = new List<Customer>();
+			await foreach (var c in query.AsAsyncEnumerable())
+			{
+				customers.Add(c);
+			}
+		}
+		else
+		{
+			customers = query.ToList();
+		}
+
+
+		// Valida que os clientes corretos foram retornados
+		Assert.Equal(2, customers.Count);
+		Assert.Contains(customers, c => c.CustomerID == "ALFKI");
+		Assert.Contains(customers, c => c.CustomerID == "ANATR");
+
 	}
 }
