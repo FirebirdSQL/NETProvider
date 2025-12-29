@@ -232,4 +232,16 @@ internal static class IscHelper
 		}
 		return value;
 	}
+
+	public static long VaxInteger(ReadOnlySpan<byte> buffer, int index, int length)
+	{
+		var value = 0L;
+		var shift = 0;
+		var i = index;
+		while(--length >= 0) {
+			value += (buffer[i++] & 0xffL) << shift;
+			shift += 8;
+		}
+		return value;
+	}
 }
