@@ -1533,16 +1533,7 @@ internal class GdsStatement : StatementBase
 				else
 				{
 					var s = xdr.ReadString(innerCharset, field.Length);
-					var runes = s.EnumerateRunesToChars().ToList();
-					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						runes.Count > field.CharCount)
-					{
-						return new string([.. runes.Take(field.CharCount).SelectMany(x => x)]);
-					}
-					else
-					{
-						return s;
-					}
+					return TruncateStringByRuneCount(s, field);
 				}
 
 			case DbDataType.VarChar:
@@ -1631,16 +1622,7 @@ internal class GdsStatement : StatementBase
 				else
 				{
 					var s = await xdr.ReadStringAsync(innerCharset, field.Length, cancellationToken).ConfigureAwait(false);
-					var runes = s.EnumerateRunesToChars().ToList();
-					if ((field.Length % field.Charset.BytesPerCharacter) == 0 &&
-						runes.Count > field.CharCount)
-					{
-						return new string([.. runes.Take(field.CharCount).SelectMany(x => x)]);
-					}
-					else
-					{
-						return s;
-					}
+					return TruncateStringByRuneCount(s, field);
 				}
 
 			case DbDataType.VarChar:
@@ -1795,6 +1777,22 @@ internal class GdsStatement : StatementBase
 			throw IscException.ForIOException(ex);
 		}
 		return row;
+	}
+
+	private static string TruncateStringByRuneCount(string s, DbField field)
+	{
+		if ((field.Length % field.Charset.BytesPerCharacter) != 0)
+		{
+			return s;
+		}
+
+		var runeCount = s.CountRunes();
+		if (runeCount <= field.CharCount)
+		{
+			return s;
+		}
+
+		return new string(s.TruncateStringToRuneCount(field.CharCount));
 	}
 
 	#endregion
