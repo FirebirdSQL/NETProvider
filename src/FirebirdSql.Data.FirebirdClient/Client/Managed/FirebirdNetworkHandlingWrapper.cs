@@ -25,7 +25,7 @@ using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Client.Managed;
 
-sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
+sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, IDisposable
 {
 	public const string CompressionName = "zlib";
 	public const string EncryptionName = "Arc4";
@@ -46,6 +46,8 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	Org.BouncyCastle.Crypto.Engines.RC4Engine _decryptor;
 	Org.BouncyCastle.Crypto.Engines.RC4Engine _encryptor;
 
+	bool _disposed;
+
 	public FirebirdNetworkHandlingWrapper(IDataProvider dataProvider)
 	{
 		_dataProvider = dataProvider;
@@ -53,12 +55,14 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		_outputBuffer = new ByteRingBuffer(PreferredBufferSize);
 		_inputBuffer = new ByteRingBuffer(PreferredBufferSize);
 		_readBuffer = new byte[PreferredBufferSize];
+		_disposed = false;
 	}
 
 	public bool IOFailed { get; set; }
 
 	public int Read(byte[] buffer, int offset, int count)
 	{
+		EnsureNotDisposed();
 		if (count <= 0)
 			return 0;
 
@@ -92,6 +96,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public int Read(Span<byte> buffer, int offset, int count)
 	{
+		EnsureNotDisposed();
 		if (count <= 0)
 			return 0;
 
@@ -119,6 +124,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
+		EnsureNotDisposed();
 		if (count <= 0)
 			return 0;
 
@@ -152,6 +158,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public async ValueTask<int> ReadAsync(Memory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
+		EnsureNotDisposed();
 		if (count <= 0)
 			return 0;
 
@@ -187,6 +194,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void Write(ReadOnlySpan<byte> buffer)
 	{
+		EnsureNotDisposed();
 		if (buffer.IsEmpty)
 			return;
 
@@ -209,6 +217,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void Write(byte[] buffer, int offset, int count)
 	{
+		EnsureNotDisposed();
 		if (buffer == null || count <= 0)
 			return;
 
@@ -230,6 +239,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	}
 	public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
+		EnsureNotDisposed();
 		if (buffer == null || count <= 0)
 			return ValueTask.CompletedTask;
 
@@ -257,6 +267,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
+		EnsureNotDisposed();
 		if (count <= 0)
 			return ValueTask.CompletedTask;
 
@@ -284,6 +295,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void Flush()
 	{
+		EnsureNotDisposed();
 		try
 		{
 			if (_compressor != null)
@@ -305,6 +317,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	}
 	public async ValueTask FlushAsync(CancellationToken cancellationToken = default)
 	{
+		EnsureNotDisposed();
 		try
 		{
 			if (_compressor != null)
@@ -327,6 +340,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void StartCompression()
 	{
+		EnsureNotDisposed();
 		_compressionBuffer = new byte[PreferredBufferSize];
 		_compressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Compress);
 		_decompressor = new Ionic.Zlib.ZlibCodec(Ionic.Zlib.CompressionMode.Decompress);
@@ -334,12 +348,14 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void StartEncryption(byte[] key)
 	{
+		EnsureNotDisposed();
 		_encryptor = CreateCipher(key);
 		_decryptor = CreateCipher(key);
 	}
 
 	void FillInputBuffer()
 	{
+		EnsureNotDisposed();
 		try
 		{
 			if (_decompressor == null)
@@ -380,6 +396,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	async ValueTask FillInputBufferAsync(CancellationToken cancellationToken)
 	{
+		EnsureNotDisposed();
 		try
 		{
 			if (_decompressor == null)
@@ -420,6 +437,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	int HandleDecompression(byte[] buffer, int count)
 	{
+		EnsureNotDisposed();
 		_decompressor.InputBuffer = buffer;
 		_decompressor.NextOut = 0;
 		_decompressor.NextIn = 0;
@@ -448,6 +466,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	void FlushPlain()
 	{
+		EnsureNotDisposed();
 		_outputBuffer.GetReadSegments(out var off1, out var len1, out var off2, out var len2);
 
 		try
@@ -481,6 +500,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	async ValueTask FlushPlainAsync(CancellationToken cancellationToken)
 	{
+		EnsureNotDisposed();
 		_outputBuffer.GetReadSegments(out var off1, out var len1, out var off2, out var len2);
 
 		try
@@ -514,6 +534,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	void FlushCompressed()
 	{
+		EnsureNotDisposed();
 		_outputBuffer.GetReadSegments(out var off1, out var len1, out var off2, out var len2);
 		try
 		{
@@ -535,6 +556,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	async ValueTask FlushCompressedAsync(CancellationToken cancellationToken)
 	{
+		EnsureNotDisposed();
 		_outputBuffer.GetReadSegments(out var off1, out var len1, out var off2, out var len2);
 		try
 		{
@@ -556,6 +578,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	void DeflateAndWrite(byte[] input, int offset, int count, Ionic.Zlib.FlushType flushType)
 	{
+		EnsureNotDisposed();
 		_compressor.InputBuffer = input;
 		_compressor.NextIn = offset;
 		_compressor.AvailableBytesIn = count;
@@ -589,6 +612,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	async ValueTask DeflateAndWriteAsync(byte[] input, int offset, int count, Ionic.Zlib.FlushType flushType, CancellationToken cancellationToken)
 	{
+		EnsureNotDisposed();
 		_compressor.InputBuffer = input;
 		_compressor.NextIn = offset;
 		_compressor.AvailableBytesIn = count;
@@ -627,11 +651,34 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 		return cipher;
 	}
 
-	sealed class ByteRingBuffer
+	public void Dispose()
+	{
+		if (_disposed)
+			return;
+		_disposed = true;
+
+		_inputBuffer.Dispose();
+		_outputBuffer.Dispose();
+
+		_compressionBuffer = null;
+		_compressor = null;
+		_decompressor = null;
+		_decryptor = null;
+		_encryptor = null;
+	}
+
+	void EnsureNotDisposed()
+	{
+		if (_disposed)
+			throw new ObjectDisposedException(nameof(FirebirdNetworkHandlingWrapper));
+	}
+
+	sealed class ByteRingBuffer : IDisposable
 	{
 		byte[] _buffer;
 		int _head;
 		int _count;
+		bool _disposed;
 
 		public byte[] Buffer => _buffer;
 		public int Count => _count;
@@ -641,10 +688,35 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 			_buffer = ArrayPool<byte>.Shared.Rent(initialCapacity);
 			_head = 0;
 			_count = 0;
+			_disposed = false;
+		}
+
+		public void Dispose()
+		{
+			if (_disposed)
+				return;
+			_disposed = true;
+
+			var buffer = _buffer;
+			_buffer = Array.Empty<byte>();
+			_head = 0;
+			_count = 0;
+
+			if (buffer.Length > 0)
+			{
+				ArrayPool<byte>.Shared.Return(buffer);
+			}
+		}
+
+		void EnsureNotDisposed()
+		{
+			if (_disposed)
+				throw new ObjectDisposedException(nameof(ByteRingBuffer));
 		}
 
 		public void EnsureFree(int bytes)
 		{
+			EnsureNotDisposed();
 			if (bytes <= 0)
 				return;
 
@@ -657,6 +729,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		void Grow(int requiredCapacity)
 		{
+			EnsureNotDisposed();
 			var newCapacity = _buffer.Length;
 			while (newCapacity < requiredCapacity)
 			{
@@ -682,6 +755,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public void Write(ReadOnlySpan<byte> src)
 		{
+			EnsureNotDisposed();
 			if (src.IsEmpty)
 				return;
 
@@ -702,6 +776,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public int CopyTo(Span<byte> dst)
 		{
+			EnsureNotDisposed();
 			if (dst.IsEmpty || _count == 0)
 				return 0;
 
@@ -719,6 +794,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public void Consume(int bytes)
 		{
+			EnsureNotDisposed();
 			if (bytes <= 0)
 				return;
 
@@ -735,6 +811,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public void GetReadSegments(out int offset1, out int length1, out int offset2, out int length2)
 		{
+			EnsureNotDisposed();
 			if (_count == 0)
 			{
 				offset1 = offset2 = length1 = length2 = 0;
@@ -749,6 +826,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public void GetWriteSegment(out int offset, out int length)
 		{
+			EnsureNotDisposed();
 			if (_count == _buffer.Length)
 			{
 				offset = 0;
@@ -763,6 +841,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 		public void AdvanceWrite(int bytes)
 		{
+			EnsureNotDisposed();
 			if (bytes <= 0)
 				return;
 
