@@ -359,19 +359,29 @@ internal sealed class GdsConnection
 
 	public void Disconnect()
 	{
+		_firebirdNetworkHandlingWrapper?.Dispose();
+		_firebirdNetworkHandlingWrapper = null;
+
 		if (_networkStream != null)
 		{
 			_networkStream.Dispose();
 			_networkStream = null;
 		}
+
+		Xdr = null;
 	}
 	public async ValueTask DisconnectAsync(CancellationToken cancellationToken = default)
 	{
+		_firebirdNetworkHandlingWrapper?.Dispose();
+		_firebirdNetworkHandlingWrapper = null;
+
 		if (_networkStream != null)
 		{
 			await _networkStream.DisposeAsync().ConfigureAwait(false);
 			_networkStream = null;
 		}
+
+		Xdr = null;
 	}
 
 	internal IResponse ProcessOperation(int operation)
