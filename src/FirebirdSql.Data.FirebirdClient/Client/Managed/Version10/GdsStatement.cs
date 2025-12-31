@@ -1247,7 +1247,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.CountRunes() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1272,7 +1272,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = field.DbValue.GetString();
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.CountRunes() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1395,7 +1395,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.CountRunes() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -1420,7 +1420,7 @@ internal class GdsStatement : StatementBase
 					else
 					{
 						var svalue = await field.DbValue.GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > field.CharCount)
+						if ((field.Length % field.Charset.BytesPerCharacter) == 0 && svalue.CountRunes() > field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
