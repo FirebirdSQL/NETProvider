@@ -1786,13 +1786,9 @@ internal class GdsStatement : StatementBase
 			return s;
 		}
 
-		var runeCount = s.CountRunes();
-		if (runeCount <= field.CharCount)
-		{
-			return s;
-		}
+		var truncated = s.TruncateStringToRuneCount(field.CharCount);
 
-		return new string(s.TruncateStringToRuneCount(field.CharCount));
+		return truncated == s.AsSpan() ? s : new string(truncated);
 	}
 
 	#endregion
