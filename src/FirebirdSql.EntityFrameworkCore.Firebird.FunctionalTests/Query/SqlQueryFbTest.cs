@@ -162,14 +162,28 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 		var inicio = new DateTime(2026, 1, 1);
 		var fim = new DateTime(2026, 1, 31);
 
-		var query = context.Orders
-			.Where(o => o.OrderDate >= inicio && o.OrderDate <= fim);
+		var query = context.Orders.Where(o => o.OrderDate >= inicio && o.OrderDate <= fim);
 
 		var sql = query.ToQueryString();
 
 		Assert.Contains("BETWEEN", sql);
 		Assert.Contains("AND", sql);
 	}
+
+	[Fact]
+	public async Task Where_OrderDate_and_Id_not_translated_to_between()
+	{
+		using var context = CreateContext();
+
+		var inicio = new DateTime(1997, 1, 1);
+
+		var query = context.Orders.Where(o => o.OrderDate >= inicio && o.OrderID <= 10);
+
+		var sql = query.ToQueryString();
+
+		Assert.DoesNotContain("BETWEEN", sql);
+	}
+
 
 	protected override DbParameter CreateDbParameter(string name, object value)
 		=> new FbParameter { ParameterName = name, Value = value };
