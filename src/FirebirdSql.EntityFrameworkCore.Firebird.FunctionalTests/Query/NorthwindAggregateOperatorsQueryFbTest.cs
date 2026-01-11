@@ -16,8 +16,10 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -101,10 +103,28 @@ public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperator
 		return base.Average_over_nested_subquery(async);
 	}
 
-	[Theory(Skip = "Different math on Firebird.")]
+	[Theory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Contains_with_local_collection_sql_injection(bool async)
+	public override async Task Contains_with_local_collection_sql_injection(bool async)
 	{
-		return base.Contains_with_local_collection_sql_injection(async);
+		using var context = CreateContext();
+
+		var ids = new[] { "ALFKI", "ANATR" };
+
+		var query = context.Customers
+			.Where(c => ids.Contains(c.CustomerID));
+
+		var result = async
+			? await query.ToListAsync()
+			: query.ToList();
+
+		var sql = query.ToQueryString();
+
+		Assert.Contains("IN", sql);
+		Assert.Contains("@ids1", sql);
+		Assert.Contains("@ids2", sql);
+
+		Assert.DoesNotContain("ALFKI, ANATR", sql);
+
 	}
 }
