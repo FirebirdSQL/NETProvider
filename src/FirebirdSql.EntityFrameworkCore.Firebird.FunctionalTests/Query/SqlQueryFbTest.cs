@@ -15,10 +15,13 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -149,6 +152,23 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 	public override Task SqlQueryRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(bool async)
 	{
 		return base.SqlQueryRaw_queryable_simple_different_cased_columns_and_not_enough_columns_throws(async);
+	}
+
+	[Fact]
+	public async Task Where_datetime_between_translated_correctly()
+	{
+		using var context = CreateContext();
+
+		var inicio = new DateTime(2026, 1, 1);
+		var fim = new DateTime(2026, 1, 31);
+
+		var query = context.Orders
+			.Where(o => o.OrderDate >= inicio && o.OrderDate <= fim);
+
+		var sql = query.ToQueryString();
+
+		Assert.Contains("BETWEEN", sql);
+		Assert.Contains("AND", sql);
 	}
 
 	protected override DbParameter CreateDbParameter(string name, object value)
