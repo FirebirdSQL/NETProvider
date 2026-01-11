@@ -143,17 +143,25 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 			Sql.Append(")");
 			return sqlBinaryExpression;
 		}
-		else
+		else if (sqlBinaryExpression.OperatorType == ExpressionType.AndAlso)
 		{
-			return base.VisitSqlBinary(sqlBinaryExpression);
-		}
+			if (sqlBinaryExpression.Left is SqlBinaryExpression left && sqlBinaryExpression.Right is SqlBinaryExpression right)
+			{
+				if (left.OperatorType == ExpressionType.GreaterThanOrEqual && right.OperatorType == ExpressionType.LessThanOrEqual &&
+					left.Left is ColumnExpression leftColumn && right.Left is ColumnExpression rightColumn &&
+					leftColumn.Name == rightColumn.Name)
+				{
+					Visit(left.Left);
+					Sql.Append(" BETWEEN ");
+					Visit(left.Right);
+					Sql.Append(" AND ");
+					Visit(right.Right);
+					return sqlBinaryExpression;
+				}
 
-		void BooleanToIntegralAndVisit(SqlExpression expression)
-		{
-			Sql.Append("IIF(");
-			Visit(expression);
-			Sql.Append(", 1, 0)");
+			}
 		}
+		return base.VisitSqlBinary(sqlBinaryExpression);
 	}
 
 	protected override Expression VisitSqlParameter(SqlParameterExpression sqlParameterExpression)
@@ -417,5 +425,12 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 			generationAction(items[i]);
 		}
+	}
+
+	void BooleanToIntegralAndVisit(SqlExpression expression)
+	{
+		Sql.Append("IIF(");
+		Visit(expression);
+		Sql.Append(", 1, 0)");
 	}
 }
