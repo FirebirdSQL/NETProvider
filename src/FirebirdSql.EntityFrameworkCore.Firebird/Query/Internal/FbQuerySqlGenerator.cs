@@ -145,20 +145,18 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		}
 		else if (sqlBinaryExpression.OperatorType == ExpressionType.AndAlso)
 		{
-			if (sqlBinaryExpression.Left is SqlBinaryExpression left && sqlBinaryExpression.Right is SqlBinaryExpression right)
+			if (sqlBinaryExpression.Left is SqlBinaryExpression left &&
+				sqlBinaryExpression.Right is SqlBinaryExpression right &&
+				left.OperatorType == ExpressionType.GreaterThanOrEqual &&
+				right.OperatorType == ExpressionType.LessThanOrEqual &&
+				left.Left.Equals(right.Left))
 			{
-				if (left.OperatorType == ExpressionType.GreaterThanOrEqual && right.OperatorType == ExpressionType.LessThanOrEqual &&
-					left.Left is ColumnExpression leftColumn && right.Left is ColumnExpression rightColumn &&
-					leftColumn.Name == rightColumn.Name)
-				{
-					Visit(left.Left);
-					Sql.Append(" BETWEEN ");
-					Visit(left.Right);
-					Sql.Append(" AND ");
-					Visit(right.Right);
-					return sqlBinaryExpression;
-				}
-
+				Visit(left.Left);
+				Sql.Append(" BETWEEN ");
+				Visit(left.Right);
+				Sql.Append(" AND ");
+				Visit(right.Right);
+				return sqlBinaryExpression;
 			}
 		}
 		return base.VisitSqlBinary(sqlBinaryExpression);
