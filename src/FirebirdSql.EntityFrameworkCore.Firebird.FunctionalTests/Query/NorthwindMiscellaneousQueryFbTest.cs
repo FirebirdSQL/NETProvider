@@ -16,11 +16,9 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
@@ -166,23 +164,10 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		return base.Where_nanosecond_and_microsecond_component(async);
 	}
 
-	[Theory]
+	[NotSupportedByProviderTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override async Task Contains_over_concatenated_columns_both_fixed_length(bool async)
+	public override Task Contains_over_concatenated_columns_both_fixed_length(bool async)
 	{
-		using var context = CreateContext();
-
-		var query = context.Customers
-			.Where(c => (c.ContactName + c.ContactTitle).Contains("Owner"));
-
-		var result = async
-			? await query.ToListAsync()
-			: query.ToList();
-
-		var sql = query.ToQueryString();
-
-		Assert.Contains("POSITION", sql);
-		Assert.Contains("||", sql);
-		Assert.Contains("COALESCE", sql);
+		return base.Contains_over_concatenated_columns_both_fixed_length(async);
 	}
 }
