@@ -102,4 +102,60 @@ internal static class Extensions
 			}
 		}
 	}
+
+	public static int CountRunes(this ReadOnlySpan<char> text)
+	{
+		var length = text.Length;
+		if(length == 0)
+			return 0;
+
+		var i = text.IndexOfAnyInRange('\uD800', '\uDBFF');
+		if(i < 0)
+			return length;
+
+		var count = i;
+		while(i < length)
+		{
+			if(char.IsHighSurrogate(text[i]) && i + 1 < length && char.IsLowSurrogate(text[i + 1]))
+			{
+				i += 2;
+			}
+			else
+			{
+				i++;
+			}
+			count++;
+		}
+		return count;
+	}
+
+	public static ReadOnlySpan<char> TruncateStringToRuneCount(this ReadOnlySpan<char> text, int maxRuneCount)
+	{
+		if(maxRuneCount <= 0 || text.IsEmpty)
+			return ReadOnlySpan<char>.Empty;
+
+		var length = text.Length;
+		if(maxRuneCount >= length)
+			return text;
+
+		var prefix = text[..maxRuneCount];
+		var i = prefix.IndexOfAnyInRange('\uD800', '\uDBFF');
+		if(i < 0)
+			return prefix;
+
+		var remaining = maxRuneCount - i;
+		while(i < length && remaining > 0)
+		{
+			if(char.IsHighSurrogate(text[i]) && i + 1 < length && char.IsLowSurrogate(text[i + 1]))
+			{
+				i += 2;
+			}
+			else
+			{
+				i++;
+			}
+			remaining--;
+		}
+		return text[..i];
+	}
 }
