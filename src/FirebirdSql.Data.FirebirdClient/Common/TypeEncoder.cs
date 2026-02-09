@@ -16,7 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
-using System.Globalization;
+using System.Buffers.Binary;
 using System.Net;
 using System.Numerics;
 using FirebirdSql.Data.Types;
@@ -64,11 +64,7 @@ internal static class TypeEncoder
 
 	public static int EncodeDate(DateTime d)
 	{
-		var calendar = new GregorianCalendar();
-		var day = calendar.GetDayOfMonth(d);
-		var month = calendar.GetMonth(d);
-		var year = calendar.GetYear(d);
-		return EncodeDateImpl(year, month, day);
+		return EncodeDateImpl(d.Year, d.Month, d.Day);
 	}
 	public static int EncodeDate(DateOnly d)
 	{
@@ -97,6 +93,11 @@ internal static class TypeEncoder
 		return new[] { (byte)(value ? 1 : 0) };
 	}
 
+	public static void EncodeBoolean(bool value, Span<byte> destination)
+	{
+		destination[0] = (byte)(value ? 1 : 0);
+	}
+
 	public static byte[] EncodeGuid(Guid value)
 	{
 		var data = value.ToByteArray();
@@ -109,17 +110,62 @@ internal static class TypeEncoder
 			b[0], b[1],
 			c[0], c[1],
 			data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]
-		};
+    };
+  }
+
+	public static void EncodeGuid(Guid value, Span<byte> destination)
+	{
+		Span<byte> data = stackalloc byte[16];
+		if (!value.TryWriteBytes(data))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+
+		Span<byte> a = stackalloc byte[4];
+		Span<byte> b = stackalloc byte[2];
+		Span<byte> c = stackalloc byte[2];
+
+		if (!BitConverter.TryWriteBytes(a, IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data[..4]))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+		if (!BitConverter.TryWriteBytes(b, IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data.Slice(4, 2)))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+		if (!BitConverter.TryWriteBytes(c, IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data.Slice(6, 2)))))
+		{
+			throw new InvalidOperationException("Failed to write Guid bytes.");
+		}
+
+		a.CopyTo(destination[..4]);
+		b.CopyTo(destination.Slice(4, 2));
+		c.CopyTo(destination.Slice(6, 2));
+		data.Slice(8, 8).CopyTo(destination[8..]);
 	}
 
 	public static byte[] EncodeInt32(int value)
 	{
-		return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
+		var result = new byte[4];
+		EncodeInt32(value, result);
+		return result;
+	}
+
+	public static void EncodeInt32(int value, Span<byte> destination)
+	{
+		BinaryPrimitives.WriteInt32BigEndian(destination, value);
 	}
 
 	public static byte[] EncodeInt64(long value)
 	{
-		return BitConverter.GetBytes(IPAddress.NetworkToHostOrder(value));
+		var result = new byte[8];
+		EncodeInt64(value, result);
+		return result;
+	}
+
+	public static void EncodeInt64(long value, Span<byte> destination)
+	{
+		BinaryPrimitives.WriteInt64BigEndian(destination, value);
 	}
 
 	public static byte[] EncodeDec16(FbDecFloat value)
