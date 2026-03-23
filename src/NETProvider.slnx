@@ -13,8 +13,8 @@
     <Project Path="FirebirdSql.Data.FirebirdClient.Tests/FirebirdSql.Data.FirebirdClient.Tests.csproj" />
     <Project Path="FirebirdSql.Data.FirebirdClient/FirebirdSql.Data.FirebirdClient.csproj" />
   </Folder>
-  <Folder Name="/Provider/Perf/">
-    <Project Path="Perf/Perf.csproj" />
+  <Folder Name="/Provider/Benchmarks/">
+    <Project Path="FirebirdSql.Data.FirebirdClient.Benchmarks/FirebirdSql.Data.FirebirdClient.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/Provider/Scratchpad/">
     <Project Path="Scratchpad/Scratchpad.csproj" />
