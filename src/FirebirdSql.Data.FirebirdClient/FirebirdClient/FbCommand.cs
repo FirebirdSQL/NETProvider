@@ -1325,6 +1325,8 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 
 	private void TraceCommandStop()
 	{
+		Debug.Assert(_startedAtTicks > 0 || _currentActivity == null, "TraceCommandStop called without TraceCommandStart");
+
 		if (_currentActivity != null)
 		{
 			// Do not set status to Ok: https://opentelemetry.io/docs/concepts/signals/traces/#span-status
@@ -1338,6 +1340,8 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 
 	private void TraceCommandException(Exception e)
 	{
+		Debug.Assert(_startedAtTicks > 0 || _currentActivity == null, "TraceCommandException called without TraceCommandStart");
+
 		if (_currentActivity != null)
 		{
 			FbActivitySource.CommandException(_currentActivity, e);
