@@ -128,6 +128,10 @@ namespace FirebirdSql.Data.Trace
 				? fbException.SQLSTATE
 				: exception.Message;
 
+			activity.SetTag("error.type", exception is FbException fbEx
+				? fbEx.SQLSTATE ?? exception.GetType().FullName
+				: exception.GetType().FullName);
+
 			activity.SetStatus(ActivityStatusCode.Error, errorDescription);
 			activity.Dispose();
 		}
