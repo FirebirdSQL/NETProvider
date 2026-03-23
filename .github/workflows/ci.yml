@@ -74,6 +74,12 @@ jobs:
           name: test-binaries
           path: '.\\src\\'
 
+      - name: Firebird Cache
+        uses: actions/cache@v4
+        with:
+          path: 'C:\firebird'
+          key: firebird-${{ matrix.FIREBIRD_SELECTION }}
+
       - name: Tests
         run: |
           try {
