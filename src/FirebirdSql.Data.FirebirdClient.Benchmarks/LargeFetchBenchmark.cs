@@ -5,8 +5,7 @@ namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 [Config(typeof(BenchmarkConfig))]
 public class LargeFetchBenchmark : BenchmarkBase
 {
-	[Params(100_000)]
-	public int Count { get; set; }
+	const int Count = 100_000;
 
 	[Params(
 		"BIGINT",
