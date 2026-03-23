@@ -45,7 +45,7 @@ internal abstract class BlobBase
 
 	protected BlobBase(DatabaseBase db)
 	{
-		_segmentSize = db.PacketSize;
+		_segmentSize = db.BlobSegmentSize;
 		_charset = db.Charset;
 	}
 
