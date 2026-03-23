@@ -279,7 +279,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 		get { return _state == ConnectionState.Closed; }
 	}
 
-	internal KeyValuePair<string, object>[] MetricsConnectionAttributes;
+	internal KeyValuePair<string, object>[] MetricsConnectionAttributes = [];
 
 	#endregion
 
