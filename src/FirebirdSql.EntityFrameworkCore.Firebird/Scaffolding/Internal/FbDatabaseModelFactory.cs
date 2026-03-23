@@ -319,6 +319,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
                LEFT JOIN rdb$relation_constraints rc on rc.rdb$index_name = I.rdb$index_name and rc.rdb$constraint_type = null
               WHERE
                trim(i.rdb$relation_name) = '{0}'
+               AND i.RDB$EXPRESSION_SOURCE IS NULL
               GROUP BY
                INDEX_NAME, IS_UNIQUE, IS_DESC ;";
 
@@ -337,6 +338,12 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 				{
 					while (reader.Read())
 					{
+						var columns = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
+						if (string.IsNullOrEmpty(columns))
+						{
+							continue;
+						}
+
 						var index = new DatabaseIndex
 						{
 							Table = table,
@@ -344,7 +351,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 							IsUnique = reader.GetBoolean(1),
 						};
 
-						foreach (var column in reader.GetString(3).Split(','))
+						foreach (var column in columns.Split(','))
 						{
 							index.Columns.Add(table.Columns.Single(y => y.Name == column.Trim()));
 						}

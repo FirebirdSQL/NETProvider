@@ -107,6 +107,54 @@ public class ScaffoldingTests : EntityFrameworkCoreTestsBase
 		Assert.That(column.StoreType, Is.EqualTo(dataType));
 	}
 
+	[Test]
+	public async Task ExpressionIndexDoesNotBreakScaffolding()
+	{
+		var tableName = "TEST_EXPR_IDX";
+
+		using var commandTable = Connection.CreateCommand();
+		commandTable.CommandText = $"recreate table {tableName} (ID INTEGER NOT NULL, DATA VARCHAR(100))";
+		await commandTable.ExecuteNonQueryAsync();
+
+		using var commandIndex = Connection.CreateCommand();
+		commandIndex.CommandText = $"create index IDX_EXPR on {tableName} computed by (upper(DATA))";
+		await commandIndex.ExecuteNonQueryAsync();
+
+		var modelFactory = GetModelFactory();
+		var model = modelFactory.Create(Connection.ConnectionString, new DatabaseModelFactoryOptions(new string[] { tableName }));
+		var table = model.Tables.Single(x => x.Name == tableName);
+
+		Assert.That(table.Indexes, Has.None.Matches<Microsoft.EntityFrameworkCore.Scaffolding.Metadata.DatabaseIndex>(x => x.Name == "IDX_EXPR"));
+	}
+
+	[Test]
+	public async Task RegularIndexScaffoldedAlongsideExpressionIndex()
+	{
+		var tableName = "TEST_MIX_IDX";
+
+		using var commandTable = Connection.CreateCommand();
+		commandTable.CommandText = $"recreate table {tableName} (ID INTEGER NOT NULL, DATA VARCHAR(100))";
+		await commandTable.ExecuteNonQueryAsync();
+
+		using var commandRegularIndex = Connection.CreateCommand();
+		commandRegularIndex.CommandText = $"create index IDX_REGULAR on {tableName} (DATA)";
+		await commandRegularIndex.ExecuteNonQueryAsync();
+
+		using var commandExprIndex = Connection.CreateCommand();
+		commandExprIndex.CommandText = $"create index IDX_EXPR_MIX on {tableName} computed by (upper(DATA))";
+		await commandExprIndex.ExecuteNonQueryAsync();
+
+		var modelFactory = GetModelFactory();
+		var model = modelFactory.Create(Connection.ConnectionString, new DatabaseModelFactoryOptions(new string[] { tableName }));
+		var table = model.Tables.Single(x => x.Name == tableName);
+
+		Assert.Multiple(() =>
+		{
+			Assert.That(table.Indexes, Has.Some.Matches<Microsoft.EntityFrameworkCore.Scaffolding.Metadata.DatabaseIndex>(x => x.Name == "IDX_REGULAR"));
+			Assert.That(table.Indexes, Has.None.Matches<Microsoft.EntityFrameworkCore.Scaffolding.Metadata.DatabaseIndex>(x => x.Name == "IDX_EXPR_MIX"));
+		});
+	}
+
 	static IDatabaseModelFactory GetModelFactory()
 	{
 		return new FbDatabaseModelFactory();
