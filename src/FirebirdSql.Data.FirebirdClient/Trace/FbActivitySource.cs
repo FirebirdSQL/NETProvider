@@ -128,7 +128,7 @@ namespace FirebirdSql.Data.Trace
 			if (string.IsNullOrEmpty(sql))
 				return null;
 			var span = sql.AsSpan().TrimStart();
-			var spaceIndex = span.IndexOfAny(' ', '\t', '\n', '\r');
+			var spaceIndex = span.IndexOfAny([' ', '\t', '\n', '\r']);
 			if (spaceIndex <= 0)
 				return span.Length > 0 ? span.ToString().ToUpperInvariant() : null;
 			return span.Slice(0, spaceIndex).ToString().ToUpperInvariant();
