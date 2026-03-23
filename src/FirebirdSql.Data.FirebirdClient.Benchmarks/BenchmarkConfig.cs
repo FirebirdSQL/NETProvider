@@ -19,12 +19,16 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
 class BenchmarkConfig : ManualConfig
 {
+	static readonly IToolchain Net100Toolchain =
+		CsProjCoreToolchain.From(new NetCoreAppSettings("net10.0", null, ".NET 10"));
+
 	public BenchmarkConfig()
 	{
 		var baseJob = Job.Default
@@ -32,17 +36,17 @@ class BenchmarkConfig : ManualConfig
 
 		AddJob(
 			baseJob
-				.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
+				.WithToolchain(Net100Toolchain)
 				.WithCustomBuildConfiguration("ReleaseNuGet")
-				.WithId("NuGet80")
+				.WithId("NuGet100")
 				.AsBaseline()
 		);
 
 		AddJob(
 			baseJob
-				.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
+				.WithToolchain(Net100Toolchain)
 				.WithCustomBuildConfiguration("Release")
-				.WithId("Core80")
+				.WithId("Core100")
 		);
 
 		AddDiagnoser(MemoryDiagnoser.Default);
