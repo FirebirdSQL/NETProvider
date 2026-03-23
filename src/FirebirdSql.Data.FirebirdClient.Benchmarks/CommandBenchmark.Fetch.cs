@@ -15,13 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
 public partial class CommandBenchmark
 {
-	[GlobalSetup(Target = nameof(Fetch))]
+	[GlobalSetup(Targets = new[] { nameof(Fetch), nameof(FetchAsync) })]
 	public void FetchGlobalSetup()
 	{
 		CreateDatabase();
@@ -69,5 +70,25 @@ public partial class CommandBenchmark
 			last = reader[0];
 		}
 		return last;
+	}
+
+	[Benchmark]
+	public async Task<object> FetchAsync()
+	{
+		await using var conn = new FbConnection(ConnectionString);
+		await conn.OpenAsync();
+
+		await using var cmd = conn.CreateCommand();
+		cmd.CommandText = "SELECT x FROM foobar";
+
+		object last = null;
+		await using var reader = await cmd.ExecuteReaderAsync();
+		while (await reader.ReadAsync())
+		{
+			last = reader[0];
+		}
+		return last;
+	}
+}
 	}
 }
