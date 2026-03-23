@@ -16,49 +16,12 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Validators;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
-[Config(typeof(Config))]
+[Config(typeof(BenchmarkConfig))]
 public partial class CommandBenchmark
 {
-	class Config : ManualConfig
-	{
-		public Config()
-		{
-			var baseJob = Job.Default
-				.WithWarmupCount(3)
-				.WithPlatform(Platform.X64)
-				.WithJit(Jit.RyuJit);
-
-			AddJob(
-				baseJob
-					.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
-					.WithCustomBuildConfiguration("ReleaseNuGet")
-					.WithId("NuGet80")
-					.AsBaseline()
-			);
-
-			AddJob(
-				baseJob
-					.WithToolchain(CsProjCoreToolchain.NetCoreApp80)
-					.WithCustomBuildConfiguration("Release")
-					.WithId("Core80")
-			);
-
-			AddDiagnoser(MemoryDiagnoser.Default);
-
-			AddValidator(BaselineValidator.FailOnError);
-			AddValidator(JitOptimizationsValidator.FailOnError);
-		}
-	}
-
 	protected const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
 
 	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
