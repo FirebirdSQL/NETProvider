@@ -94,42 +94,20 @@ namespace FirebirdSql.Data.Trace
 			{
 				foreach (FbParameter p in command.Parameters)
 				{
-					var name = p.ParameterName;
-					var value = NormalizeDbNull(p.InternalValue);
-					activity.SetTag($"db.query.parameter.{name}", value);
+					activity.SetTag($"db.query.parameter.{p.ParameterName}", p.InternalValue == DBNull.Value ? null : p.InternalValue);
 				}
-			}
-
-			// Only for explicit transactions.
-			if (command.Transaction != null)
-			{
-				FbTransactionInfo fbInfo = new FbTransactionInfo(command.Transaction);
-
-				var transactionId = fbInfo.GetTransactionId();
-				activity.SetTag($"db.transaction_id", transactionId);
-
-				// TODO: Firebird 4+ only (or remove?)
-				/*
-				var snapshotId = fbInfo.GetTransactionSnapshotNumber();
-				if (snapshotId != 0)
-				{
-					activity.SetTag($"db.snapshot_id", snapshotId);
-				}
-				*/
 			}
 
 			return activity;
 		}
 
-		internal static void CommandException(Activity activity, Exception exception, bool escaped = true)
+		internal static void CommandException(Activity activity, Exception exception)
 		{
-			// Reference: https://github.com/open-telemetry/semantic-conventions/blob/main/docs/exceptions/exceptions-spans.md
 			activity.AddEvent(
 				new("exception", tags: new()
 				{
 					{ "exception.message", exception.Message },
 					{ "exception.type", exception.GetType().FullName },
-					{ "exception.escaped", escaped },
 					{ "exception.stacktrace", exception.ToString() },
 				})
 			);
@@ -145,10 +123,5 @@ namespace FirebirdSql.Data.Trace
 			activity.SetStatus(ActivityStatusCode.Error, errorDescription);
 			activity.Dispose();
 		}
-
-		private static object NormalizeDbNull(object value) =>
-			value == DBNull.Value || value == null
-				? null
-				: value;
 	}
 }
