@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Logging;
 
@@ -9,7 +10,9 @@ namespace FirebirdSql.Data.Trace
 {
 	internal static class FbActivitySource
 	{
-		internal static readonly ActivitySource Source = new("FirebirdSql.Data", "1.0.0");
+		static readonly string Version = typeof(FbActivitySource).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
+
+		internal static readonly ActivitySource Source = new("FirebirdSql.Data", Version);
 
 		internal static Activity CommandStart(FbCommand command)
 		{

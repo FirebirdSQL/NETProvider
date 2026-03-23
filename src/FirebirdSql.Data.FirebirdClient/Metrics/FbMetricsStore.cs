@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 
 namespace FirebirdSql.Data.Metrics
@@ -14,7 +15,9 @@ namespace FirebirdSql.Data.Metrics
 		private const string ConnectionStateIdleValue = "idle";
 		private const string ConnectionStateUsedValue = "used";
 
-		internal static readonly Meter Source = new("FirebirdSql.Data", "1.0.0");
+		static readonly string Version = typeof(FbMetricsStore).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
+
+		internal static readonly Meter Source = new("FirebirdSql.Data", Version);
 
 		static readonly Histogram<double> OperationDuration;
 		static readonly Histogram<double> ConnectionCreateTime;
