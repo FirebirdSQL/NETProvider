@@ -20,7 +20,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: NuGet Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props', '**/Versions.props') }}
@@ -39,13 +39,13 @@ jobs:
         shell: powershell
 
       - name: Upload Build Output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: '.\\out\\'
 
       - name: Upload Test Binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-binaries
           path: '.\\src\\**\\bin\\'
@@ -84,13 +84,13 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Download Test Binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: test-binaries
           path: '.\\src\\'
 
       - name: Firebird Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: 'C:\firebird'
           key: firebird-${{ matrix.FIREBIRD_SELECTION }}
