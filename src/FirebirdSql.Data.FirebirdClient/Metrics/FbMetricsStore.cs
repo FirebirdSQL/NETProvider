@@ -24,12 +24,20 @@ namespace FirebirdSql.Data.Metrics
 
 		static FbMetricsStore()
 		{
-			// Reference: https://github.com/open-telemetry/semantic-conventions/blob/main/docs/database/database-spans.md
+#if NET9_0_OR_GREATER
+			var durationAdvice = new InstrumentAdvice<double>
+			{
+				HistogramBucketBoundaries = [0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+			};
+#endif
 
 			OperationDuration = Source.CreateHistogram<double>(
 				"db.client.operation.duration",
 				unit: "s",
 				description: "Duration of database client operations."
+#if NET9_0_OR_GREATER
+				, advice: durationAdvice
+#endif
 			);
 
 			Source.CreateObservableUpDownCounter(
@@ -39,12 +47,6 @@ namespace FirebirdSql.Data.Metrics
 				description: "The number of connections that are currently in state described by the 'state' attribute."
 			);
 
-			// db.client.connection.idle.max
-			//   The maximum number of idle open connections allowed
-
-			// db.client.connection.idle.min
-			//   The minimum number of idle open connections allowed
-
 			Source.CreateObservableUpDownCounter(
 				"db.client.connection.max",
 				GetConnectionMax,
@@ -52,16 +54,13 @@ namespace FirebirdSql.Data.Metrics
 				description: "The maximum number of open connections allowed."
 			);
 
-			// db.client.connection.pending_requests
-			//   The number of current pending requests for an open connection
-
-			// db.client.connection.timeouts
-			//   The number of connection timeouts that have occurred trying to obtain a connection from the pool
-
 			ConnectionCreateTime = Source.CreateHistogram<double>(
 				"db.client.connection.create_time",
 				unit: "s",
 				description: "The time it took to create a new connection."
+#if NET9_0_OR_GREATER
+				, advice: durationAdvice
+#endif
 			);
 
 			// db.client.connection.wait_time
