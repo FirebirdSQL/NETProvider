@@ -548,7 +548,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	public void WriteBlobBuffer(byte[] buffer)
 	{
 		var length = buffer.Length; // 2 for short for buffer length
-		if (length > short.MaxValue)
+		if (length > ushort.MaxValue)
 			throw new IOException("Blob buffer too big.");
 		Write(length + 2);
 		Write(length + 2);  //bizarre but true! three copies of the length
@@ -559,7 +559,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	public async ValueTask WriteBlobBufferAsync(byte[] buffer, CancellationToken cancellationToken = default)
 	{
 		var length = buffer.Length; // 2 for short for buffer length
-		if (length > short.MaxValue)
+		if (length > ushort.MaxValue)
 			throw new IOException("Blob buffer too big.");
 		await WriteAsync(length + 2, cancellationToken).ConfigureAwait(false);
 		await WriteAsync(length + 2, cancellationToken).ConfigureAwait(false);  //bizarre but true! three copies of the length

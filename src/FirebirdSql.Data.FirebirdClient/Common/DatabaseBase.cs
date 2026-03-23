@@ -33,16 +33,18 @@ internal abstract class DatabaseBase
 	public abstract int Handle { get; }
 	public Charset Charset { get; }
 	public int PacketSize { get; }
+	public int BlobSegmentSize { get; }
 	public short Dialect { get; }
 	public int TransactionCount { get; set; }
 	public string ServerVersion { get; protected set; }
 	public abstract bool HasRemoteEventSupport { get; }
 	public abstract bool ConnectionBroken { get; }
 
-	public DatabaseBase(Charset charset, int packetSize, short dialect)
+	public DatabaseBase(Charset charset, int packetSize, int blobSegmentSize, short dialect)
 	{
 		Charset = charset;
 		PacketSize = packetSize;
+		BlobSegmentSize = blobSegmentSize;
 		Dialect = dialect;
 	}
 

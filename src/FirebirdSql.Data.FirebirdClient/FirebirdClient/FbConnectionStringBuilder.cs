@@ -81,8 +81,9 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 
 	[Category("Advanced")]
 	[DisplayName("PacketSize")]
-	[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes.")]
+	[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes. Deprecated: use BlobSegmentSize instead.")]
 	[DefaultValue(Common.ConnectionString.DefaultValuePacketSize)]
+	[Obsolete("Use BlobSegmentSize instead.")]
 	public int PacketSize
 	{
 		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyPacketSize), base.TryGetValue, Common.ConnectionString.DefaultValuePacketSize); }
@@ -317,6 +318,16 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 	{
 		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyParallelWorkers), base.TryGetValue, Common.ConnectionString.DefaultValueParallelWorkers); }
 		set { SetValue(Common.ConnectionString.DefaultKeyParallelWorkers, value); }
+	}
+
+	[Category("Advanced")]
+	[DisplayName("BlobSegmentSize")]
+	[Description("The size (in bytes) of blob segments. BlobSegmentSize may be in the range 512-65535 bytes.")]
+	[DefaultValue(Common.ConnectionString.DefaultValueBlobSegmentSize)]
+	public int BlobSegmentSize
+	{
+		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyBlobSegmentSize), base.TryGetValue, Common.ConnectionString.DefaultValueBlobSegmentSize); }
+		set { SetValue(Common.ConnectionString.DefaultKeyBlobSegmentSize, value); }
 	}
 
 	#endregion
