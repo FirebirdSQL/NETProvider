@@ -52,6 +52,10 @@ namespace FirebirdSql.Data.Trace
 			}
 
 			// db.namespace
+			if (dbName != null)
+			{
+				activity.SetTag("db.namespace", dbName);
+			}
 
 			if (dbOperationName != null)
 			{
