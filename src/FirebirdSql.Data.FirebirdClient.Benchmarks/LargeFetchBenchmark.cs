@@ -3,10 +3,8 @@
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
 [Config(typeof(BenchmarkConfig))]
-public class LargeFetchBenchmark
+public class LargeFetchBenchmark : BenchmarkBase
 {
-	protected const string ConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
-
 	[Params(100_000)]
 	public int Count { get; set; }
 
@@ -22,14 +20,7 @@ public class LargeFetchBenchmark
 	[GlobalSetup(Target = nameof(Fetch))]
 	public void FetchGlobalSetup()
 	{
-		FbConnection.CreateDatabase(ConnectionString, 8192, false, true);
-	}
-
-	[GlobalCleanup]
-	public void GlobalCleanup()
-	{
-		FbConnection.ClearAllPools();
-		FbConnection.DropDatabase(ConnectionString);
+		CreateDatabase(pageSize: 8192);
 	}
 
 	[Benchmark]
