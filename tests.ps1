@@ -133,6 +133,13 @@ function Tests-FirebirdClient-Default-NoCompression-CryptDisabled() {
 function Tests-FirebirdClient-Embedded() {
 	Tests-FirebirdClient 'Embedded' $False 'Disabled'
 }
+function Tests-FirebirdClient-All() {
+	Tests-FirebirdClient-Default-Compression-CryptRequired
+	Tests-FirebirdClient-Default-NoCompression-CryptRequired
+	Tests-FirebirdClient-Default-Compression-CryptDisabled
+	Tests-FirebirdClient-Default-NoCompression-CryptDisabled
+	Tests-FirebirdClient-Embedded
+}
 function Tests-FirebirdClient($serverType, $compression, $wireCrypt) {
 	pushd $testsProviderDir
 	try {
