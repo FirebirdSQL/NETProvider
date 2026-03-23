@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Logging;
 
 namespace FirebirdSql.Data.Trace
 {
@@ -72,7 +73,10 @@ namespace FirebirdSql.Data.Trace
 
 			// db.query_summary
 
-			activity.SetTag("db.query.text", command.CommandText);
+			if (FbLogManager.IsQueryTextTracingEnabled)
+			{
+				activity.SetTag("db.query.text", command.CommandText);
+			}
 
 			// network.peer.address
 
@@ -83,11 +87,14 @@ namespace FirebirdSql.Data.Trace
 				activity.SetTag("server.address", command.Connection.DataSource);
 			}
 
-			foreach (FbParameter p in command.Parameters)
+			if (FbLogManager.IsParameterLoggingEnabled)
 			{
-				var name = p.ParameterName;
-				var value = NormalizeDbNull(p.InternalValue);
-				activity.SetTag($"db.query.parameter.{name}", value);
+				foreach (FbParameter p in command.Parameters)
+				{
+					var name = p.ParameterName;
+					var value = NormalizeDbNull(p.InternalValue);
+					activity.SetTag($"db.query.parameter.{name}", value);
+				}
 			}
 
 			// Only for explicit transactions.
