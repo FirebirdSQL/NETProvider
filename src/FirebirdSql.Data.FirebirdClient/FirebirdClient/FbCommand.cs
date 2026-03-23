@@ -1343,6 +1343,9 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			FbActivitySource.CommandException(_currentActivity, e);
 			_currentActivity = null;
 		}
+
+		FbMetricsStore.CommandStop(_startedAtTicks, Connection);
+		_startedAtTicks = 0;
 	}
 
 	#endregion Tracing
