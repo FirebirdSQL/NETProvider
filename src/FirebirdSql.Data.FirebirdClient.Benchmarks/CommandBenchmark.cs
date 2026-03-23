@@ -22,9 +22,8 @@ namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 [Config(typeof(BenchmarkConfig))]
 public partial class CommandBenchmark : BenchmarkBase
 {
+	const int Count = 100;
+
 	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
 	public string DataType { get; set; }
-
-	[Params(100)]
-	public int Count { get; set; }
 }
