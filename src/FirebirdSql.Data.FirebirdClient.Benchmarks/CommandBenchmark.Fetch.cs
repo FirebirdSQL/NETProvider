@@ -90,5 +90,3 @@ public partial class CommandBenchmark
 		return last;
 	}
 }
-	}
-}
