@@ -5,6 +5,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Trace;
 
 namespace FirebirdSql.Data.Metrics
 {
@@ -17,7 +18,7 @@ namespace FirebirdSql.Data.Metrics
 
 		static readonly string Version = typeof(FbMetricsStore).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
 
-		internal static readonly Meter Source = new("FirebirdSql.Data", Version);
+		internal static readonly Meter Source = new(FbTelemetry.MeterName, Version);
 
 		static readonly Histogram<double> OperationDuration;
 		static readonly Histogram<double> ConnectionCreateTime;
