@@ -37,7 +37,8 @@ namespace FirebirdSql.Data.Trace
 					break;
 
 				case CommandType.Text:
-					activityName = dbName;
+					dbOperationName = ExtractSqlVerb(command.CommandText);
+					activityName = dbOperationName ?? dbName;
 					break;
 
 				default:
@@ -64,6 +65,8 @@ namespace FirebirdSql.Data.Trace
 			{
 				activity.SetTag("db.operation.name", dbOperationName);
 			}
+
+			activity.SetTag("db.query.summary", activityName);
 
 			if (command.CommandType == CommandType.StoredProcedure)
 			{
@@ -118,6 +121,17 @@ namespace FirebirdSql.Data.Trace
 
 			activity.SetStatus(ActivityStatusCode.Error, errorDescription);
 			activity.Dispose();
+		}
+
+		static string ExtractSqlVerb(string sql)
+		{
+			if (string.IsNullOrEmpty(sql))
+				return null;
+			var span = sql.AsSpan().TrimStart();
+			var spaceIndex = span.IndexOfAny(' ', '\t', '\n', '\r');
+			if (spaceIndex <= 0)
+				return span.Length > 0 ? span.ToString().ToUpperInvariant() : null;
+			return span.Slice(0, spaceIndex).ToString().ToUpperInvariant();
 		}
 	}
 }
