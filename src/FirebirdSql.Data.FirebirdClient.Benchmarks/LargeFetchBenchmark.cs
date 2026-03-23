@@ -23,7 +23,7 @@ public class LargeFetchBenchmark : BenchmarkBase
 	}
 
 	[Benchmark]
-	public void Fetch()
+	public object Fetch()
 	{
 		using var conn = new FbConnection(ConnectionString);
 		conn.Open();
@@ -43,11 +43,13 @@ public class LargeFetchBenchmark : BenchmarkBase
 			END
 		";
 
+		object last = null;
 		using var reader = cmd.ExecuteReader();
 		while (reader.Read())
 		{
-			_ = reader[0];
+			last = reader[0];
 		}
+		return last;
 	}
 	private static string GetFillExpression(string dataType) =>
 		dataType switch

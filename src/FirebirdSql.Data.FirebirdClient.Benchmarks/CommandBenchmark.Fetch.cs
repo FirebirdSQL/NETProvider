@@ -54,7 +54,7 @@ public partial class CommandBenchmark
 	}
 
 	[Benchmark]
-	public void Fetch()
+	public object Fetch()
 	{
 		using var conn = new FbConnection(ConnectionString);
 		conn.Open();
@@ -62,10 +62,12 @@ public partial class CommandBenchmark
 		using var cmd = conn.CreateCommand();
 		cmd.CommandText = "SELECT x FROM foobar";
 
+		object last = null;
 		using var reader = cmd.ExecuteReader();
 		while (reader.Read())
 		{
-			var _ = reader[0];
+			last = reader[0];
 		}
+		return last;
 	}
 }
