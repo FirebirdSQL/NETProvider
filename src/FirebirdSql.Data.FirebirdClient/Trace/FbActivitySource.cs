@@ -44,7 +44,7 @@ namespace FirebirdSql.Data.Trace
 			if (activity is not { IsAllDataRequested: true })
 				return activity;
 
-			activity.SetTag("db.system", "firebird");
+			activity.SetTag("db.system.name", "firebirdsql");
 
 			if (dbCollectionName != null)
 			{

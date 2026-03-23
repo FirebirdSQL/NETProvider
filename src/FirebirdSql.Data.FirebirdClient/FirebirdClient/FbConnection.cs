@@ -194,7 +194,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 				_connectionString = value;
 
 				MetricsConnectionAttributes = [
-					new("db.system", "firebird"),
+					new("db.system.name", "firebirdsql"),
 					new("db.namespace", _options.Database),
 					new("server.address", $"{_options.DataSource}:{_options.Port}")
 				];
