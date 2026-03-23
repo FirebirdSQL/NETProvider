@@ -97,29 +97,26 @@ namespace FirebirdSql.Data.Metrics
 
 		static IEnumerable<Measurement<int>> GetConnectionCount() =>
 			FbConnectionPoolManager.Instance.GetMetrics()
-				.SelectMany(kvp => new List<Measurement<int>>
+				.SelectMany(m => new List<Measurement<int>>
 				{
 					new(
-						kvp.Value.idleCount,
-						new(ConnectionPoolNameAttributeName, kvp.Key),
+						m.idleCount,
+						new(ConnectionPoolNameAttributeName, m.poolName),
 						new(ConnectionStateAttributeName, ConnectionStateIdleValue)
 					),
 
 					new(
-						kvp.Value.busyCount,
-						new(ConnectionPoolNameAttributeName, kvp.Key),
+						m.busyCount,
+						new(ConnectionPoolNameAttributeName, m.poolName),
 						new(ConnectionStateAttributeName, ConnectionStateUsedValue)
 					),
 				});
 
 		static IEnumerable<Measurement<int>> GetConnectionMax() =>
 			FbConnectionPoolManager.Instance.GetMetrics()
-				.SelectMany(kvp => new List<Measurement<int>>
-				{
-					new(
-						kvp.Value.maxSize,
-						[new(ConnectionPoolNameAttributeName, kvp.Key)]
-					),
-				});
+				.Select(m => new Measurement<int>(
+					m.maxSize,
+					[new(ConnectionPoolNameAttributeName, m.poolName)]
+				));
 	}
 }
