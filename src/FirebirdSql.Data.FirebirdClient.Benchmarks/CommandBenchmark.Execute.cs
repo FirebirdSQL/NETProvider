@@ -15,13 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
 public partial class CommandBenchmark
 {
-	[GlobalSetup(Target = nameof(Execute))]
+	[GlobalSetup(Targets = new[] { nameof(Execute), nameof(ExecuteAsync) })]
 	public void ExecuteGlobalSetup()
 	{
 		CreateDatabase();
@@ -50,6 +51,25 @@ public partial class CommandBenchmark
 		{
 			p.Value = i;
 			cmd.ExecuteNonQuery();
+		}
+	}
+
+	[Benchmark]
+	public async Task ExecuteAsync()
+	{
+		await using var conn = new FbConnection(ConnectionString);
+		await conn.OpenAsync();
+
+		await using var cmd = conn.CreateCommand();
+		cmd.CommandText = @"INSERT INTO foobar (x) VALUES (@cnt)";
+
+		var p = new FbParameter() { ParameterName = "@cnt" };
+		cmd.Parameters.Add(p);
+
+		for (var i = 0; i < Count; i++)
+		{
+			p.Value = i;
+			await cmd.ExecuteNonQueryAsync();
 		}
 	}
 }
