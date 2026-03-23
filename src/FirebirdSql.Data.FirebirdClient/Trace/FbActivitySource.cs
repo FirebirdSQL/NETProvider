@@ -13,7 +13,7 @@ namespace FirebirdSql.Data.Trace
 	{
 		static readonly string Version = typeof(FbActivitySource).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
 
-		internal static readonly ActivitySource Source = new("FirebirdSql.Data", Version);
+		internal static readonly ActivitySource Source = new(FbTelemetry.ActivitySourceName, Version);
 
 		internal static Activity CommandStart(FbCommand command)
 		{
