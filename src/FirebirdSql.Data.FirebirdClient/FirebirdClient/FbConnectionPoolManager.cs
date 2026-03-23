@@ -224,11 +224,8 @@ sealed class FbConnectionPoolManager : IDisposable
 		}
 	}
 
-	internal Dictionary<string, (int idleCount, int busyCount, int maxSize)> GetMetrics() =>
-		_pools.ToDictionary(
-			kvp => kvp.Key,
-			kvp => (kvp.Value.AvailableCount, kvp.Value.BusyCount, kvp.Value.MaxSize)
-		);
+	internal IEnumerable<(string poolName, int idleCount, int busyCount, int maxSize)> GetMetrics() =>
+		_pools.Select(kvp => (kvp.Key, kvp.Value.AvailableCount, kvp.Value.BusyCount, kvp.Value.MaxSize));
 
 	public void Dispose()
 	{
