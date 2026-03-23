@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Reflection;
+using FirebirdSql.Data.Common;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Logging;
 
@@ -16,7 +17,6 @@ namespace FirebirdSql.Data.Trace
 
 		internal static Activity CommandStart(FbCommand command)
 		{
-			// Reference: https://github.com/open-telemetry/semantic-conventions/blob/main/docs/database/database-spans.md
 			var dbName = command.Connection.Database;
 
 			string dbOperationName = null;
@@ -55,7 +55,6 @@ namespace FirebirdSql.Data.Trace
 				activity.SetTag("db.collection.name", dbCollectionName);
 			}
 
-			// db.namespace
 			if (dbName != null)
 			{
 				activity.SetTag("db.namespace", dbName);
@@ -66,28 +65,25 @@ namespace FirebirdSql.Data.Trace
 				activity.SetTag("db.operation.name", dbOperationName);
 			}
 
-			// db.response.status_code
-
-			// error.type (handled by RecordException)
-
-			// server.port
-
-			// db.operation.batch.size
-
-			// db.query_summary
+			if (command.CommandType == CommandType.StoredProcedure)
+			{
+				activity.SetTag("db.stored_procedure.name", command.CommandText);
+			}
 
 			if (FbLogManager.IsQueryTextTracingEnabled)
 			{
 				activity.SetTag("db.query.text", command.CommandText);
 			}
 
-			// network.peer.address
-
-			// network.peer.port
-
 			if (command.Connection.DataSource != null)
 			{
 				activity.SetTag("server.address", command.Connection.DataSource);
+			}
+
+			var port = command.Connection.ConnectionOptions.Port;
+			if (port != ConnectionString.DefaultValuePortNumber)
+			{
+				activity.SetTag("server.port", port);
 			}
 
 			if (FbLogManager.IsParameterLoggingEnabled)
