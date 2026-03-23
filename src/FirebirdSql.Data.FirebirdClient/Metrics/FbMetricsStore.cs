@@ -74,10 +74,9 @@ namespace FirebirdSql.Data.Metrics
 		{
 			if (OperationDuration.Enabled && startedAtTicks > 0)
 			{
-				var elapsedTicks = Stopwatch.GetTimestamp() - startedAtTicks;
-				var elapsedSeconds = TimeSpan.FromTicks(elapsedTicks).TotalSeconds;
+				var elapsed = Stopwatch.GetElapsedTime(startedAtTicks);
 
-				OperationDuration.Record(elapsedSeconds, connection.MetricsConnectionAttributes);
+				OperationDuration.Record(elapsed.TotalSeconds, connection.MetricsConnectionAttributes);
 			}
 		}
 
@@ -87,10 +86,9 @@ namespace FirebirdSql.Data.Metrics
 		{
 			if (ConnectionCreateTime.Enabled && startedAtTicks > 0)
 			{
-				var elapsedTicks = Stopwatch.GetTimestamp() - startedAtTicks;
-				var elapsedSeconds = TimeSpan.FromTicks(elapsedTicks).TotalSeconds;
+				var elapsed = Stopwatch.GetElapsedTime(startedAtTicks);
 
-				ConnectionCreateTime.Record(elapsedSeconds, [new(ConnectionPoolNameAttributeName, poolName)]);
+				ConnectionCreateTime.Record(elapsed.TotalSeconds, [new(ConnectionPoolNameAttributeName, poolName)]);
 			}
 		}
 
