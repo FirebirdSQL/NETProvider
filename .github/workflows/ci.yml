@@ -56,8 +56,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        FIREBIRD_SELECTION: [FB30, FB40, FB50]
-        TEST_SUITE: [Tests-FirebirdClient-Default-Compression-CryptRequired, Tests-FirebirdClient-Default-NoCompression-CryptRequired, Tests-FirebirdClient-Default-Compression-CryptDisabled, Tests-FirebirdClient-Default-NoCompression-CryptDisabled, Tests-FirebirdClient-Embedded, Tests-EFCore, Tests-EFCore-Functional, Tests-EF6]
+        include:
+          # Full coverage on FB50 (latest)
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-Compression-CryptRequired }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-NoCompression-CryptRequired }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-Compression-CryptDisabled }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-NoCompression-CryptDisabled }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Embedded }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EFCore }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EFCore-Functional }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EF6 }
+          # Compatibility check on FB40
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-FirebirdClient-All }
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-EFCore }
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-EF6 }
+          # Compatibility check on FB30
+          - { FIREBIRD_SELECTION: FB30, TEST_SUITE: Tests-FirebirdClient-All }
+          - { FIREBIRD_SELECTION: FB30, TEST_SUITE: Tests-EFCore }
     timeout-minutes: 120
     steps:
       - name: Checkout
