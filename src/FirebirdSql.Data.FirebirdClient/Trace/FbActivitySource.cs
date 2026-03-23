@@ -41,68 +41,67 @@ namespace FirebirdSql.Data.Trace
 			}
 
 			var activity = Source.StartActivity(activityName, ActivityKind.Client);
-			if (activity.IsAllDataRequested)
+			if (activity is not { IsAllDataRequested: true })
+				return activity;
+
+			activity.SetTag("db.system", "firebird");
+
+			if (dbCollectionName != null)
 			{
-				activity.SetTag("db.system", "firebird");
+				activity.SetTag("db.collection.name", dbCollectionName);
+			}
 
-				if (dbCollectionName != null)
+			// db.namespace
+
+			if (dbOperationName != null)
+			{
+				activity.SetTag("db.operation.name", dbOperationName);
+			}
+
+			// db.response.status_code
+
+			// error.type (handled by RecordException)
+
+			// server.port
+
+			// db.operation.batch.size
+
+			// db.query_summary
+
+			activity.SetTag("db.query.text", command.CommandText);
+
+			// network.peer.address
+
+			// network.peer.port
+
+			if (command.Connection.DataSource != null)
+			{
+				activity.SetTag("server.address", command.Connection.DataSource);
+			}
+
+			foreach (FbParameter p in command.Parameters)
+			{
+				var name = p.ParameterName;
+				var value = NormalizeDbNull(p.InternalValue);
+				activity.SetTag($"db.query.parameter.{name}", value);
+			}
+
+			// Only for explicit transactions.
+			if (command.Transaction != null)
+			{
+				FbTransactionInfo fbInfo = new FbTransactionInfo(command.Transaction);
+
+				var transactionId = fbInfo.GetTransactionId();
+				activity.SetTag($"db.transaction_id", transactionId);
+
+				// TODO: Firebird 4+ only (or remove?)
+				/*
+				var snapshotId = fbInfo.GetTransactionSnapshotNumber();
+				if (snapshotId != 0)
 				{
-					activity.SetTag("db.collection.name", dbCollectionName);
+					activity.SetTag($"db.snapshot_id", snapshotId);
 				}
-
-				// db.namespace
-
-				if (dbOperationName != null)
-				{
-					activity.SetTag("db.operation.name", dbOperationName);
-				}
-
-				// db.response.status_code
-
-				// error.type (handled by RecordException)
-
-				// server.port
-
-				// db.operation.batch.size
-
-				// db.query_summary
-
-				activity.SetTag("db.query.text", command.CommandText);
-
-				// network.peer.address
-
-				// network.peer.port
-
-				if (command.Connection.DataSource != null)
-				{
-					activity.SetTag("server.address", command.Connection.DataSource);
-				}
-
-				foreach (FbParameter p in command.Parameters)
-				{
-					var name = p.ParameterName;
-					var value = NormalizeDbNull(p.InternalValue);
-					activity.SetTag($"db.query.parameter.{name}", value);
-
-				}
-
-				// Only for explicit transactions.
-				if (command.Transaction != null)
-				{
-					FbTransactionInfo fbInfo = new FbTransactionInfo(command.Transaction);
-
-					var transactionId = fbInfo.GetTransactionId();
-					activity.SetTag($"db.transaction_id", transactionId);
-
-					// TODO: Firebird 4+ only (or remove?)
-					/*
-					var snapshotId = fbInfo.GetTransactionSnapshotNumber();
-					if (snapshotId != 0)
-					{
-						activity.SetTag($"db.snapshot_id", snapshotId);
-					}
-					*/
-				}
+				*/
 			}
 
 			return activity;
