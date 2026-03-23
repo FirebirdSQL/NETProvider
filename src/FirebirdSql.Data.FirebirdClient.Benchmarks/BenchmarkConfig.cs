@@ -17,7 +17,9 @@
 
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
@@ -50,6 +52,10 @@ class BenchmarkConfig : ManualConfig
 		);
 
 		AddDiagnoser(MemoryDiagnoser.Default);
+
+		AddExporter(MarkdownExporter.GitHub);
+
+		Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest);
 
 		AddValidator(BaselineValidator.FailOnError);
 		AddValidator(JitOptimizationsValidator.FailOnError);
