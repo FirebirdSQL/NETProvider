@@ -196,7 +196,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 				MetricsConnectionAttributes = [
 					new("db.system.name", "firebirdsql"),
 					new("db.namespace", _options.Database),
-					new("server.address", $"{_options.DataSource}:{_options.Port}")
+					new("server.address", _options.DataSource),
+					new("server.port", _options.Port),
 				];
 			}
 		}
