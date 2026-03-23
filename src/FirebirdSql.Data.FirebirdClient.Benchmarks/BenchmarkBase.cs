@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -15,16 +15,27 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using BenchmarkDotNet.Attributes;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
-[Config(typeof(BenchmarkConfig))]
-public partial class CommandBenchmark : BenchmarkBase
+public abstract class BenchmarkBase
 {
-	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
-	public string DataType { get; set; }
+	const string DefaultConnectionString = "database=localhost:benchmark.fdb;user=sysdba;password=masterkey";
 
-	[Params(100)]
-	public int Count { get; set; }
+	protected static readonly string ConnectionString =
+		Environment.GetEnvironmentVariable("FIREBIRD_BENCHMARK_CS") ?? DefaultConnectionString;
+
+	protected static void CreateDatabase(int pageSize = 16 * 1024)
+	{
+		FbConnection.CreateDatabase(ConnectionString, pageSize, false, true);
+	}
+
+	[GlobalCleanup]
+	public void GlobalCleanup()
+	{
+		FbConnection.ClearAllPools();
+		FbConnection.DropDatabase(ConnectionString);
+	}
 }
