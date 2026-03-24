@@ -205,7 +205,7 @@ internal sealed class GdsBlob : BlobBase
 		{
 			_database.Xdr.Write(IscCodes.op_get_segment);
 			_database.Xdr.Write(_blobHandle);
-			_database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
+			_database.Xdr.Write(requested < ushort.MaxValue ? requested : ushort.MaxValue);
 			_database.Xdr.Write(DataSegment);
 			_database.Xdr.Flush();
 
@@ -254,7 +254,7 @@ internal sealed class GdsBlob : BlobBase
 		{
 			await _database.Xdr.WriteAsync(IscCodes.op_get_segment, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(requested < ushort.MaxValue ? requested : ushort.MaxValue, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(DataSegment, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
@@ -304,7 +304,7 @@ internal sealed class GdsBlob : BlobBase
 		{
 			_database.Xdr.Write(IscCodes.op_get_segment);
 			_database.Xdr.Write(_blobHandle);
-			_database.Xdr.Write(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12);
+			_database.Xdr.Write(requested < ushort.MaxValue ? requested : ushort.MaxValue);
 			_database.Xdr.Write(DataSegment);
 			_database.Xdr.Flush();
 
@@ -360,7 +360,7 @@ internal sealed class GdsBlob : BlobBase
 		{
 			await _database.Xdr.WriteAsync(IscCodes.op_get_segment, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(_blobHandle, cancellationToken).ConfigureAwait(false);
-			await _database.Xdr.WriteAsync(requested < short.MaxValue - 12 ? requested : short.MaxValue - 12, cancellationToken).ConfigureAwait(false);
+			await _database.Xdr.WriteAsync(requested < ushort.MaxValue ? requested : ushort.MaxValue, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.WriteAsync(DataSegment, cancellationToken).ConfigureAwait(false);
 			await _database.Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
 
