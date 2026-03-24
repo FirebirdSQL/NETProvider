@@ -47,21 +47,36 @@ function Prepare() {
 	$selectedConfiguration = $FirebirdConfiguration[$FirebirdSelection]
 	$fbDownload = $selectedConfiguration.Download
 	$fbDownloadName = $fbDownload -Replace '.+/(.+)$','$1'
-	if (Test-Path $firebirdDir) {
-		rm -Force -Recurse $firebirdDir
+
+	if (Test-Path "$firebirdDir\firebird.exe") {
+		echo "Using cached Firebird from $firebirdDir"
 	}
-	mkdir $firebirdDir | Out-Null
+	else {
+		if (Test-Path $firebirdDir) {
+			rm -Force -Recurse $firebirdDir
+		}
+		mkdir $firebirdDir | Out-Null
+
+		pushd $firebirdDir
+		try {
+			echo "Downloading $fbDownload"
+			Invoke-RestMethod -Uri $fbDownload -OutFile $fbDownloadName
+			echo "Extracting $fbDownloadName"
+			7z x -bsp0 -bso0 $fbDownloadName
+			rm $fbDownloadName
+		}
+		finally {
+			popd
+		}
+	}
+
+	cp -Recurse -Force $firebirdDir\* $testsProviderDir
 
 	pushd $firebirdDir
 	try {
-		echo "Downloading $fbDownload"
-		Invoke-RestMethod -Uri $fbDownload -OutFile $fbDownloadName 
-		echo "Extracting $fbDownloadName"
-		7z x -bsp0 -bso0 $fbDownloadName
-		rm $fbDownloadName
-		cp -Recurse -Force .\* $testsProviderDir
-
-		ni firebird.log -ItemType File | Out-Null
+		if (-not (Test-Path firebird.log)) {
+			ni firebird.log -ItemType File | Out-Null
+		}
 
 		echo "Starting Firebird"
 		$process = Start-Process -FilePath $selectedConfiguration.Executable -ArgumentList $selectedConfiguration.Args -PassThru
@@ -88,7 +103,6 @@ function Cleanup() {
 		# give OS time to release all files
 		sleep -Milliseconds 100
 	}
-	rm -Force -Recurse $firebirdDir
 
 	Write-Host "=== END ==="
 }
@@ -118,6 +132,13 @@ function Tests-FirebirdClient-Default-NoCompression-CryptDisabled() {
 }
 function Tests-FirebirdClient-Embedded() {
 	Tests-FirebirdClient 'Embedded' $False 'Disabled'
+}
+function Tests-FirebirdClient-All() {
+	Tests-FirebirdClient-Default-Compression-CryptRequired
+	Tests-FirebirdClient-Default-NoCompression-CryptRequired
+	Tests-FirebirdClient-Default-Compression-CryptDisabled
+	Tests-FirebirdClient-Default-NoCompression-CryptDisabled
+	Tests-FirebirdClient-Embedded
 }
 function Tests-FirebirdClient($serverType, $compression, $wireCrypt) {
 	pushd $testsProviderDir
