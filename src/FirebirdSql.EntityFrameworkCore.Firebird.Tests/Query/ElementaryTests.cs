@@ -209,6 +209,52 @@ public class ElementaryTests : EntityFrameworkCoreTestsBase
 			StringAssert.Contains(@"CAST(_UTF8'test' AS VARCHAR(4) CHARACTER SET UTF8) COLLATE UNICODE_CI_AI", sql);
 		}
 	}
+
+	[Test]
+	public async Task SqlQueryScalarSingleQuotesValueColumn()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Database.SqlQueryRaw<int>(@"SELECT 1 AS ""Value"" FROM RDB$DATABASE");
+			Assert.DoesNotThrowAsync(() => query.SingleAsync());
+			var sql = db.LastCommandText;
+			StringAssert.Contains(@"""Value""", sql);
+		}
+	}
+
+	[Test]
+	public async Task SqlQueryScalarSingleOrDefaultQuotesValueColumn()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Database.SqlQueryRaw<int>(@"SELECT 1 AS ""Value"" FROM RDB$DATABASE");
+			Assert.DoesNotThrowAsync(() => query.SingleOrDefaultAsync());
+			var sql = db.LastCommandText;
+			StringAssert.Contains(@"""Value""", sql);
+		}
+	}
+
+	[Test]
+	public async Task SqlQueryScalarComposedWhereQuotesValueColumn()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Database.SqlQueryRaw<int>(@"SELECT 1 AS ""Value"" FROM RDB$DATABASE").Where(x => x > 0);
+			Assert.DoesNotThrowAsync(() => query.LoadAsync());
+			var sql = db.LastCommandText;
+			StringAssert.Contains(@"""Value""", sql);
+		}
+	}
+
+	[Test]
+	public async Task EntitySingleOrDefaultQuotesIdentifiers()
+	{
+		await using (var db = await GetDbContext<SelectContext>())
+		{
+			var query = db.Set<MonAttachment>().OrderBy(x => x.AttachmentId).Take(1);
+			Assert.DoesNotThrowAsync(() => query.SingleOrDefaultAsync());
+		}
+	}
 }
 
 class SelectContext : FbTestDbContext
