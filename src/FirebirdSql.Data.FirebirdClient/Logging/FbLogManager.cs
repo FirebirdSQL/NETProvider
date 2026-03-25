@@ -23,6 +23,7 @@ namespace FirebirdSql.Data.Logging;
 public static class FbLogManager
 {
 	public static bool IsParameterLoggingEnabled { get; private set; } = false;
+	public static bool IsQueryTextTracingEnabled { get; private set; } = false;
 
 	private static ILoggerFactory LoggerFactory = NullLoggerFactory.Instance;
 
@@ -31,6 +32,9 @@ public static class FbLogManager
 
 	public static void EnableParameterLogging(bool enable = true) =>
 		IsParameterLoggingEnabled = enable;
+
+	public static void EnableQueryTextTracing(bool enable = true) =>
+		IsQueryTextTracingEnabled = enable;
 
 	internal static ILogger<T> CreateLogger<T>() =>
 		LoggerFactory.CreateLogger<T>();
