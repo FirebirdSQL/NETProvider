@@ -15,15 +15,15 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Reflection;
-using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Attributes;
 
-namespace Perf;
+namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
 
-class Program
+[Config(typeof(BenchmarkConfig))]
+public partial class CommandBenchmark : BenchmarkBase
 {
-	static void Main(string[] args)
-	{
-		BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
-	}
+	const int Count = 100;
+
+	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
+	public string DataType { get; set; }
 }
