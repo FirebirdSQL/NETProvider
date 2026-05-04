@@ -2,12 +2,12 @@
 
 Thanks for considering contributing. Here are some items to consider before starting (in no particular order).
 
-* Check [tracker](https://github.com/FirebirdSQL/NETProvider/issues) if you want to start on something.
-* Before you start working on something announce your intention on the mailing list (or in comment in tracker).
+* Check [issues](https://github.com/FirebirdSQL/NETProvider/issues) if you want to start on something.
+* Before you start working on something announce your intention on the mailing list (or comment on the issue).
 * Issue only complete PRs (no WIPs).
 * Make sure your PR doesn't contain unneccessary changes (whitespaces, new lines, ...).
-* Consider squashing your commits.
 * Follow existing code formatting/styling (even for new files).
+* Disclose AI usage.
 * Make sure you swept all corners (i.e. all build configurations are fine, works with all Firebird version, etc.).
 * Make sure your changes merge without conflicts.
 * Consider backward compatibility.
