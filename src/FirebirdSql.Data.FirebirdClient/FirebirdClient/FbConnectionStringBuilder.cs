@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -317,6 +317,26 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 	{
 		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyParallelWorkers), base.TryGetValue, Common.ConnectionString.DefaultValueParallelWorkers); }
 		set { SetValue(Common.ConnectionString.DefaultKeyParallelWorkers, value); }
+	}
+
+	[Category("Advanced")]
+	[DisplayName("Boolean Domains")]
+	[Description("Comma-separated SQL LIKE patterns. Columns whose Firebird domain name matches are reported as Boolean to ADO.NET, regardless of the underlying SQL type. '%' matches any sequence; '_' matches a single character. Example: 'D_BOOL%,IS\\_%'.")]
+	[DefaultValue(Common.ConnectionString.DefaultValueDomainPatterns)]
+	public string BooleanDomains
+	{
+		get { return Common.ConnectionString.GetString(GetKey(Common.ConnectionString.DefaultKeyBooleanDomains), base.TryGetValue, Common.ConnectionString.DefaultValueDomainPatterns); }
+		set { SetValue(Common.ConnectionString.DefaultKeyBooleanDomains, value); }
+	}
+
+	[Category("Advanced")]
+	[DisplayName("Guid Domains")]
+	[Description("Comma-separated SQL LIKE patterns. Columns whose Firebird domain name matches are reported as Guid to ADO.NET, regardless of the underlying SQL type. '%' matches any sequence; '_' matches a single character. Example: 'GUID%'.")]
+	[DefaultValue(Common.ConnectionString.DefaultValueDomainPatterns)]
+	public string GuidDomains
+	{
+		get { return Common.ConnectionString.GetString(GetKey(Common.ConnectionString.DefaultKeyGuidDomains), base.TryGetValue, Common.ConnectionString.DefaultValueDomainPatterns); }
+		set { SetValue(Common.ConnectionString.DefaultKeyGuidDomains, value); }
 	}
 
 	#endregion

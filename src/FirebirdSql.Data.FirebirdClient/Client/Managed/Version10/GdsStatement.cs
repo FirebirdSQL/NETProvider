@@ -1224,11 +1224,11 @@ internal class GdsStatement : StatementBase
 
 	protected void WriteRawParameter(IXdrWriter xdr, DbField field)
 	{
-		if (field.DbDataType != DbDataType.Null)
+		if (field.RawDbDataType != DbDataType.Null)
 		{
 			field.FixNull();
 
-			switch (field.DbDataType)
+			switch (field.RawDbDataType)
 			{
 				case DbDataType.Char:
 					if (field.Charset.IsOctetsCharset)
@@ -1372,11 +1372,11 @@ internal class GdsStatement : StatementBase
 	}
 	protected async ValueTask WriteRawParameterAsync(IXdrWriter xdr, DbField field, CancellationToken cancellationToken = default)
 	{
-		if (field.DbDataType != DbDataType.Null)
+		if (field.RawDbDataType != DbDataType.Null)
 		{
 			field.FixNull();
 
-			switch (field.DbDataType)
+			switch (field.RawDbDataType)
 			{
 				case DbDataType.Char:
 					if (field.Charset.IsOctetsCharset)
@@ -1523,7 +1523,7 @@ internal class GdsStatement : StatementBase
 	{
 		var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
 
-		switch (field.DbDataType)
+		switch (field.RawDbDataType)
 		{
 			case DbDataType.Char:
 				if (field.Charset.IsOctetsCharset)
@@ -1614,14 +1614,14 @@ internal class GdsStatement : StatementBase
 				return xdr.ReadInt128();
 
 			default:
-				throw TypeHelper.InvalidDataType((int)field.DbDataType);
+				throw TypeHelper.InvalidDataType((int)field.RawDbDataType);
 		}
 	}
 	protected async ValueTask<object> ReadRawValueAsync(IXdrReader xdr, DbField field, CancellationToken cancellationToken = default)
 	{
 		var innerCharset = !_database.Charset.IsNoneCharset ? _database.Charset : field.Charset;
 
-		switch (field.DbDataType)
+		switch (field.RawDbDataType)
 		{
 			case DbDataType.Char:
 				if (field.Charset.IsOctetsCharset)
@@ -1712,7 +1712,7 @@ internal class GdsStatement : StatementBase
 				return await xdr.ReadInt128Async(cancellationToken).ConfigureAwait(false);
 
 			default:
-				throw TypeHelper.InvalidDataType((int)field.DbDataType);
+				throw TypeHelper.InvalidDataType((int)field.RawDbDataType);
 		}
 	}
 

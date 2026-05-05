@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -759,5 +759,80 @@ public class ConnectionStringTests
 		var cs = new ConnectionString(ConnectionString);
 		Assert.AreEqual(hostname, cs.DataSource);
 		Assert.AreEqual("test.fdb", cs.Database);
+	}
+
+	[Test]
+	public void BooleanDomains_Spaced_Key()
+	{
+		var cs = new ConnectionString("user=u;password=p;boolean domains=D_BOOL%");
+		Assert.AreEqual("D_BOOL%", cs.BooleanDomains);
+		Assert.IsTrue(cs.HasDomainTypeMappings);
+		Assert.IsTrue(cs.DomainTypeMappings.ContainsKey(DbDataType.Boolean));
+	}
+
+	[Test]
+	public void BooleanDomains_NoSpace_Key()
+	{
+		var cs = new ConnectionString("user=u;password=p;booleandomains=D_BOOL%");
+		Assert.AreEqual("D_BOOL%", cs.BooleanDomains);
+	}
+
+	[Test]
+	public void GuidDomains_Spaced_Key()
+	{
+		var cs = new ConnectionString("user=u;password=p;guid domains=GUID%");
+		Assert.AreEqual("GUID%", cs.GuidDomains);
+		Assert.IsTrue(cs.DomainTypeMappings.ContainsKey(DbDataType.Guid));
+	}
+
+	[Test]
+	public void GuidDomains_NoSpace_Key()
+	{
+		var cs = new ConnectionString("user=u;password=p;guiddomains=GUID%");
+		Assert.AreEqual("GUID%", cs.GuidDomains);
+	}
+
+	[Test]
+	public void DomainTypeMappings_BothBooleanAndGuid()
+	{
+		var cs = new ConnectionString("user=u;password=p;boolean domains=D_BOOL%;guid domains=D_GUID%");
+		Assert.AreEqual("D_BOOL%", cs.BooleanDomains);
+		Assert.AreEqual("D_GUID%", cs.GuidDomains);
+		Assert.AreEqual(2, cs.DomainTypeMappings.Count);
+		Assert.IsTrue(cs.DomainTypeMappings[DbDataType.Boolean].Matches("D_BOOL"));
+		Assert.IsTrue(cs.DomainTypeMappings[DbDataType.Boolean].Matches("D_BOOL_NULLABLE"));
+		Assert.IsTrue(cs.DomainTypeMappings[DbDataType.Guid].Matches("D_GUID"));
+		Assert.IsTrue(cs.DomainTypeMappings[DbDataType.Guid].Matches("D_GUID_NULLABLE"));
+	}
+
+	[Test]
+	public void DomainTypeMappings_DefaultEmpty_NoOverrides()
+	{
+		var cs = new ConnectionString("user=u;password=p");
+		Assert.AreEqual("", cs.BooleanDomains);
+		Assert.AreEqual("", cs.GuidDomains);
+		Assert.IsFalse(cs.HasDomainTypeMappings);
+		Assert.AreEqual(0, cs.DomainTypeMappings.Count);
+	}
+
+	[Test]
+	public void BooleanDomains_CommaSeparatedPatterns()
+	{
+		var cs = new ConnectionString("user=u;password=p;boolean domains=D_BOOL%,FLAG%");
+		var patterns = cs.DomainTypeMappings[DbDataType.Boolean];
+		Assert.IsTrue(patterns.Matches("D_BOOL"));
+		Assert.IsTrue(patterns.Matches("D_BOOL_NULLABLE"));
+		Assert.IsTrue(patterns.Matches("FLAG_X"));
+		Assert.IsFalse(patterns.Matches("OTHER"));
+	}
+
+	[Test]
+	public void DomainTypeMappings_RdbSystemDomainsAreNotMatched()
+	{
+		var cs = new ConnectionString("user=u;password=p;boolean domains=%");
+		var patterns = cs.DomainTypeMappings[DbDataType.Boolean];
+		Assert.IsTrue(patterns.Matches("CUSTOM"));
+		Assert.IsFalse(patterns.Matches("RDB$1"));
+		Assert.IsFalse(patterns.Matches("rdb$something"));
 	}
 }

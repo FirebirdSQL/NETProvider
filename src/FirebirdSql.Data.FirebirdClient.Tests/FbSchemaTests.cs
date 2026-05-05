@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -206,7 +206,7 @@ public class FbSchemaTests : FbTestsBase
 		Assert.AreEqual(1, tables1.Rows.Count);
 
 		var tables2 = await Connection.GetSchemaAsync("Tables", new string[] { null, null, null, "TABLE" });
-		Assert.AreEqual(3, tables2.Rows.Count);
+		Assert.AreEqual(4, tables2.Rows.Count);
 	}
 
 	[Test]

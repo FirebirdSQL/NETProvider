@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -39,6 +39,8 @@ internal sealed class DbField
 	private DbValue _dbValue;
 	private Charset _charset;
 	private ArrayBase _arrayHandle;
+	private string _domainName;
+	private DbDataType? _overrideDataType;
 
 	#endregion
 
@@ -46,7 +48,32 @@ internal sealed class DbField
 
 	public DbDataType DbDataType
 	{
+		get
+		{
+			return _overrideDataType ?? RawDbDataType;
+		}
+	}
+
+	// Underlying SQL-level type, ignoring any domain-based override. Wire serialization
+	// (read/write paths in GdsStatement and DbValue) must use this — the override is a
+	// CLR-level reporting concern only; the on-the-wire shape is dictated by the actual
+	// SQL type the server prepared (e.g. SMALLINT remains 2 bytes even when reported as
+	// Boolean to ADO.NET).
+	public DbDataType RawDbDataType
+	{
 		get { return TypeHelper.GetDbDataTypeFromSqlType(SqlType, SubType, NumericScale, Length, Charset); }
+	}
+
+	public string DomainName
+	{
+		get { return _domainName; }
+		set { _domainName = value?.Trim(); }
+	}
+
+	public DbDataType? OverrideDataType
+	{
+		get { return _overrideDataType; }
+		set { _overrideDataType = value; }
 	}
 
 	public int SqlType
@@ -183,7 +210,7 @@ internal sealed class DbField
 			return false;
 		}
 
-		switch (DbDataType)
+		switch (RawDbDataType)
 		{
 			case DbDataType.SmallInt:
 			case DbDataType.Integer:
@@ -206,7 +233,7 @@ internal sealed class DbField
 			return false;
 		}
 
-		switch (DbDataType)
+		switch (RawDbDataType)
 		{
 			case DbDataType.Numeric:
 			case DbDataType.Decimal:
@@ -224,7 +251,7 @@ internal sealed class DbField
 			return false;
 		}
 
-		switch (DbDataType)
+		switch (RawDbDataType)
 		{
 			case DbDataType.Binary:
 			case DbDataType.Text:
@@ -242,7 +269,7 @@ internal sealed class DbField
 			return false;
 		}
 
-		switch (DbDataType)
+		switch (RawDbDataType)
 		{
 			case DbDataType.Char:
 			case DbDataType.VarChar:
@@ -261,7 +288,7 @@ internal sealed class DbField
 			return false;
 		}
 
-		switch (DbDataType)
+		switch (RawDbDataType)
 		{
 			case DbDataType.Array:
 				return true;
@@ -308,11 +335,12 @@ internal sealed class DbField
 		}
 		else
 		{
+			// SetValue uses SqlType (wire-level) and RawDbDataType (never the CLR override)
 			switch (SqlType)
 			{
 				case IscCodes.SQL_TEXT:
 				case IscCodes.SQL_VARYING:
-					if (DbDataType == DbDataType.Guid)
+					if (RawDbDataType == DbDataType.Guid)
 					{
 						DbValue.SetValue(TypeDecoder.DecodeGuid(buffer));
 					}
@@ -468,9 +496,11 @@ internal sealed class DbField
 
 	public void FixNull()
 	{
+		// Wire serialization uses RawDbDataType, so FixNull must set a value compatible
+		// with the wire-level SQL type — not the CLR-level override (e.g. Boolean).
 		if (NullFlag == -1 && _dbValue.IsDBNull())
 		{
-			switch (DbDataType)
+			switch (RawDbDataType)
 			{
 				case DbDataType.Char:
 				case DbDataType.VarChar:

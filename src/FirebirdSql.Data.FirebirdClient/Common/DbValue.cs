@@ -94,6 +94,12 @@ internal sealed class DbValue
 					return GetArray();
 				}
 
+			case DbDataType.Boolean:
+				return GetBoolean();
+
+			case DbDataType.Guid:
+				return GetGuid();
+
 			default:
 				return _value;
 		}
@@ -137,6 +143,12 @@ internal sealed class DbValue
 					return await GetArrayAsync(cancellationToken).ConfigureAwait(false);
 				}
 
+			case DbDataType.Boolean:
+				return GetBoolean();
+
+			case DbDataType.Guid:
+				return GetGuid();
+
 			default:
 				return _value;
 		}
@@ -149,7 +161,7 @@ internal sealed class DbValue
 
 	public string GetString()
 	{
-		if (Field.DbDataType == DbDataType.Text && _value is long l)
+		if (Field.RawDbDataType == DbDataType.Text && _value is long l)
 		{
 			_value = GetClobData(l);
 		}
@@ -162,7 +174,7 @@ internal sealed class DbValue
 	}
 	public async ValueTask<string> GetStringAsync(CancellationToken cancellationToken = default)
 	{
-		if (Field.DbDataType == DbDataType.Text && _value is long l)
+		if (Field.RawDbDataType == DbDataType.Text && _value is long l)
 		{
 			_value = await GetClobDataAsync(l, cancellationToken).ConfigureAwait(false);
 		}
@@ -181,7 +193,15 @@ internal sealed class DbValue
 
 	public bool GetBoolean()
 	{
-		return Convert.ToBoolean(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			bool b => b,
+			short i16 => i16 != 0,
+			int i32 => i32 != 0,
+			long i64 => i64 != 0L,
+			decimal dec => dec != 0m,
+			_ => Convert.ToBoolean(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public byte GetByte()
@@ -401,7 +421,7 @@ internal sealed class DbValue
 		}
 
 
-		switch (Field.DbDataType)
+		switch (Field.RawDbDataType)
 		{
 			case DbDataType.Char:
 				{
@@ -597,7 +617,7 @@ internal sealed class DbValue
 				return Int128Helper.GetBytes(GetInt128());
 
 			default:
-				throw TypeHelper.InvalidDataType((int)Field.DbDataType);
+				throw TypeHelper.InvalidDataType((int)Field.RawDbDataType);
 		}
 	}
 	public async ValueTask<byte[]> GetBytesAsync(CancellationToken cancellationToken = default)
@@ -616,7 +636,7 @@ internal sealed class DbValue
 		}
 
 
-		switch (Field.DbDataType)
+		switch (Field.RawDbDataType)
 		{
 			case DbDataType.Char:
 				{
@@ -812,7 +832,7 @@ internal sealed class DbValue
 				return Int128Helper.GetBytes(GetInt128());
 
 			default:
-				throw TypeHelper.InvalidDataType((int)Field.DbDataType);
+				throw TypeHelper.InvalidDataType((int)Field.RawDbDataType);
 		}
 	}
 

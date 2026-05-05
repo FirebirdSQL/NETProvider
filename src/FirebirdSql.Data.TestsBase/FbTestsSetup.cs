@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -50,6 +50,7 @@ public class FbTestsSetup
 			{
 				await connection.OpenAsync();
 				var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+				await CreateUserTypeDomains(connection);
 				await CreateTables(connection, serverVersion);
 				await CreateProcedures(connection, serverVersion);
 				await CreateFunctions(connection, serverVersion);
@@ -127,6 +128,40 @@ public class FbTestsSetup
 		await using (var command = new FbCommand("RECREATE TABLE GUID_TEST (INT_FIELD INTEGER, GUID_FIELD CHAR(16) CHARACTER SET OCTETS)", connection))
 		{
 			await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand(@"
+RECREATE TABLE USER_TYPE_TEST (
+	ID			INTEGER NOT NULL PRIMARY KEY,
+	IS_ACTIVE	D_BOOL,
+	OPT_FLAG	D_BOOL_NULLABLE,
+	ROW_GUID	D_GUID,
+	OPT_GUID	D_GUID_NULLABLE
+)", connection))
+		{
+			await command.ExecuteNonQueryAsync();
+		}
+	}
+
+	private static async Task CreateUserTypeDomains(FbConnection connection)
+	{
+		var domains = new[]
+		{
+			("D_BOOL",          "SMALLINT NOT NULL CHECK (VALUE IN (0,1))"),
+			("D_BOOL_DEFAULT1", "SMALLINT DEFAULT 1 NOT NULL CHECK (VALUE IN (0,1))"),
+			("D_BOOL_DEFAULT0", "SMALLINT DEFAULT 0 NOT NULL CHECK (VALUE IN (0,1))"),
+			("D_BOOL_NULLABLE", "SMALLINT CHECK (VALUE IN (0,1))"),
+			("D_GUID",          "CHAR(16) CHARACTER SET OCTETS NOT NULL"),
+			("D_GUID_NULLABLE", "CHAR(16) CHARACTER SET OCTETS"),
+		};
+		// CREATE OR ALTER DOMAIN does not exist in Firebird (any version).
+		// The test database is always created fresh so CREATE DOMAIN is correct.
+		foreach (var (name, definition) in domains)
+		{
+			await using (var command = new FbCommand($"CREATE DOMAIN {name} AS {definition}", connection))
+			{
+				await command.ExecuteNonQueryAsync();
+			}
 		}
 	}
 

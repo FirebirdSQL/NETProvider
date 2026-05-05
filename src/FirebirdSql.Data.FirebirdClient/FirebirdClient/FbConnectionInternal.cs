@@ -40,6 +40,7 @@ internal class FbConnectionInternal
 	private ConnectionString _connectionStringOptions;
 	private FbConnection _owningConnection;
 	private FbEnlistmentNotification _enlistmentNotification;
+	private DomainNameResolver _domainResolver;
 
 	#endregion
 
@@ -79,6 +80,11 @@ internal class FbConnectionInternal
 	public ConnectionString ConnectionStringOptions
 	{
 		get { return _connectionStringOptions; }
+	}
+
+	public DomainNameResolver DomainResolver
+	{
+		get { return _domainResolver ??= new DomainNameResolver(); }
 	}
 
 	public bool CancelDisabled { get; private set; }
@@ -300,6 +306,7 @@ internal class FbConnectionInternal
 				_db = null;
 				_owningConnection = null;
 				_connectionStringOptions = null;
+				_domainResolver = null;
 			}
 		}
 	}
@@ -318,6 +325,7 @@ internal class FbConnectionInternal
 				_db = null;
 				_owningConnection = null;
 				_connectionStringOptions = null;
+				_domainResolver = null;
 			}
 		}
 	}

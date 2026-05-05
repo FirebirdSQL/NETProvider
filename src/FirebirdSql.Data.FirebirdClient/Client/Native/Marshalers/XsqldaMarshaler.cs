@@ -86,7 +86,7 @@ internal static class XsqldaMarshaler
 			};
 
 
-			if (descriptor[i].HasDataType() && descriptor[i].DbDataType != DbDataType.Null)
+			if (descriptor[i].HasDataType() && descriptor[i].RawDbDataType != DbDataType.Null)
 			{
 				var buffer = descriptor[i].DbValue.GetBytes();
 				xsqlvar[i].sqldata = Marshal.AllocHGlobal(buffer.Length);

@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -1144,12 +1144,14 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				{
 					parameter.NullFlag = 0;
 
+					var inputValue = NormalizeDomainParameterValue(commandParameter.InternalValue, parameter.RawDbDataType);
+
 					switch (parameter.DbDataType)
 					{
 						case DbDataType.Binary:
 							{
 								var blob = _statement.CreateBlob();
-								blob.Write((byte[])commandParameter.InternalValue);
+								blob.Write((byte[])inputValue);
 								parameter.DbValue.SetValue(blob.Id);
 							}
 							break;
@@ -1157,13 +1159,13 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 						case DbDataType.Text:
 							{
 								var blob = _statement.CreateBlob();
-								if (commandParameter.InternalValue is byte[])
+								if (inputValue is byte[])
 								{
-									blob.Write((byte[])commandParameter.InternalValue);
+									blob.Write((byte[])inputValue);
 								}
 								else
 								{
-									blob.Write((string)commandParameter.InternalValue);
+									blob.Write((string)inputValue);
 								}
 								parameter.DbValue.SetValue(blob.Id);
 							}
@@ -1182,21 +1184,21 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 								}
 
 								parameter.ArrayHandle.Handle = 0;
-								parameter.ArrayHandle.Write((Array)commandParameter.InternalValue);
+								parameter.ArrayHandle.Write((Array)inputValue);
 								parameter.DbValue.SetValue(parameter.ArrayHandle.Handle);
 							}
 							break;
 
 						case DbDataType.Guid:
-							if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
+							if (!(inputValue is Guid) && !(inputValue is byte[]))
 							{
 								throw new InvalidOperationException("Incorrect Guid value.");
 							}
-							parameter.DbValue.SetValue(commandParameter.InternalValue);
+							parameter.DbValue.SetValue(inputValue);
 							break;
 
 						default:
-							parameter.DbValue.SetValue(commandParameter.InternalValue);
+							parameter.DbValue.SetValue(inputValue);
 							break;
 					}
 				}
@@ -1240,12 +1242,14 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				{
 					statementParameter.NullFlag = 0;
 
+					var inputValue = NormalizeDomainParameterValue(commandParameter.InternalValue, statementParameter.RawDbDataType);
+
 					switch (statementParameter.DbDataType)
 					{
 						case DbDataType.Binary:
 							{
 								var blob = _statement.CreateBlob();
-								await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								await blob.WriteAsync((byte[])inputValue, cancellationToken).ConfigureAwait(false);
 								statementParameter.DbValue.SetValue(blob.Id);
 							}
 							break;
@@ -1253,13 +1257,13 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 						case DbDataType.Text:
 							{
 								var blob = _statement.CreateBlob();
-								if (commandParameter.InternalValue is byte[])
+								if (inputValue is byte[])
 								{
-									await blob.WriteAsync((byte[])commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+									await blob.WriteAsync((byte[])inputValue, cancellationToken).ConfigureAwait(false);
 								}
 								else
 								{
-									await blob.WriteAsync((string)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+									await blob.WriteAsync((string)inputValue, cancellationToken).ConfigureAwait(false);
 								}
 								statementParameter.DbValue.SetValue(blob.Id);
 							}
@@ -1278,21 +1282,21 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 								}
 
 								statementParameter.ArrayHandle.Handle = 0;
-								await statementParameter.ArrayHandle.WriteAsync((Array)commandParameter.InternalValue, cancellationToken).ConfigureAwait(false);
+								await statementParameter.ArrayHandle.WriteAsync((Array)inputValue, cancellationToken).ConfigureAwait(false);
 								statementParameter.DbValue.SetValue(statementParameter.ArrayHandle.Handle);
 							}
 							break;
 
 						case DbDataType.Guid:
-							if (!(commandParameter.InternalValue is Guid) && !(commandParameter.InternalValue is byte[]))
+							if (!(inputValue is Guid) && !(inputValue is byte[]))
 							{
 								throw new InvalidOperationException("Incorrect Guid value.");
 							}
-							statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+							statementParameter.DbValue.SetValue(inputValue);
 							break;
 
 						default:
-							statementParameter.DbValue.SetValue(commandParameter.InternalValue);
+							statementParameter.DbValue.SetValue(inputValue);
 							break;
 					}
 				}
@@ -1364,6 +1368,8 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				throw;
 			}
 
+			ApplyDomainTypeMappings(innerConn);
+
 			// Add this	command	to the active command list
 			innerConn.AddPreparedCommand(this);
 		}
@@ -1432,6 +1438,8 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 
 				throw;
 			}
+
+			await ApplyDomainTypeMappingsAsync(innerConn, cancellationToken).ConfigureAwait(false);
 
 			// Add this	command	to the active command list
 			innerConn.AddPreparedCommand(this);
@@ -1576,6 +1584,74 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		if (_commandText == null || _commandText.Length == 0)
 		{
 			throw new InvalidOperationException("The command text for this Command has not been set.");
+		}
+	}
+
+	private static object NormalizeDomainParameterValue(object value, DbDataType rawTargetType)
+	{
+		// rawTargetType is always RawDbDataType (the wire-level SQL type).
+		// Input parameters have no relation/field name, so DomainNameResolver cannot
+		// set OverrideDataType on them via RDB$RELATION_FIELDS. We therefore work
+		// against the actual SQL type to convert bool → the correct numeric wire value.
+		if (value is bool b)
+		{
+			switch (rawTargetType)
+			{
+				case DbDataType.SmallInt:
+					return (short)(b ? 1 : 0);
+				case DbDataType.Integer:
+					return b ? 1 : 0;
+				case DbDataType.BigInt:
+					return b ? 1L : 0L;
+				case DbDataType.Numeric:
+				case DbDataType.Decimal:
+					return b ? 1m : 0m;
+			}
+		}
+		return value;
+	}
+
+	private void ApplyDomainTypeMappings(FbConnectionInternal innerConn)
+	{
+		var opts = innerConn.ConnectionStringOptions;
+		if (opts == null || !opts.HasDomainTypeMappings)
+			return;
+		var resolver = innerConn.DomainResolver;
+		if (resolver.IsResolving)
+			return;
+		resolver.Resolve(_connection, EnumerateStatementFields(), opts.DomainTypeMappings);
+	}
+
+	private async ValueTask ApplyDomainTypeMappingsAsync(FbConnectionInternal innerConn, CancellationToken cancellationToken)
+	{
+		var opts = innerConn.ConnectionStringOptions;
+		if (opts == null || !opts.HasDomainTypeMappings)
+			return;
+		var resolver = innerConn.DomainResolver;
+		if (resolver.IsResolving)
+			return;
+		await resolver.ResolveAsync(_connection, EnumerateStatementFields(), opts.DomainTypeMappings, cancellationToken).ConfigureAwait(false);
+	}
+
+	private IEnumerable<DbField> EnumerateStatementFields()
+	{
+		if (_statement == null)
+			yield break;
+		// Yield output fields (SELECT columns, SP output) — domain override applies here.
+		var fields = _statement.Fields;
+		if (fields != null)
+		{
+			for (var i = 0; i < fields.Count; i++)
+				yield return fields[i];
+		}
+		// Also yield input parameters. Their Relation/Name are typically empty so
+		// DomainNameResolver.Collect() will skip them; NormalizeDomainParameterValue
+		// handles bool→numeric conversion via RawDbDataType independently.
+		var parameters = _statement.Parameters;
+		if (parameters != null)
+		{
+			for (var i = 0; i < parameters.Count; i++)
+				yield return parameters[i];
 		}
 	}
 

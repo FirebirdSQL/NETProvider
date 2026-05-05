@@ -58,6 +58,7 @@ internal sealed class ConnectionString
 	internal const string DefaultValueApplicationName = "";
 	internal const int DefaultValueCommandTimeout = 0;
 	internal const int DefaultValueParallelWorkers = 0;
+	internal const string DefaultValueDomainPatterns = "";
 
 	internal const string DefaultKeyUserId = "user id";
 	internal const string DefaultKeyPortNumber = "port number";
@@ -88,6 +89,8 @@ internal sealed class ConnectionString
 	internal const string DefaultKeyApplicationName = "application name";
 	internal const string DefaultKeyCommandTimeout = "command timeout";
 	internal const string DefaultKeyParallelWorkers = "parallel workers";
+	internal const string DefaultKeyBooleanDomains = "boolean domains";
+	internal const string DefaultKeyGuidDomains = "guid domains";
 	#endregion
 
 	#region Static Fields
@@ -163,6 +166,17 @@ internal sealed class ConnectionString
 			{ DefaultKeyParallelWorkers, DefaultKeyParallelWorkers },
 			{ "parallelworkers", DefaultKeyParallelWorkers },
 			{ "parallel", DefaultKeyParallelWorkers },
+			{ DefaultKeyBooleanDomains, DefaultKeyBooleanDomains },
+			{ "booleandomains", DefaultKeyBooleanDomains },
+			{ DefaultKeyGuidDomains, DefaultKeyGuidDomains },
+			{ "guiddomains", DefaultKeyGuidDomains },
+		};
+
+	internal static readonly IReadOnlyDictionary<string, DbDataType> DomainTypeMappingKeys =
+		new Dictionary<string, DbDataType>(StringComparer.OrdinalIgnoreCase)
+		{
+			{ DefaultKeyBooleanDomains, DbDataType.Boolean },
+			{ DefaultKeyGuidDomains, DbDataType.Guid },
 		};
 
 	internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -196,6 +210,8 @@ internal sealed class ConnectionString
 			{ DefaultKeyApplicationName, DefaultValueApplicationName },
 			{ DefaultKeyCommandTimeout, DefaultValueCommandTimeout },
 			{ DefaultKeyParallelWorkers, DefaultValueParallelWorkers },
+			{ DefaultKeyBooleanDomains, DefaultValueDomainPatterns },
+			{ DefaultKeyGuidDomains, DefaultValueDomainPatterns },
 		};
 
 	#endregion
@@ -203,6 +219,7 @@ internal sealed class ConnectionString
 	#region Fields
 
 	private Dictionary<string, object> _options;
+	private IReadOnlyDictionary<DbDataType, DomainPatternList> _domainTypeMappings;
 
 	#endregion
 
@@ -237,6 +254,28 @@ internal sealed class ConnectionString
 	public string ApplicationName => GetString(DefaultKeyApplicationName, _options.TryGetValue);
 	public int CommandTimeout => GetInt32(DefaultKeyCommandTimeout, _options.TryGetValue);
 	public int ParallelWorkers => GetInt32(DefaultKeyParallelWorkers, _options.TryGetValue);
+	public string BooleanDomains => GetString(DefaultKeyBooleanDomains, _options.TryGetValue);
+	public string GuidDomains => GetString(DefaultKeyGuidDomains, _options.TryGetValue);
+
+	public IReadOnlyDictionary<DbDataType, DomainPatternList> DomainTypeMappings
+	{
+		get
+		{
+			if (_domainTypeMappings != null)
+				return _domainTypeMappings;
+			var map = new Dictionary<DbDataType, DomainPatternList>();
+			foreach (var entry in DomainTypeMappingKeys)
+			{
+				var spec = GetString(entry.Key, _options.TryGetValue);
+				var patterns = DomainPatternList.Parse(spec);
+				if (patterns.HasAny)
+					map[entry.Value] = patterns;
+			}
+			return _domainTypeMappings = map;
+		}
+	}
+
+	public bool HasDomainTypeMappings => DomainTypeMappings.Count > 0;
 
 	#endregion
 
