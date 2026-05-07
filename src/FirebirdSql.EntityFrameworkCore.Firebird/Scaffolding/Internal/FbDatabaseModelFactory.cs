@@ -22,11 +22,11 @@ using System.Data.Common;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Services;
+using FirebirdSql.EntityFrameworkCore.Firebird.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
-using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 
@@ -39,7 +39,7 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		using (var connection = new FbConnection(connectionString))
 		{
 			return Create(connection, options);
-		}
+		};
 	}
 
 	public override DatabaseModel Create(DbConnection connection, DatabaseModelFactoryOptions options)
@@ -51,20 +51,18 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		{
 			connection.Open();
 		}
-
-		var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
-		MajorVersionNumber = serverVersion.Major;
-
 		try
 		{
+			var serverVersion = FbServerProperties.ParseServerVersion(connection.ServerVersion);
+			MajorVersionNumber = serverVersion.Major;
+
 			databaseModel.DatabaseName = connection.Database;
-			databaseModel.DefaultSchema = GetDefaultSchema(connection);
+			databaseModel.DefaultSchema = GetDefaultSchema();
 
-			var schemaList = new List<string>();
 			var tableList = options.Tables.ToList();
-			var tableFilter = GenerateTableFilter(tableList, schemaList);
+			var tableFilter = GenerateTableFilter(tableList);
 
-			var tables = GetTables(connection, tableFilter);
+			var tables = GetTables(connection);
 			foreach (var table in tables)
 			{
 				table.Database = databaseModel;
@@ -85,34 +83,31 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		}
 	}
 
-	private static string GetDefaultSchema(DbConnection connection)
-	{
-		return null;
-	}
+	private static string GetDefaultSchema() => null;
 
-	private static Func<DatabaseTable, bool> GenerateTableFilter(IReadOnlyList<string> tables, IReadOnlyList<string> schemas)
-	{
-		return tables.Any() ? x => tables.Contains(x.Name) : _ => true;
-	}
+	private static Func<DatabaseTable, bool> GenerateTableFilter(IReadOnlyList<string> tables) =>
+		tables.Any() ? x => tables.Contains(x.Name) : _ => true;
 
-	private const string GetTablesQuery =
-		@"SELECT
-                trim(r.RDB$RELATION_NAME),
-                r.RDB$DESCRIPTION,
-                r.RDB$RELATION_TYPE
-              FROM
-               RDB$RELATIONS r
-             WHERE
-              r.RDB$SYSTEM_FLAG is distinct from 1
-             ORDER BY
-              r.RDB$RELATION_NAME";
+	private const string GetTablesQuery = """
+		SELECT
+			TRIM(r.rdb$relation_name) relation_name,
+			r.rdb$description description,
+			r.rdb$relation_type relation_type
+		FROM
+			rdb$relations r
+		WHERE
+			r.rdb$system_flag IS DISTINCT FROM 1
+		ORDER BY
+			r.rdb$relation_name
+		""";
 
-	private IEnumerable<DatabaseTable> GetTables(DbConnection connection, Func<DatabaseTable, bool> filter)
+	private List<DatabaseTable> GetTables(DbConnection connection)
 	{
 		using (var command = connection.CreateCommand())
 		{
 			var tables = new List<DatabaseTable>();
 			command.CommandText = GetTablesQuery;
+
 			using (var reader = command.ExecuteReader())
 			{
 				while (reader.Read())
@@ -133,113 +128,167 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 				}
 			}
 
-			GetColumns(connection, tables, filter);
+			GetColumns(connection, tables);
 			GetPrimaryKeys(connection, tables);
-			GetIndexes(connection, tables, filter);
+			GetIndexes(connection, tables);
 			GetConstraints(connection, tables);
 
 			return tables;
 		}
 	}
 
-	private const string GetColumnsQuery =
-		@"SELECT
-               trim(RF.RDB$FIELD_NAME) as COLUMN_NAME,
-               COALESCE(RF.RDB$DEFAULT_SOURCE, F.RDB$DEFAULT_SOURCE) as COLUMN_DEFAULT,
-               COALESCE(COALESCE(RF.RDB$NULL_FLAG, F.RDB$NULL_FLAG), 0) as NOT_NULL,
-               CASE Coalesce(F.RDB$FIELD_TYPE, 0)
-                WHEN 7 THEN
-                 CASE F.RDB$FIELD_SUB_TYPE
-                  WHEN 0 THEN 'SMALLINT'
-			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-				  ELSE '?'
-                 END
-                WHEN 8 THEN
-                 CASE F.RDB$FIELD_SUB_TYPE
-                  WHEN 0 THEN 'INTEGER'
-			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-				  ELSE '?'
-                 END
+	private string GetColumnsQuery() => $"""
+		SELECT
+			TRIM(rf.rdb$field_name) column_name,
+			COALESCE(rf.rdb$null_flag, f.rdb$null_flag, 0) column_required,
+
+			CASE COALESCE(f.rdb$field_type, 0)
+				WHEN 7 THEN
+					CASE f.rdb$field_sub_type
+						WHEN 0 THEN 'SMALLINT'
+						WHEN 1 THEN 'NUMERIC(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						WHEN 2 THEN 'DECIMAL(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						ELSE '?'
+					END
+				WHEN 8 THEN
+					CASE f.rdb$field_sub_type
+						WHEN 0 THEN 'INTEGER'
+						WHEN 1 THEN 'NUMERIC(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						WHEN 2 THEN 'DECIMAL(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						ELSE '?'
+					END
 				WHEN 9 THEN 'QUAD'
 				WHEN 10 THEN 'FLOAT'
 				WHEN 12 THEN 'DATE'
 				WHEN 13 THEN 'TIME'
-				WHEN 14 THEN 'CHAR(' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
+				WHEN 14 THEN 'CHAR(' || (TRUNC(f.rdb$field_length / ch.rdb$bytes_per_character)) || ')'
 				WHEN 16 THEN
-				 CASE F.RDB$FIELD_SUB_TYPE
-				  WHEN 0 THEN 'BIGINT'
-			      WHEN 1 THEN 'NUMERIC(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-			      WHEN 2 THEN 'DECIMAL(' || (F.RDB$FIELD_PRECISION) || ',' || ABS(F.RDB$FIELD_SCALE) || ')'
-				  ELSE '?'
-				 END
+					CASE f.rdb$field_sub_type
+						WHEN 0 THEN 'BIGINT'
+						WHEN 1 THEN 'NUMERIC(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						WHEN 2 THEN 'DECIMAL(' || (f.rdb$field_precision) || ',' || ABS(f.rdb$field_scale) || ')'
+						ELSE '?'
+					END
 				WHEN 23 THEN 'BOOLEAN'
+				WHEN 24 THEN 'DECFLOAT(' || (f.rdb$field_precision) || ')'
+				WHEN 25 THEN 'DECFLOAT(' || (f.rdb$field_precision) || ')'
+				WHEN 26 THEN 'INT128'
 				WHEN 27 THEN 'DOUBLE PRECISION'
+				WHEN 28 THEN 'TIME WITH TIME ZONE'
+				WHEN 29 THEN 'TIMESTAMP WITH TIME ZONE'
 				WHEN 35 THEN 'TIMESTAMP'
-				WHEN 37 THEN 'VARCHAR(' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
-				WHEN 40 THEN 'CSTRING' || (TRUNC(F.RDB$FIELD_LENGTH / CH.RDB$BYTES_PER_CHARACTER)) || ')'
+				WHEN 37 THEN 'VARCHAR(' || (TRUNC(f.rdb$field_length / ch.rdb$bytes_per_character)) || ')'
+				WHEN 40 THEN 'CSTRING(' || (TRUNC(f.rdb$field_length / ch.rdb$bytes_per_character)) || ')'
 				WHEN 45 THEN 'BLOB_ID'
 				WHEN 261 THEN 'BLOB SUB_TYPE ' ||
-				  CASE F.RDB$FIELD_SUB_TYPE
-					WHEN 0 THEN 'BINARY'
-					WHEN 1 THEN 'TEXT'
-					ELSE F.RDB$FIELD_SUB_TYPE
-				  END
-				ELSE 'RDB$FIELD_TYPE: ' || F.RDB$FIELD_TYPE || '?'
-			   END as STORE_TYPE,
-               F.rdb$description as COLUMN_COMMENT,
-               COALESCE({1}, 0)   as AUTO_GENERATED,
-               ch.RDB$CHARACTER_SET_NAME as CHARACTER_SET_NAME
-              FROM
-               RDB$RELATION_FIELDS RF
-               JOIN  RDB$FIELDS F ON(F.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE)
-               LEFT OUTER JOIN  RDB$CHARACTER_SETS CH ON(CH.RDB$CHARACTER_SET_ID = F.RDB$CHARACTER_SET_ID)
-              WHERE
-               trim(RF.RDB$RELATION_NAME) = '" + "{0}" + @"'
-               AND COALESCE(RF.RDB$SYSTEM_FLAG, 0) = 0
-             ORDER BY
-              RF.RDB$FIELD_POSITION;";
+					CASE f.rdb$field_sub_type
+						WHEN 0 THEN 'BINARY'
+						WHEN 1 THEN 'TEXT'
+						ELSE f.rdb$field_sub_type
+					END
+				ELSE 'RDB$FIELD_TYPE: ' || f.rdb$field_type || '?'
+			END column_store_type,
 
-	private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<DatabaseTable, bool> tableFilter)
+			rf.rdb$field_source column_domain,
+
+			NULLIF(ch.rdb$character_set_name, d.rdb$character_set_name) character_set_name,
+			co.rdb$collation_name collation_name,
+			COALESCE(f.rdb$segment_length, 0) segment_length,
+
+			COALESCE(rf.rdb$default_source, f.rdb$default_source) column_default,
+			f.rdb$computed_source column_computed_source,
+			f.rdb$description column_comment,
+
+			COALESCE({(MajorVersionNumber < 3 ? "NULL" : "rf.rdb$identity_type")}, -1) identity_type,
+			COALESCE({(MajorVersionNumber < 3 ? "NULL" : "g.rdb$initial_value")}, 1) identity_start,
+			COALESCE({(MajorVersionNumber < 3 ? "NULL" : "g.rdb$generator_increment")}, 1) identity_increment
+		FROM
+			rdb$relation_fields rf
+			JOIN rdb$fields f ON f.rdb$field_name = rf.rdb$field_source 
+			LEFT JOIN rdb$character_sets ch ON ch.rdb$character_set_id = f.rdb$character_set_id
+			LEFT JOIN rdb$collations co ON co.rdb$character_set_id = f.rdb$character_set_id AND co.rdb$collation_id = rf.rdb$collation_id
+			{(MajorVersionNumber < 3 ? "" : "LEFT JOIN rdb$generators g ON g.rdb$generator_name = rf.rdb$generator_name")}
+			CROSS JOIN rdb$database d
+		WHERE
+			TRIM(rf.rdb$relation_name) = @RelationName AND COALESCE(rf.rdb$system_flag, 0) = 0
+		ORDER BY
+			rf.rdb$field_position
+		""";
+
+	private void GetColumns(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
 	{
-		var identityType = MajorVersionNumber < 3 ? "null" : "rf.RDB$IDENTITY_TYPE";
-
 		foreach (var table in tables)
 		{
 			using (var command = connection.CreateCommand())
 			{
-				command.CommandText = string.Format(GetColumnsQuery, table.Name, identityType);
+				command.CommandText = GetColumnsQuery();
+				command.Parameters.Add(new FbParameter("@RelationName", table.Name));
+
 				using (var reader = command.ExecuteReader())
 				{
 					while (reader.Read())
 					{
 						var name = reader["COLUMN_NAME"].ToString();
-						var defaultValue = reader["COLUMN_DEFAULT"].ToString();
-						var nullable = !Convert.ToBoolean(reader["NOT_NULL"]);
-						var autoGenerated = Convert.ToBoolean(reader["AUTO_GENERATED"]);
-						var storeType = reader["STORE_TYPE"].ToString();
+						var isNullable = !Convert.ToBoolean(reader["COLUMN_REQUIRED"]);
+						var storeType = reader["COLUMN_STORE_TYPE"].ToString();
+
+						var columnDomain = reader["COLUMN_DOMAIN"].ToString();
+
 						var charset = reader["CHARACTER_SET_NAME"].ToString();
+						var collation = reader["COLLATION_NAME"].ToString();
+						var segmentSize = Convert.ToInt32(reader["SEGMENT_LENGTH"]);
+
+						var defaultValue = reader["COLUMN_DEFAULT"].ToString();
+						var computedSource = reader["COLUMN_COMPUTED_SOURCE"].ToString();
 						var comment = reader["COLUMN_COMMENT"].ToString();
 
-
-						var valueGenerated = ValueGenerated.Never;
-
-						if (autoGenerated)
-						{
-							valueGenerated = ValueGenerated.OnAdd;
-						}
+						var identityType = Convert.ToInt32(reader["IDENTITY_TYPE"]);
+						var identityStart = Convert.ToInt32(reader["IDENTITY_START"]);
+						var identityIncrement = Convert.ToInt32(reader["IDENTITY_INCREMENT"]);
 
 						var column = new DatabaseColumn
 						{
 							Table = table,
 							Name = name,
 							StoreType = storeType,
-							IsNullable = nullable,
-							DefaultValueSql = CreateDefaultValueString(defaultValue),
-							ValueGenerated = valueGenerated,
+							IsNullable = isNullable,
+
+							DefaultValueSql = string.IsNullOrEmpty(defaultValue) ? null : defaultValue.Remove(0, 8),
+							ValueGenerated = identityType == -1 ? ValueGenerated.Never : ValueGenerated.OnAdd,
 							Comment = string.IsNullOrEmpty(comment) ? null : comment,
+							Collation = string.IsNullOrEmpty(collation) ? null : collation.Trim(),
+							ComputedColumnSql = string.IsNullOrEmpty(computedSource) ? null : computedSource
 						};
+
+						if (segmentSize > 0)
+						{
+							column.SetAnnotation(FbAnnotationNames.BlobSegmentSize, segmentSize);
+						}
+
+						if (!string.IsNullOrEmpty(charset))
+						{
+							column.SetAnnotation(FbAnnotationNames.CharacterSet, charset.Trim());
+						}
+
+						if (!columnDomain.StartsWith("RDB$"))
+						{
+							column.SetAnnotation(FbAnnotationNames.DomainName, columnDomain.Trim());
+						}
+
+						if (identityType != -1)
+						{
+							column.SetAnnotation(FbAnnotationNames.IdentityType, identityType);
+						}
+
+						if (identityStart != 1)
+						{
+							column.SetAnnotation(FbAnnotationNames.IdentityStart, identityStart);
+						}
+
+						if (identityIncrement != 1)
+						{
+							column.SetAnnotation(FbAnnotationNames.IdentityIncrement, identityIncrement);
+						}
 
 						table.Columns.Add(column);
 					}
@@ -248,91 +297,75 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		}
 	}
 
-	private string CreateDefaultValueString(string defaultValue)
+	private const string GetPrimaryKeysQuery = """
+		SELECT
+			TRIM(i.rdb$index_name) index_name,
+			TRIM(sg.rdb$field_name) field_name
+		FROM
+			rdb$indices i
+			LEFT JOIN rdb$index_segments sg ON i.rdb$index_name = sg.rdb$index_name
+			LEFT JOIN rdb$relation_constraints rc ON rc.rdb$index_name = i.rdb$index_name
+		WHERE
+			rc.rdb$constraint_type = 'PRIMARY KEY' AND TRIM(i.rdb$relation_name) = @RelationName
+		ORDER BY
+			sg.rdb$field_position
+		""";
+
+	private static void GetPrimaryKeys(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
 	{
-		if (defaultValue == null)
-		{
-			return null;
-		}
-		if (defaultValue.StartsWith("default "))
-		{
-			return defaultValue.Remove(0, 8);
-		}
-		else
-		{
-			return null;
-		}
-
-	}
-
-	private const string GetPrimaryQuery =
-	@"SELECT
-           trim(i.rdb$index_name) as INDEX_NAME,
-           trim(sg.rdb$field_name) as FIELD_NAME
-          FROM
-           RDB$INDICES i
-           LEFT JOIN rdb$index_segments sg on i.rdb$index_name = sg.rdb$index_name
-           LEFT JOIN rdb$relation_constraints rc on rc.rdb$index_name = I.rdb$index_name
-          WHERE
-           rc.rdb$constraint_type = 'PRIMARY KEY'
-           AND trim(i.rdb$relation_name) = '{0}'
-          ORDER BY sg.RDB$FIELD_POSITION;";
-
-	private void GetPrimaryKeys(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
-	{
-		foreach (var x in tables)
+		foreach (var table in tables)
 		{
 			using (var command = connection.CreateCommand())
 			{
-				command.CommandText = string.Format(GetPrimaryQuery, x.Name);
+				command.CommandText = GetPrimaryKeysQuery;
+				command.Parameters.Add(new FbParameter("@RelationName", table.Name));
 
 				using (var reader = command.ExecuteReader())
 				{
 					DatabasePrimaryKey index = null;
 					while (reader.Read())
 					{
-						if (index == null)
+						index ??= new DatabasePrimaryKey
 						{
-							index = new DatabasePrimaryKey
-							{
-								Table = x,
-								Name = reader.GetString(0).Trim()
-							};
-						}
-						index.Columns.Add(x.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
-						x.PrimaryKey = index;
+							Table = table,
+							Name = reader.GetString(0).Trim()
+						};
+						index.Columns.Add(table.Columns.Single(y => y.Name == reader.GetString(1).Trim()));
+						table.PrimaryKey = index;
 					}
 				}
 			}
 		}
 	}
 
-	private const string GetIndexesQuery =
-		@"SELECT
-               trim(I.rdb$index_name) as INDEX_NAME,
-               COALESCE(I.rdb$unique_flag, 0) as IS_UNIQUE,
-               Coalesce(I.rdb$index_type, 0) as IS_DESC,
-               list(trim(sg.RDB$FIELD_NAME)) as COLUMNS
-              FROM
-               RDB$INDICES i
-               LEFT JOIN rdb$index_segments sg on i.rdb$index_name = sg.rdb$index_name
-               LEFT JOIN rdb$relation_constraints rc on rc.rdb$index_name = I.rdb$index_name and rc.rdb$constraint_type = null
-              WHERE
-               trim(i.rdb$relation_name) = '{0}'
-               AND i.RDB$EXPRESSION_SOURCE IS NULL
-              GROUP BY
-               INDEX_NAME, IS_UNIQUE, IS_DESC ;";
+	private const string GetIndexesQuery = """
+		SELECT
+			TRIM(i.rdb$index_name) index_name,
+			COALESCE(i.rdb$unique_flag, 0) is_unique,
+			Coalesce(i.rdb$index_type, 0) is_desc,
+			LIST(TRIM(sg.rdb$field_name)) columns
+		FROM
+			RDB$INDICES i
+			LEFT JOIN rdb$index_segments sg ON i.rdb$index_name = sg.rdb$index_name
+			LEFT JOIN rdb$relation_constraints rc ON rc.rdb$index_name = i.rdb$index_name
+		WHERE
+			TRIM(i.rdb$relation_name) = @RelationName
+			AND i.RDB$EXPRESSION_SOURCE IS NULL
+		GROUP BY
+			index_name, is_unique, is_desc
+		""";
 
 	/// <remarks>
 	/// Primary keys are handled as in <see cref="GetConstraints"/>, not here
 	/// </remarks>
-	private void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables, Func<DatabaseTable, bool> tableFilter)
+	private static void GetIndexes(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
 	{
 		foreach (var table in tables)
 		{
 			using (var command = connection.CreateCommand())
 			{
-				command.CommandText = string.Format(GetIndexesQuery, table.Name);
+				command.CommandText = GetIndexesQuery;
+				command.Parameters.Add(new FbParameter("@RelationName", table.Name));
 
 				using (var reader = command.ExecuteReader())
 				{
@@ -370,33 +403,38 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		}
 	}
 
-	private const string GetConstraintsQuery =
-		@"SELECT
-               trim(drs.rdb$constraint_name) as CONSTRAINT_NAME,
-               trim(drs.RDB$RELATION_NAME) as TABLE_NAME,
-               trim(mrc.rdb$relation_name) AS REFERENCED_TABLE_NAME,
-               (select list(trim(di.rdb$field_name)||'|'||trim(mi.rdb$field_name))
-                from
-                 rdb$index_segments di
-                 join rdb$index_segments mi on mi.RDB$FIELD_POSITION=di.RDB$FIELD_POSITION and mi.rdb$index_name = mrc.rdb$index_name
-                where
-                 di.rdb$index_name = drs.rdb$index_name) as PAIRED_COLUMNS,
-               trim(rc.RDB$DELETE_RULE) as DELETE_RULE
-              FROM
-               rdb$relation_constraints drs
-               left JOIN rdb$ref_constraints rc ON drs.rdb$constraint_name = rc.rdb$constraint_name
-               left JOIN rdb$relation_constraints mrc ON rc.rdb$const_name_uq = mrc.rdb$constraint_name
-              WHERE
-               drs.rdb$constraint_type = 'FOREIGN KEY'
-               AND trim(drs.RDB$RELATION_NAME) = '{0}' ";
+	private const string GetConstraintsQuery = """
+		SELECT
+			TRIM(drs.rdb$constraint_name) constraint_name,
+			TRIM(drs.rdb$relation_name) table_name,
+			TRIM(mrc.rdb$relation_name) referenced_table_name,
+			(
+				SELECT
+					LIST(TRIM(di.rdb$field_name) || '|' || TRIM(mi.rdb$field_name))
+				FROM
+					rdb$index_segments di
+					join rdb$index_segments mi ON mi.rdb$field_position = di.rdb$field_position AND mi.rdb$index_name = mrc.rdb$index_name
+				WHERE
+					di.rdb$index_name = drs.rdb$index_name
+			) paired_columns,
+			TRIM(rc.rdb$delete_rule) delete_rule
+		FROM
+			rdb$relation_constraints drs
+			LEFT JOIN rdb$ref_constraints rc ON drs.rdb$constraint_name = rc.rdb$constraint_name
+			LEFT JOIN rdb$relation_constraints mrc ON rc.rdb$const_name_uq = mrc.rdb$constraint_name
+		WHERE
+			drs.rdb$constraint_type = 'FOREIGN KEY' AND TRIM(drs.rdb$relation_name) = @RelationName
+		""";
 
-	private void GetConstraints(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
+	private static void GetConstraints(DbConnection connection, IReadOnlyList<DatabaseTable> tables)
 	{
 		foreach (var table in tables)
 		{
 			using (var command = connection.CreateCommand())
 			{
-				command.CommandText = string.Format(GetConstraintsQuery, table.Name);
+				command.CommandText = GetConstraintsQuery;
+				command.Parameters.Add(new FbParameter("@RelationName", table.Name));
+
 				using (var reader = command.ExecuteReader())
 				{
 					while (reader.Read())
@@ -419,9 +457,8 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 		}
 	}
 
-	private static ReferentialAction? ConvertToReferentialAction(string onDeleteAction)
-	{
-		return onDeleteAction.ToUpperInvariant() switch
+	private static ReferentialAction? ConvertToReferentialAction(string onDeleteAction) =>
+		onDeleteAction.ToUpperInvariant() switch
 		{
 			"RESTRICT" => ReferentialAction.Restrict,
 			"CASCADE" => ReferentialAction.Cascade,
@@ -429,5 +466,4 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 			"NO ACTION" => ReferentialAction.NoAction,
 			_ => null,
 		};
-	}
 }

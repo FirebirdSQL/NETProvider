@@ -111,7 +111,7 @@ public class FbTestsSetup
 		commandText.Append("VARRAY_FIELD	 VARCHAR(30) [1:4],");
 		commandText.Append("BIG_ARRAY		 INTEGER [1:32767],");
 		commandText.Append("EXPR_FIELD		 COMPUTED BY (smallint_field * 1000),");
-		commandText.Append("CS_FIELD		 CHAR(1) CHARACTER SET UNICODE_FSS,");
+		commandText.Append("CS_FIELD		 CHAR(1) CHARACTER SET UNICODE_FSS COLLATE UNICODE_FSS,");
 		commandText.Append("UCCHAR_ARRAY	 CHAR(10) [1:10] CHARACTER SET UNICODE_FSS);");
 
 		await using (var command = new FbCommand(commandText.ToString(), connection))
