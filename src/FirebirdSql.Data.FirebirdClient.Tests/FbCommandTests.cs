@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -358,6 +359,37 @@ end";
 			command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 			var ra = await command.ExecuteNonQueryAsync();
 			Assert.AreEqual(ra, 1);
+		}
+	}
+
+	[Test]
+	public async Task InsertDateTimeIntoVarChar()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, varchar_field) values (1234, @dt)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select varchar_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			reader.Read();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
 		}
 	}
 
