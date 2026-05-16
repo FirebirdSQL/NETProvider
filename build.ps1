@@ -20,7 +20,6 @@ function Clean() {
 }
 
 function Build() {
-	dotnet clean "$baseDir\src\NETProvider.slnx" -c $Configuration -v m
 	dotnet build "$baseDir\src\NETProvider.slnx" -c $Configuration -p:ContinuousIntegrationBuild=true -v m
 }
 

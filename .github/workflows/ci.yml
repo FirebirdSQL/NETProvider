@@ -7,22 +7,24 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 jobs:
-  ci:
+  build:
     runs-on: windows-2025
-    strategy:
-      fail-fast: false
-      matrix:
-        FIREBIRD_SELECTION: [FB30, FB40, FB50]
-        TEST_SUITE: [Tests-FirebirdClient-Default-Compression-CryptRequired, Tests-FirebirdClient-Default-NoCompression-CryptRequired, Tests-FirebirdClient-Default-Compression-CryptDisabled, Tests-FirebirdClient-Default-NoCompression-CryptDisabled, Tests-FirebirdClient-Embedded, Tests-EFCore, Tests-EFCore-Functional, Tests-EF6]
-    timeout-minutes: 120
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-        
+
       - name: .NET 10.0
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+
+      - name: NuGet Cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props', '**/Versions.props') }}
+          restore-keys: nuget-
 
       - name: Build
         run: |
@@ -35,6 +37,63 @@ jobs:
             exit 1
           }
         shell: powershell
+
+      - name: Upload Build Output
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: '.\\out\\'
+
+      - name: Upload Test Binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-binaries
+          path: '.\\src\\**\\bin\\'
+
+  test:
+    needs: build
+    runs-on: windows-2025
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Full coverage on FB50 (latest)
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-Compression-CryptRequired }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-NoCompression-CryptRequired }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-Compression-CryptDisabled }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Default-NoCompression-CryptDisabled }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-FirebirdClient-Embedded }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EFCore }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EFCore-Functional }
+          - { FIREBIRD_SELECTION: FB50, TEST_SUITE: Tests-EF6 }
+          # Compatibility check on FB40
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-FirebirdClient-All }
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-EFCore }
+          - { FIREBIRD_SELECTION: FB40, TEST_SUITE: Tests-EF6 }
+          # Compatibility check on FB30
+          - { FIREBIRD_SELECTION: FB30, TEST_SUITE: Tests-FirebirdClient-All }
+          - { FIREBIRD_SELECTION: FB30, TEST_SUITE: Tests-EFCore }
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: .NET 10.0
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download Test Binaries
+        uses: actions/download-artifact@v8
+        with:
+          name: test-binaries
+          path: '.\\src\\'
+
+      - name: Firebird Cache
+        uses: actions/cache@v5
+        with:
+          path: 'C:\firebird'
+          key: firebird-${{ matrix.FIREBIRD_SELECTION }}
 
       - name: Tests
         run: |
@@ -49,9 +108,3 @@ jobs:
             exit 1
           }
         shell: powershell
-
-      - name: Publish Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'ci_${{ matrix.TEST_SUITE }}_${{ matrix.FIREBIRD_SELECTION }}_${{ env.CONFIGURATION }}'
-          path: '.\\out\\'
