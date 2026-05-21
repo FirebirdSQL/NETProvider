@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Buffers.Binary;
 using System.Net;
 using System.Numerics;
 using FirebirdSql.Data.Types;
@@ -98,23 +99,43 @@ internal static class TypeDecoder
 		return value[0] != 0;
 	}
 
+	public static bool DecodeBoolean(ReadOnlySpan<byte> value)
+	{
+		return value[0] != 0;
+	}
+
 	public static Guid DecodeGuid(byte[] value)
 	{
 		var a = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));
 		var b = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value, 4));
 		var c = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value, 6));
-		var d = new[] { value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15] };
-		return new Guid(a, b, c, d);
+		return new Guid(a, b, c, value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15]);
+	}
+
+	public static Guid DecodeGuidSpan(Span<byte> value)
+	{
+		var a = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value[..4]));
+		var b = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value[4..6]));
+		var c = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(value[6..8]));
+		return new Guid(a, b, c, value[8], value[9], value[10], value[11], value[12], value[13], value[14], value[15]);
 	}
 
 	public static int DecodeInt32(byte[] value)
 	{
-		return IPAddress.HostToNetworkOrder(BitConverter.ToInt32(value, 0));
+		return BinaryPrimitives.ReadInt32BigEndian(value);
+	}
+
+	public static int DecodeInt32(Span<byte> value) {
+		return BinaryPrimitives.ReadInt32BigEndian(value);
 	}
 
 	public static long DecodeInt64(byte[] value)
 	{
-		return IPAddress.HostToNetworkOrder(BitConverter.ToInt64(value, 0));
+		return BinaryPrimitives.ReadInt64BigEndian(value);
+	}
+
+	public static long DecodeInt64(Span<byte> value) {
+		return BinaryPrimitives.ReadInt64BigEndian(value);
 	}
 
 	public static FbDecFloat DecodeDec16(byte[] value)
