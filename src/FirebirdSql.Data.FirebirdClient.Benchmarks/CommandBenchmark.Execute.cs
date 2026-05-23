@@ -47,9 +47,10 @@ public partial class CommandBenchmark
 		var p = new FbParameter() { ParameterName = "@cnt" };
 		cmd.Parameters.Add(p);
 
+		var value = SampleValue();
 		for (var i = 0; i < Count; i++)
 		{
-			p.Value = i;
+			p.Value = value;
 			cmd.ExecuteNonQuery();
 		}
 	}
@@ -66,9 +67,10 @@ public partial class CommandBenchmark
 		var p = new FbParameter() { ParameterName = "@cnt" };
 		cmd.Parameters.Add(p);
 
+		var value = SampleValue();
 		for (var i = 0; i < Count; i++)
 		{
-			p.Value = i;
+			p.Value = value;
 			await cmd.ExecuteNonQueryAsync();
 		}
 	}

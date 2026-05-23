@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 
 namespace FirebirdSql.Data.FirebirdClient.Benchmarks;
@@ -24,6 +25,21 @@ public partial class CommandBenchmark : BenchmarkBase
 {
 	const int Count = 100;
 
-	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8")]
+	[Params("BIGINT", "VARCHAR(10) CHARACTER SET UTF8", "CHAR(100) CHARACTER SET UTF8")]
 	public string DataType { get; set; }
+
+	// A parameter value matched to the column type: a string sized to the declared
+	// length for CHAR/VARCHAR (so the rune count/validate write path is exercised),
+	// or an integer otherwise. The length must not exceed the column or the server
+	// raises isc_string_truncation.
+	private object SampleValue()
+	{
+		if (DataType.Contains("CHAR"))
+		{
+			var match = Regex.Match(DataType, @"\((\d+)\)");
+			var length = match.Success ? int.Parse(match.Groups[1].Value) : 1;
+			return new string('x', length);
+		}
+		return 1;
+	}
 }
