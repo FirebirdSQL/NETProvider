@@ -72,22 +72,6 @@ internal static class Extensions
 		}
 	}
 
-	extension(string s)
-	{
-		public IEnumerable<char[]> EnumerateRunesToChars()
-		{
-			if (s == null)
-				throw new ArgumentNullException(nameof(s));
-
-			return s.EnumerateRunes().Select(r =>
-			{
-				var result = new char[r.Utf16SequenceLength];
-				r.EncodeToUtf16(result);
-				return result;
-			});
-		}
-	}
-
 	extension(Encoding)
 	{
 		public static Encoding GetANSIEncoding()
@@ -100,6 +84,65 @@ internal static class Extensions
 			{
 				return Encoding.Default;
 			}
+		}
+	}
+
+	extension(ReadOnlySpan<char> text)
+	{
+		public int CountRunes()
+		{
+			var length = text.Length;
+			if(length == 0)
+				return 0;
+
+			var i = text.IndexOfAnyInRange('\uD800', '\uDBFF');
+			if(i < 0)
+				return length;
+
+			var count = i;
+			while(i < length)
+			{
+				if(char.IsHighSurrogate(text[i]) && i + 1 < length && char.IsLowSurrogate(text[i + 1]))
+				{
+					i += 2;
+				}
+				else
+				{
+					i++;
+				}
+				count++;
+			}
+			return count;
+		}
+
+		public ReadOnlySpan<char> TruncateStringToRuneCount(int maxRuneCount)
+		{
+			if(maxRuneCount <= 0 || text.IsEmpty)
+				return ReadOnlySpan<char>.Empty;
+
+			var length = text.Length;
+			if(maxRuneCount >= length)
+				return text;
+
+			var prefix = text[..maxRuneCount];
+			var i = prefix.IndexOfAnyInRange('\uD800', '\uDBFF');
+			if(i < 0)
+				return prefix;
+
+			var remaining = maxRuneCount - i;
+			while(i < length && remaining > 0)
+			{
+				if(char.IsHighSurrogate(text[i]) && i + 1 < length && char.IsLowSurrogate(text[i + 1]))
+				{
+					i += 2;
+				}
+				else
+				{
+					i++;
+				}
+				remaining--;
+			}
+			return text[..i];
 		}
 	}
 }
