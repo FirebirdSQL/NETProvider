@@ -363,6 +363,36 @@ end";
 	}
 
 	[Test]
+	public async Task InsertLongIntoClob()
+	{
+		var r = new Random();
+		var l = r.NextInt64();
+
+		await using (var command = new FbCommand("insert into TEST (int_field, clob_field) values (1234, @l)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.Int64;
+			param.Value = l;
+			param.ParameterName = "@l";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select clob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			var m = reader.GetInt64(0);
+
+			Assert.AreEqual(l, m);
+		}
+	}
+
+	[Test]
 	public async Task InsertDateTimeIntoVarChar()
 	{
 		var dtNow = DateTime.Now;
