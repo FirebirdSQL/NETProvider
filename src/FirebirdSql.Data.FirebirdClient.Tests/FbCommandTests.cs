@@ -425,6 +425,37 @@ end";
 	}
 
 	[Test]
+	public async Task InsertDateTimeIntoBlob()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, blob_field) values (1234, @dt)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select blob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
+		}
+	}
+
+	[Test]
 	public async Task InsertNullTest()
 	{
 		await using (var command = new FbCommand("insert into TEST (int_field) values (@value)", Connection))
