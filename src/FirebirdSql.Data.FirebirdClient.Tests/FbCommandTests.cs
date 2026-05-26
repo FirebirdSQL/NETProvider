@@ -402,6 +402,27 @@ end";
 		}
 	}
 
+	[Test, Description("Verifies that attempting to read an long from a field containing a string fails.")]
+	public async Task ReadLongFromClobNonIntegralStringThrowsException()
+	{
+		string s = "test value";
+
+		await using (var command = new FbCommand("insert into TEST (int_field, clob_field) values (1234, @s)", Connection))
+		{
+			command.Parameters.AddWithValue("@s", s);
+
+			await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select clob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			Assert.Throws<FormatException>(() => reader.GetInt64(0));
+		}
+	}
+
 	[Test]
 	public async Task InsertLongIntoClob()
 	{
