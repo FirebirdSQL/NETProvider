@@ -33,23 +33,17 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_CrossApply_Correlated_Select_Anonymous()
-	{
-		base.QF_CrossApply_Correlated_Select_Anonymous();
-	}
+		=> RunIfLateralIsSupported(base.QF_CrossApply_Correlated_Select_Anonymous);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_OuterApply_Correlated_Select_QF()
-	{
-		base.QF_OuterApply_Correlated_Select_QF();
-	}
+		=> RunIfLateralIsSupported(base.QF_OuterApply_Correlated_Select_QF);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void Udf_with_argument_being_comparison_of_nullable_columns()
-	{
-		base.Udf_with_argument_being_comparison_of_nullable_columns();
-	}
+		=> RunIfLateralIsSupported(base.Udf_with_argument_being_comparison_of_nullable_columns);
 
 	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections()
@@ -57,71 +51,49 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		base.QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_CrossApply_Correlated_Select_Result()
-	{
-		base.QF_CrossApply_Correlated_Select_Result();
-	}
+		=> RunIfLateralIsSupported(base.QF_CrossApply_Correlated_Select_Result);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous()
-	{
-		base.QF_Select_Correlated_Subquery_In_Anonymous();
-	}
+		=> RunIfLateralIsSupported(base.QF_Select_Correlated_Subquery_In_Anonymous);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Correlated_Func_Call_With_Navigation()
-	{
-		base.QF_Correlated_Func_Call_With_Navigation();
-	}
+		=> RunIfLateralIsSupported(base.QF_Correlated_Func_Call_With_Navigation);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous()
-	{
-		base.QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous();
-	}
+		=> RunIfLateralIsSupported(base.QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_OuterApply_Correlated_Select_Entity()
-	{
-		base.QF_OuterApply_Correlated_Select_Entity();
-	}
+		=> RunIfLateralIsSupported(base.QF_OuterApply_Correlated_Select_Entity);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Correlated_Nested_Func_Call()
-	{
-		base.QF_Correlated_Nested_Func_Call();
-	}
+		=> RunIfLateralIsSupported(base.QF_Correlated_Nested_Func_Call);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_OuterApply_Correlated_Select_Anonymous()
-	{
-		base.QF_OuterApply_Correlated_Select_Anonymous();
-	}
+		=> RunIfLateralIsSupported(base.QF_OuterApply_Correlated_Select_Anonymous);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF()
-	{
-		base.QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF();
-	}
+		=> RunIfLateralIsSupported(base.QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Correlated_Select_In_Anonymous()
-	{
-		base.QF_Correlated_Select_In_Anonymous();
-	}
+		=> RunIfLateralIsSupported(base.QF_Correlated_Select_In_Anonymous);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_CrossApply_Correlated_Select_QF_Type()
-	{
-		base.QF_CrossApply_Correlated_Select_QF_Type();
-	}
+		=> RunIfLateralIsSupported(base.QF_CrossApply_Correlated_Select_QF_Type);
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void Udf_with_argument_being_comparison_to_null_parameter()
-	{
-		base.Udf_with_argument_being_comparison_to_null_parameter();
-	}
+		=> RunIfLateralIsSupported(base.Udf_with_argument_being_comparison_to_null_parameter);
 
 	[DoesNotHaveTheDataFact]
 	public override void QF_CrossJoin_Not_Correlated()
@@ -216,6 +188,15 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		}
 	}
 
+
+	// A correlated queryable function needs LATERAL, which is Firebird 4 and later.
+	void RunIfLateralIsSupported(Action test)
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return;
+		test();
+	}
 
 	public class Fb : UdfFixtureBase
 	{
@@ -348,6 +329,62 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                             suspend;
                                                         end
                                                     end");
+
+			// Used only by the FB4+ tests, and the last name is 39 characters, which FB3 rejects.
+			if (!((FbTestStore)TestStore).ServerLessThan4())
+			{
+				await context.Database.ExecuteSqlRawAsync(
+					@"create function ""AddValues"" (a int, b int)
+	                                                    returns int
+	                                                    as
+	                                                    begin
+	                                                        return :a + :b;
+	                                                    end");
+
+				await context.Database.ExecuteSqlRawAsync(
+					@"create procedure ""GetCustomerOrderCountByYear"" (customerId int)
+	                                                    returns
+	                                                    (
+	                                                        ""CustomerId"" int not null,
+	                                                        ""Count"" int not null,
+	                                                        ""Year"" int not null
+	                                                    )
+	                                                    as
+	                                                    begin
+	                                                        for select :customerId, count(""Id""), extract(year from ""OrderDate"")
+	                                                        from ""Orders""
+	                                                        where ""CustomerId"" = :customerId
+	                                                        group by ""CustomerId"", extract(year from ""OrderDate"")
+	                                                        order by extract(year from ""OrderDate"")
+	                                                        into :""CustomerId"", :""Count"", :""Year"" do
+	                                                        begin
+	                                                            suspend;
+	                                                        end
+	                                                    end");
+
+				await context.Database.ExecuteSqlRawAsync(
+					@"create procedure ""GetCustomerOrderCountByYearOnlyFrom2000"" (customerId int, onlyFrom2000 boolean)
+	                                                    returns
+	                                                    (
+	                                                        ""CustomerId"" int not null,
+	                                                        ""Count"" int not null,
+	                                                        ""Year"" int not null
+	                                                    )
+	                                                    as
+	                                                    begin
+	                                                        for select :customerId, count(""Id""), extract(year from ""OrderDate"")
+	                                                        from ""Orders""
+	                                                        where ""CustomerId"" = 1
+	                                                        and (:onlyFrom2000 = false or :onlyFrom2000 is null
+	                                                            or (:onlyFrom2000 = true and extract(year from ""OrderDate"") = 2000))
+	                                                        group by ""CustomerId"", extract(year from ""OrderDate"")
+	                                                        order by extract(year from ""OrderDate"")
+	                                                        into :""CustomerId"", :""Count"", :""Year"" do
+	                                                        begin
+	                                                            suspend;
+	                                                        end
+	                                                    end");
+			}
 
 			await context.SaveChangesAsync();
 		}
