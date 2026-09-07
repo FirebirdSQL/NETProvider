@@ -298,6 +298,12 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 				.Append(AliasSeparator)
 				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
 		}
+		else if (crossApplyExpression.Table is TableValuedFunctionExpression function)
+		{
+			// Same for a table-valued function. The alias goes on the derived table rather than
+			// on the call, so the rest of the statement keeps referring to it unchanged.
+			GenerateLateralFunction(function);
+		}
 		else
 		{
 			Visit(crossApplyExpression.Table);
@@ -325,6 +331,12 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 				.Append(AliasSeparator)
 				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
 		}
+		else if (outerApplyExpression.Table is TableValuedFunctionExpression function)
+		{
+			// Same for a table-valued function. The alias goes on the derived table rather than
+			// on the call, so the rest of the statement keeps referring to it unchanged.
+			GenerateLateralFunction(function);
+		}
 		else
 		{
 			Visit(outerApplyExpression.Table);
@@ -332,6 +344,23 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 		Sql.Append(" ON TRUE");
 		return outerApplyExpression;
+	}
+
+	// Firebird will not take a bare table-valued function after LATERAL either, so it is
+	// wrapped the same way a table is: (SELECT * FROM "Func"(args)) AS "alias".
+	void GenerateLateralFunction(TableValuedFunctionExpression function)
+	{
+		Sql
+			.Append("(SELECT * FROM ")
+			.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(function.Name, function.Schema))
+			.Append("(");
+
+		GenerateList(function.Arguments, e => Visit(e));
+
+		Sql
+			.Append("))")
+			.Append(AliasSeparator)
+			.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(function.Alias));
 	}
 
 	protected override void GeneratePseudoFromClause()
