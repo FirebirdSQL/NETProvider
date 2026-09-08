@@ -33,94 +33,30 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdFact]
-	public override void QF_CrossApply_Correlated_Select_Anonymous()
-	{
-		base.QF_CrossApply_Correlated_Select_Anonymous();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_OuterApply_Correlated_Select_QF()
-	{
-		base.QF_OuterApply_Correlated_Select_QF();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void Udf_with_argument_being_comparison_of_nullable_columns()
-	{
-		base.Udf_with_argument_being_comparison_of_nullable_columns();
-	}
-
 	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections()
 	{
 		base.QF_Select_Correlated_Subquery_In_Anonymous_MultipleCollections();
 	}
 
-	[NotSupportedOnFirebirdFact]
-	public override void QF_CrossApply_Correlated_Select_Result()
-	{
-		base.QF_CrossApply_Correlated_Select_Result();
-	}
-
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Select_Correlated_Subquery_In_Anonymous()
 	{
+		// that needs LATERAL which is Firebird 4+
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return;
 		base.QF_Select_Correlated_Subquery_In_Anonymous();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact]
 	public override void QF_Correlated_Func_Call_With_Navigation()
 	{
+		// that needs LATERAL which is Firebird 4+
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return;
 		base.QF_Correlated_Func_Call_With_Navigation();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous()
-	{
-		base.QF_Select_Correlated_Direct_With_Function_Query_Parameter_Correlated_In_Anonymous();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_OuterApply_Correlated_Select_Entity()
-	{
-		base.QF_OuterApply_Correlated_Select_Entity();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_Correlated_Nested_Func_Call()
-	{
-		base.QF_Correlated_Nested_Func_Call();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_OuterApply_Correlated_Select_Anonymous()
-	{
-		base.QF_OuterApply_Correlated_Select_Anonymous();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF()
-	{
-		base.QF_Select_Correlated_Subquery_In_Anonymous_Nested_With_QF();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_Correlated_Select_In_Anonymous()
-	{
-		base.QF_Correlated_Select_In_Anonymous();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void QF_CrossApply_Correlated_Select_QF_Type()
-	{
-		base.QF_CrossApply_Correlated_Select_QF_Type();
-	}
-
-	[NotSupportedOnFirebirdFact]
-	public override void Udf_with_argument_being_comparison_to_null_parameter()
-	{
-		base.Udf_with_argument_being_comparison_to_null_parameter();
 	}
 
 	[DoesNotHaveTheDataFact]
@@ -208,6 +144,8 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 				.HasName("GetCustWithMostOrdersAfterDate");
 			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerWithMostOrdersAfterDateInstance)))
 				.HasName("GetCustWithMostOrdersAfterDate");
+			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(GetCustomerOrderCountByYearOnlyFrom2000)))
+				.HasName("GetCustOrderCountByYearFrom2000");
 
 			modelBuilder.HasDbFunction(typeof(UDFSqlContext).GetMethod(nameof(IdentityString)))
 				.HasSchema(null);
@@ -344,6 +282,58 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
                                                         group by o.""Id"", ""OrderDate""
                                                         having count(""ProductId"") > 1
                                                         into :""OrderId"", :""CustomerId"", :""OrderDate"" do
+                                                        begin
+                                                            suspend;
+                                                        end
+                                                    end");
+
+			await context.Database.ExecuteSqlRawAsync(
+				@"create function ""AddValues"" (a int, b int)
+                                                    returns int
+                                                    as
+                                                    begin
+                                                        return :a + :b;
+                                                    end");
+
+			await context.Database.ExecuteSqlRawAsync(
+				@"create procedure ""GetCustomerOrderCountByYear"" (customerId int)
+                                                    returns
+                                                    (
+                                                        ""CustomerId"" int not null,
+                                                        ""Count"" int not null,
+                                                        ""Year"" int not null
+                                                    )
+                                                    as
+                                                    begin
+                                                        for select :customerId, count(""Id""), extract(year from ""OrderDate"")
+                                                        from ""Orders""
+                                                        where ""CustomerId"" = :customerId
+                                                        group by ""CustomerId"", extract(year from ""OrderDate"")
+                                                        order by extract(year from ""OrderDate"")
+                                                        into :""CustomerId"", :""Count"", :""Year"" do
+                                                        begin
+                                                            suspend;
+                                                        end
+                                                    end");
+
+			await context.Database.ExecuteSqlRawAsync(
+				@"create procedure ""GetCustOrderCountByYearFrom2000"" (customerId int, onlyFrom2000 boolean)
+                                                    returns
+                                                    (
+                                                        ""CustomerId"" int not null,
+                                                        ""Count"" int not null,
+                                                        ""Year"" int not null
+                                                    )
+                                                    as
+                                                    begin
+                                                        for select :customerId, count(""Id""), extract(year from ""OrderDate"")
+                                                        from ""Orders""
+                                                        where ""CustomerId"" = 1
+                                                        and (:onlyFrom2000 = false or :onlyFrom2000 is null
+                                                            or (:onlyFrom2000 = true and extract(year from ""OrderDate"") = 2000))
+                                                        group by ""CustomerId"", extract(year from ""OrderDate"")
+                                                        order by extract(year from ""OrderDate"")
+                                                        into :""CustomerId"", :""Count"", :""Year"" do
                                                         begin
                                                             suspend;
                                                         end
