@@ -29,11 +29,18 @@ public class FbZonedTimeTypeTests
 	{
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "UTC") },
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "utc") },
+			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "UTC", TimeSpan.Zero) },
 	};
 	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
 	public void EqualityTrue(FbZonedTime expected, FbZonedTime actual)
 	{
 		Assert.AreEqual(expected, actual);
+	}
+
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void HashCodeEqual(FbZonedTime expected, FbZonedTime actual)
+	{
+		Assert.AreEqual(expected.GetHashCode(), actual.GetHashCode());
 	}
 
 	static readonly object[] SimpleEqualityFalseSource = new object[]

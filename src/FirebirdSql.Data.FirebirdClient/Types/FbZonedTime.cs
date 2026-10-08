@@ -57,19 +57,16 @@ public readonly struct FbZonedTime : IEquatable<FbZonedTime>, IConvertible
 		return obj is FbZonedTime fbZonedTime && Equals(fbZonedTime);
 	}
 
+	// Offset is intentionally excluded, it's derived from Time and TimeZone and only present in extended bind.
 	public override int GetHashCode()
 	{
-		unchecked
-		{
-			var hash = (int)2166136261;
-			hash = (hash * 16777619) ^ Time.GetHashCode();
-			hash = (hash * 16777619) ^ TimeZone.GetHashCode();
-			if (Offset != null)
-				hash = (hash * 16777619) ^ Offset.GetHashCode();
-			return hash;
-		}
+		var hash = new HashCode();
+		hash.Add(Time);
+		hash.Add(TimeZone, StringComparer.OrdinalIgnoreCase);
+		return hash.ToHashCode();
 	}
 
+	// Offset is intentionally excluded, it's derived from Time and TimeZone and only present in extended bind.
 	public bool Equals(FbZonedTime other) => Time.Equals(other.Time) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
 
 	TypeCode IConvertible.GetTypeCode() => TypeCode.Object;
