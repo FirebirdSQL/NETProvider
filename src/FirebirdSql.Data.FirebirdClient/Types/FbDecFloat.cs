@@ -154,7 +154,7 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 
 	public static bool operator !=(FbDecFloat lhs, FbDecFloat rhs)
 	{
-		return lhs.Equals(rhs);
+		return !lhs.Equals(rhs);
 	}
 
 	static FbDecFloat ParseNumber(IFormattable formattable, string format)
