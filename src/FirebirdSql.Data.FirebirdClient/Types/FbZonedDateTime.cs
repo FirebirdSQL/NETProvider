@@ -101,5 +101,5 @@ public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>, IConvertib
 
 	public static bool operator ==(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
 
-	public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
+	public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => !lhs.Equals(rhs);
 }
