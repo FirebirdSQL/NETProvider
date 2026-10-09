@@ -167,6 +167,10 @@ sealed class FbConnectionPoolManager : IDisposable
 			var ticks = Environment.TickCount;
 			return ticks + -(long)int.MinValue;
 		}
+
+		internal int AvailableCount => _available.Count;
+		internal int BusyCount => _busy.Count;
+		internal int MaxSize => _connectionString.MaxPoolSize;
 	}
 
 	int _disposed;
@@ -219,6 +223,9 @@ sealed class FbConnectionPoolManager : IDisposable
 			pool.ClearPool();
 		}
 	}
+
+	internal IEnumerable<(string poolName, int idleCount, int busyCount, int maxSize)> GetMetrics() =>
+		_pools.Select(kvp => (kvp.Key, kvp.Value.AvailableCount, kvp.Value.BusyCount, kvp.Value.MaxSize));
 
 	public void Dispose()
 	{
