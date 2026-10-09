@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -358,6 +359,221 @@ end";
 			command.Parameters.Add("@date", FbDbType.Date).Value = DateTime.Now.ToString();
 			var ra = await command.ExecuteNonQueryAsync();
 			Assert.AreEqual(ra, 1);
+		}
+	}
+
+	[Test]
+	public async Task InsertDoubleIntoVarChar()
+	{
+		var r = new Random();
+		double d = r.NextDouble() * 1e9;
+		var culture = CultureInfo.CurrentCulture;
+
+		try
+		{
+			CultureInfo.CurrentCulture = new CultureInfo("de-DE", false);
+
+			await using (var command = new FbCommand("insert into TEST (int_field, varchar_field) values (1234, @d)", Connection))
+			{
+				var param = command.CreateParameter();
+
+				param.DbType = DbType.Double;
+				param.Value = d;
+				param.ParameterName = "@d";
+
+				command.Parameters.Add(param);
+
+				var ra = await command.ExecuteNonQueryAsync();
+			}
+
+			await using (var command = new FbCommand("select varchar_field from TEST where int_field = 1234", Connection))
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+
+				var j = reader.GetDouble(0);
+
+				Assert.AreEqual(d, j);
+			}
+		}
+		finally
+		{
+			CultureInfo.CurrentCulture = culture;
+		}
+	}
+
+	[Test, Description("Verifies that attempting to read an long from a field containing a string fails.")]
+	public async Task ReadLongFromClobNonIntegralStringThrowsException()
+	{
+		string s = "test value";
+
+		await using (var command = new FbCommand("insert into TEST (int_field, clob_field) values (1234, @s)", Connection))
+		{
+			command.Parameters.AddWithValue("@s", s);
+
+			await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select clob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			Assert.Throws<FormatException>(() => reader.GetInt64(0));
+		}
+	}
+
+	[Test]
+	public async Task InsertLongIntoClob()
+	{
+		var r = new Random();
+		var l = r.NextInt64();
+
+		await using (var command = new FbCommand("insert into TEST (int_field, clob_field) values (1234, @l)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.Int64;
+			param.Value = l;
+			param.ParameterName = "@l";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select clob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			var m = reader.GetInt64(0);
+
+			Assert.AreEqual(l, m);
+		}
+	}
+
+	[Test]
+	public async Task InsertDateTimeIntoVarChar()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, varchar_field) values (1234, @dt)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select varchar_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			reader.Read();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
+		}
+	}
+
+	[Test]
+	public async Task InsertDateTimeIntoVarCharUsingCast()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, varchar_field) values (1234, CAST(@dt as timestamp))", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select varchar_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			reader.Read();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
+		}
+	}
+
+	[Test]
+	public async Task InsertDateTimeIntoClob()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, clob_field) values (1234, @dt)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select clob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
+		}
+	}
+
+	[Test]
+	public async Task InsertDateTimeIntoBlob()
+	{
+		var dtNow = DateTime.Now;
+
+		// FirebirdSql only stores DateTime to tenths of a millisecond.
+		var dtNormalized = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond, (dtNow.Microsecond / 100) * 100);
+		await using (var command = new FbCommand("insert into TEST (int_field, blob_field) values (1234, @dt)", Connection))
+		{
+			var param = command.CreateParameter();
+
+			param.DbType = DbType.DateTime;
+			param.Value = dtNormalized;
+			param.ParameterName = "@dt";
+
+			command.Parameters.Add(param);
+
+			var ra = await command.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("select blob_field from TEST where int_field = 1234", Connection))
+		await using (var reader = await command.ExecuteReaderAsync())
+		{
+			await reader.ReadAsync();
+
+			var dtThen = reader.GetDateTime(0);
+
+			Assert.AreEqual(dtNormalized, dtThen);
 		}
 	}
 
