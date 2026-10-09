@@ -76,7 +76,7 @@ internal class GdsDatabase : DatabaseBase
 	#region Constructors
 
 	public GdsDatabase(GdsConnection connection)
-		: base(connection.Charset, connection.PacketSize, connection.Dialect)
+		: base(connection.Charset, connection.PacketSize, connection.BlobSegmentSize, connection.Dialect)
 	{
 		_connection = connection;
 		_handle = -1;

@@ -51,8 +51,8 @@ internal sealed class FesDatabase : DatabaseBase
 
 	#region Constructors
 
-	public FesDatabase(string dllName, Charset charset, int packetSize, short dialect)
-		: base(charset, packetSize, dialect)
+	public FesDatabase(string dllName, Charset charset, int packetSize, int blobSegmentSize, short dialect)
+		: base(charset, packetSize, blobSegmentSize, dialect)
 	{
 		_fbClient = FbClientFactory.Create(dllName);
 		_fbClientVersion = FesConnection.GetClientVersion(_fbClient);

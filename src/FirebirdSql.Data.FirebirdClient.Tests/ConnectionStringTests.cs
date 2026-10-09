@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Globalization;
 using System.Threading;
 using FirebirdSql.Data.Common;
@@ -759,5 +760,62 @@ public class ConnectionStringTests
 		var cs = new ConnectionString(ConnectionString);
 		Assert.AreEqual(hostname, cs.DataSource);
 		Assert.AreEqual("test.fdb", cs.Database);
+	}
+
+	[Test]
+	public void BlobSegmentSizeDefault()
+	{
+		var cs = new ConnectionString();
+		Assert.AreEqual(ConnectionString.DefaultValueBlobSegmentSize, cs.BlobSegmentSize);
+	}
+
+	[Test]
+	public void BlobSegmentSizeParsing()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blob segment size=65535";
+		var cs = new ConnectionString(connStr);
+		Assert.AreEqual(65535, cs.BlobSegmentSize);
+	}
+
+	[Test]
+	public void BlobSegmentSizeParsingSynonym()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blobsegmentsize=32000";
+		var cs = new ConnectionString(connStr);
+		Assert.AreEqual(32000, cs.BlobSegmentSize);
+	}
+
+	[Test]
+	public void BlobSegmentSizeValidationTooSmall()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blob segment size=100";
+		var cs = new ConnectionString(connStr);
+		Assert.Throws<ArgumentException>(() => cs.Validate());
+	}
+
+	[Test]
+	public void BlobSegmentSizeValidationTooLarge()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blob segment size=70000";
+		var cs = new ConnectionString(connStr);
+		Assert.Throws<ArgumentException>(() => cs.Validate());
+	}
+
+	[Test]
+	public void BlobSegmentSizeValidationMinBoundary()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blob segment size=512";
+		var cs = new ConnectionString(connStr);
+		Assert.DoesNotThrow(() => cs.Validate());
+		Assert.AreEqual(512, cs.BlobSegmentSize);
+	}
+
+	[Test]
+	public void BlobSegmentSizeValidationMaxBoundary()
+	{
+		const string connStr = "datasource=testserver;database=testdb.fdb;user=testuser;password=testpwd;blob segment size=65535";
+		var cs = new ConnectionString(connStr);
+		Assert.DoesNotThrow(() => cs.Validate());
+		Assert.AreEqual(65535, cs.BlobSegmentSize);
 	}
 }

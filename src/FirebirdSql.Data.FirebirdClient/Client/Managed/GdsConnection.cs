@@ -38,6 +38,7 @@ internal sealed class GdsConnection
 	public int PortNumber { get; private set; }
 	public int Timeout { get; private set; }
 	public int PacketSize { get; private set; }
+	public int BlobSegmentSize { get; private set; }
 	public Charset Charset { get; private set; }
 	public short Dialect { get; private set; }
 	public bool Compression { get; private set; }
@@ -55,10 +56,10 @@ internal sealed class GdsConnection
 	internal AuthBlock AuthBlock { get; private set; }
 
 	public GdsConnection(string dataSource, int port, int timeout)
-		: this(null, null, dataSource, port, timeout, 8192, Charset.DefaultCharset, 3, false, Version13.WireCryptOption.Enabled, null)
+		: this(null, null, dataSource, port, timeout, 8192, 8192, Charset.DefaultCharset, 3, false, Version13.WireCryptOption.Enabled, null)
 	{ }
 
-	public GdsConnection(string user, string password, string dataSource, int portNumber, int timeout, int packetSize, Charset charset, short dialect, bool compression, Version13.WireCryptOption wireCrypt, byte[] cryptKey)
+	public GdsConnection(string user, string password, string dataSource, int portNumber, int timeout, int packetSize, int blobSegmentSize, Charset charset, short dialect, bool compression, Version13.WireCryptOption wireCrypt, byte[] cryptKey)
 	{
 		User = user;
 		Password = password;
@@ -66,6 +67,7 @@ internal sealed class GdsConnection
 		PortNumber = portNumber;
 		Timeout = timeout;
 		PacketSize = packetSize;
+		BlobSegmentSize = blobSegmentSize;
 		Charset = charset;
 		Dialect = dialect;
 		Compression = compression;

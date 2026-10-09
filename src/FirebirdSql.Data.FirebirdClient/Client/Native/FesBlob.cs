@@ -206,8 +206,8 @@ internal sealed class FesBlob : BlobBase
 
 	public override void GetSegment(Stream stream)
 	{
-		var requested = (short)SegmentSize;
-		short segmentLength = 0;
+		var requested = (ushort)SegmentSize;
+		ushort segmentLength = 0;
 
 		ClearStatusVector();
 
@@ -243,8 +243,8 @@ internal sealed class FesBlob : BlobBase
 	}
 	public override ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default)
 	{
-		var requested = (short)SegmentSize;
-		short segmentLength = 0;
+		var requested = (ushort)SegmentSize;
+		ushort segmentLength = 0;
 
 		ClearStatusVector();
 
@@ -284,8 +284,8 @@ internal sealed class FesBlob : BlobBase
 
 	public override byte[] GetSegment()
 	{
-		var requested = (short)(SegmentSize - 2);
-		short segmentLength = 0;
+		var requested = (ushort)(SegmentSize - 2);
+		ushort segmentLength = 0;
 
 		ClearStatusVector();
 
@@ -328,8 +328,8 @@ internal sealed class FesBlob : BlobBase
 	}
 	public override ValueTask<byte[]> GetSegmentAsync(CancellationToken cancellationToken = default)
 	{
-		var requested = (short)SegmentSize;
-		short segmentLength = 0;
+		var requested = (ushort)SegmentSize;
+		ushort segmentLength = 0;
 
 		ClearStatusVector();
 
@@ -380,7 +380,7 @@ internal sealed class FesBlob : BlobBase
 		_database.FbClient.isc_put_segment(
 			_statusVector,
 			ref _blobHandle,
-			(short)buffer.Length,
+			(ushort)buffer.Length,
 			buffer);
 
 		_database.ProcessStatusVector(_statusVector);
@@ -392,7 +392,7 @@ internal sealed class FesBlob : BlobBase
 		_database.FbClient.isc_put_segment(
 			_statusVector,
 			ref _blobHandle,
-			(short)buffer.Length,
+			(ushort)buffer.Length,
 			buffer);
 
 		_database.ProcessStatusVector(_statusVector);
