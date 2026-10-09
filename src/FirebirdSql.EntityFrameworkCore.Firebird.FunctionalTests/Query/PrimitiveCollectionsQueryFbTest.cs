@@ -35,7 +35,7 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
 	[ConditionalFact]
 	public virtual async Task Json_representation_of_bool_array()
 	{
-		await using var context = CreateContext();
+		await using var context = Fixture.CreateContext();
 
 		Assert.Equal(
 			"[true,false]",
@@ -49,433 +49,455 @@ public class PrimitiveCollectionsQueryFbTest : PrimitiveCollectionsQueryRelation
 		base.Parameter_collection_in_subquery_and_Convert_as_compiled_query();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_in_subquery_Union_another_parameter_collection_as_compiled_query(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Parameter_collection_in_subquery_Union_another_parameter_collection_as_compiled_query()
 	{
-		return base.Parameter_collection_in_subquery_Union_another_parameter_collection_as_compiled_query(async);
+		return base.Parameter_collection_in_subquery_Union_another_parameter_collection_as_compiled_query();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Column_collection_of_strings_contains_null(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Any()
 	{
-		return base.Column_collection_of_strings_contains_null(async);
+		return base.Column_collection_Any();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Inline_collection_Count_with_one_value(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Contains_over_subquery()
 	{
-		return base.Inline_collection_Count_with_one_value(async);
+		return base.Column_collection_Contains_over_subquery();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Inline_collection_Count_with_two_values(bool async)
-    {
-        return base.Inline_collection_Count_with_two_values(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Inline_collection_Count_with_three_values(bool async)
-    {
-        return base.Inline_collection_Count_with_three_values(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_Count(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Count_method()
 	{
-		return base.Parameter_collection_Count(async);
+		return base.Column_collection_Count_method();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_ints_Contains_int(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Count_with_predicate()
 	{
-		return base.Parameter_collection_of_ints_Contains_int(async);
+		return base.Column_collection_Count_with_predicate();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_nullable_ints_Contains_int(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Distinct()
 	{
-		return base.Parameter_collection_of_nullable_ints_Contains_int(async);
+		return base.Column_collection_Distinct();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_nullable_ints_Contains_nullable_int(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_ElementAt()
 	{
-		return base.Parameter_collection_of_nullable_ints_Contains_nullable_int(async);
+		return base.Column_collection_ElementAt();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_strings_Contains_string(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_First()
 	{
-		return base.Parameter_collection_of_strings_Contains_string(async);
+		return base.Column_collection_First();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_strings_Contains_nullable_string(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_FirstOrDefault()
 	{
-		return base.Parameter_collection_of_strings_Contains_nullable_string(async);
+		return base.Column_collection_FirstOrDefault();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_of_DateTimes_Contains(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_in_subquery_Union_parameter_collection()
 	{
-		return base.Parameter_collection_of_DateTimes_Contains(async);
+		return base.Column_collection_in_subquery_Union_parameter_collection();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_of_bools_Contains(bool async)
-    {
-        return base.Parameter_collection_of_bools_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_of_enums_Contains(bool async)
-    {
-        return base.Parameter_collection_of_enums_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_null_Contains(bool async)
-    {
-        return base.Parameter_collection_null_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_of_ints_Contains(bool async)
-    {
-        return base.Column_collection_of_ints_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_of_nullable_ints_Contains(bool async)
-    {
-        return base.Column_collection_of_nullable_ints_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_of_nullable_ints_Contains_null(bool async)
-    {
-        return base.Column_collection_of_nullable_ints_Contains_null(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_of_nullable_strings_contains_null(bool async)
-    {
-        return base.Column_collection_of_nullable_strings_contains_null(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_of_bools_Contains(bool async)
-    {
-        return base.Column_collection_of_bools_Contains(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Count_method(bool async)
-    {
-        return base.Column_collection_Count_method(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Length(bool async)
-    {
-        return base.Column_collection_Length(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_index_int(bool async)
-    {
-        return base.Column_collection_index_int(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_index_string(bool async)
-    {
-        return base.Column_collection_index_string(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_index_datetime(bool async)
-    {
-        return base.Column_collection_index_datetime(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_index_beyond_end(bool async)
-    {
-        return base.Column_collection_index_beyond_end(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Nullable_reference_column_collection_index_equals_nullable_column(bool async)
-    {
-        return base.Nullable_reference_column_collection_index_equals_nullable_column(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Non_nullable_reference_column_collection_index_equals_nullable_column(bool async)
-    {
-        return base.Non_nullable_reference_column_collection_index_equals_nullable_column(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Inline_collection_index_Column(bool async)
-    {
-        return base.Inline_collection_index_Column(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_index_Column_equal_Column(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_index_beyond_end()
 	{
-		return base.Parameter_collection_index_Column_equal_Column(async);
+		return base.Column_collection_index_beyond_end();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_index_Column_equal_constant(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_index_datetime()
 	{
-		return base.Parameter_collection_index_Column_equal_constant(async);
+		return base.Column_collection_index_datetime();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_ElementAt(bool async)
-    {
-        return base.Column_collection_ElementAt(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Skip(bool async)
-    {
-        return base.Column_collection_Skip(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Take(bool async)
-    {
-        return base.Column_collection_Take(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Skip_Take(bool async)
-    {
-        return base.Column_collection_Skip_Take(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_OrderByDescending_ElementAt(bool async)
-    {
-        return base.Column_collection_OrderByDescending_ElementAt(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Any(bool async)
-    {
-        return base.Column_collection_Any(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Distinct(bool async)
-    {
-        return base.Column_collection_Distinct(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Join_parameter_collection(bool async)
-    {
-        return base.Column_collection_Join_parameter_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Inline_collection_Join_ordered_column_collection(bool async)
-    {
-        return base.Inline_collection_Join_ordered_column_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_Concat_column_collection(bool async)
-    {
-        return base.Parameter_collection_Concat_column_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Union_parameter_collection(bool async)
-    {
-        return base.Column_collection_Union_parameter_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_Intersect_inline_collection(bool async)
-    {
-        return base.Column_collection_Intersect_inline_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Inline_collection_Except_column_collection(bool async)
-    {
-        return base.Inline_collection_Except_column_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_in_subquery_Union_column_collection_as_compiled_query(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_index_int()
 	{
-		return base.Parameter_collection_in_subquery_Union_column_collection_as_compiled_query(async);
+		return base.Column_collection_index_int();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_in_subquery_Union_column_collection(bool async)
-    {
-        return base.Parameter_collection_in_subquery_Union_column_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Parameter_collection_in_subquery_Union_column_collection_nested(bool async)
-    {
-        return base.Parameter_collection_in_subquery_Union_column_collection_nested(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Parameter_collection_in_subquery_Count_as_compiled_query(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_index_string()
 	{
-		return base.Parameter_collection_in_subquery_Count_as_compiled_query(async);
+		return base.Column_collection_index_string();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Column_collection_in_subquery_Union_parameter_collection(bool async)
-    {
-        return base.Column_collection_in_subquery_Union_parameter_collection(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_ints_ordered(bool async)
-    {
-        return base.Project_collection_of_ints_ordered(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_datetimes_filtered(bool async)
-    {
-        return base.Project_collection_of_datetimes_filtered(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_nullable_ints_with_paging(bool async)
-    {
-        return base.Project_collection_of_nullable_ints_with_paging(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_nullable_ints_with_paging2(bool async)
-    {
-        return base.Project_collection_of_nullable_ints_with_paging2(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_nullable_ints_with_paging3(bool async)
-    {
-        return base.Project_collection_of_nullable_ints_with_paging3(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_collection_of_ints_with_distinct(bool async)
-    {
-        return base.Project_collection_of_ints_with_distinct(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Project_empty_collection_of_nullables_and_collection_only_containing_nulls(bool async)
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Intersect_inline_collection()
 	{
-		return base.Project_empty_collection_of_nullables_and_collection_only_containing_nulls(async);
+		return base.Column_collection_Intersect_inline_collection();
 	}
 
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_multiple_collections(bool async)
-    {
-        return base.Project_multiple_collections(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Project_primitive_collections_element(bool async)
-    {
-        return base.Project_primitive_collections_element(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Nested_contains_with_Lists_and_no_inferred_type_mapping(bool async)
-    {
-        return base.Nested_contains_with_Lists_and_no_inferred_type_mapping(async);
-    }
-
-	[NotSupportedOnFirebirdTheory]
-    [MemberData(nameof(IsAsyncData))]
-    public override Task Nested_contains_with_arrays_and_no_inferred_type_mapping(bool async)
-    {
-        return base.Nested_contains_with_arrays_and_no_inferred_type_mapping(async);
-    }
-
-	PrimitiveCollectionsContext CreateContext()
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Join_parameter_collection()
 	{
-		return Fixture.CreateContext();
+		return base.Column_collection_Join_parameter_collection();
 	}
 
-	public class PrimitiveCollectionsQueryFbFixture : PrimitiveCollectionsQueryFixtureBase
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Length()
+	{
+		return base.Column_collection_Length();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_bools_Contains()
+	{
+		return base.Column_collection_of_bools_Contains();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_ints_Contains()
+	{
+		return base.Column_collection_of_ints_Contains();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_nullable_ints_Contains()
+	{
+		return base.Column_collection_of_nullable_ints_Contains();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_nullable_ints_Contains_null()
+	{
+		return base.Column_collection_of_nullable_ints_Contains_null();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_nullable_strings_contains_null()
+	{
+		return base.Column_collection_of_nullable_strings_contains_null();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_of_strings_contains_null()
+	{
+		return base.Column_collection_of_strings_contains_null();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_OrderByDescending_ElementAt()
+	{
+		return base.Column_collection_OrderByDescending_ElementAt();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_SelectMany()
+	{
+		return base.Column_collection_SelectMany();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_SelectMany_with_filter()
+	{
+		return base.Column_collection_SelectMany_with_filter();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_SelectMany_with_Select_to_anonymous_type()
+	{
+		return base.Column_collection_SelectMany_with_Select_to_anonymous_type();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Single()
+	{
+		return base.Column_collection_Single();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_SingleOrDefault()
+	{
+		return base.Column_collection_SingleOrDefault();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Skip()
+	{
+		return base.Column_collection_Skip();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Skip_Take()
+	{
+		return base.Column_collection_Skip_Take();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Take()
+	{
+		return base.Column_collection_Take();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Union_parameter_collection()
+	{
+		return base.Column_collection_Union_parameter_collection();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_Count()
+	{
+		return base.Column_collection_Where_Count();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_ElementAt()
+	{
+		return base.Column_collection_Where_ElementAt();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_Skip()
+	{
+		return base.Column_collection_Where_Skip();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_Skip_Take()
+	{
+		return base.Column_collection_Where_Skip_Take();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_Take()
+	{
+		return base.Column_collection_Where_Take();
+	}
+
+	[NotSupportedOnFirebirdFact]
+	public override Task Column_collection_Where_Union()
+	{
+		return base.Column_collection_Where_Union();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Count_with_column_predicate_with_EF_Parameter()
+	{
+		return base.Inline_collection_Count_with_column_predicate_with_EF_Parameter();
+	}
+
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Count_with_one_value()
+	{
+		return base.Inline_collection_Count_with_one_value();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Count_with_two_values()
+	{
+		return base.Inline_collection_Count_with_two_values();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Count_with_three_values()
+	{
+		return base.Inline_collection_Count_with_three_values();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Except_column_collection()
+	{
+		return base.Inline_collection_Except_column_collection();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_index_Column()
+	{
+		return base.Inline_collection_index_Column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_index_Column_with_EF_Constant()
+	{
+		return base.Inline_collection_index_Column_with_EF_Constant();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_Join_ordered_column_collection()
+	{
+		return base.Inline_collection_Join_ordered_column_collection();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_List_value_index_Column()
+	{
+		return base.Inline_collection_List_value_index_Column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_of_nullable_value_type_Max()
+	{
+		return base.Inline_collection_of_nullable_value_type_Max();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_of_nullable_value_type_Min()
+	{
+		return base.Inline_collection_of_nullable_value_type_Min();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_of_nullable_value_type_with_null_Max()
+	{
+		return base.Inline_collection_of_nullable_value_type_with_null_Max();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_of_nullable_value_type_with_null_Min()
+	{
+		return base.Inline_collection_of_nullable_value_type_with_null_Min();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_value_index_Column()
+	{
+		return base.Inline_collection_value_index_Column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Inline_collection_with_single_parameter_element_Count()
+	{
+		return base.Inline_collection_with_single_parameter_element_Count();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Non_nullable_reference_column_collection_index_equals_nullable_column()
+	{
+		return base.Non_nullable_reference_column_collection_index_equals_nullable_column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Nullable_reference_column_collection_index_equals_nullable_column()
+	{
+		return base.Nullable_reference_column_collection_index_equals_nullable_column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_Concat_column_collection()
+	{
+		return base.Parameter_collection_Concat_column_collection();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_Count()
+	{
+		return base.Parameter_collection_Count();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_Count_with_column_predicate_with_EF_Constant()
+	{
+		return base.Parameter_collection_Count_with_column_predicate_with_EF_Constant();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_ImmutableArray_of_ints_Contains_int()
+	{
+		return base.Parameter_collection_ImmutableArray_of_ints_Contains_int();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_in_subquery_Count_as_compiled_query()
+	{
+		return base.Parameter_collection_in_subquery_Count_as_compiled_query();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_in_subquery_Union_column_collection()
+	{
+		return base.Parameter_collection_in_subquery_Union_column_collection();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_in_subquery_Union_column_collection_as_compiled_query()
+	{
+		return base.Parameter_collection_in_subquery_Union_column_collection_as_compiled_query();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_in_subquery_Union_column_collection_nested()
+	{
+		return base.Parameter_collection_in_subquery_Union_column_collection_nested();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_index_Column_equal_Column()
+	{
+		return base.Parameter_collection_index_Column_equal_Column();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_index_Column_equal_constant()
+	{
+		return base.Parameter_collection_index_Column_equal_constant();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Parameter_collection_Where_with_EF_Constant_Where_Any()
+	{
+		return base.Parameter_collection_Where_with_EF_Constant_Where_Any();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_collection_of_datetimes_filtered()
+	{
+		return base.Project_collection_of_datetimes_filtered();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_collection_of_ints_ordered()
+	{
+		return base.Project_collection_of_ints_ordered();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_collection_of_nullable_ints_with_paging2()
+	{
+		return base.Project_collection_of_nullable_ints_with_paging2();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_empty_collection_of_nullables_and_collection_only_containing_nulls()
+	{
+		return base.Project_empty_collection_of_nullables_and_collection_only_containing_nulls();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_inline_collection_with_Union()
+	{
+		return base.Project_inline_collection_with_Union();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Project_multiple_collections()
+	{
+		return base.Project_multiple_collections();
+	}
+
+	[NotSupportedByProviderFact]
+	public override Task Values_of_enum_casted_to_underlying_value()
+	{
+		return base.Values_of_enum_casted_to_underlying_value();
+	}
+
+	public class PrimitiveCollectionsQueryFbFixture : PrimitiveCollectionsQueryFixtureBase, ITestSqlLoggerFactory
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 	}
 }

@@ -191,8 +191,9 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		base.VisitSqlConstant(sqlConstantExpression);
 		if (shouldExplicitStringLiteralTypes)
 		{
+			var isUnicode = FbTypeMappingSource.IsUnicode(sqlConstantExpression.TypeMapping);
 			Sql.Append(" AS ");
-			Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string));
+			Sql.Append(((IFbSqlGenerationHelper)Dependencies.SqlGenerationHelper).StringLiteralQueryType(sqlConstantExpression.Value as string, isUnicode));
 			Sql.Append(")");
 		}
 		return sqlConstantExpression;
@@ -200,11 +201,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 	protected override void GenerateEmptyProjection(SelectExpression selectExpression)
 	{
-		base.GenerateEmptyProjection(selectExpression);
-		if (selectExpression.Alias != null)
-		{
-			Sql.Append(" AS empty");
-		}
+		Sql.Append("1 AS dummy");
 	}
 
 	protected override void GenerateTop(SelectExpression selectExpression)
@@ -283,6 +280,60 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		}
 	}
 
+	// Adapted from Npgsql Entity Framework Core provider
+	// (https://github.com/npgsql/efcore.pg)
+	// Copyright (c) 2002-2021, Npgsql
+	protected override Expression VisitCrossApply(CrossApplyExpression crossApplyExpression)
+	{
+		Sql.Append("JOIN LATERAL ");
+
+		if (crossApplyExpression.Table is TableExpression table)
+		{
+			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
+			// will sometimes generate that.
+			Sql
+				.Append("(SELECT * FROM ")
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
+				.Append(")")
+				.Append(AliasSeparator)
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
+		}
+		else
+		{
+			Visit(crossApplyExpression.Table);
+		}
+
+		Sql.Append(" ON TRUE");
+		return crossApplyExpression;
+	}
+
+	// Adapted from Npgsql Entity Framework Core provider
+	// (https://github.com/npgsql/efcore.pg)
+	// Copyright (c) 2002-2021, Npgsql
+	protected override Expression VisitOuterApply(OuterApplyExpression outerApplyExpression)
+	{
+		Sql.Append("LEFT JOIN LATERAL ");
+
+		if (outerApplyExpression.Table is TableExpression table)
+		{
+			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
+			// will sometimes generate that.
+			Sql
+				.Append("(SELECT * FROM ")
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
+				.Append(")")
+				.Append(AliasSeparator)
+				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
+		}
+		else
+		{
+			Visit(outerApplyExpression.Table);
+		}
+
+		Sql.Append(" ON TRUE");
+		return outerApplyExpression;
+	}
+
 	protected override void GeneratePseudoFromClause()
 	{
 		Sql.Append(" FROM RDB$DATABASE");
@@ -311,7 +362,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 
 	protected override Expression VisitTableValuedFunction(TableValuedFunctionExpression tableValuedFunctionExpression)
 	{
-		Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.StoreFunction.Name));
+		Sql.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(tableValuedFunctionExpression.Name));
 		if (tableValuedFunctionExpression.Arguments.Any())
 		{
 			Sql.Append("(");
@@ -332,7 +383,7 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		};
 	}
 
-	public virtual Expression VisitSpacedFunction(FbSpacedFunctionExpression spacedFunctionExpression)
+	protected virtual Expression VisitSpacedFunction(FbSpacedFunctionExpression spacedFunctionExpression)
 	{
 		Sql.Append(spacedFunctionExpression.Name);
 		Sql.Append("(");

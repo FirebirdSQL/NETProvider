@@ -31,8 +31,6 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_DTO_constructor_distinct_with_collection_projection_translated_to_server_with_binding_after_client_eval(bool async)
@@ -146,5 +144,19 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 	public override Task Subquery_with_navigation_inside_inline_collection(bool async)
 	{
 		return base.Subquery_with_navigation_inside_inline_collection(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(bool async)
+	{
+		return base.SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(async);
+	}
+
+	[NotSupportedByProviderTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Where_nanosecond_and_microsecond_component(bool async)
+	{
+		return base.Where_nanosecond_and_microsecond_component(async);
 	}
 }

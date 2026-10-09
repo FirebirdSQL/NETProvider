@@ -28,7 +28,7 @@ internal abstract class DatabaseBase
 	public Action<IscException> WarningMessage { get; set; }
 
 	public abstract bool UseUtf8ParameterBuffer { get; }
-	public Encoding ParameterBufferEncoding => UseUtf8ParameterBuffer ? Encoding.UTF8 : Encoding2.Default;
+	public Encoding ParameterBufferEncoding => UseUtf8ParameterBuffer ? Encoding.UTF8 : Encoding.GetANSIEncoding();
 
 	public abstract int Handle { get; }
 	public Charset Charset { get; }

@@ -29,11 +29,18 @@ public class FbZonedTimeTypeTests
 	{
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "UTC") },
 			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "utc") },
+			new object[] { new FbZonedTime(TimeSpan.FromMinutes(142), "UTC"), new FbZonedTime(TimeSpan.FromMinutes(142), "UTC", TimeSpan.Zero) },
 	};
 	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
 	public void EqualityTrue(FbZonedTime expected, FbZonedTime actual)
 	{
 		Assert.AreEqual(expected, actual);
+	}
+
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void HashCodeEqual(FbZonedTime expected, FbZonedTime actual)
+	{
+		Assert.AreEqual(expected.GetHashCode(), actual.GetHashCode());
 	}
 
 	static readonly object[] SimpleEqualityFalseSource = new object[]
@@ -45,5 +52,20 @@ public class FbZonedTimeTypeTests
 	public void EqualityFalse(FbZonedTime expected, FbZonedTime actual)
 	{
 		Assert.AreNotEqual(expected, actual);
+	}
+
+	[TestCase("-5:0", "-05:00")]
+	[TestCase("europe/prague", "Europe/Prague")]
+	public void TimeZoneIsNormalized(string timeZone, string expected)
+	{
+		Assert.AreEqual(expected, new FbZonedTime(TimeSpan.FromMinutes(142), timeZone).TimeZone);
+	}
+
+	[Test]
+	public void ConvertToTimeSpanShouldNotThrow()
+	{
+		var fbZonedTime = new FbZonedTime(TimeSpan.FromMinutes(142), "UTC");
+
+		Assert.DoesNotThrow(() => Convert.ChangeType(fbZonedTime, typeof(TimeSpan)));
 	}
 }

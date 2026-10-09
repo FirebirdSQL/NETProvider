@@ -20,7 +20,7 @@
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 	</PropertyGroup>
 	<PropertyGroup>
-		<CopyrightEndYear>2024</CopyrightEndYear>
+		<CopyrightEndYear>2026</CopyrightEndYear>
 	</PropertyGroup>
 
 	<!-- SourceLink -->

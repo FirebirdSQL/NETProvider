@@ -473,18 +473,14 @@ internal static class TypeHelper
 		{
 			return FbDbType.Binary;
 		}
-#if NET6_0_OR_GREATER
 		else if (type == typeof(System.DateOnly))
 		{
 			return FbDbType.Date;
 		}
-#endif
-#if NET6_0_OR_GREATER
 		else if (type == typeof(System.TimeOnly))
 		{
 			return FbDbType.Time;
 		}
-#endif
 		else
 		{
 			throw new ArgumentException($"Unknown type: {type}.");

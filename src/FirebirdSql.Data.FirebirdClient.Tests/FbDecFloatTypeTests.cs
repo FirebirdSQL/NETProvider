@@ -38,6 +38,7 @@ public class FbDecFloatTypeTests
 			new object[] { new FbDecFloat(-10, 3), new FbDecFloat(-100, 2) },
 			new object[] { new FbDecFloat(10, -3), new FbDecFloat(1, -2) },
 			new object[] { new FbDecFloat(-10, -3), new FbDecFloat(-1, -2) },
+			new object[] { new FbDecFloat(0, 0), new FbDecFloat(0, 5) },
 			new object[] { FbDecFloat.PositiveInfinity, FbDecFloat.PositiveInfinity },
 			new object[] { FbDecFloat.NegativeInfinity, FbDecFloat.NegativeInfinity },
 			new object[] { FbDecFloat.PositiveNaN, FbDecFloat.PositiveNaN },
@@ -48,11 +49,19 @@ public class FbDecFloatTypeTests
 		Assert.AreEqual(expected, actual);
 	}
 
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void HashCodeEqual(FbDecFloat expected, FbDecFloat actual)
+	{
+		Assert.AreEqual(expected.GetHashCode(), actual.GetHashCode());
+	}
+
 	static readonly object[] SimpleEqualityFalseSource = new object[]
 	{
 			new object[] { new FbDecFloat(0), new FbDecFloat(BigInteger.Parse("986767875675879890678765756798079808709")) },
 			new object[] { new FbDecFloat(6, 3), new FbDecFloat(-6, 3) },
 			new object[] { new FbDecFloat(6, 3), new FbDecFloat(6, -3) },
+			new object[] { new FbDecFloat(1, 0), new FbDecFloat(1, 1_000_000_000) },
+			new object[] { new FbDecFloat(1, int.MaxValue), new FbDecFloat(1, int.MinValue) },
 			new object[] { FbDecFloat.PositiveInfinity, FbDecFloat.NegativeInfinity },
 			new object[] { FbDecFloat.PositiveNaN, FbDecFloat.NegativeNaN },
 			new object[] { FbDecFloat.PositiveInfinity, FbDecFloat.PositiveNaN },

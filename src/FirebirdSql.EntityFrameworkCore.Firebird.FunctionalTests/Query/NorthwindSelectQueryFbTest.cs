@@ -206,6 +206,13 @@ public class NorthwindSelectQueryFbTest : NorthwindSelectQueryRelationalTestBase
 		return base.Reverse_in_SelectMany_with_Take(async);
 	}
 
+	[NotSupportedOnFirebirdTheory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Set_operation_in_pending_collection(bool async)
+	{
+		return base.Set_operation_in_pending_collection(async);
+	}
+
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
 	public override async Task Correlated_collection_after_distinct_with_complex_projection_not_containing_original_identifier(bool async)

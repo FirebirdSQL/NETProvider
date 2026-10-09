@@ -36,7 +36,7 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 	{
 		return AssertQuery(
 			async,
-			ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+			ss => ss.Set<Weapon>().Select(w => w.IsAutomatic.ToString()));
 	}
 
 	[Theory]
@@ -45,7 +45,7 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 	{
 		return AssertQuery(
 			async,
-			ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()), elementAsserter: (lhs, rhs) => { Assert.True(lhs.Equals(rhs, System.StringComparison.OrdinalIgnoreCase)); });
+			ss => ss.Set<LocustHorde>().Select(lh => lh.Eradicated.ToString()));
 	}
 
 	[Theory(Skip = "Different implicit ordering on Firebird.")]
@@ -95,83 +95,6 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 	public override Task DateTimeOffset_Date_returns_datetime(bool async)
 	{
 		return base.DateTimeOffset_Date_returns_datetime(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_date_component(bool async)
-	{
-		return base.Where_datetimeoffset_date_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_day_component(bool async)
-	{
-		return base.Where_datetimeoffset_day_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_dayofyear_component(bool async)
-	{
-		return base.Where_datetimeoffset_dayofyear_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_hour_component(bool async)
-	{
-		return base.Where_datetimeoffset_hour_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_millisecond_component(bool async)
-	{
-		return base.Where_datetimeoffset_millisecond_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_minute_component(bool async)
-	{
-		return base.Where_datetimeoffset_minute_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_month_component(bool async)
-	{
-		return base.Where_datetimeoffset_month_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_now(bool async)
-	{
-		return base.Where_datetimeoffset_now(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_second_component(bool async)
-	{
-		return base.Where_datetimeoffset_second_component(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_utcnow(bool async)
-	{
-		return base.Where_datetimeoffset_utcnow(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_datetimeoffset_year_component(bool async)
-	{
-		return base.Where_datetimeoffset_year_component(async);
 	}
 
 	[NotSupportedOnFirebirdTheory]
@@ -246,13 +169,6 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Array_access_on_byte_array(bool async)
-	{
-		return base.Array_access_on_byte_array(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_distinct_3_levels(bool async)
 	{
 		return base.Correlated_collection_after_distinct_3_levels(async);
@@ -316,20 +232,6 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task First_on_byte_array(bool async)
-	{
-		return base.First_on_byte_array(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_subtract_TimeOnly(bool async)
-	{
-		return base.Where_TimeOnly_subtract_TimeOnly(async);
-	}
-
-	[NotSupportedOnFirebirdTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(bool async)
 	{
 		return base.Correlated_collection_with_groupby_with_complex_grouping_key_not_projecting_identifier_column_with_group_aggregate_in_final_projection(async);
@@ -349,35 +251,14 @@ public class TPTGearsOfWarQueryFbTest : TPTGearsOfWarQueryRelationalTestBase<TPT
 		return base.Subquery_inside_Take_argument(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_to_unix_time_milliseconds(bool async)
+	public override Task Non_string_concat_uses_appropriate_type_mapping(bool async)
 	{
-		return base.DateTimeOffset_to_unix_time_milliseconds(async);
-	}
-
-	[NotSupportedByProviderTheory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task DateTimeOffset_to_unix_time_seconds(bool async)
-	{
-		return base.DateTimeOffset_to_unix_time_seconds(async);
+		return base.Non_string_concat_uses_appropriate_type_mapping(async);
 	}
 
 	[Theory(Skip = "NETProvider#1008")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_IsBetween(bool async)
-	{
-		return base.Where_TimeOnly_IsBetween(async);
-	}
-
-	[Theory(Skip = "NETProvider#1009")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Where_TimeOnly_Add_TimeSpan(bool async)
-	{
-		return base.Where_TimeOnly_Add_TimeSpan(async);
-	}
-
-	[Theory(Skip = "Different implicit ordering on Firebird.")]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task String_concat_with_null_conditional_argument(bool async)
 	{

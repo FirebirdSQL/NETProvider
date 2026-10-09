@@ -111,7 +111,7 @@ internal class GdsDatabase : Version10.GdsDatabase
 	protected virtual ValueTask SendTrustedAuthToBufferAsync(DatabaseParameterBufferBase dpb, byte[] authData, CancellationToken cancellationToken = default)
 	{
 		dpb.Append(IscCodes.isc_dpb_trusted_auth, authData);
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	protected IResponse ProcessTrustedAuthResponse(SspiHelper sspiHelper, IResponse response)

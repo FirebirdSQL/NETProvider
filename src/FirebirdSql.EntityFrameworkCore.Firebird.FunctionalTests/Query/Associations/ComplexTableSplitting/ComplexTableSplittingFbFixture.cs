@@ -13,31 +13,16 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net)
+//$Authors = Niek Schoemaker (@niekschoemaker)
 
-using System;
-using System.Globalization;
-using System.Text;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.Data.Common;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.ComplexTableSplitting;
 
-internal static class Encoding2
+public class ComplexTableSplittingFbFixture : ComplexTableSplittingRelationalFixtureBase
 {
-	public static Encoding Default { get; } = GetANSIEncoding();
-
-	private static Encoding GetANSIEncoding()
-	{
-#if NET48
-		return Encoding.Default;
-#else
-		try
-		{
-			return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
-		}
-		catch (Exception)
-		{
-			return Encoding.Default;
-		}
-#endif
-	}
+	protected override ITestStoreFactory TestStoreFactory
+		=> FbTestStoreFactory.Instance;
 }

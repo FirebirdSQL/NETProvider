@@ -33,7 +33,6 @@ public class FbObjectToStringTranslator : IMethodCallTranslator
 			typeof(int),
 			typeof(long),
 			typeof(DateTime),
-			typeof(bool),
 			typeof(byte),
 			typeof(byte[]),
 			typeof(double),
@@ -59,18 +58,54 @@ public class FbObjectToStringTranslator : IMethodCallTranslator
 
 	public SqlExpression Translate(SqlExpression instance, MethodInfo method, IReadOnlyList<SqlExpression> arguments, IDiagnosticsLogger<DbLoggerCategory.Query> logger)
 	{
-		if (method.Name == nameof(ToString) && method.GetParameters().Length == 0)
+		if (instance == null || method.Name != nameof(ToString) || arguments.Count != 0)
 		{
-			var type = instance.Type.UnwrapNullableType();
-			if (SupportedTypes.Contains(type))
+			return null;
+		}
+
+		if (instance.TypeMapping?.ClrType == typeof(string))
+		{
+			return instance;
+		}
+
+		if (SupportedTypes.Contains(instance.Type))
+		{
+			return _fbSqlExpressionFactory.Convert(instance, typeof(string));
+		}
+		else if (instance.Type == typeof(Guid))
+		{
+			return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, true, new[] { true }, typeof(string));
+		}
+		else if (instance.Type == typeof(bool))
+		{
+			if (instance is not ColumnExpression { IsNullable: false })
 			{
-				return _fbSqlExpressionFactory.Convert(instance, typeof(string));
+				return _fbSqlExpressionFactory.Case(
+					instance,
+					new[]
+					{
+						new CaseWhenClause(
+							_fbSqlExpressionFactory.Constant(false),
+							_fbSqlExpressionFactory.Constant(false.ToString())),
+						new CaseWhenClause(
+							_fbSqlExpressionFactory.Constant(true),
+							_fbSqlExpressionFactory.Constant(true.ToString()))
+					},
+					_fbSqlExpressionFactory.Constant(string.Empty));
 			}
-			else if (type == typeof(Guid))
+			else
 			{
-				return _fbSqlExpressionFactory.Function("UUID_TO_CHAR", new[] { instance }, true, new[] { true }, typeof(string));
+				return _fbSqlExpressionFactory.Case(
+					new[]
+					{
+						new CaseWhenClause(
+							instance,
+							_fbSqlExpressionFactory.Constant(true.ToString()))
+					},
+					_fbSqlExpressionFactory.Constant(false.ToString()));
 			}
 		}
+
 		return null;
 	}
 }

@@ -27,7 +27,7 @@ internal abstract class ServiceManagerBase
 	public Action<IscException> WarningMessage { get; set; }
 
 	public abstract bool UseUtf8ParameterBuffer { get; }
-	public Encoding ParameterBufferEncoding => UseUtf8ParameterBuffer ? Encoding.UTF8 : Encoding2.Default;
+	public Encoding ParameterBufferEncoding => UseUtf8ParameterBuffer ? Encoding.UTF8 : Encoding.GetANSIEncoding();
 
 	public int Handle { get; protected set; }
 	public Charset Charset { get; }

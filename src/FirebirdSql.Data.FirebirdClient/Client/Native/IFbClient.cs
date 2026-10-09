@@ -23,8 +23,8 @@ using FirebirdSql.Data.Client.Native.Handles;
 namespace FirebirdSql.Data.Client.Native;
 
 /// <summary>
-/// This is the interface that the dynamically-generated class uses to call the native library. 
-/// Each connection can specify different client library to use even on the same OS. 
+/// This is the interface that the dynamically-generated class uses to call the native library.
+/// Each connection can specify different client library to use even on the same OS.
 /// IFbClient and FbClientactory classes are implemented to support this feature.
 /// Public visibility added, because auto-generated assembly can't work with internal types
 /// </summary>
@@ -68,6 +68,14 @@ public interface IFbClient
 		short bpbLength,
 		byte[] bpbAddress);
 
+	IntPtr isc_blob_info(
+		[In, Out] IntPtr[] statusVector,
+		ref BlobHandle blobHandle,
+		short itemListBufferLength,
+		byte[] itemListBuffer,
+		short resultBufferLength,
+		byte[] resultBuffer);
+
 	IntPtr isc_get_segment(
 		[In, Out] IntPtr[] statusVector,
 		[MarshalAs(UnmanagedType.I4)] ref BlobHandle blobHandle,
@@ -80,6 +88,13 @@ public interface IFbClient
 		[MarshalAs(UnmanagedType.I4)] ref BlobHandle blobHandle,
 		short segBufferLength,
 		byte[] segBuffer);
+
+	IntPtr isc_seek_blob(
+		[In, Out] IntPtr[] statusVector,
+		[MarshalAs(UnmanagedType.I4)] ref BlobHandle blobHandle,
+		short mode,
+		int offset,
+		ref int resultingBlobPosition);
 
 	IntPtr isc_cancel_blob(
 		[In, Out] IntPtr[] statusVector,

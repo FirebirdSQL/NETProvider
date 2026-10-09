@@ -257,14 +257,6 @@ internal static class FbClientFactory
 	private static IFbClient CreateInstance(TypeBuilder tb)
 	{
 		var t = tb.CreateTypeInfo().AsType();
-
-#if DEBUG
-#if NET48
-		var ab = (AssemblyBuilder)tb.Assembly;
-		ab.Save("DynamicAssembly.dll");
-#endif
-#endif
-
 		return (IFbClient)Activator.CreateInstance(t);
 	}
 
@@ -288,13 +280,7 @@ internal static class FbClientFactory
 		assemblyName.Name = baseName + "_Assembly";
 
 		// We create the dynamic assembly in our current AppDomain
-		var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName,
-#if NET48
-				AssemblyBuilderAccess.RunAndSave
-#else
-				AssemblyBuilderAccess.Run
-#endif
-			);
+		var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
 		// Generate the actual module (which is the DLL itself)
 		var moduleBuilder = assemblyBuilder.DefineDynamicModule(baseName + "_Module");

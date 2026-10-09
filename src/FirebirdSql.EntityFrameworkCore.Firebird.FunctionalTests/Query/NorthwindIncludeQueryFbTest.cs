@@ -24,7 +24,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class NorthwindIncludeQueryFbTest : NorthwindIncludeQueryTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
+public class NorthwindIncludeQueryFbTest : NorthwindIncludeQueryRelationalTestBase<NorthwindQueryFbFixture<NoopModelCustomizer>>
 {
 	public NorthwindIncludeQueryFbTest(NorthwindQueryFbFixture<NoopModelCustomizer> fixture)
 		: base(fixture)
@@ -56,13 +56,6 @@ public class NorthwindIncludeQueryFbTest : NorthwindIncludeQueryTestBase<Northwi
 	public override Task Include_collection_with_cross_apply_with_filter(bool async)
 	{
 		return base.Include_collection_with_cross_apply_with_filter(async);
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Include_collection_with_last_no_orderby(bool async)
-	{
-		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Include_collection_with_last_no_orderby(async));
 	}
 
 	[Theory(Skip = "Different ordering on Firebird.")]

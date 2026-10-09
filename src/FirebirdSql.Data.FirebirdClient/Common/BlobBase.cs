@@ -29,14 +29,17 @@ internal abstract class BlobBase
 	private int _segmentSize;
 
 	protected long _blobId;
+	protected bool _isOpen;
 	protected int _position;
 	protected TransactionBase _transaction;
 
 	public abstract int Handle { get; }
 	public long Id => _blobId;
 	public bool EOF => (_rblFlags & IscCodes.RBL_eof_pending) != 0;
+	public bool IsOpen => _isOpen;
 
-	protected int SegmentSize => _segmentSize;
+	public int SegmentSize => _segmentSize;
+	public int Position => _position;
 
 	public abstract DatabaseBase Database { get; }
 
@@ -203,26 +206,32 @@ internal abstract class BlobBase
 		}
 	}
 
-	protected abstract void Create();
-	protected abstract ValueTask CreateAsync(CancellationToken cancellationToken = default);
+	public abstract void Create();
+	public abstract ValueTask CreateAsync(CancellationToken cancellationToken = default);
 
-	protected abstract void Open();
-	protected abstract ValueTask OpenAsync(CancellationToken cancellationToken = default);
+	public abstract void Open();
+	public abstract ValueTask OpenAsync(CancellationToken cancellationToken = default);
 
-	protected abstract void GetSegment(Stream stream);
-	protected abstract ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default);
+	public abstract int GetLength();
+	public abstract ValueTask<int> GetLengthAsync(CancellationToken cancellationToken = default);
 
-	protected abstract void PutSegment(byte[] buffer);
-	protected abstract ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default);
+	public abstract byte[] GetSegment();
+	public abstract ValueTask<byte[]> GetSegmentAsync(CancellationToken cancellationToken = default);
 
-	protected abstract void Seek(int position);
-	protected abstract ValueTask SeekAsync(int position, CancellationToken cancellationToken = default);
+	public abstract void GetSegment(Stream stream);
+	public abstract ValueTask GetSegmentAsync(Stream stream, CancellationToken cancellationToken = default);
 
-	protected abstract void Close();
-	protected abstract ValueTask CloseAsync(CancellationToken cancellationToken = default);
+	public abstract void PutSegment(byte[] buffer);
+	public abstract ValueTask PutSegmentAsync(byte[] buffer, CancellationToken cancellationToken = default);
 
-	protected abstract void Cancel();
-	protected abstract ValueTask CancelAsync(CancellationToken cancellationToken = default);
+	public abstract void Seek(int offset, int seekMode);
+	public abstract ValueTask SeekAsync(int offset, int seekMode, CancellationToken cancellationToken = default);
+
+	public abstract void Close();
+	public abstract ValueTask CloseAsync(CancellationToken cancellationToken = default);
+
+	public abstract void Cancel();
+	public abstract ValueTask CancelAsync(CancellationToken cancellationToken = default);
 
 	protected void RblAddValue(int rblValue)
 	{

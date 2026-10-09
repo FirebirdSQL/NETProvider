@@ -15,16 +15,10 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.Metadata;
 
-namespace FirebirdSql.Data.Common;
-
-internal static class DateTime2
+public enum FbIdentityType
 {
-	public static DateTime UnixEpoch =>
-#if NET48 || NETSTANDARD2_0
-			new DateTime(621355968000000000);
-#else
-			DateTime.UnixEpoch;
-#endif
+	GeneratedAlways = 0,
+	GeneratedByDefault = 1,
 }

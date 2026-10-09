@@ -27,35 +27,13 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class OperatorsQueryFbTest : OperatorsQueryTestBase
+public class OperatorsQueryFbTest(NonSharedFixture fixture) : OperatorsQueryTestBase(fixture)
 {
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Concat_and_json_scalar(bool async)
 	{
 		return base.Concat_and_json_scalar(async);
-	}
-
-	protected override ContextFactory<TContext> Initialize<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Action<IServiceCollection> addServices = null, Action<TContext> seed = null, Func<string, bool> shouldLogCategory = null, Func<TestStore> createTestStore = null, bool usePooling = true)
-	{
-		return base.Initialize(
-			modelBuilder =>
-			{
-				ModelHelpers.SetStringLengths(modelBuilder);
-				onModelCreating?.Invoke(modelBuilder);
-			},
-			onConfiguring, addServices, seed, shouldLogCategory, createTestStore, usePooling);
-	}
-
-	protected override Task<ContextFactory<TContext>> InitializeAsync<TContext>(Action<ModelBuilder> onModelCreating = null, Action<DbContextOptionsBuilder> onConfiguring = null, Action<IServiceCollection> addServices = null, Action<TContext> seed = null, Func<string, bool> shouldLogCategory = null, Func<TestStore> createTestStore = null, bool usePooling = true)
-	{
-		return base.InitializeAsync(
-			modelBuilder =>
-			{
-				ModelHelpers.SetStringLengths(modelBuilder);
-				onModelCreating?.Invoke(modelBuilder);
-			},
-			onConfiguring, addServices, seed, shouldLogCategory, createTestStore, usePooling);
 	}
 
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;

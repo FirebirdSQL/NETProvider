@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net10.0</TargetFrameworks>
 		<AssemblyName>FirebirdSql.EntityFrameworkCore.Firebird</AssemblyName>
 		<RootNamespace>FirebirdSql.EntityFrameworkCore.Firebird</RootNamespace>
 		<SignAssembly>true</SignAssembly>

@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/EF6/">
+    <Project Path="EntityFramework.Firebird.Tests/EntityFramework.Firebird.Tests.csproj" />
+    <Project Path="EntityFramework.Firebird/EntityFramework.Firebird.csproj" />
+  </Folder>
+  <Folder Name="/EFCore/">
+    <Project Path="FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests/FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.csproj" />
+    <Project Path="FirebirdSql.EntityFrameworkCore.Firebird.Tests/FirebirdSql.EntityFrameworkCore.Firebird.Tests.csproj" />
+    <Project Path="FirebirdSql.EntityFrameworkCore.Firebird/FirebirdSql.EntityFrameworkCore.Firebird.csproj" />
+  </Folder>
+  <Folder Name="/Provider/">
+    <Project Path="FirebirdSql.Data.External/FirebirdSql.Data.External.shproj" />
+    <Project Path="FirebirdSql.Data.FirebirdClient.Tests/FirebirdSql.Data.FirebirdClient.Tests.csproj" />
+    <Project Path="FirebirdSql.Data.FirebirdClient/FirebirdSql.Data.FirebirdClient.csproj" />
+  </Folder>
+  <Folder Name="/Provider/Perf/">
+    <Project Path="Perf/Perf.csproj" />
+  </Folder>
+  <Folder Name="/Provider/Scratchpad/">
+    <Project Path="Scratchpad/Scratchpad.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Versions.props" />
+  </Folder>
+  <Folder Name="/TestsBase/">
+    <Project Path="FirebirdSql.Data.TestsBase/FirebirdSql.Data.TestsBase.shproj" />
+  </Folder>
+  <Properties Name="TextTemplating" Scope="PostLoad">
+    <Property Name="TextTemplating" Value="1" />
+  </Properties>
+</Solution>

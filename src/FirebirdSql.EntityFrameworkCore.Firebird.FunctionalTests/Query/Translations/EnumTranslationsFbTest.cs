@@ -1,4 +1,4 @@
-﻿/*
+/*
  *    The contents of this file are subject to the Initial
  *    Developer's Public License Version 1.0 (the "License");
  *    you may not use this file except in compliance with the
@@ -13,15 +13,26 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Jiri Cincura (jiri@cincura.net)
+//$Authors = Niek Schoemaker (@niekschoemaker)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Translations;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
+using Xunit.Abstractions;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations;
 
-public class ManyToManyHeterogeneousQueryFbTest : ManyToManyHeterogeneousQueryRelationalTestBase
+public class EnumTranslationsFbTest : EnumTranslationsTestBase<BasicTypesQueryFbFixture>
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	public EnumTranslationsFbTest(BasicTypesQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
+		: base(fixture)
+	{
+		Fixture.TestSqlLoggerFactory.Clear();
+		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
+	}
+
+	protected override void ClearLog()
+	{
+		Fixture.TestSqlLoggerFactory.Clear();
+	}
 }

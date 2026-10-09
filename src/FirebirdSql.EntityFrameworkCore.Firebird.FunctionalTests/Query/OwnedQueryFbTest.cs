@@ -272,10 +272,6 @@ public class OwnedQueryFbTest : OwnedQueryRelationalTestBase<OwnedQueryFbTest.Ow
 
 	[DoesNotHaveTheDataTheory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Can_OrderBy_owened_indexer_properties_converted(bool isAsync) => base.Can_OrderBy_owened_indexer_properties_converted(isAsync);
-
-	[DoesNotHaveTheDataTheory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_collection_navigation_ToList_Count_member(bool isAsync) => base.Where_collection_navigation_ToList_Count_member(isAsync);
 
 	[DoesNotHaveTheDataTheory]

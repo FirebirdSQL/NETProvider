@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Linq;
 using System.Numerics;
 using FirebirdSql.Data.Types;
 
@@ -325,10 +326,11 @@ internal sealed class DbField
 						{
 							var s = Charset.GetString(buffer, 0, buffer.Length);
 
+							var runes = s.EnumerateRunesToChars().ToList();
 							if ((Length % Charset.BytesPerCharacter) == 0 &&
-								s.Length > CharCount)
+								runes.Count > CharCount)
 							{
-								s = s.Substring(0, CharCount);
+								s = new string([.. runes.Take(CharCount).SelectMany(x => x)]);
 							}
 
 							DbValue.SetValue(s);
@@ -509,7 +511,7 @@ internal sealed class DbField
 
 				case DbDataType.Date:
 				case DbDataType.TimeStamp:
-					DbValue.SetValue(DateTime2.UnixEpoch);
+					DbValue.SetValue(DateTime.UnixEpoch);
 					break;
 
 				case DbDataType.Time:
@@ -522,7 +524,7 @@ internal sealed class DbField
 
 				case DbDataType.TimeStampTZ:
 				case DbDataType.TimeStampTZEx:
-					DbValue.SetValue(new FbZonedDateTime(DateTime2.UnixEpoch, TimeZoneMapping.DefaultTimeZoneName));
+					DbValue.SetValue(new FbZonedDateTime(DateTime.UnixEpoch, TimeZoneMapping.DefaultTimeZoneName));
 					break;
 
 				case DbDataType.TimeTZ:

@@ -113,7 +113,7 @@ internal sealed class Charset
 		switch (SystemName)
 		{
 			case None:
-				Encoding = Encoding2.Default;
+				Encoding = Encoding.GetANSIEncoding();
 				IsNoneCharset = true;
 				break;
 			case Octets:

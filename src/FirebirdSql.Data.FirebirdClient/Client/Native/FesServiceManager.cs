@@ -94,7 +94,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 		Handle = svcHandle;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Detach()
@@ -121,7 +121,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 		Handle = svcHandle;
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Start(ServiceParameterBufferBase spb)
@@ -156,7 +156,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 		ProcessStatusVector();
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override void Query(ServiceParameterBufferBase spb, int requestLength, byte[] requestBuffer, int bufferLength, byte[] buffer)
@@ -199,7 +199,7 @@ internal sealed class FesServiceManager : ServiceManagerBase
 
 		ProcessStatusVector();
 
-		return ValueTask2.CompletedTask;
+		return ValueTask.CompletedTask;
 	}
 
 	public override ServiceParameterBufferBase CreateServiceParameterBuffer()

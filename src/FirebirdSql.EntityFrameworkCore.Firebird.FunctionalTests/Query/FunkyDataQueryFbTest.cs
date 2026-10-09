@@ -15,7 +15,6 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
@@ -39,9 +38,11 @@ public class FunkyDataQueryFbTest : FunkyDataQueryTestBase<FunkyDataQueryFbTest.
 		return base.String_contains_on_argument_with_wildcard_column(async);
 	}
 
-	public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase
+	public class FunkyDataQueryFbFixture : FunkyDataQueryFixtureBase, ITestSqlLoggerFactory
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{

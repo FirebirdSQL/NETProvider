@@ -31,7 +31,7 @@ public class FbTimeOnlyTypeMapping : TimeOnlyTypeMapping
 
 	protected override string GenerateNonNullSqlLiteral(object value)
 	{
-		return $"CAST('{value:HH:mm:ss.ffff}' AS TIME)";
+		return $"CAST('{value:HH\\:mm\\:ss.ffff}' AS TIME)";
 	}
 
 	protected override RelationalTypeMapping Clone(RelationalTypeMappingParameters parameters)

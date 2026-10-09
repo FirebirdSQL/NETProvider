@@ -15,22 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using System;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
-namespace FirebirdSql.Data.Logging;
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-sealed class NullLoggingProvider : IFbLoggingProvider
+public class AdHocAdvancedMappingsQueryFbTest(NonSharedFixture fixture) : AdHocAdvancedMappingsQueryRelationalTestBase(fixture)
 {
-	public IFbLogger CreateLogger(string name) => NullLogger.Instance;
-
-	sealed class NullLogger : IFbLogger
-	{
-		internal static NullLogger Instance = new NullLogger();
-
-		NullLogger() { }
-
-		public bool IsEnabled(FbLogLevel level) => false;
-
-		public void Log(FbLogLevel level, string msg, Exception exception = null) { }
-	}
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

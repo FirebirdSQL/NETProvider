@@ -22,7 +22,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public interface IFbSqlGenerationHelper : ISqlGenerationHelper
 {
-	string StringLiteralQueryType(string s);
+	string StringLiteralQueryType(string s, bool isUnicode);
 	string StringParameterQueryType(bool isUnicode);
 	void GenerateBlockParameterName(StringBuilder builder, string name);
 	string AlternativeStatementTerminator { get; }

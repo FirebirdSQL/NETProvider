@@ -20,25 +20,16 @@ function Clean() {
 }
 
 function Build() {
-	function b($target, $check=$True) {
-		dotnet msbuild /t:$target /p:Configuration=$Configuration /p:ContinuousIntegrationBuild=true "$baseDir\src\NETProvider.sln" /v:m /m
-		if ($check) {
-			Check-ExitCode
-		}
-	}
-	b 'Clean'
-	# this sometimes fails on CI
-	b 'Restore' $False
-	b 'Restore'
-	b 'Build'
+	dotnet clean "$baseDir\src\NETProvider.slnx" -c $Configuration -v m
+	dotnet build "$baseDir\src\NETProvider.slnx" -c $Configuration -p:ContinuousIntegrationBuild=true -v m
 }
 
 function Versions() {
 	function v($file) {
 		return (Get-Item $file).VersionInfo.ProductVersion -replace '(\d+)\.(\d+)\.(\d+)(-[a-z0-9]+)?.*','$1.$2.$3$4'
 	}
-	$script:versionProvider = v $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net8.0\FirebirdSql.Data.FirebirdClient.dll
-	$script:versionEFCore = v $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\net8.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
+	$script:versionProvider = v $baseDir\src\FirebirdSql.Data.FirebirdClient\bin\$Configuration\net10.0\FirebirdSql.Data.FirebirdClient.dll
+	$script:versionEFCore = v $baseDir\src\FirebirdSql.EntityFrameworkCore.Firebird\bin\$Configuration\net10.0\FirebirdSql.EntityFrameworkCore.Firebird.dll
 	$script:versionEF6 = v $baseDir\src\EntityFramework.Firebird\bin\$Configuration\net48\EntityFramework.Firebird.dll
 }
 

@@ -313,7 +313,7 @@ public class FbDataReaderTests : FbTestsBase
 			{
 				bytes[i] = (byte)random.Next(byte.MinValue, byte.MaxValue);
 			}
-			var binaryString = $"x'{BitConverter.ToString(bytes).Replace("-", string.Empty)}'";
+			var binaryString = $"x'{Convert.ToHexString(bytes)}'";
 
 			await using (var command = new FbCommand($"select {binaryString} from TEST", Connection, transaction))
 			{

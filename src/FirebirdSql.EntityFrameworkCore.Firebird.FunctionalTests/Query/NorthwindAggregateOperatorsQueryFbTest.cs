@@ -30,8 +30,6 @@ public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperator
 		: base(fixture)
 	{ }
 
-	protected override bool CanExecuteQueryString => false;
-
 	[NotSupportedOnFirebirdTheory]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Multiple_collection_navigation_with_FirstOrDefault_chained(bool async)
@@ -73,20 +71,6 @@ public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperator
 
 	[Theory(Skip = "Different math on Firebird.")]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Average_over_max_subquery_is_client_eval(bool async)
-	{
-		return base.Average_over_max_subquery_is_client_eval(async);
-	}
-
-	[Theory(Skip = "Different math on Firebird.")]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Average_over_nested_subquery_is_client_eval(bool async)
-	{
-		return base.Average_over_nested_subquery_is_client_eval(async);
-	}
-
-	[Theory(Skip = "Different math on Firebird.")]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Sum_with_division_on_decimal(bool async)
 	{
 		return base.Sum_with_division_on_decimal(async);
@@ -97,5 +81,19 @@ public class NorthwindAggregateOperatorsQueryFbTest : NorthwindAggregateOperator
 	public override Task Contains_inside_Average_without_GroupBy(bool async)
 	{
 		return base.Contains_inside_Average_without_GroupBy(async);
+	}
+
+	[Theory(Skip = "Different math on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Average_over_max_subquery(bool async)
+	{
+		return base.Average_over_max_subquery(async);
+	}
+
+	[Theory(Skip = "Different math on Firebird.")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Average_over_nested_subquery(bool async)
+	{
+		return base.Average_over_nested_subquery(async);
 	}
 }

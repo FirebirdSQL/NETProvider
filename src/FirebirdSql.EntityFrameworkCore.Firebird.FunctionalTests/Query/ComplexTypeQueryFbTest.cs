@@ -36,20 +36,6 @@ public class ComplexTypeQueryFbTest : ComplexTypeQueryRelationalTestBase<Complex
 
 	[Theory]
 	[MemberData(nameof(IsAsyncData))]
-	public override Task Project_complex_type_via_optional_navigation(bool async)
-	{
-		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Project_complex_type_via_optional_navigation(async));
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
-	public override Task Project_struct_complex_type_via_optional_navigation(bool async)
-	{
-		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Project_struct_complex_type_via_optional_navigation(async));
-	}
-
-	[Theory]
-	[MemberData(nameof(IsAsyncData))]
 	public override Task Union_property_in_complex_type(bool async)
 	{
 		return AssertQuery(

@@ -25,23 +25,23 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class ToSqlQueryFbTest : ToSqlQueryTestBase
+public class ToSqlQueryFbTest(NonSharedFixture fixture) : ToSqlQueryTestBase(fixture)
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
 	public override async Task Entity_type_with_navigation_mapped_to_SqlQuery(bool async)
 	{
 		var contextFactory = await InitializeAsync<Context27629>(
-			seed: c =>
+			seed: async c =>
 			{
 				var author = new Author { Name = "Toast", Posts = { new Post { Title = "Sausages of the world!" } } };
 				c.Add(author);
-				c.SaveChanges();
+				await c.SaveChangesAsync();
 
 				var postStat = new PostStat { Count = 10, Author = author };
 				author.PostStat = postStat;
 				c.Add(postStat);
-				c.SaveChanges();
+				await c.SaveChangesAsync();
 			});
 
 		using var context = contextFactory.CreateContext();

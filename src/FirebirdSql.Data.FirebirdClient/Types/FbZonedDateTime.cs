@@ -17,11 +17,12 @@
 
 using System;
 using System.Runtime.InteropServices;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Types;
 
 [StructLayout(LayoutKind.Auto)]
-public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
+public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>, IConvertible
 {
 	public DateTime DateTime { get; }
 	public string TimeZone { get; }
@@ -42,7 +43,7 @@ public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
 	}
 
 	public FbZonedDateTime(DateTime dateTime, string timeZone)
-		: this(dateTime, timeZone, null)
+		: this(dateTime, TimeZoneMapping.Normalize(timeZone), null)
 	{ }
 
 	public override string ToString()
@@ -59,22 +60,44 @@ public readonly struct FbZonedDateTime : IEquatable<FbZonedDateTime>
 		return obj is FbZonedDateTime fbZonedDateTime && Equals(fbZonedDateTime);
 	}
 
+	// Offset is intentionally excluded, it's derived from DateTime and TimeZone and only present in extended bind.
 	public override int GetHashCode()
 	{
-		unchecked
-		{
-			var hash = (int)2166136261;
-			hash = (hash * 16777619) ^ DateTime.GetHashCode();
-			hash = (hash * 16777619) ^ TimeZone.GetHashCode();
-			if (Offset != null)
-				hash = (hash * 16777619) ^ Offset.GetHashCode();
-			return hash;
-		}
+		var hash = new HashCode();
+		hash.Add(DateTime);
+		hash.Add(TimeZone, StringComparer.OrdinalIgnoreCase);
+		return hash.ToHashCode();
 	}
 
+	// Offset is intentionally excluded, it's derived from DateTime and TimeZone and only present in extended bind.
 	public bool Equals(FbZonedDateTime other) => DateTime.Equals(other.DateTime) && TimeZone.Equals(other.TimeZone, StringComparison.OrdinalIgnoreCase);
+
+	TypeCode IConvertible.GetTypeCode() => TypeCode.Object;
+
+	DateTime IConvertible.ToDateTime(IFormatProvider provider) => DateTime;
+
+	string IConvertible.ToString(IFormatProvider provider) => ToString();
+
+	object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+		=> ReferenceEquals(conversionType, typeof(FbZonedDateTime))
+			? this
+		: throw new InvalidCastException(conversionType?.FullName);
+
+	bool IConvertible.ToBoolean(IFormatProvider provider) => throw new InvalidCastException(nameof(Boolean));
+	byte IConvertible.ToByte(IFormatProvider provider) => throw new InvalidCastException(nameof(Byte));
+	char IConvertible.ToChar(IFormatProvider provider) => throw new InvalidCastException(nameof(Char));
+	decimal IConvertible.ToDecimal(IFormatProvider provider) => throw new InvalidCastException(nameof(Decimal));
+	double IConvertible.ToDouble(IFormatProvider provider) => throw new InvalidCastException(nameof(Double));
+	short IConvertible.ToInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(Int16));
+	int IConvertible.ToInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(Int32));
+	long IConvertible.ToInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(Int64));
+	sbyte IConvertible.ToSByte(IFormatProvider provider) => throw new InvalidCastException(nameof(SByte));
+	float IConvertible.ToSingle(IFormatProvider provider) => throw new InvalidCastException(nameof(Single));
+	ushort IConvertible.ToUInt16(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt16));
+	uint IConvertible.ToUInt32(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt32));
+	ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException(nameof(UInt64));
 
 	public static bool operator ==(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
 
-	public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => lhs.Equals(rhs);
+	public static bool operator !=(FbZonedDateTime lhs, FbZonedDateTime rhs) => !lhs.Equals(rhs);
 }

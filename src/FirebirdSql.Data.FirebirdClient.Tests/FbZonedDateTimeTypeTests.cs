@@ -29,11 +29,18 @@ public class FbZonedDateTimeTypeTests
 	{
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC") },
 			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "utc") },
+			new object[] { new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC"), new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC", TimeSpan.Zero) },
 	};
 	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
 	public void EqualityTrue(FbZonedDateTime expected, FbZonedDateTime actual)
 	{
 		Assert.AreEqual(expected, actual);
+	}
+
+	[TestCaseSource(nameof(SimpleEqualityTrueSource))]
+	public void HashCodeEqual(FbZonedDateTime expected, FbZonedDateTime actual)
+	{
+		Assert.AreEqual(expected.GetHashCode(), actual.GetHashCode());
 	}
 
 	static readonly object[] SimpleEqualityFalseSource = new object[]
@@ -45,6 +52,21 @@ public class FbZonedDateTimeTypeTests
 	public void EqualityFalse(FbZonedDateTime expected, FbZonedDateTime actual)
 	{
 		Assert.AreNotEqual(expected, actual);
+	}
+
+	[TestCase("-5:0", "-05:00")]
+	[TestCase("europe/prague", "Europe/Prague")]
+	public void TimeZoneIsNormalized(string timeZone, string expected)
+	{
+		Assert.AreEqual(expected, new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), timeZone).TimeZone);
+	}
+
+	[Test]
+	public void ConvertToDateTimeShouldNotThrow()
+	{
+		var fbZonedDateTime = new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), "UTC");
+		
+		Assert.DoesNotThrow(() => Convert.ChangeType(fbZonedDateTime, typeof(DateTime)));
 	}
 
 	public void DateTimeShouldBeUtc()

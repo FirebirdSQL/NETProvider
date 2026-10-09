@@ -15,14 +15,14 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-namespace FirebirdSql.Data.Logging;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 
-public enum FbLogLevel
+namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
+
+public class AdHocManyToManyQueryFbTest(NonSharedFixture fixture) : AdHocManyToManyQueryRelationalTestBase(fixture)
 {
-	Trace = 1,
-	Debug = 2,
-	Info = 3,
-	Warn = 4,
-	Error = 5,
-	Fatal = 6,
+	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

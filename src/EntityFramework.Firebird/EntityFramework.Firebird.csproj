@@ -47,17 +47,12 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="$(EF6ReferencePackageVersion)" />
+		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="$(EF6ReferenceProviderVersion)" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
 		<Reference Include="System.Configuration" />
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'!='Debug'">
-		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="$(EF6ReferenceProviderVersion)" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\FirebirdSql.Data.FirebirdClient\FirebirdSql.Data.FirebirdClient.csproj" />
 	</ItemGroup>
 </Project>

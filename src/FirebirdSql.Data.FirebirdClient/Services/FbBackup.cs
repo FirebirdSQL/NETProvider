@@ -32,7 +32,7 @@ public sealed class FbBackup : FbService
 	public int Factor { get; set; }
 	public string SkipData { get; set; }
 	public FbBackupFlags Options { get; set; }
-	public FbBackupRestoreStatistics Statistics { get; set; }
+	public FbBackupRestoreStatistics? Statistics { get; set; }
 
 	public FbBackup(string connectionString = null)
 		: base(connectionString)
@@ -67,7 +67,8 @@ public sealed class FbBackup : FbService
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+				if (Statistics.HasValue)
+					startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.Value.BuildConfiguration());
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				StartTask(startSpb);
@@ -113,7 +114,8 @@ public sealed class FbBackup : FbService
 				if (!string.IsNullOrEmpty(SkipData))
 					startSpb.Append2(IscCodes.isc_spb_bkp_skip_data, SkipData);
 				startSpb.Append(IscCodes.isc_spb_options, (int)Options);
-				startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.BuildConfiguration());
+				if (Statistics.HasValue)
+					startSpb.Append2(IscCodes.isc_spb_bkp_stat, Statistics.Value.BuildConfiguration());
 				if (ConnectionStringOptions.ParallelWorkers > 0)
 					startSpb.Append(IscCodes.isc_spb_bkp_parallel_workers, ConnectionStringOptions.ParallelWorkers);
 				await StartTaskAsync(startSpb, cancellationToken).ConfigureAwait(false);

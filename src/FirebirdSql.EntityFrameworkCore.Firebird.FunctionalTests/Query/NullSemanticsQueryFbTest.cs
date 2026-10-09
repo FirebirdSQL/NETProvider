@@ -20,6 +20,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestModels.NullSemanticsModel;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
@@ -39,5 +40,19 @@ public class NullSemanticsQueryFbTest : NullSemanticsQueryTestBase<NullSemantics
 		var context = new NullSemanticsContext(options.Options);
 		context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 		return context;
+	}
+
+	[Theory(Skip = "efcore#34906")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task CaseOpWhen_predicate(bool async)
+	{
+		return base.CaseOpWhen_predicate(async);
+	}
+
+	[Theory(Skip = "efcore#34906")]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task CaseOpWhen_projection(bool async)
+	{
+		return base.CaseOpWhen_projection(async);
 	}
 }

@@ -15,6 +15,9 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -38,5 +41,29 @@ public class FbSqlTranslatingExpressionVisitor : RelationalSqlTranslatingExpress
 			return Dependencies.SqlExpressionFactory.Function("OCTET_LENGTH", new[] { sqlExpression }, true, new[] { true }, typeof(int));
 		}
 		return base.VisitUnary(unaryExpression);
+	}
+
+	public override SqlExpression GenerateGreatest(IReadOnlyList<SqlExpression> expressions, Type resultType)
+	{
+		var resultTypeMapping = ExpressionExtensions.InferTypeMapping(expressions);
+		return Dependencies.SqlExpressionFactory.Function(
+		   "MAXVALUE",
+		   expressions,
+		   nullable: true,
+		   Enumerable.Repeat(true, expressions.Count),
+		   resultType,
+		   resultTypeMapping);
+	}
+
+	public override SqlExpression GenerateLeast(IReadOnlyList<SqlExpression> expressions, Type resultType)
+	{
+		var resultTypeMapping = ExpressionExtensions.InferTypeMapping(expressions);
+		return Dependencies.SqlExpressionFactory.Function(
+		   "MINVALUE",
+		   expressions,
+		   nullable: true,
+		   Enumerable.Repeat(true, expressions.Count),
+		   resultType,
+		   resultTypeMapping);
 	}
 }

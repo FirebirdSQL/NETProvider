@@ -25,5 +25,13 @@ public static class FbAnnotationNames
 	public const string HiLoSequenceSchema = Prefix + nameof(HiLoSequenceSchema);
 	public const string SequenceName = Prefix + nameof(SequenceName);
 	public const string SequenceSchema = Prefix + nameof(SequenceSchema);
-	public const string SequenceNameSuffix = Prefix+ nameof(SequenceNameSuffix);
+	public const string SequenceNameSuffix = Prefix + nameof(SequenceNameSuffix);
+
+	public const string BlobSegmentSize = Prefix + nameof(BlobSegmentSize);
+	public const string CharacterSet = Prefix + nameof(CharacterSet);
+	public const string DomainName = Prefix + nameof(DomainName);
+
+	public const string IdentityType = Prefix + nameof(IdentityType);
+	public const string IdentityStart = Prefix + nameof(IdentityStart);
+	public const string IdentityIncrement = Prefix + nameof(IdentityIncrement);
 }

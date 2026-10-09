@@ -115,36 +115,34 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 
 	public override int GetHashCode()
 	{
-		unchecked
-		{
-			var hash = (int)2166136261;
-			hash = (hash * 16777619) ^ Type.GetHashCode();
-			hash = (hash * 16777619) ^ Negative.GetHashCode();
-			hash = (hash * 16777619) ^ Coefficient.GetHashCode();
-			hash = (hash * 16777619) ^ Exponent.GetHashCode();
-			return hash;
-		}
+		var (coefficient, exponent) = Normalize();
+		return HashCode.Combine(Type, Negative, coefficient, exponent);
 	}
 
 	public bool Equals(FbDecFloat other)
 	{
-		if (!(Type.Equals(other.Type) && Negative.Equals(other.Negative)))
+		if (Type != other.Type || Negative != other.Negative)
 			return false;
-		if (Coefficient.Equals(other.Coefficient) && Exponent.Equals(other.Exponent))
+		if (Coefficient.Equals(other.Coefficient) && Exponent == other.Exponent)
 			return true;
-		if (Exponent < other.Exponent)
+		return Normalize() == other.Normalize();
+	}
+
+	// Values with the same numeric value (e.g. 1E1 and 10E0) normalize to the same representation.
+	(BigInteger coefficient, int exponent) Normalize()
+	{
+		if (Coefficient.IsZero)
+			return (BigInteger.Zero, 0);
+		var coefficient = Coefficient;
+		var exponent = Exponent;
+		while (true)
 		{
-			var difference = other.Exponent - Exponent;
-			var value = other.Coefficient * BigInteger.Pow(10, difference);
-			return value.Equals(Coefficient);
+			var quotient = BigInteger.DivRem(coefficient, 10, out var remainder);
+			if (!remainder.IsZero)
+				return (coefficient, exponent);
+			coefficient = quotient;
+			exponent++;
 		}
-		if (Exponent > other.Exponent)
-		{
-			var difference = Exponent - other.Exponent;
-			var value = Coefficient * BigInteger.Pow(10, difference);
-			return value.Equals(other.Coefficient);
-		}
-		return false;
 	}
 
 	public static bool operator ==(FbDecFloat lhs, FbDecFloat rhs)
@@ -154,7 +152,7 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 
 	public static bool operator !=(FbDecFloat lhs, FbDecFloat rhs)
 	{
-		return lhs.Equals(rhs);
+		return !lhs.Equals(rhs);
 	}
 
 	static FbDecFloat ParseNumber(IFormattable formattable, string format)

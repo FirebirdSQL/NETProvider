@@ -44,6 +44,7 @@ public class FbBlobTests : FbTestsBase
 				insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
 				await insert.ExecuteNonQueryAsync();
 			}
+
 			await transaction.CommitAsync();
 		}
 

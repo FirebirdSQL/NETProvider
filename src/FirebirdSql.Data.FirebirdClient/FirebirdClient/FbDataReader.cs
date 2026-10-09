@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -169,11 +170,7 @@ public sealed class FbDataReader : DbDataReader
 			_fields = null;
 		}
 	}
-#if NET48 || NETSTANDARD2_0
-	public async Task CloseAsync()
-#else
 	public override async Task CloseAsync()
-#endif
 	{
 		if (!IsClosed)
 		{
@@ -210,13 +207,11 @@ public sealed class FbDataReader : DbDataReader
 			Close();
 		}
 	}
-#if !(NET48 || NETSTANDARD2_0)
 	public override async ValueTask DisposeAsync()
 	{
 		await CloseAsync().ConfigureAwait(false);
 		await base.DisposeAsync().ConfigureAwait(false);
 	}
-#endif
 
 	public override bool Read()
 	{
@@ -330,11 +325,7 @@ public sealed class FbDataReader : DbDataReader
 				}
 				finally
 				{
-#if NET48 || NETSTANDARD2_0
 					reader.Dispose();
-#else
-					reader.Dispose();
-#endif
 				}
 
 				/* Create new row for the Schema Table	*/
@@ -392,20 +383,12 @@ public sealed class FbDataReader : DbDataReader
 		}
 		finally
 		{
-#if NET48 || NETSTANDARD2_0
 			schemaCmd.Dispose();
-#else
-			schemaCmd.Dispose();
-#endif
 		}
 
 		return _schemaTable;
 	}
-#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
-	public async Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
-#else
 	public override async Task<DataTable> GetSchemaTableAsync(CancellationToken cancellationToken = default)
-#endif
 	{
 		CheckState();
 
@@ -456,11 +439,7 @@ public sealed class FbDataReader : DbDataReader
 				}
 				finally
 				{
-#if NET48 || NETSTANDARD2_0
-					reader.Dispose();
-#else
 					await reader.DisposeAsync().ConfigureAwait(false);
-#endif
 				}
 
 				/* Create new row for the Schema Table	*/
@@ -518,11 +497,7 @@ public sealed class FbDataReader : DbDataReader
 		}
 		finally
 		{
-#if NET48 || NETSTANDARD2_0
-			schemaCmd.Dispose();
-#else
 			await schemaCmd.DisposeAsync().ConfigureAwait(false);
-#endif
 		}
 
 		return _schemaTable;
@@ -700,18 +675,14 @@ public sealed class FbDataReader : DbDataReader
 			{
 				return (T)(object)_row[i].GetZonedTime();
 			}
-#if NET6_0_OR_GREATER
 			else if (type == typeof(DateOnly))
 			{
 				return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
 			}
-#endif
-#if NET6_0_OR_GREATER
 			else if (type == typeof(TimeOnly))
 			{
 				return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
 			}
-#endif
 			else
 			{
 				return (T)_row[i].GetValue();
@@ -805,18 +776,14 @@ public sealed class FbDataReader : DbDataReader
 			{
 				return (T)(object)_row[i].GetZonedTime();
 			}
-#if NET6_0_OR_GREATER
 			else if (type == typeof(DateOnly))
 			{
 				return (T)(object)DateOnly.FromDateTime(_row[i].GetDateTime());
 			}
-#endif
-#if NET6_0_OR_GREATER
 			else if (type == typeof(TimeOnly))
 			{
 				return (T)(object)TimeOnly.FromTimeSpan(_row[i].GetTimeSpan());
 			}
-#endif
 			else
 			{
 				return (T)await _row[i].GetValueAsync().ConfigureAwait(false);
@@ -976,6 +943,15 @@ public sealed class FbDataReader : DbDataReader
 	public override DateTime GetDateTime(int i)
 	{
 		return GetFieldValue<DateTime>(i);
+	}
+
+	public override Stream GetStream(int i)
+	{
+		CheckState();
+		CheckPosition();
+		CheckIndex(i);
+
+		return _row[i].GetBinaryStream();
 	}
 
 	public override bool IsDBNull(int i)

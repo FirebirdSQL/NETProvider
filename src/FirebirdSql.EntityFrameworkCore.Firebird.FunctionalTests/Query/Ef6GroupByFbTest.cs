@@ -45,9 +45,11 @@ public class Ef6GroupByFbTest : Ef6GroupByTestBase<Ef6GroupByFbTest.Ef6GroupByFb
 		return base.Average_Grouped_from_LINQ_101(async);
 	}
 
-	public class Ef6GroupByFbFixture : Ef6GroupByFixtureBase
+	public class Ef6GroupByFbFixture : Ef6GroupByFixtureBase, ITestSqlLoggerFactory
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+		public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 		{
