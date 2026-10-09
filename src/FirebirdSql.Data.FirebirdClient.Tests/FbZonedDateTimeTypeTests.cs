@@ -54,6 +54,13 @@ public class FbZonedDateTimeTypeTests
 		Assert.AreNotEqual(expected, actual);
 	}
 
+	[TestCase("-5:0", "-05:00")]
+	[TestCase("europe/prague", "Europe/Prague")]
+	public void TimeZoneIsNormalized(string timeZone, string expected)
+	{
+		Assert.AreEqual(expected, new FbZonedDateTime(new DateTime(2020, 12, 4, 10, 38, 0, DateTimeKind.Utc), timeZone).TimeZone);
+	}
+
 	[Test]
 	public void ConvertToDateTimeShouldNotThrow()
 	{

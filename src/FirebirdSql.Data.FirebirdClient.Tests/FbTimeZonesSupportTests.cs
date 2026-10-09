@@ -60,6 +60,24 @@ public class FbTimeZonesSupportTests : FbTestsBase
 
 	[TestCase(true)]
 	[TestCase(false)]
+	public async Task ReadsZonedDateTimeWithOffsetCorrectly(bool isExtended)
+	{
+		if (isExtended)
+		{
+			await SetExtended();
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast('2020-08-27 10:00 +01:00' as timestamp with time zone) from rdb$database";
+			var result = (FbZonedDateTime)await cmd.ExecuteScalarAsync();
+			Assert.AreEqual(new DateTime(2020, 08, 27, 09, 00, 00, DateTimeKind.Utc), result.DateTime);
+			Assert.AreEqual("+01:00", result.TimeZone);
+			Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(60) : (TimeSpan?)null, result.Offset);
+		}
+	}
+
+	[TestCase(true)]
+	[TestCase(false)]
 	public async Task ReadsZonedDateTimeNullCorrectly(bool isExtended)
 	{
 		if (isExtended)
@@ -89,6 +107,25 @@ public class FbTimeZonesSupportTests : FbTestsBase
 			cmd.Parameters.AddWithValue("value", value);
 			var result = (FbZonedDateTime)await cmd.ExecuteScalarAsync();
 			Assert.AreEqual(value, result);
+		}
+	}
+
+	[TestCase(true)]
+	[TestCase(false)]
+	public async Task PassesZonedDateTimeWithOffsetCorrectly(bool isExtended)
+	{
+		if (isExtended)
+		{
+			await SetExtended();
+		}
+		var value = new FbZonedDateTime(new DateTime(2020, 08, 27, 08, 00, 00, DateTimeKind.Utc), "-5:30");
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as timestamp with time zone) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			var result = (FbZonedDateTime)await cmd.ExecuteScalarAsync();
+			Assert.AreEqual(value, result);
+			Assert.AreEqual("-05:30", result.TimeZone);
 		}
 	}
 
@@ -124,6 +161,24 @@ public class FbTimeZonesSupportTests : FbTestsBase
 			Assert.AreEqual(new TimeSpan(14, 00, 00), result.Time);
 			Assert.AreEqual("Europe/Prague", result.TimeZone);
 			Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(60) : (TimeSpan?)null, result.Offset);
+		}
+	}
+
+	[TestCase(true)]
+	[TestCase(false)]
+	public async Task ReadsZonedTimeWithOffsetCorrectly(bool isExtended)
+	{
+		if (isExtended)
+		{
+			await SetExtended();
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast('15:00 -05:30' as time with time zone) from rdb$database";
+			var result = (FbZonedTime)await cmd.ExecuteScalarAsync();
+			Assert.AreEqual(new TimeSpan(20, 30, 00), result.Time);
+			Assert.AreEqual("-05:30", result.TimeZone);
+			Assert.AreEqual(isExtended ? TimeSpan.FromMinutes(-330) : (TimeSpan?)null, result.Offset);
 		}
 	}
 

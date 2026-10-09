@@ -17,6 +17,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using FirebirdSql.Data.Common;
 
 namespace FirebirdSql.Data.Types;
 
@@ -40,7 +41,7 @@ public readonly struct FbZonedTime : IEquatable<FbZonedTime>, IConvertible
 	}
 
 	public FbZonedTime(TimeSpan time, string timeZone)
-		: this(time, timeZone, null)
+		: this(time, TimeZoneMapping.Normalize(timeZone), null)
 	{ }
 
 	public override string ToString()

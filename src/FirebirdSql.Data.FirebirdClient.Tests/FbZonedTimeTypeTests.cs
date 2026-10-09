@@ -54,6 +54,13 @@ public class FbZonedTimeTypeTests
 		Assert.AreNotEqual(expected, actual);
 	}
 
+	[TestCase("-5:0", "-05:00")]
+	[TestCase("europe/prague", "Europe/Prague")]
+	public void TimeZoneIsNormalized(string timeZone, string expected)
+	{
+		Assert.AreEqual(expected, new FbZonedTime(TimeSpan.FromMinutes(142), timeZone).TimeZone);
+	}
+
 	[Test]
 	public void ConvertToTimeSpanShouldNotThrow()
 	{
