@@ -535,4 +535,18 @@ end";
 			await transaction.RollbackAsync();
 		}
 	}
+
+	[Test]
+	public async Task RecordsAffectedIsMinusOneForSelectTest()
+	{
+		// DbDataReader.RecordsAffected: "-1 for SELECT statements; 0 if no rows were affected or the statement failed."
+		await using (var command = new FbCommand("select INT_FIELD from TEST where 1 = 0", Connection))
+		{
+			var reader = await command.ExecuteReaderAsync();
+			while (await reader.ReadAsync())
+			{ }
+			await reader.CloseAsync();
+			Assert.AreEqual(-1, reader.RecordsAffected);
+		}
+	}
 }
