@@ -753,7 +753,17 @@ public sealed class FbConnection : DbConnection, ICloneable
 				}
 			}
 			catch
-			{ }
+			{
+				if (_innerConnection != null)
+				{
+					if (_options.Pooling)
+					{
+						FbConnectionPoolManager.Instance.Release(_innerConnection, returnToAvailable: false);
+					}
+
+					DisconnectEnlistedHelper();
+				}
+			}
 			finally
 			{
 				OnStateChange(_state, ConnectionState.Closed);
@@ -810,7 +820,17 @@ public sealed class FbConnection : DbConnection, ICloneable
 				}
 			}
 			catch
-			{ }
+			{
+				if (_innerConnection != null)
+				{
+					if (_options.Pooling)
+					{
+						FbConnectionPoolManager.Instance.Release(_innerConnection, false);
+					}
+
+					await DisconnectEnlistedHelper().ConfigureAwait(false);
+				}
+			}
 			finally
 			{
 				OnStateChange(_state, ConnectionState.Closed);
