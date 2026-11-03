@@ -367,6 +367,11 @@ internal class FbConnectionInternal
 			await DisposeTransactionAsync(cancellationToken).ConfigureAwait(false);
 			throw FbException.Create(ex);
 		}
+		catch (OperationCanceledException)
+		{
+			await DisposeTransactionAsync(CancellationToken.None).ConfigureAwait(false);
+			throw;
+		}
 
 		return _activeTransaction;
 	}
@@ -411,6 +416,11 @@ internal class FbConnectionInternal
 		{
 			await DisposeTransactionAsync(cancellationToken).ConfigureAwait(false);
 			throw FbException.Create(ex);
+		}
+		catch (OperationCanceledException)
+		{
+			await DisposeTransactionAsync(CancellationToken.None).ConfigureAwait(false);
+			throw;
 		}
 
 		return _activeTransaction;
