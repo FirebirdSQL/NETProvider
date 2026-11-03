@@ -254,9 +254,10 @@ public sealed class FbParameterCollection : DbParameterCollection
 
 	public override void RemoveAt(int index)
 	{
-		if (index < 0 || index > Count)
+		// IList.RemoveAt: ArgumentOutOfRangeException when "index is not a valid index in the IList".
+		if (index < 0 || index >= Count)
 		{
-			throw new IndexOutOfRangeException("The specified index does not exist.");
+			throw new ArgumentOutOfRangeException(nameof(index), index, "The specified index does not exist.");
 		}
 
 		var parameter = this[index];
@@ -266,7 +267,13 @@ public sealed class FbParameterCollection : DbParameterCollection
 
 	public override void RemoveAt(string parameterName)
 	{
-		RemoveAt(IndexOf(parameterName));
+		var index = IndexOf(parameterName);
+		if (index < 0)
+		{
+			throw new IndexOutOfRangeException("The specified index does not exist.");
+		}
+
+		RemoveAt(index);
 	}
 
 	public void CopyTo(FbParameter[] array, int index)

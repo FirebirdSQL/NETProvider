@@ -26,6 +26,29 @@ namespace FirebirdSql.Data.FirebirdClient.Tests;
 [NoServerCategory]
 public class FbParameterCollectionTests
 {
+	[TestCase(-1)]
+	[TestCase(0)]
+	[TestCase(1)]
+	public void RemoveAtInvalidIndexThrowsArgumentOutOfRangeTest(int index)
+	{
+		var command = new FbCommand();
+		if (index == 1)
+		{
+			command.Parameters.Add("@p1", 1);
+		}
+
+		var ex = Assert.Throws<ArgumentOutOfRangeException>(() => command.Parameters.RemoveAt(index));
+		Assert.AreEqual("index", ex.ParamName);
+		Assert.AreEqual(index == 1 ? 1 : 0, command.Parameters.Count);
+	}
+
+	[Test]
+	public void RemoveAtUnknownNameThrowsIndexOutOfRangeTest()
+	{
+		var command = new FbCommand();
+		Assert.Throws<IndexOutOfRangeException>(() => command.Parameters.RemoveAt("@missing"));
+	}
+
 	[Test]
 	public void AddTest()
 	{
