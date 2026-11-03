@@ -285,24 +285,8 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 	// Copyright (c) 2002-2021, Npgsql
 	protected override Expression VisitCrossApply(CrossApplyExpression crossApplyExpression)
 	{
-		Sql.Append("JOIN LATERAL ");
-
-		if (crossApplyExpression.Table is TableExpression table)
-		{
-			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
-			// will sometimes generate that.
-			Sql
-				.Append("(SELECT * FROM ")
-				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
-				.Append(")")
-				.Append(AliasSeparator)
-				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Alias));
-		}
-		else
-		{
-			Visit(crossApplyExpression.Table);
-		}
-
+		Sql.Append("JOIN ");
+		GenerateApplySource(crossApplyExpression.Table);
 		Sql.Append(" ON TRUE");
 		return crossApplyExpression;
 	}
@@ -312,14 +296,28 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 	// Copyright (c) 2002-2021, Npgsql
 	protected override Expression VisitOuterApply(OuterApplyExpression outerApplyExpression)
 	{
-		Sql.Append("LEFT JOIN LATERAL ");
+		Sql.Append("LEFT JOIN ");
+		GenerateApplySource(outerApplyExpression.Table);
+		Sql.Append(" ON TRUE");
+		return outerApplyExpression;
+	}
 
-		if (outerApplyExpression.Table is TableExpression table)
+	// LATERAL is only allowed in front of a derived table, so anything that is not one has to
+	// become one - except a selectable procedure, which is implicitly lateral already.
+	void GenerateApplySource(TableExpressionBase source)
+	{
+		if (source is TableValuedFunctionExpression function)
+		{
+			// A selectable procedure takes its arguments from streams earlier in the FROM clause
+			// without LATERAL, so the call is emitted as it is anywhere else.
+			Visit(function);
+		}
+		else if (source is TableExpression table)
 		{
 			// Firebird doesn't support LATERAL JOIN over table, and it doesn't really make sense to do it - but EF Core
 			// will sometimes generate that.
 			Sql
-				.Append("(SELECT * FROM ")
+				.Append("LATERAL (SELECT * FROM ")
 				.Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(table.Name, table.Schema))
 				.Append(")")
 				.Append(AliasSeparator)
@@ -327,11 +325,9 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		}
 		else
 		{
-			Visit(outerApplyExpression.Table);
+			Sql.Append("LATERAL ");
+			Visit(source);
 		}
-
-		Sql.Append(" ON TRUE");
-		return outerApplyExpression;
 	}
 
 	protected override void GeneratePseudoFromClause()
