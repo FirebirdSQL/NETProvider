@@ -42,8 +42,8 @@ public class FbTestStore : RelationalTestStore
 
 	public Version ServerVersion { get; private set; }
 	public bool ServerLessThan4() => ServerVersion < new Version(4, 0, 0, 0);
-
 	public bool ServerLessThan5() => ServerVersion < new Version(5, 0, 0, 0);
+	public bool ServerLessThan6() => ServerVersion < new Version(6, 0, 0, 0);
 
 	protected override async Task InitializeAsync(Func<DbContext> createContext, Func<DbContext, Task> seed, Func<DbContext, Task> clean)
 	{
