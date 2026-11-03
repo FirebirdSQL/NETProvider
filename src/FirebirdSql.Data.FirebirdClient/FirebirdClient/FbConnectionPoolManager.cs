@@ -65,13 +65,19 @@ sealed class FbConnectionPoolManager : IDisposable
 
 		public void Dispose()
 		{
+			Item[] items;
+
 			lock (_syncRoot)
 			{
 				if (_disposed)
 					return;
 				_disposed = true;
-				CleanConnectionsImpl();
+
+				items = _available.ToArray();
+				_available.Clear();
 			}
+
+			CleanConnectionsImpl(items);
 		}
 
 		public FbConnectionInternal GetConnection(out bool createdNew)
@@ -103,6 +109,8 @@ sealed class FbConnectionPoolManager : IDisposable
 
 		public void PrunePool()
 		{
+			List<Item> release;
+
 			lock (_syncRoot)
 			{
 				CheckDisposedImpl();
@@ -117,26 +125,33 @@ sealed class FbConnectionPoolManager : IDisposable
 				{
 					keep = keep.Concat(available.Except(keep).OrderByDescending(x => x.Created).Take(_connectionString.MinPoolSize - keepCount)).ToList();
 				}
-				var release = available.Except(keep).ToList();
-				Parallel.ForEach(release, x => x.Release());
+				release = available.Except(keep).ToList();
 				_available = new Stack<Item>(keep);
 			}
+
+			// Call Release() outside the lock to avoid potential deadlocks
+			Parallel.ForEach(release, x => x.Release());
 		}
 
 		public void ClearPool()
 		{
+			Item[] items;
+
 			lock (_syncRoot)
 			{
 				CheckDisposedImpl();
 
-				CleanConnectionsImpl();
+				items = _available.ToArray();
 				_available.Clear();
 			}
+
+			// Call Release() outside the lock to avoid potential deadlocks
+			CleanConnectionsImpl(items);
 		}
 
-		void CleanConnectionsImpl()
+		void CleanConnectionsImpl(Item[] items)
 		{
-			Parallel.ForEach(_available, x => x.Release());
+			Parallel.ForEach(items, x => x.Release());
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
