@@ -31,7 +31,6 @@ public class FbParameterCollectionTests
 	[TestCase(1)]
 	public void RemoveAtInvalidIndexThrowsArgumentOutOfRangeTest(int index)
 	{
-		// IList.RemoveAt: ArgumentOutOfRangeException when "index is not a valid index in the IList".
 		var command = new FbCommand();
 		if (index == 1)
 		{
