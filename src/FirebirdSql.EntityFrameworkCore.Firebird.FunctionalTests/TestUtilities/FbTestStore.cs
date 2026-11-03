@@ -96,7 +96,8 @@ public class FbTestStore : RelationalTestStore
 	public override async Task OpenConnectionAsync()
 	{
 		await base.OpenConnectionAsync();
-		if (FbServerProperties.ParseServerVersion(Connection.ServerVersion) >= new Version(4, 0, 0, 0))
+		ServerVersion = FbServerProperties.ParseServerVersion(Connection.ServerVersion);
+		if (ServerVersion >= new Version(4, 0, 0, 0))
 		{
 			await using (var cmd = Connection.CreateCommand())
 			{
