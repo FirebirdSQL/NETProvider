@@ -77,7 +77,7 @@ public abstract class FbTestsBase
 	public virtual async Task TearDown()
 	{
 		var cs = BuildConnectionString(ServerType, Compression, WireCrypt);
-		Connection.Dispose();
+		Connection?.Dispose();
 		if (_insertTestData)
 		{
 			await DeleteAllData(cs);
