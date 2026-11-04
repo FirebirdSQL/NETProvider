@@ -51,7 +51,7 @@ public sealed class FbDataReader : DbDataReader
 	private bool _eof;
 	private bool _isClosed;
 	private int _position;
-	private int _recordsAffected = -1;
+	private int _recordsAffected;
 	private Dictionary<string, int> _columnsIndexesOrdinal;
 	private Dictionary<string, int> _columnsIndexesOrdinalCI;
 
@@ -84,6 +84,7 @@ public sealed class FbDataReader : DbDataReader
 		_connection = connection;
 		_commandBehavior = commandBehavior;
 		_fields = _command.GetFieldsDescriptor();
+		_recordsAffected = -1;
 
 		UpdateRecordsAffected();
 	}
