@@ -16,6 +16,7 @@
 //$Authors = Carlos Guzman Alvarez, Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
@@ -23,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
+using FirebirdSql.Data.Metrics;
 using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
@@ -190,6 +192,13 @@ public sealed class FbConnection : DbConnection, ICloneable
 				_options = new ConnectionString(value);
 				_options.Validate();
 				_connectionString = value;
+
+				MetricsConnectionAttributes = [
+					new("db.system.name", "firebirdsql"),
+					new("db.namespace", _options.Database),
+					new("server.address", _options.DataSource),
+					new("server.port", _options.Port),
+				];
 			}
 		}
 	}
@@ -269,6 +278,8 @@ public sealed class FbConnection : DbConnection, ICloneable
 	{
 		get { return _state == ConnectionState.Closed; }
 	}
+
+	internal KeyValuePair<string, object>[] MetricsConnectionAttributes = [];
 
 	#endregion
 
@@ -524,6 +535,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 	public override void Open()
 	{
 		LogMessages.ConnectionOpening(Log, this);
+		var startedAtTicks = FbMetricsStore.ConnectionOpening();
 
 		if (string.IsNullOrEmpty(_connectionString))
 		{
@@ -616,10 +628,13 @@ public sealed class FbConnection : DbConnection, ICloneable
 		}
 
 		LogMessages.ConnectionOpened(Log, this);
+		FbMetricsStore.ConnectionOpened(startedAtTicks, this._options.NormalizedConnectionString);
 	}
+
 	public override async Task OpenAsync(CancellationToken cancellationToken)
 	{
 		LogMessages.ConnectionOpening(Log, this);
+		var startedAtTicks = FbMetricsStore.ConnectionOpening();
 
 		if (string.IsNullOrEmpty(_connectionString))
 		{
@@ -712,6 +727,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 		}
 
 		LogMessages.ConnectionOpened(Log, this);
+		FbMetricsStore.ConnectionOpened(startedAtTicks, this._options.NormalizedConnectionString);
 	}
 
 	public override void Close()
