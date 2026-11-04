@@ -23,6 +23,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public class FbGuidTypeMapping : GuidTypeMapping
 {
+	public static new FbGuidTypeMapping Default { get; } = new();
+
 	public FbGuidTypeMapping()
 		: base("CHAR(16) CHARACTER SET OCTETS")
 	{ }

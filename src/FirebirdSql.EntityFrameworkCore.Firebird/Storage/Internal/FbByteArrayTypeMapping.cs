@@ -22,6 +22,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public class FbByteArrayTypeMapping : ByteArrayTypeMapping
 {
+	public static new FbByteArrayTypeMapping Default { get; } = new();
+
 	public FbByteArrayTypeMapping()
 		: base("BLOB SUB_TYPE BINARY", System.Data.DbType.Binary)
 	{ }

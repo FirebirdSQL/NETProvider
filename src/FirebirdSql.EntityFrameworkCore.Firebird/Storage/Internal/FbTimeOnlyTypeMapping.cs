@@ -21,6 +21,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public class FbTimeOnlyTypeMapping : TimeOnlyTypeMapping
 {
+	public static new FbTimeOnlyTypeMapping Default { get; } = new("TIME");
+
 	public FbTimeOnlyTypeMapping(string storeType)
 		: base(storeType)
 	{ }
