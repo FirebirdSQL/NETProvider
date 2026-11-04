@@ -76,7 +76,6 @@ public class FbDataReaderTests : FbTestsBase
 			await using (var reader = await command.ExecuteReaderAsync())
 			{
 				Assert.IsTrue(reader.HasRows);
-				Assert.IsTrue(reader.HasRows);
 				Assert.IsTrue(await reader.ReadAsync());
 				Assert.AreEqual(1, reader.GetInt32(0));
 				Assert.IsTrue(reader.Read());
@@ -84,6 +83,58 @@ public class FbDataReaderTests : FbTestsBase
 				Assert.IsFalse(reader.Read());
 				Assert.IsTrue(reader.HasRows, "HasRows describes the result, not the current position");
 			}
+		}
+	}
+
+	[Test]
+	public async Task HasRowsThenCloseKeepsStoredProcedureOutputParametersTest()
+	{
+		await using (var create = Connection.CreateCommand())
+		{
+			create.CommandText = "RECREATE PROCEDURE HASROWS_OUTPUT (P1 INTEGER) RETURNS (R1 INTEGER) AS BEGIN R1 = P1 * 2; END";
+			await create.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("EXECUTE PROCEDURE HASROWS_OUTPUT(?)", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("P1", FbDbType.Integer).Value = 21;
+			var output = command.Parameters.Add("R1", FbDbType.Integer);
+			output.Direction = ParameterDirection.Output;
+
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				Assert.IsTrue(reader.HasRows);
+				await reader.CloseAsync();
+			}
+
+			Assert.AreEqual(42, output.Value, "HasRows must not consume the stored procedure output row");
+		}
+	}
+
+	[Test]
+	public void HasRowsThenCloseKeepsStoredProcedureOutputParametersSyncTest()
+	{
+		using (var create = Connection.CreateCommand())
+		{
+			create.CommandText = "RECREATE PROCEDURE HASROWS_OUTPUT (P1 INTEGER) RETURNS (R1 INTEGER) AS BEGIN R1 = P1 * 2; END";
+			create.ExecuteNonQuery();
+		}
+
+		using (var command = new FbCommand("EXECUTE PROCEDURE HASROWS_OUTPUT(?)", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("P1", FbDbType.Integer).Value = 21;
+			var output = command.Parameters.Add("R1", FbDbType.Integer);
+			output.Direction = ParameterDirection.Output;
+
+			using (var reader = command.ExecuteReader())
+			{
+				Assert.IsTrue(reader.HasRows);
+				reader.Close();
+			}
+
+			Assert.AreEqual(42, output.Value, "HasRows must not consume the stored procedure output row");
 		}
 	}
 

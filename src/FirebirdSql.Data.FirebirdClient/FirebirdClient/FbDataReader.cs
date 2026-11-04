@@ -51,6 +51,9 @@ public sealed class FbDataReader : DbDataReader
 	private bool _eof;
 	private bool _isClosed;
 	private int _position;
+	// Row fetched ahead by HasRows. _hasPeekedRow is needed because a peek that found nothing
+	// leaves _peekedRow null, and that must still count as "already fetched" so the statement is not
+	// fetched again. _peekedRow is only non-null while _hasPeekedRow is true.
 	private DbValue[] _peekedRow;
 	private bool _hasPeekedRow;
 	private bool _hasRows;
@@ -169,7 +172,8 @@ public sealed class FbDataReader : DbDataReader
 			{
 				if (_command.CommandType == CommandType.StoredProcedure)
 				{
-					_command.SetOutputParameters();
+					// HasRows may already have fetched the output row; hand it over rather than losing it.
+					_command.SetOutputParameters(_peekedRow);
 				}
 				if (_command.HasImplicitTransaction)
 				{
@@ -200,7 +204,8 @@ public sealed class FbDataReader : DbDataReader
 			{
 				if (_command.CommandType == CommandType.StoredProcedure)
 				{
-					await _command.SetOutputParametersAsync(CancellationToken.None).ConfigureAwait(false);
+					// HasRows may already have fetched the output row; hand it over rather than losing it.
+					await _command.SetOutputParametersAsync(_peekedRow, CancellationToken.None).ConfigureAwait(false);
 				}
 				if (_command.HasImplicitTransaction)
 				{
