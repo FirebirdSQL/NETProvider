@@ -57,6 +57,10 @@ public class MappingQueryFbTest : MappingQueryTestBase<MappingQueryFbTest.Mappin
 	{
 		protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
+		// The base fixture shares the "Northwind" store, but FbTestStore creates a shared store from the model of
+		// whichever fixture uses it first. When this reduced model came first, all Northwind tests ran against its schema.
+		protected override string StoreName => "MappingQuery";
+
 		protected override string DatabaseSchema { get; } = null;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
