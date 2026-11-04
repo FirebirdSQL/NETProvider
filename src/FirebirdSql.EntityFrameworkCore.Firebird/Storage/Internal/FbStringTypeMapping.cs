@@ -26,6 +26,8 @@ public class FbStringTypeMapping : StringTypeMapping
 {
 	readonly FbDbType _fbDbType;
 
+	public static new FbStringTypeMapping Default { get; } = new("BLOB SUB_TYPE TEXT", System.Data.DbType.String, FbDbType.Text);
+
 	public FbStringTypeMapping(string storeType, DbType dbType, FbDbType fbDbType, int? size = null, bool unicode = true)
 		: base(storeType, dbType, unicode: unicode, size: size)
 	{
@@ -37,6 +39,11 @@ public class FbStringTypeMapping : StringTypeMapping
 	{
 		_fbDbType = fbDbType;
 	}
+
+	public FbDbType FbDbType => _fbDbType;
+
+	public virtual FbStringTypeMapping Clone(FbDbType fbDbType)
+		=> new FbStringTypeMapping(Parameters, fbDbType);
 
 	protected override void ConfigureParameter(DbParameter parameter)
 	{

@@ -26,6 +26,8 @@ public class FbTimeSpanTypeMapping : TimeSpanTypeMapping
 {
 	readonly FbDbType _fbDbType;
 
+	public static new FbTimeSpanTypeMapping Default { get; } = new("TIME", FbDbType.Time);
+
 	public FbTimeSpanTypeMapping(string storeType, FbDbType fbDbType)
 		: base(storeType)
 	{
@@ -37,6 +39,11 @@ public class FbTimeSpanTypeMapping : TimeSpanTypeMapping
 	{
 		_fbDbType = fbDbType;
 	}
+
+	public FbDbType FbDbType => _fbDbType;
+
+	public virtual FbTimeSpanTypeMapping Clone(FbDbType fbDbType)
+		=> new FbTimeSpanTypeMapping(Parameters, fbDbType);
 
 	protected override void ConfigureParameter(DbParameter parameter)
 	{
