@@ -263,6 +263,27 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 		}
 	}
 
+	/// <summary>
+	/// The rows an INSERT, UPDATE or DELETE affected, or -1 for any other statement (DbCommand.ExecuteNonQuery: "For all
+	/// other types of statements, the return value is -1"; DbDataReader.RecordsAffected: "-1 for SELECT statements").
+	/// Firebird classifies INSERT ... RETURNING and DML inside an execute block as stored procedure execution; the server's
+	/// count is reported for those only when it is positive, so procedures that change no rows keep -1.
+	/// </summary>
+	internal int StatementRecordsAffected
+	{
+		get
+		{
+			return _statement?.StatementType switch
+			{
+				DbStatementType.Insert => RecordsAffected,
+				DbStatementType.Update => RecordsAffected,
+				DbStatementType.Delete => RecordsAffected,
+				DbStatementType.StoredProcedure when RecordsAffected > 0 => RecordsAffected,
+				_ => -1,
+			};
+		}
+	}
+
 	internal bool IsDisposed
 	{
 		get { return _disposed; }
@@ -529,13 +550,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			}
 		}
 
-		return _statement.StatementType switch
-		{
-			DbStatementType.Insert => RecordsAffected,
-			DbStatementType.Update => RecordsAffected,
-			DbStatementType.Delete => RecordsAffected,
-			_ => -1,
-		};
+		return StatementRecordsAffected;
 	}
 	public override async Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
 	{
@@ -566,13 +581,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 			}
 		}
 
-		return _statement.StatementType switch
-		{
-			DbStatementType.Insert => RecordsAffected,
-			DbStatementType.Update => RecordsAffected,
-			DbStatementType.Delete => RecordsAffected,
-			_ => -1,
-		};
+		return StatementRecordsAffected;
 	}
 
 	public new FbDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
