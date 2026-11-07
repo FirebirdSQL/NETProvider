@@ -21,6 +21,21 @@ Reading a `DECFLOAT` column:
 
 `FbDecFloat` has explicit conversions from and to `decimal`, `double` and `float`, with the same rules.
 
+### .NET 11 `Decimal64` and `Decimal128`
+
+On .NET 11 or later, the IEEE 754 decimal types `System.Numerics.Decimal64` and `System.Numerics.Decimal128` match `DECFLOAT(16)` and `DECFLOAT(34)`. Conversions are exact, including the exponent (`1.10` stays `1.10`), negative zero, infinities and NaNs.
+
+* Parameters: a `Decimal128` value is a `FbDbType.Dec34` parameter, a `Decimal64` or `Decimal32` value a `FbDbType.Dec16` parameter. They can also be passed to other numeric parameters. A `Decimal128` value passed to a `DECFLOAT(16)` parameter works when it fits exactly, otherwise it throws `OverflowException`.
+* Reader: `GetFieldValue<Decimal128>()` and `GetFieldValue<Decimal64>()` read `DECFLOAT` and the other numeric types; they throw `OverflowException` when the value does not fit exactly (e.g. a 34 digit `DECFLOAT(34)` value read as `Decimal64`).
+* `FbDecFloat` has explicit conversions from `Decimal32`, `Decimal64` and `Decimal128`, and to `Decimal64` and `Decimal128`.
+
+```csharp
+command.CommandText = "insert into t (d34) values (@d34)";
+command.Parameters.AddWithValue("d34", Decimal128.Parse("1234567890123456789012345678.901234", CultureInfo.InvariantCulture));
+...
+var value = reader.GetFieldValue<Decimal128>(0);
+```
+
 ### Examples
 
-Examples can be found in [`FbDecFloat16SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat16SupportTests.cs) and [`FbDecFloat34SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat34SupportTests.cs).
+Examples can be found in [`FbDecFloat16SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat16SupportTests.cs), [`FbDecFloat34SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat34SupportTests.cs) and [`FbDecimalIeee754SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecimalIeee754SupportTests.cs).
