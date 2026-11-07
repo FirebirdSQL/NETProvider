@@ -189,6 +189,7 @@ internal sealed class DbValue
 		return _value switch
 		{
 			BigInteger bi => (byte)bi,
+			FbDecFloat df => (byte)df.ToIntegerRoundingToEven(),
 			_ => Convert.ToByte(_value, CultureInfo.InvariantCulture),
 		};
 	}
@@ -198,6 +199,7 @@ internal sealed class DbValue
 		return _value switch
 		{
 			BigInteger bi => (short)bi,
+			FbDecFloat df => (short)df.ToIntegerRoundingToEven(),
 			_ => Convert.ToInt16(_value, CultureInfo.InvariantCulture),
 		};
 	}
@@ -207,6 +209,7 @@ internal sealed class DbValue
 		return _value switch
 		{
 			BigInteger bi => (int)bi,
+			FbDecFloat df => (int)df.ToIntegerRoundingToEven(),
 			_ => Convert.ToInt32(_value, CultureInfo.InvariantCulture),
 		};
 	}
@@ -216,18 +219,27 @@ internal sealed class DbValue
 		return _value switch
 		{
 			BigInteger bi => (long)bi,
+			FbDecFloat df => (long)df.ToIntegerRoundingToEven(),
 			_ => Convert.ToInt64(_value, CultureInfo.InvariantCulture),
 		};
 	}
 
 	public decimal GetDecimal()
 	{
-		return Convert.ToDecimal(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			FbDecFloat df => (decimal)df,
+			_ => Convert.ToDecimal(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public float GetFloat()
 	{
-		return Convert.ToSingle(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			FbDecFloat df => (float)df,
+			_ => Convert.ToSingle(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public Guid GetGuid()
@@ -242,7 +254,11 @@ internal sealed class DbValue
 
 	public double GetDouble()
 	{
-		return Convert.ToDouble(_value, CultureInfo.InvariantCulture);
+		return _value switch
+		{
+			FbDecFloat df => (double)df,
+			_ => Convert.ToDouble(_value, CultureInfo.InvariantCulture),
+		};
 	}
 
 	public DateTime GetDateTime()
@@ -260,9 +276,39 @@ internal sealed class DbValue
 		return (TimeSpan)_value;
 	}
 
+#if NET11_0_OR_GREATER
+	// exact; OverflowException when the value cannot be represented exactly
+	public Decimal128 GetDecimal128()
+	{
+		return (Decimal128)GetDecFloat();
+	}
+
+	// exact; OverflowException when the value cannot be represented exactly
+	public Decimal64 GetDecimal64()
+	{
+		return (Decimal64)GetDecFloat();
+	}
+#endif
+
 	public FbDecFloat GetDecFloat()
 	{
-		return (FbDecFloat)_value;
+		return _value switch
+		{
+			FbDecFloat df => df,
+			decimal d => (FbDecFloat)d,
+			double d => (FbDecFloat)d,
+			float f => (FbDecFloat)f,
+			byte b => b,
+			sbyte sb => sb,
+			short s => s,
+			ushort us => us,
+			int i => i,
+			uint ui => ui,
+			long l => l,
+			ulong ul => ul,
+			BigInteger bi => new FbDecFloat(bi),
+			_ => (FbDecFloat)_value,
+		};
 	}
 
 	public BigInteger GetInt128()

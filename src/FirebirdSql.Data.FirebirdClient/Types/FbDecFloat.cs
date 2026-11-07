@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Buffers.Binary;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -64,16 +65,163 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 		float.NaN => PositiveNaN,
 		float.PositiveInfinity => PositiveInfinity,
 		float.NegativeInfinity => NegativeInfinity,
-		_ => ParseNumber(value, "0.#######"),
+		// shortest representation that round-trips to the same float
+		_ => ParseRoundTrip(value.ToString("R", CultureInfo.InvariantCulture)),
 	};
 	public static explicit operator FbDecFloat(double value) => value switch
 	{
 		double.NaN => PositiveNaN,
 		double.PositiveInfinity => PositiveInfinity,
 		double.NegativeInfinity => NegativeInfinity,
-		_ => ParseNumber(value, "0.###############"),
+		// shortest representation that round-trips to the same double
+		_ => ParseRoundTrip(value.ToString("R", CultureInfo.InvariantCulture)),
 	};
-	public static explicit operator FbDecFloat(decimal value) => ParseNumber(value, "0.############################");
+	public static explicit operator FbDecFloat(decimal value)
+	{
+		// exact: the decimal's 96-bit integer and scale are the coefficient and (negated) exponent
+		Span<int> bits = stackalloc int[4];
+		decimal.GetBits(value, bits);
+		BigInteger coefficient = ((UInt128)(uint)bits[2] << 64) | ((UInt128)(uint)bits[1] << 32) | (uint)bits[0];
+		var negative = bits[3] < 0;
+		var scale = (bits[3] >> 16) & 0xFF;
+		return new FbDecFloat(DecimalType.Finite, negative, negative ? -coefficient : coefficient, -scale);
+	}
+
+	// Exact (the scale is kept when possible, e.g. 110E-2 -> 1.10m).
+	// Throws OverflowException when the value cannot be represented exactly as decimal, including NaN and infinities.
+	public static explicit operator decimal(FbDecFloat value)
+	{
+		if (value.Type != DecimalType.Finite)
+		{
+			throw value.CannotRepresent(nameof(Decimal));
+		}
+		var coefficient = BigInteger.Abs(value.Coefficient);
+		var exponent = value.Exponent;
+		if (exponent > 0)
+		{
+			if (!coefficient.IsZero)
+			{
+				if (exponent > 28)
+				{
+					throw value.CannotRepresent(nameof(Decimal));
+				}
+				coefficient *= BigInteger.Pow(10, exponent);
+			}
+			exponent = 0;
+		}
+		// only trailing zeros can be dropped
+		while (exponent < 0 && (exponent < -28 || coefficient > MaxDecimalCoefficient))
+		{
+			var quotient = BigInteger.DivRem(coefficient, 10, out var remainder);
+			if (!remainder.IsZero)
+			{
+				break;
+			}
+			coefficient = quotient;
+			exponent++;
+		}
+		if (exponent < -28 || coefficient > MaxDecimalCoefficient)
+		{
+			throw value.CannotRepresent(nameof(Decimal));
+		}
+		var bits = (UInt128)coefficient;
+		return new decimal((int)(uint)bits, (int)(uint)(bits >> 32), (int)(uint)(bits >> 64), value.Negative, (byte)-exponent);
+	}
+	// Nearest double (overflows to infinity, underflows to zero); NaN and infinities are mapped.
+	public static explicit operator double(FbDecFloat value) => value.Type switch
+	{
+		DecimalType.Infinity => value.Negative ? double.NegativeInfinity : double.PositiveInfinity,
+		DecimalType.NaN or DecimalType.SignalingNaN => double.NaN,
+		_ => value.Negative && value.Coefficient.IsZero ? -0d : double.Parse(value.ToInvariantScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture),
+	};
+	// Nearest float (overflows to infinity, underflows to zero); NaN and infinities are mapped.
+	public static explicit operator float(FbDecFloat value) => value.Type switch
+	{
+		DecimalType.Infinity => value.Negative ? float.NegativeInfinity : float.PositiveInfinity,
+		DecimalType.NaN or DecimalType.SignalingNaN => float.NaN,
+		_ => value.Negative && value.Coefficient.IsZero ? -0f : float.Parse(value.ToInvariantScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture),
+	};
+
+	static readonly BigInteger MaxDecimalCoefficient = (BigInteger)decimal.MaxValue;
+
+	string ToInvariantScientificString() => $"{Coefficient.ToString(CultureInfo.InvariantCulture)}E{Exponent.ToString(CultureInfo.InvariantCulture)}";
+
+	OverflowException CannotRepresent(string type) => new OverflowException($"Value {this} cannot be represented exactly as {type}.");
+
+#if NET11_0_OR_GREATER
+	// The IEEE 754 decimal interchange encoding of Decimal64/Decimal128 (EncodeDecimal/DecodeDecimal, densely packed decimal)
+	// is the encoding of DECFLOAT(16)/DECFLOAT(34), so the conversions go through the DECFLOAT codec and are exact,
+	// including the exponent (1.10 stays 1.10), negative zero, infinities and NaNs.
+
+	public static explicit operator FbDecFloat(Decimal128 value) => DecimalCodec.DecFloat34.ParseBytes(ToHostBytes(Decimal128.EncodeDecimal(value)));
+	public static explicit operator FbDecFloat(Decimal64 value) => DecimalCodec.DecFloat16.ParseBytes(ToHostBytes(Decimal64.EncodeDecimal(value)));
+	public static explicit operator FbDecFloat(Decimal32 value) => (FbDecFloat)(Decimal64)value;
+
+	// Exact; throws OverflowException when the value has more than 34 significant digits or its exponent is out of range.
+	public static explicit operator Decimal128(FbDecFloat value)
+	{
+		var bytes = DecimalCodec.DecFloat34.EncodeDecimal(value);
+		return Decimal128.DecodeDecimal(BitConverter.IsLittleEndian ? BinaryPrimitives.ReadUInt128LittleEndian(bytes) : BinaryPrimitives.ReadUInt128BigEndian(bytes));
+	}
+	// Exact; throws OverflowException when the value has more than 16 significant digits or its exponent is out of range.
+	public static explicit operator Decimal64(FbDecFloat value)
+	{
+		var bytes = DecimalCodec.DecFloat16.EncodeDecimal(value);
+		return Decimal64.DecodeDecimal(BitConverter.IsLittleEndian ? BinaryPrimitives.ReadUInt64LittleEndian(bytes) : BinaryPrimitives.ReadUInt64BigEndian(bytes));
+	}
+
+	// the codec works with host byte order
+	static byte[] ToHostBytes(UInt128 bits)
+	{
+		var bytes = new byte[16];
+		if (BitConverter.IsLittleEndian)
+			BinaryPrimitives.WriteUInt128LittleEndian(bytes, bits);
+		else
+			BinaryPrimitives.WriteUInt128BigEndian(bytes, bits);
+		return bytes;
+	}
+	static byte[] ToHostBytes(ulong bits)
+	{
+		var bytes = new byte[8];
+		if (BitConverter.IsLittleEndian)
+			BinaryPrimitives.WriteUInt64LittleEndian(bytes, bits);
+		else
+			BinaryPrimitives.WriteUInt64BigEndian(bytes, bits);
+		return bytes;
+	}
+#endif
+
+	// Nearest integer, ties to even (as Convert.ToInt64(decimal) does).
+	// Throws OverflowException for NaN, infinities and values far beyond the 64-bit range.
+	internal BigInteger ToIntegerRoundingToEven()
+	{
+		if (Type != DecimalType.Finite)
+		{
+			throw CannotRepresent(nameof(BigInteger));
+		}
+		if (Exponent >= 0)
+		{
+			if (Exponent > 40 && !Coefficient.IsZero)
+			{
+				throw CannotRepresent(nameof(BigInteger));
+			}
+			return Coefficient * BigInteger.Pow(10, Exponent);
+		}
+		var digitsToDrop = -(long)Exponent;
+		if (digitsToDrop > BigInteger.Abs(Coefficient).GetBitLength())
+		{
+			// |value| < 0.5
+			return BigInteger.Zero;
+		}
+		var divisor = BigInteger.Pow(10, (int)digitsToDrop);
+		var quotient = BigInteger.DivRem(Coefficient, divisor, out var remainder);
+		var twice = BigInteger.Abs(remainder) * 2;
+		if (twice > divisor || (twice == divisor && !quotient.IsEven))
+		{
+			quotient += Coefficient.Sign;
+		}
+		return quotient;
+	}
 
 	public override string ToString()
 	{
@@ -155,10 +303,23 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 		return !lhs.Equals(rhs);
 	}
 
-	static FbDecFloat ParseNumber(IFormattable formattable, string format)
+	// Parses the invariant "R" format of float/double, e.g. "2", "-0", "6.6", "1E-20", "1.7976931348623157E+308".
+	static FbDecFloat ParseRoundTrip(string s)
 	{
-		var s = formattable.ToString(format, CultureInfo.InvariantCulture);
-		var pos = s.IndexOf('.');
-		return new FbDecFloat(BigInteger.Parse(s.Remove(pos, 1), CultureInfo.InvariantCulture), -(s.Length - pos - 1));
+		var exponent = 0;
+		var exponentPos = s.IndexOf('E');
+		if (exponentPos >= 0)
+		{
+			exponent = int.Parse(s.AsSpan(exponentPos + 1), NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
+			s = s.Substring(0, exponentPos);
+		}
+		var pointPos = s.IndexOf('.');
+		if (pointPos >= 0)
+		{
+			exponent -= s.Length - pointPos - 1;
+			s = s.Remove(pointPos, 1);
+		}
+		var coefficient = BigInteger.Parse(s, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
+		return new FbDecFloat(DecimalType.Finite, s[0] == '-', coefficient, exponent);
 	}
 }
