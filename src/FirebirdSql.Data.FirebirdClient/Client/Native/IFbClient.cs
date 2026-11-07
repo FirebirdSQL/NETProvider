@@ -79,14 +79,14 @@ public interface IFbClient
 	IntPtr isc_get_segment(
 		[In, Out] IntPtr[] statusVector,
 		[MarshalAs(UnmanagedType.I4)] ref BlobHandle blobHandle,
-		ref short actualSegLength,
-		short segBufferLength,
+		ref ushort actualSegLength,
+		ushort segBufferLength,
 		byte[] segBuffer);
 
 	IntPtr isc_put_segment(
 		[In, Out] IntPtr[] statusVector,
 		[MarshalAs(UnmanagedType.I4)] ref BlobHandle blobHandle,
-		short segBufferLength,
+		ushort segBufferLength,
 		byte[] segBuffer);
 
 	IntPtr isc_seek_blob(

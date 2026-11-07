@@ -319,6 +319,16 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 		set { SetValue(Common.ConnectionString.DefaultKeyParallelWorkers, value); }
 	}
 
+	[Category("Advanced")]
+	[DisplayName("BlobSegmentSize")]
+	[Description("The size (in bytes) of blob segments. BlobSegmentSize may be in the range 512-65535 bytes.")]
+	[DefaultValue(Common.ConnectionString.DefaultValueBlobSegmentSize)]
+	public int BlobSegmentSize
+	{
+		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyBlobSegmentSize), base.TryGetValue, Common.ConnectionString.DefaultValueBlobSegmentSize); }
+		set { SetValue(Common.ConnectionString.DefaultKeyBlobSegmentSize, value); }
+	}
+
 	#endregion
 
 	#region Constructors
