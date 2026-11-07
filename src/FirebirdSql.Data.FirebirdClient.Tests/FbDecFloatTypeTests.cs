@@ -162,20 +162,27 @@ public class FbDecFloatTypeTests
 	public void DoubleAndSingleConversionsRoundTrip()
 	{
 		var random = new Random(20261107);
+		var negativeDoubles = 0;
+		var negativeSingles = 0;
 		for (var i = 0; i < 10_000; i++)
 		{
-			var d = BitConverter.Int64BitsToDouble(random.NextInt64());
+			// random bit patterns, so all exponents and both signs are covered
+			var d = BitConverter.Int64BitsToDouble(random.NextInt64(long.MinValue, long.MaxValue));
 			if (double.IsFinite(d))
 			{
 				var result = (FbDecFloat)d;
 				Assert.AreEqual(d, double.Parse(result.ToString(), CultureInfo.InvariantCulture), $"{d:R} -> {result}");
+				negativeDoubles += d < 0 ? 1 : 0;
 			}
 			var f = BitConverter.Int32BitsToSingle(random.Next(int.MinValue, int.MaxValue));
 			if (float.IsFinite(f))
 			{
 				var result = (FbDecFloat)f;
 				Assert.AreEqual(f, float.Parse(result.ToString(), CultureInfo.InvariantCulture), $"{f:R} -> {result}");
+				negativeSingles += f < 0 ? 1 : 0;
 			}
 		}
+		Assert.Greater(negativeDoubles, 1000);
+		Assert.Greater(negativeSingles, 1000);
 	}
 }
