@@ -15,6 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System;
 using System.Globalization;
 using System.Threading;
 using FirebirdSql.Data.Common;
@@ -180,6 +181,39 @@ public class ConnectionStringTests
 		const string ConnectionString = "wire crYpt=reQUIREd";
 		var cs = new ConnectionString(ConnectionString);
 		Assert.AreEqual(FbWireCrypt.Required, cs.WireCrypt);
+	}
+
+	[Test]
+	public void DecFloatTypeDefault()
+	{
+		var cs = new ConnectionString("database=test.fdb");
+		Assert.AreEqual(FbDecFloatType.FbDecFloat, cs.DecFloatType);
+	}
+
+	[TestCase("decfloat type=ieee754")]
+	[TestCase("DecFloatType=Ieee754")]
+	public void DecFloatTypeParsing(string connectionString)
+	{
+		var cs = new ConnectionString(connectionString);
+		Assert.AreEqual(FbDecFloatType.Ieee754, cs.DecFloatType);
+	}
+
+	[Test]
+	public void DecFloatTypeInvalidValue()
+	{
+		Assert.Throws<NotSupportedException>(() => new ConnectionString("decfloat type=decimal"));
+	}
+
+	[Test]
+	public void DecFloatTypeIeee754Validation()
+	{
+		var cs = new ConnectionString("database=localhost:test.fdb;user=sysdba;password=masterkey;decfloat type=ieee754");
+#if NET11_0_OR_GREATER
+		Assert.DoesNotThrow(cs.Validate);
+#else
+		var ex = Assert.Throws<ArgumentException>(cs.Validate);
+		StringAssert.Contains("'DecFloat Type'", ex.Message);
+#endif
 	}
 
 	[Test]

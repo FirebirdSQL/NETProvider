@@ -319,6 +319,16 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 		set { SetValue(Common.ConnectionString.DefaultKeyParallelWorkers, value); }
 	}
 
+	[Category("Advanced")]
+	[DisplayName("DecFloat Type")]
+	[Description("CLR type of DECFLOAT values: FbDecFloat, or Ieee754 for System.Numerics.Decimal64/Decimal128 (.NET 11 or later).")]
+	[DefaultValue(Common.ConnectionString.DefaultValueDecFloatType)]
+	public FbDecFloatType DecFloatType
+	{
+		get { return GetDecFloatType(Common.ConnectionString.DefaultKeyDecFloatType, Common.ConnectionString.DefaultValueDecFloatType); }
+		set { SetValue(Common.ConnectionString.DefaultKeyDecFloatType, value); }
+	}
+
 	#endregion
 
 	#region Constructors
@@ -381,6 +391,22 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 				return enumResult;
 			default:
 				return Common.ConnectionString.GetWireCrypt(key, base.TryGetValue, defaultValue);
+		}
+	}
+
+	private FbDecFloatType GetDecFloatType(string keyword, FbDecFloatType defaultValue)
+	{
+		var key = GetKey(keyword);
+		if (!TryGetValue(key, out var value))
+			return defaultValue;
+		switch (value)
+		{
+			case FbDecFloatType fbDecFloatType:
+				return fbDecFloatType;
+			case string s when Enum.TryParse<FbDecFloatType>(s, true, out var enumResult):
+				return enumResult;
+			default:
+				return Common.ConnectionString.GetDecFloatType(key, base.TryGetValue, defaultValue);
 		}
 	}
 

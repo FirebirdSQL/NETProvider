@@ -55,6 +55,16 @@ internal sealed class DbValue
 		return TypeHelper.IsDBNull(_value);
 	}
 
+	// GetValue honoring the DecFloatType connection option (values returned to the client).
+	public object GetValue(FbDecFloatType decFloatType)
+	{
+		return TypeHelper.GetClientValue(GetValue(), _field.DbDataType, decFloatType);
+	}
+	public async ValueTask<object> GetValueAsync(FbDecFloatType decFloatType, CancellationToken cancellationToken = default)
+	{
+		return TypeHelper.GetClientValue(await GetValueAsync(cancellationToken).ConfigureAwait(false), _field.DbDataType, decFloatType);
+	}
+
 	public object GetValue()
 	{
 		if (IsDBNull())

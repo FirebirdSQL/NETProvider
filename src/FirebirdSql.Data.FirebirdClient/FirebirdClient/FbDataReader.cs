@@ -54,6 +54,7 @@ public sealed class FbDataReader : DbDataReader
 	private int _recordsAffected;
 	private Dictionary<string, int> _columnsIndexesOrdinal;
 	private Dictionary<string, int> _columnsIndexesOrdinalCI;
+	private FbDecFloatType _decFloatType;
 
 	#endregion
 
@@ -84,6 +85,7 @@ public sealed class FbDataReader : DbDataReader
 		_connection = connection;
 		_commandBehavior = commandBehavior;
 		_fields = _command.GetFieldsDescriptor();
+		_decFloatType = connection?.ConnectionOptions?.DecFloatType ?? default;
 
 		UpdateRecordsAffected();
 	}
@@ -538,7 +540,7 @@ public sealed class FbDataReader : DbDataReader
 		CheckState();
 		CheckIndex(i);
 
-		return _fields[i].GetSystemType();
+		return _fields[i].GetSystemType(_decFloatType);
 	}
 
 	public override Type GetProviderSpecificFieldType(int i)
@@ -695,7 +697,7 @@ public sealed class FbDataReader : DbDataReader
 			}
 			else
 			{
-				return (T)_row[i].GetValue();
+				return (T)_row[i].GetValue(_decFloatType);
 			}
 		}
 		catch (IscException ex)
@@ -806,7 +808,7 @@ public sealed class FbDataReader : DbDataReader
 			}
 			else
 			{
-				return (T)await _row[i].GetValueAsync().ConfigureAwait(false);
+				return (T)await _row[i].GetValueAsync(_decFloatType).ConfigureAwait(false);
 			}
 		}
 		catch (IscException ex)

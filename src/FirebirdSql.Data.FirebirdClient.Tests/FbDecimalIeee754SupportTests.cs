@@ -258,6 +258,114 @@ public class FbDecimalIeee754SupportTests : FbTestsBase
 			await cmd.ExecuteNonQueryAsync();
 		}
 	}
+
+	async Task<FbConnection> OpenIeee754ConnectionAsync()
+	{
+		var builder = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		builder.DecFloatType = FbDecFloatType.Ieee754;
+		var connection = new FbConnection(builder.ToString());
+		await connection.OpenAsync();
+		return connection;
+	}
+
+	[Test]
+	public async Task DecFloatTypeIeee754ReturnsDecimal64AndDecimal128()
+	{
+		await using (var connection = await OpenIeee754ConnectionAsync())
+		await using (var cmd = connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast('1.10' as decfloat(16)), cast('-1.10' as decfloat(34)), cast(null as decfloat(34)), cast(1.5 as numeric(18, 2)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				Assert.AreEqual(typeof(Decimal64), reader.GetFieldType(0));
+				Assert.AreEqual(typeof(Decimal128), reader.GetFieldType(1));
+				Assert.AreEqual(typeof(Decimal128), reader.GetFieldType(2));
+				Assert.AreEqual(typeof(decimal), reader.GetFieldType(3));
+				Assert.AreEqual("DECFLOAT", reader.GetDataTypeName(1));
+
+				Assert.IsTrue(await reader.ReadAsync());
+				var values = new object[4];
+				reader.GetValues(values);
+				Assert.IsInstanceOf<Decimal64>(values[0]);
+				AssertSameValueAndExponent(D64("1.10"), (Decimal64)values[0]);
+				Assert.IsInstanceOf<Decimal128>(values[1]);
+				AssertSameValueAndExponent(D128("-1.10"), (Decimal128)values[1]);
+				Assert.AreEqual(DBNull.Value, values[2]);
+				Assert.AreEqual(1.5m, values[3]);
+				Assert.IsInstanceOf<Decimal128>(reader[1]);
+				Assert.IsInstanceOf<Decimal128>(await reader.GetFieldValueAsync<object>(1));
+				// the other accessors are not affected
+				Assert.AreEqual(new FbDecFloat(-110, -2), reader.GetFieldValue<FbDecFloat>(1));
+				Assert.AreEqual(-1.10m, reader.GetDecimal(1));
+
+				var schema = await reader.GetSchemaTableAsync();
+				Assert.AreEqual(typeof(Decimal64), schema.Rows[0]["DataType"]);
+				Assert.AreEqual(typeof(Decimal128), schema.Rows[1]["DataType"]);
+			}
+		}
+	}
+
+	[Test]
+	public async Task DecFloatTypeIeee754ExecuteScalarReturnsDecimal128()
+	{
+		await using (var connection = await OpenIeee754ConnectionAsync())
+		await using (var cmd = connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast('1234567890123456789012345678901234' as decfloat(34)) from rdb$database";
+			var result = await cmd.ExecuteScalarAsync();
+			Assert.IsInstanceOf<Decimal128>(result);
+			AssertSameValueAndExponent(D128("1234567890123456789012345678901234"), (Decimal128)result);
+			Assert.IsInstanceOf<Decimal128>(cmd.ExecuteScalar());
+		}
+	}
+
+	[Test]
+	public async Task DecFloatTypeIeee754OutputParameters()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "recreate procedure decimal128_proc (i decfloat(34)) returns (o34 decfloat(34), o16 decfloat(16)) as begin o34 = i; o16 = 1.5; end";
+			await cmd.ExecuteNonQueryAsync();
+		}
+		try
+		{
+			await using (var connection = await OpenIeee754ConnectionAsync())
+			await using (var cmd = connection.CreateCommand())
+			{
+				cmd.CommandText = "decimal128_proc";
+				cmd.CommandType = System.Data.CommandType.StoredProcedure;
+				cmd.Parameters.Add("i", D128("-0.00"));
+				var o34 = cmd.Parameters.Add(new FbParameter("o34", FbDbType.Dec34) { Direction = System.Data.ParameterDirection.Output });
+				var o16 = cmd.Parameters.Add(new FbParameter("o16", FbDbType.Dec16) { Direction = System.Data.ParameterDirection.Output });
+				await cmd.ExecuteNonQueryAsync();
+				Assert.IsInstanceOf<Decimal128>(o34.Value);
+				AssertSameValueAndExponent(D128("-0.00"), (Decimal128)o34.Value);
+				Assert.IsInstanceOf<Decimal64>(o16.Value);
+				AssertSameValueAndExponent(D64("1.5"), (Decimal64)o16.Value);
+			}
+		}
+		finally
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "drop procedure decimal128_proc";
+				await cmd.ExecuteNonQueryAsync();
+			}
+		}
+	}
+
+	[Test]
+	public async Task DecFloatTypeIeee754DataAdapterFill()
+	{
+		await using (var connection = await OpenIeee754ConnectionAsync())
+		using (var adapter = new FbDataAdapter("select cast('1.10' as decfloat(34)) as d34 from rdb$database", connection))
+		{
+			var table = new System.Data.DataTable();
+			adapter.Fill(table);
+			Assert.AreEqual(typeof(Decimal128), table.Columns["D34"].DataType);
+			AssertSameValueAndExponent(D128("1.10"), (Decimal128)table.Rows[0]["D34"]);
+		}
+	}
 }
 
 #endif
