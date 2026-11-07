@@ -81,9 +81,8 @@ public class FbConnectionStringBuilder : DbConnectionStringBuilder
 
 	[Category("Advanced")]
 	[DisplayName("PacketSize")]
-	[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes. Deprecated: use BlobSegmentSize instead.")]
+	[Description("The size (in bytes) of network packets. PacketSize may be in the range 512-32767 bytes.")]
 	[DefaultValue(Common.ConnectionString.DefaultValuePacketSize)]
-	[Obsolete("Use BlobSegmentSize instead.")]
 	public int PacketSize
 	{
 		get { return Common.ConnectionString.GetInt32(GetKey(Common.ConnectionString.DefaultKeyPacketSize), base.TryGetValue, Common.ConnectionString.DefaultValuePacketSize); }

@@ -240,7 +240,6 @@ public sealed class FbConnection : DbConnection, ICloneable
 	}
 
 	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-	[Obsolete("Use BlobSegmentSize instead.")]
 	public int PacketSize
 	{
 		get { return _options.PacketSize; }

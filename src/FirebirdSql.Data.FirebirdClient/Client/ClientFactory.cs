@@ -122,13 +122,13 @@ internal static class ClientFactory
 	{
 		var charset = GetCharset(options);
 
-		return new Native.FesDatabase(options.ClientLibrary, charset, options.PacketSize, options.BlobSegmentSize, options.Dialect);
+		return new Native.FesDatabase(options.ClientLibrary, charset, options.BlobSegmentSize, options.Dialect);
 	}
 	private static ValueTask<DatabaseBase> CreateNativeDatabaseAsync(ConnectionString options)
 	{
 		var charset = GetCharset(options);
 
-		return ValueTask.FromResult<DatabaseBase>(new Native.FesDatabase(options.ClientLibrary, charset, options.PacketSize, options.BlobSegmentSize, options.Dialect));
+		return ValueTask.FromResult<DatabaseBase>(new Native.FesDatabase(options.ClientLibrary, charset, options.BlobSegmentSize, options.Dialect));
 	}
 
 	private static ServiceManagerBase CreateManagedServiceManager(ConnectionString options)
