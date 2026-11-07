@@ -24,6 +24,12 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: .NET 11.0
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+
       - name: Build
         run: |
           try {
