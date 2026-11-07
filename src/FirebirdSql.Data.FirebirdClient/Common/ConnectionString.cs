@@ -58,6 +58,7 @@ internal sealed class ConnectionString
 	internal const string DefaultValueApplicationName = "";
 	internal const int DefaultValueCommandTimeout = 0;
 	internal const int DefaultValueParallelWorkers = 0;
+	internal const FbDecFloatType DefaultValueDecFloatType = FbDecFloatType.FbDecFloat;
 
 	internal const string DefaultKeyUserId = "user id";
 	internal const string DefaultKeyPortNumber = "port number";
@@ -88,6 +89,7 @@ internal sealed class ConnectionString
 	internal const string DefaultKeyApplicationName = "application name";
 	internal const string DefaultKeyCommandTimeout = "command timeout";
 	internal const string DefaultKeyParallelWorkers = "parallel workers";
+	internal const string DefaultKeyDecFloatType = "decfloat type";
 	#endregion
 
 	#region Static Fields
@@ -163,6 +165,8 @@ internal sealed class ConnectionString
 			{ DefaultKeyParallelWorkers, DefaultKeyParallelWorkers },
 			{ "parallelworkers", DefaultKeyParallelWorkers },
 			{ "parallel", DefaultKeyParallelWorkers },
+			{ DefaultKeyDecFloatType, DefaultKeyDecFloatType },
+			{ "decfloattype", DefaultKeyDecFloatType },
 		};
 
 	internal static readonly IDictionary<string, object> DefaultValues = new Dictionary<string, object>(StringComparer.Ordinal)
@@ -196,6 +200,7 @@ internal sealed class ConnectionString
 			{ DefaultKeyApplicationName, DefaultValueApplicationName },
 			{ DefaultKeyCommandTimeout, DefaultValueCommandTimeout },
 			{ DefaultKeyParallelWorkers, DefaultValueParallelWorkers },
+			{ DefaultKeyDecFloatType, DefaultValueDecFloatType },
 		};
 
 	#endregion
@@ -237,6 +242,7 @@ internal sealed class ConnectionString
 	public string ApplicationName => GetString(DefaultKeyApplicationName, _options.TryGetValue);
 	public int CommandTimeout => GetInt32(DefaultKeyCommandTimeout, _options.TryGetValue);
 	public int ParallelWorkers => GetInt32(DefaultKeyParallelWorkers, _options.TryGetValue);
+	public FbDecFloatType DecFloatType => GetDecFloatType(DefaultKeyDecFloatType, _options.TryGetValue);
 
 	#endregion
 
@@ -302,6 +308,12 @@ internal sealed class ConnectionString
 		{
 			throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'Parallel Workers' value of {0} is not valid.{1}The value should be an integer >= 0.", ParallelWorkers, Environment.NewLine));
 		}
+#if !NET11_0_OR_GREATER
+		if (DecFloatType == FbDecFloatType.Ieee754)
+		{
+			throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "'DecFloat Type' value of {0} requires .NET 11 or later.", DecFloatType));
+		}
+#endif
 	}
 
 	#endregion
@@ -360,6 +372,9 @@ internal sealed class ConnectionString
 									break;
 								case DefaultKeyWireCrypt:
 									_options[key] = ParseEnum<FbWireCrypt>(values[1], DefaultKeyWireCrypt);
+									break;
+								case DefaultKeyDecFloatType:
+									_options[key] = ParseEnum<FbDecFloatType>(values[1], DefaultKeyDecFloatType);
 									break;
 								default:
 									_options[key] = values[1];
@@ -562,6 +577,13 @@ internal sealed class ConnectionString
 	{
 		return tryGetValue(key, out var value)
 			? (FbWireCrypt)value
+			: defaultValue;
+	}
+
+	internal static FbDecFloatType GetDecFloatType(string key, TryGetValueDelegate tryGetValue, FbDecFloatType defaultValue = default)
+	{
+		return tryGetValue(key, out var value)
+			? (FbDecFloatType)value
 			: defaultValue;
 	}
 

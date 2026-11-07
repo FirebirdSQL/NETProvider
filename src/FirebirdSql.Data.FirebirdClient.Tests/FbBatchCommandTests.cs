@@ -66,6 +66,59 @@ public class FbBatchCommandTests : FbTestsBase
 		await base.TearDown();
 	}
 
+#if NET11_0_OR_GREATER
+	[Test]
+	public async Task Decimal128AndDecimal64ProperlyInDatabase()
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "recreate table batch_decfloat (id int, d16 decfloat(16), d34 decfloat(34))";
+			await cmd.ExecuteNonQueryAsync();
+		}
+		try
+		{
+			var d34 = new[] { Decimal128.Parse("1234567890123456789012345678.901234", System.Globalization.CultureInfo.InvariantCulture), Decimal128.Parse("-1.10", System.Globalization.CultureInfo.InvariantCulture) };
+			var d16 = new[] { Decimal64.Parse("1.10", System.Globalization.CultureInfo.InvariantCulture), Decimal64.Parse("-9.999999999999999E+384", System.Globalization.CultureInfo.InvariantCulture) };
+			await using (var cmd = Connection.CreateBatchCommand())
+			{
+				cmd.CommandText = "insert into batch_decfloat values (@id, @d16, @d34)";
+				for (var i = 0; i < d34.Length; i++)
+				{
+					var batch = cmd.AddBatchParameters();
+					batch.Add("id", i);
+					batch.Add("d16", d16[i]);
+					batch.Add("d34", d34[i]);
+				}
+				var result = await cmd.ExecuteNonQueryAsync();
+				Assert.IsTrue(result.AllSuccess);
+			}
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "select d16, d34 from batch_decfloat order by id";
+				await using (var reader = await cmd.ExecuteReaderAsync())
+				{
+					for (var i = 0; i < d34.Length; i++)
+					{
+						Assert.IsTrue(await reader.ReadAsync());
+						// same bits: same value and same exponent
+						Assert.AreEqual(Decimal64.EncodeDecimal(d16[i]), Decimal64.EncodeDecimal(reader.GetFieldValue<Decimal64>(0)));
+						Assert.AreEqual(Decimal128.EncodeDecimal(d34[i]), Decimal128.EncodeDecimal(reader.GetFieldValue<Decimal128>(1)));
+					}
+					Assert.IsFalse(await reader.ReadAsync());
+				}
+			}
+		}
+		finally
+		{
+			await using (var cmd = Connection.CreateCommand())
+			{
+				cmd.CommandText = "drop table batch_decfloat";
+				await cmd.ExecuteNonQueryAsync();
+			}
+		}
+	}
+#endif
+
 	[Test]
 	public async Task DataProperlyInDatabase()
 	{

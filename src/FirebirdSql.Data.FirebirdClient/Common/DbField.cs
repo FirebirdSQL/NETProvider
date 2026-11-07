@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Numerics;
+using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common;
@@ -550,6 +551,11 @@ internal sealed class DbField
 	public Type GetSystemType()
 	{
 		return TypeHelper.GetTypeFromDbDataType(DbDataType);
+	}
+
+	public Type GetSystemType(FbDecFloatType decFloatType)
+	{
+		return TypeHelper.GetTypeFromDbDataType(DbDataType, decFloatType);
 	}
 
 	public bool HasDataType()

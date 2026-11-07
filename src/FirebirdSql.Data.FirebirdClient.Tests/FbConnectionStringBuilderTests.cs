@@ -68,4 +68,19 @@ public class FbConnectionStringBuilderTests
 		var b = new FbConnectionStringBuilder("wire crypt=required");
 		Assert.AreEqual(FbWireCrypt.Required, b.WireCrypt);
 	}
+
+	[Test]
+	public void DecFloatTypeSetter()
+	{
+		var b = new FbConnectionStringBuilder();
+		b.DecFloatType = FbDecFloatType.Ieee754;
+		Assert.AreEqual("decfloat type=Ieee754", b.ToString());
+	}
+
+	[Test]
+	public void DecFloatTypeGetter()
+	{
+		Assert.AreEqual(FbDecFloatType.FbDecFloat, new FbConnectionStringBuilder().DecFloatType);
+		Assert.AreEqual(FbDecFloatType.Ieee754, new FbConnectionStringBuilder("decfloattype=ieee754").DecFloatType);
+	}
 }

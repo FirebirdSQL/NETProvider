@@ -659,7 +659,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				// Get the return value
 				if (values != null && values.Length > 0)
 				{
-					val = values[0].GetValue();
+					val = values[0].GetValue(_connection.ConnectionOptions.DecFloatType);
 				}
 
 				CommitImplicitTransaction();
@@ -706,7 +706,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 				// Get the return value
 				if (values != null && values.Length > 0)
 				{
-					val = await values[0].GetValueAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
+					val = await values[0].GetValueAsync(_connection.ConnectionOptions.DecFloatType, explicitCancellation.CancellationToken).ConfigureAwait(false);
 				}
 
 				await CommitImplicitTransactionAsync(explicitCancellation.CancellationToken).ConfigureAwait(false);
@@ -870,7 +870,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 							parameter.Direction == ParameterDirection.InputOutput ||
 							parameter.Direction == ParameterDirection.ReturnValue)
 						{
-							parameter.Value = values[i].GetValue();
+							parameter.Value = values[i].GetValue(_connection.ConnectionOptions.DecFloatType);
 							i++;
 						}
 					}
@@ -900,7 +900,7 @@ public sealed class FbCommand : DbCommand, IFbPreparedCommand, IDescriptorFiller
 							parameter.Direction == ParameterDirection.InputOutput ||
 							parameter.Direction == ParameterDirection.ReturnValue)
 						{
-							parameter.Value = await values[i].GetValueAsync(cancellationToken).ConfigureAwait(false);
+							parameter.Value = await values[i].GetValueAsync(_connection.ConnectionOptions.DecFloatType, cancellationToken).ConfigureAwait(false);
 							i++;
 						}
 					}

@@ -29,8 +29,8 @@ $FirebirdConfiguration = @{
 }
 
 $frameworkVersion = 'net10.0'
+$providerTestsFrameworkVersions = @('net10.0', 'net11.0')
 $testsBaseDir = "$baseDir\src\FirebirdSql.Data.FirebirdClient.Tests"
-$testsProviderDir = "$testsBaseDir\bin\$Configuration\$frameworkVersion"
 
 $firebirdProcess = $null
 
@@ -59,7 +59,9 @@ function Prepare() {
 		echo "Extracting $fbDownloadName"
 		7z x -bsp0 -bso0 $fbDownloadName
 		rm $fbDownloadName
-		cp -Recurse -Force .\* $testsProviderDir
+		foreach ($providerTestsFrameworkVersion in $providerTestsFrameworkVersions) {
+			cp -Recurse -Force .\* "$testsBaseDir\bin\$Configuration\$providerTestsFrameworkVersion"
+		}
 
 		ni firebird.log -ItemType File | Out-Null
 
@@ -120,13 +122,16 @@ function Tests-FirebirdClient-Embedded() {
 	Tests-FirebirdClient 'Embedded' $False 'Disabled'
 }
 function Tests-FirebirdClient($serverType, $compression, $wireCrypt) {
-	pushd $testsProviderDir
-	try {
-		.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All "--where=(ServerType==$serverType && Compression==$compression && WireCrypt==$wireCrypt) || Category==NoServer"
-		Check-ExitCode
-	}
-	finally {
-		popd
+	foreach ($providerTestsFrameworkVersion in $providerTestsFrameworkVersions) {
+		echo "=== FirebirdClient tests ($providerTestsFrameworkVersion) ==="
+		pushd "$testsBaseDir\bin\$Configuration\$providerTestsFrameworkVersion"
+		try {
+			.\FirebirdSql.Data.FirebirdClient.Tests.exe --labels=All "--where=(ServerType==$serverType && Compression==$compression && WireCrypt==$wireCrypt) || Category==NoServer"
+			Check-ExitCode
+		}
+		finally {
+			popd
+		}
 	}
 }
 

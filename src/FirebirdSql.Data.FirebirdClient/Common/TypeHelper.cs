@@ -326,6 +326,42 @@ internal static class TypeHelper
 		}
 	}
 
+	// CLR type of a field as returned to the client, honoring the DecFloatType connection option.
+	public static Type GetTypeFromDbDataType(DbDataType type, FbDecFloatType decFloatType)
+	{
+#if NET11_0_OR_GREATER
+		if (decFloatType == FbDecFloatType.Ieee754)
+		{
+			switch (type)
+			{
+				case DbDataType.Dec16:
+					return typeof(System.Numerics.Decimal64);
+				case DbDataType.Dec34:
+					return typeof(System.Numerics.Decimal128);
+			}
+		}
+#endif
+		return GetTypeFromDbDataType(type);
+	}
+
+	// Value of a field as returned to the client, honoring the DecFloatType connection option.
+	public static object GetClientValue(object value, DbDataType type, FbDecFloatType decFloatType)
+	{
+#if NET11_0_OR_GREATER
+		if (decFloatType == FbDecFloatType.Ieee754 && value is FbDecFloat decFloat)
+		{
+			switch (type)
+			{
+				case DbDataType.Dec16:
+					return (System.Numerics.Decimal64)decFloat;
+				case DbDataType.Dec34:
+					return (System.Numerics.Decimal128)decFloat;
+			}
+		}
+#endif
+		return value;
+	}
+
 	public static Type GetTypeFromDbDataType(DbDataType type)
 	{
 		switch (type)
@@ -465,6 +501,16 @@ internal static class TypeHelper
 		{
 			return FbDbType.Dec34;
 		}
+#if NET11_0_OR_GREATER
+		else if (type == typeof(System.Numerics.Decimal128))
+		{
+			return FbDbType.Dec34;
+		}
+		else if (type == typeof(System.Numerics.Decimal64) || type == typeof(System.Numerics.Decimal32))
+		{
+			return FbDbType.Dec16;
+		}
+#endif
 		else if (type == typeof(System.Numerics.BigInteger))
 		{
 			return FbDbType.Int128;
