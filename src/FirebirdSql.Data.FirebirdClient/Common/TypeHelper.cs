@@ -465,6 +465,16 @@ internal static class TypeHelper
 		{
 			return FbDbType.Dec34;
 		}
+#if NET11_0_OR_GREATER
+		else if (type == typeof(System.Numerics.Decimal128))
+		{
+			return FbDbType.Dec34;
+		}
+		else if (type == typeof(System.Numerics.Decimal64) || type == typeof(System.Numerics.Decimal32))
+		{
+			return FbDbType.Dec16;
+		}
+#endif
 		else if (type == typeof(System.Numerics.BigInteger))
 		{
 			return FbDbType.Int128;

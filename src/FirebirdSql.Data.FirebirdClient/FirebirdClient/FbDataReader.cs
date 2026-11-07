@@ -663,6 +663,16 @@ public sealed class FbDataReader : DbDataReader
 			{
 				return (T)(object)_row[i].GetDecFloat();
 			}
+#if NET11_0_OR_GREATER
+			else if (type == typeof(Decimal128))
+			{
+				return (T)(object)_row[i].GetDecimal128();
+			}
+			else if (type == typeof(Decimal64))
+			{
+				return (T)(object)_row[i].GetDecimal64();
+			}
+#endif
 			else if (type == typeof(BigInteger))
 			{
 				return (T)(object)_row[i].GetInt128();
@@ -764,6 +774,16 @@ public sealed class FbDataReader : DbDataReader
 			{
 				return (T)(object)_row[i].GetDecFloat();
 			}
+#if NET11_0_OR_GREATER
+			else if (type == typeof(Decimal128))
+			{
+				return (T)(object)_row[i].GetDecimal128();
+			}
+			else if (type == typeof(Decimal64))
+			{
+				return (T)(object)_row[i].GetDecimal64();
+			}
+#endif
 			else if (type == typeof(BigInteger))
 			{
 				return (T)(object)_row[i].GetInt128();

@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Buffers.Binary;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -146,6 +147,49 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 	string ToInvariantScientificString() => $"{Coefficient.ToString(CultureInfo.InvariantCulture)}E{Exponent.ToString(CultureInfo.InvariantCulture)}";
 
 	OverflowException CannotRepresent(string type) => new OverflowException($"Value {this} cannot be represented exactly as {type}.");
+
+#if NET11_0_OR_GREATER
+	// The IEEE 754 decimal interchange encoding of Decimal64/Decimal128 (EncodeDecimal/DecodeDecimal, densely packed decimal)
+	// is the encoding of DECFLOAT(16)/DECFLOAT(34), so the conversions go through the DECFLOAT codec and are exact,
+	// including the exponent (1.10 stays 1.10), negative zero, infinities and NaNs.
+
+	public static explicit operator FbDecFloat(Decimal128 value) => DecimalCodec.DecFloat34.ParseBytes(ToHostBytes(Decimal128.EncodeDecimal(value)));
+	public static explicit operator FbDecFloat(Decimal64 value) => DecimalCodec.DecFloat16.ParseBytes(ToHostBytes(Decimal64.EncodeDecimal(value)));
+	public static explicit operator FbDecFloat(Decimal32 value) => (FbDecFloat)(Decimal64)value;
+
+	// Exact; throws OverflowException when the value has more than 34 significant digits or its exponent is out of range.
+	public static explicit operator Decimal128(FbDecFloat value)
+	{
+		var bytes = DecimalCodec.DecFloat34.EncodeDecimal(value);
+		return Decimal128.DecodeDecimal(BitConverter.IsLittleEndian ? BinaryPrimitives.ReadUInt128LittleEndian(bytes) : BinaryPrimitives.ReadUInt128BigEndian(bytes));
+	}
+	// Exact; throws OverflowException when the value has more than 16 significant digits or its exponent is out of range.
+	public static explicit operator Decimal64(FbDecFloat value)
+	{
+		var bytes = DecimalCodec.DecFloat16.EncodeDecimal(value);
+		return Decimal64.DecodeDecimal(BitConverter.IsLittleEndian ? BinaryPrimitives.ReadUInt64LittleEndian(bytes) : BinaryPrimitives.ReadUInt64BigEndian(bytes));
+	}
+
+	// the codec works with host byte order
+	static byte[] ToHostBytes(UInt128 bits)
+	{
+		var bytes = new byte[16];
+		if (BitConverter.IsLittleEndian)
+			BinaryPrimitives.WriteUInt128LittleEndian(bytes, bits);
+		else
+			BinaryPrimitives.WriteUInt128BigEndian(bytes, bits);
+		return bytes;
+	}
+	static byte[] ToHostBytes(ulong bits)
+	{
+		var bytes = new byte[8];
+		if (BitConverter.IsLittleEndian)
+			BinaryPrimitives.WriteUInt64LittleEndian(bytes, bits);
+		else
+			BinaryPrimitives.WriteUInt64BigEndian(bytes, bits);
+		return bytes;
+	}
+#endif
 
 	// Nearest integer, ties to even (as Convert.ToInt64(decimal) does).
 	// Throws OverflowException for NaN, infinities and values far beyond the 64-bit range.
