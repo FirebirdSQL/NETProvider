@@ -242,6 +242,15 @@ public sealed class FbParameter : DbParameter, ICloneable
 					var result = new byte[Math.Min(Size, bvalue.Length)];
 					Array.Copy(bvalue, result, result.Length);
 					return result;
+#if NET11_0_OR_GREATER
+				// IEEE 754 decimal values are passed on as FbDecFloat (exact), so every conversion that handles FbDecFloat handles them too.
+				case System.Numerics.Decimal128 d128:
+					return (Types.FbDecFloat)d128;
+				case System.Numerics.Decimal64 d64:
+					return (Types.FbDecFloat)d64;
+				case System.Numerics.Decimal32 d32:
+					return (Types.FbDecFloat)d32;
+#endif
 				default:
 					return _value;
 			}

@@ -40,30 +40,14 @@ internal sealed class DbValue
 	public DbValue(DbField field, object value)
 	{
 		_field = field;
-		_value = Normalize(value) ?? DBNull.Value;
+		_value = value ?? DBNull.Value;
 	}
 
 	public DbValue(StatementBase statement, DbField field, object value)
 	{
 		_statement = statement;
 		_field = field;
-		_value = Normalize(value) ?? DBNull.Value;
-	}
-
-	// IEEE 754 decimal values are kept as FbDecFloat (exact), so every conversion that handles FbDecFloat handles them too.
-	static object Normalize(object value)
-	{
-#if NET11_0_OR_GREATER
-		return value switch
-		{
-			Decimal128 d => (FbDecFloat)d,
-			Decimal64 d => (FbDecFloat)d,
-			Decimal32 d => (FbDecFloat)d,
-			_ => value,
-		};
-#else
-		return value;
-#endif
+		_value = value ?? DBNull.Value;
 	}
 
 	public bool IsDBNull()
@@ -160,7 +144,7 @@ internal sealed class DbValue
 
 	public void SetValue(object value)
 	{
-		_value = Normalize(value);
+		_value = value;
 	}
 
 	public string GetString()
