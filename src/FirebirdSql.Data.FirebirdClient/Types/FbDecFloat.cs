@@ -86,6 +86,99 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 		return new FbDecFloat(DecimalType.Finite, negative, negative ? -coefficient : coefficient, -scale);
 	}
 
+	// Exact (the scale is kept when possible, e.g. 110E-2 -> 1.10m).
+	// Throws OverflowException when the value cannot be represented exactly as decimal, including NaN and infinities.
+	public static explicit operator decimal(FbDecFloat value)
+	{
+		if (value.Type != DecimalType.Finite)
+		{
+			throw value.CannotRepresent(nameof(Decimal));
+		}
+		var coefficient = BigInteger.Abs(value.Coefficient);
+		var exponent = value.Exponent;
+		if (exponent > 0)
+		{
+			if (!coefficient.IsZero)
+			{
+				if (exponent > 28)
+				{
+					throw value.CannotRepresent(nameof(Decimal));
+				}
+				coefficient *= BigInteger.Pow(10, exponent);
+			}
+			exponent = 0;
+		}
+		// only trailing zeros can be dropped
+		while (exponent < 0 && (exponent < -28 || coefficient > MaxDecimalCoefficient))
+		{
+			var quotient = BigInteger.DivRem(coefficient, 10, out var remainder);
+			if (!remainder.IsZero)
+			{
+				break;
+			}
+			coefficient = quotient;
+			exponent++;
+		}
+		if (exponent < -28 || coefficient > MaxDecimalCoefficient)
+		{
+			throw value.CannotRepresent(nameof(Decimal));
+		}
+		var bits = (UInt128)coefficient;
+		return new decimal((int)(uint)bits, (int)(uint)(bits >> 32), (int)(uint)(bits >> 64), value.Negative, (byte)-exponent);
+	}
+	// Nearest double (overflows to infinity, underflows to zero); NaN and infinities are mapped.
+	public static explicit operator double(FbDecFloat value) => value.Type switch
+	{
+		DecimalType.Infinity => value.Negative ? double.NegativeInfinity : double.PositiveInfinity,
+		DecimalType.NaN or DecimalType.SignalingNaN => double.NaN,
+		_ => value.Negative && value.Coefficient.IsZero ? -0d : double.Parse(value.ToInvariantScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture),
+	};
+	// Nearest float (overflows to infinity, underflows to zero); NaN and infinities are mapped.
+	public static explicit operator float(FbDecFloat value) => value.Type switch
+	{
+		DecimalType.Infinity => value.Negative ? float.NegativeInfinity : float.PositiveInfinity,
+		DecimalType.NaN or DecimalType.SignalingNaN => float.NaN,
+		_ => value.Negative && value.Coefficient.IsZero ? -0f : float.Parse(value.ToInvariantScientificString(), NumberStyles.Float, CultureInfo.InvariantCulture),
+	};
+
+	static readonly BigInteger MaxDecimalCoefficient = (BigInteger)decimal.MaxValue;
+
+	string ToInvariantScientificString() => $"{Coefficient.ToString(CultureInfo.InvariantCulture)}E{Exponent.ToString(CultureInfo.InvariantCulture)}";
+
+	OverflowException CannotRepresent(string type) => new OverflowException($"Value {this} cannot be represented exactly as {type}.");
+
+	// Nearest integer, ties to even (as Convert.ToInt64(decimal) does).
+	// Throws OverflowException for NaN, infinities and values far beyond the 64-bit range.
+	internal BigInteger ToIntegerRoundingToEven()
+	{
+		if (Type != DecimalType.Finite)
+		{
+			throw CannotRepresent(nameof(BigInteger));
+		}
+		if (Exponent >= 0)
+		{
+			if (Exponent > 40 && !Coefficient.IsZero)
+			{
+				throw CannotRepresent(nameof(BigInteger));
+			}
+			return Coefficient * BigInteger.Pow(10, Exponent);
+		}
+		var digitsToDrop = -(long)Exponent;
+		if (digitsToDrop > BigInteger.Abs(Coefficient).GetBitLength())
+		{
+			// |value| < 0.5
+			return BigInteger.Zero;
+		}
+		var divisor = BigInteger.Pow(10, (int)digitsToDrop);
+		var quotient = BigInteger.DivRem(Coefficient, divisor, out var remainder);
+		var twice = BigInteger.Abs(remainder) * 2;
+		if (twice > divisor || (twice == divisor && !quotient.IsEven))
+		{
+			quotient += Coefficient.Sign;
+		}
+		return quotient;
+	}
+
 	public override string ToString()
 	{
 		if (this == NegativeZero)

@@ -185,4 +185,79 @@ public class FbDecFloatTypeTests
 		Assert.Greater(negativeDoubles, 1000);
 		Assert.Greater(negativeSingles, 1000);
 	}
+	static readonly object[] ToDecimalSource = new object[]
+	{
+			new object[] { new FbDecFloat(110, -2), "1.10" },
+			new object[] { new FbDecFloat(-5, 0), "-5" },
+			new object[] { new FbDecFloat(1, 28), "10000000000000000000000000000" },
+			new object[] { new FbDecFloat(BigInteger.Parse("79228162514264337593543950335"), 0), "79228162514264337593543950335" },
+			new object[] { new FbDecFloat(BigInteger.Parse("792281625142643375935439503350"), -1), "79228162514264337593543950335" },
+			new object[] { new FbDecFloat(1, -28), "0.0000000000000000000000000001" },
+			new object[] { new FbDecFloat(1000, -31), "0.0000000000000000000000000001" },
+			new object[] { new FbDecFloat(0, -40), "0.0000000000000000000000000000" },
+			new object[] { new FbDecFloat(0, 40), "0" },
+	};
+	[TestCaseSource(nameof(ToDecimalSource))]
+	public void ConvertsToDecimalExactly(FbDecFloat value, string expected)
+	{
+		Assert.AreEqual(expected, ((decimal)value).ToString(CultureInfo.InvariantCulture));
+	}
+
+	static readonly object[] ToDecimalThrowsSource = new object[]
+	{
+			new FbDecFloat(1, 29),
+			new FbDecFloat(BigInteger.Parse("79228162514264337593543950336"), 0),
+			new FbDecFloat(1, -29),
+			new FbDecFloat(BigInteger.Parse("10000000000000000000000000000001"), -31),
+			new FbDecFloat(1, int.MaxValue),
+			new FbDecFloat(1, int.MinValue),
+			FbDecFloat.PositiveNaN,
+			FbDecFloat.PositiveSignalingNaN,
+			FbDecFloat.NegativeInfinity,
+	};
+	[TestCaseSource(nameof(ToDecimalThrowsSource))]
+	public void ConvertsToDecimalThrowsWhenNotExact(FbDecFloat value)
+	{
+		Assert.Throws<OverflowException>(() => _ = (decimal)value);
+	}
+
+	static readonly object[] ToDoubleSource = new object[]
+	{
+			new object[] { new FbDecFloat(66, -1), 6.6 },
+			new object[] { new FbDecFloat(BigInteger.Parse("30000000000000004"), -17), 0.1 + 0.2 },
+			new object[] { new FbDecFloat(1, 400), double.PositiveInfinity },
+			new object[] { new FbDecFloat(-1, 400), double.NegativeInfinity },
+			new object[] { new FbDecFloat(1, -400), 0d },
+			new object[] { FbDecFloat.PositiveInfinity, double.PositiveInfinity },
+			new object[] { FbDecFloat.NegativeInfinity, double.NegativeInfinity },
+			new object[] { FbDecFloat.PositiveNaN, double.NaN },
+			new object[] { FbDecFloat.NegativeSignalingNaN, double.NaN },
+	};
+	[TestCaseSource(nameof(ToDoubleSource))]
+	public void ConvertsToNearestDouble(FbDecFloat value, double expected)
+	{
+		Assert.AreEqual(expected, (double)value);
+		Assert.AreEqual((float)expected, (float)value);
+	}
+
+	[Test]
+	public void ConvertsNegativeZeroToFloatingPoint()
+	{
+		Assert.IsTrue(double.IsNegative((double)FbDecFloat.NegativeZero));
+		Assert.IsTrue(float.IsNegative((float)FbDecFloat.NegativeZero));
+	}
+
+	[TestCase("2", 1, 20)]
+	[TestCase("25", -1, 2)]
+	[TestCase("35", -1, 4)]
+	[TestCase("-25", -1, -2)]
+	[TestCase("251", -2, 3)]
+	[TestCase("5", -1, 0)]
+	[TestCase("15", -1, 2)]
+	[TestCase("1", int.MinValue, 0)]
+	public void RoundsToIntegerToEven(string coefficient, int exponent, long expected)
+	{
+		var value = new FbDecFloat(BigInteger.Parse(coefficient), exponent);
+		Assert.AreEqual(new BigInteger(expected), value.ToIntegerRoundingToEven());
+	}
 }
