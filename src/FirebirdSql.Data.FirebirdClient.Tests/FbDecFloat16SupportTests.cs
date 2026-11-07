@@ -66,6 +66,11 @@ public class FbDecFloat16SupportTests : FbTestsBase
 			new object[] { new FbDecFloat(1, 384), "1E384" },
 			new object[] { new FbDecFloat(BigInteger.Parse("100000000000000000000"), -20), "1" },
 			new object[] { new FbDecFloat(100, -400), "1E-398" },
+			new object[] { (FbDecFloat)2.0, "2" },
+			new object[] { (FbDecFloat)1e-20, "1E-20" },
+			new object[] { (FbDecFloat)2.5f, "2.5" },
+			new object[] { (FbDecFloat)100m, "100" },
+			new object[] { (FbDecFloat)1.10m, "1.10" },
 		};
 
 	static readonly object[] UnrepresentableValues = new object[]
@@ -73,6 +78,8 @@ public class FbDecFloat16SupportTests : FbTestsBase
 		new FbDecFloat(BigInteger.Parse("30000000000000004"), -17),
 		new FbDecFloat(1, 385),
 		new FbDecFloat(1, -399),
+		(FbDecFloat)(0.1 + 0.2),
+		(FbDecFloat)decimal.MaxValue,
 	};
 
 	[TestCaseSource(nameof(TestValues))]

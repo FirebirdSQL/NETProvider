@@ -66,6 +66,13 @@ public class FbDecFloat34SupportTests : FbTestsBase
 			new object[] { new FbDecFloat(1, 6144), "1E6144" },
 			new object[] { new FbDecFloat(BigInteger.Parse("12345678901234567890123456789012340"), 0), "12345678901234567890123456789012340" },
 			new object[] { new FbDecFloat(1000, -6179), "1E-6176" },
+			new object[] { (FbDecFloat)2.0, "2" },
+			new object[] { (FbDecFloat)1e-20, "1E-20" },
+			new object[] { (FbDecFloat)2.5f, "2.5" },
+			new object[] { (FbDecFloat)(0.1 + 0.2), "0.30000000000000004" },
+			new object[] { (FbDecFloat)100m, "100" },
+			new object[] { (FbDecFloat)1.10m, "1.10" },
+			new object[] { (FbDecFloat)decimal.MaxValue, "79228162514264337593543950335" },
 		};
 
 	static readonly object[] UnrepresentableValues = new object[]
