@@ -17,6 +17,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using FirebirdSql.Data.Types;
 
 namespace FirebirdSql.Data.Common;
@@ -41,6 +42,9 @@ class DecimalCodec
 			ELimit = 3 * (1 << ExponentContinuationBits) - 1;
 			EMin = -ELimit / 2;
 			ExponentBias = -EMin + CoefficientDigits - 1;
+			MaxCoefficient = BigInteger.Pow(10, CoefficientDigits) - 1;
+			MinExponent = UnbiasedExponent(0);
+			MaxExponent = UnbiasedExponent(ELimit);
 		}
 
 		public int FormatBitLength { get; }
@@ -51,6 +55,10 @@ class DecimalCodec
 		public int ELimit { get; }
 		public int EMin { get; }
 		public int ExponentBias { get; }
+		public BigInteger MaxCoefficient { get; }
+		// Range of the exponent applied to the integral coefficient (value = coefficient * 10^exponent).
+		public int MinExponent { get; }
+		public int MaxExponent { get; }
 
 		public void ValidateByteLength(byte[] decBytes)
 		{
@@ -171,8 +179,8 @@ class DecimalCodec
 
 	void EncodeFinite(FbDecFloat @decimal, byte[] decBytes)
 	{
-		var biasedExponent = _decimalFormat.BiasedExponent(@decimal.Exponent);
-		var coefficient = @decimal.Coefficient;
+		var (coefficient, exponent) = FitToFormat(@decimal);
+		var biasedExponent = _decimalFormat.BiasedExponent(exponent);
 		var mostSignificantDigit = _coefficientCoder.EncodeValue(coefficient, decBytes);
 		var expMSB = biasedExponent >>> _decimalFormat.ExponentContinuationBits;
 		var expTwoBitCont = (biasedExponent >>> _decimalFormat.ExponentContinuationBits - 2) & 0b011;
@@ -190,6 +198,52 @@ class DecimalCodec
 					| expTwoBitCont);
 		}
 		EncodeExponentContinuation(decBytes, biasedExponent, _decimalFormat.ExponentContinuationBits - 2);
+	}
+
+	// Brings the coefficient and exponent into the ranges of the format without changing the numeric value
+	// (removing trailing zeros of the coefficient, or moving the exponent into the coefficient).
+	// Throws when that is impossible, i.e. when the value would have to be rounded, or overflows or underflows the format.
+	(BigInteger coefficient, int exponent) FitToFormat(FbDecFloat @decimal)
+	{
+		var coefficient = BigInteger.Abs(@decimal.Coefficient);
+		long exponent = @decimal.Exponent;
+		if (coefficient.IsZero)
+		{
+			return (coefficient, (int)Math.Clamp(exponent, _decimalFormat.MinExponent, _decimalFormat.MaxExponent));
+		}
+		while (coefficient > _decimalFormat.MaxCoefficient)
+		{
+			coefficient = BigInteger.DivRem(coefficient, 10, out var remainder);
+			if (!remainder.IsZero)
+			{
+				throw CannotRepresent(@decimal, $"more than {_decimalFormat.CoefficientDigits} significant digits");
+			}
+			exponent++;
+		}
+		while (exponent > _decimalFormat.MaxExponent)
+		{
+			coefficient *= 10;
+			if (coefficient > _decimalFormat.MaxCoefficient)
+			{
+				throw CannotRepresent(@decimal, "exponent overflow");
+			}
+			exponent--;
+		}
+		while (exponent < _decimalFormat.MinExponent)
+		{
+			coefficient = BigInteger.DivRem(coefficient, 10, out var remainder);
+			if (!remainder.IsZero)
+			{
+				throw CannotRepresent(@decimal, "exponent underflow");
+			}
+			exponent++;
+		}
+		return (coefficient, (int)exponent);
+	}
+
+	OverflowException CannotRepresent(FbDecFloat @decimal, string reason)
+	{
+		return new OverflowException($"Value {@decimal} cannot be represented exactly as DECFLOAT({_decimalFormat.CoefficientDigits}): {reason}.");
 	}
 
 	static void EncodeExponentContinuation(byte[] decBytes, int expAndBias, int expBitsRemaining)

@@ -64,16 +64,27 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 		float.NaN => PositiveNaN,
 		float.PositiveInfinity => PositiveInfinity,
 		float.NegativeInfinity => NegativeInfinity,
-		_ => ParseNumber(value, "0.#######"),
+		// shortest representation that round-trips to the same float
+		_ => ParseRoundTrip(value.ToString("R", CultureInfo.InvariantCulture)),
 	};
 	public static explicit operator FbDecFloat(double value) => value switch
 	{
 		double.NaN => PositiveNaN,
 		double.PositiveInfinity => PositiveInfinity,
 		double.NegativeInfinity => NegativeInfinity,
-		_ => ParseNumber(value, "0.###############"),
+		// shortest representation that round-trips to the same double
+		_ => ParseRoundTrip(value.ToString("R", CultureInfo.InvariantCulture)),
 	};
-	public static explicit operator FbDecFloat(decimal value) => ParseNumber(value, "0.############################");
+	public static explicit operator FbDecFloat(decimal value)
+	{
+		// exact: the decimal's 96-bit integer and scale are the coefficient and (negated) exponent
+		Span<int> bits = stackalloc int[4];
+		decimal.GetBits(value, bits);
+		BigInteger coefficient = ((UInt128)(uint)bits[2] << 64) | ((UInt128)(uint)bits[1] << 32) | (uint)bits[0];
+		var negative = bits[3] < 0;
+		var scale = (bits[3] >> 16) & 0xFF;
+		return new FbDecFloat(DecimalType.Finite, negative, negative ? -coefficient : coefficient, -scale);
+	}
 
 	public override string ToString()
 	{
@@ -155,10 +166,23 @@ public readonly struct FbDecFloat : IEquatable<FbDecFloat>
 		return !lhs.Equals(rhs);
 	}
 
-	static FbDecFloat ParseNumber(IFormattable formattable, string format)
+	// Parses the invariant "R" format of float/double, e.g. "2", "-0", "6.6", "1E-20", "1.7976931348623157E+308".
+	static FbDecFloat ParseRoundTrip(string s)
 	{
-		var s = formattable.ToString(format, CultureInfo.InvariantCulture);
-		var pos = s.IndexOf('.');
-		return new FbDecFloat(BigInteger.Parse(s.Remove(pos, 1), CultureInfo.InvariantCulture), -(s.Length - pos - 1));
+		var exponent = 0;
+		var exponentPos = s.IndexOf('E');
+		if (exponentPos >= 0)
+		{
+			exponent = int.Parse(s.AsSpan(exponentPos + 1), NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
+			s = s.Substring(0, exponentPos);
+		}
+		var pointPos = s.IndexOf('.');
+		if (pointPos >= 0)
+		{
+			exponent -= s.Length - pointPos - 1;
+			s = s.Remove(pointPos, 1);
+		}
+		var coefficient = BigInteger.Parse(s, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
+		return new FbDecFloat(DecimalType.Finite, s[0] == '-', coefficient, exponent);
 	}
 }
