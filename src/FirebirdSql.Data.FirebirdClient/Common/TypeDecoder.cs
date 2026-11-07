@@ -24,6 +24,13 @@ namespace FirebirdSql.Data.Common;
 
 internal static class TypeDecoder
 {
+	// INT128-backed NUMERIC/DECIMAL: System.Decimal when the value fits exactly (the common case),
+	// otherwise a BigDecimal, so that reading the row never fails and never rounds silently.
+	public static object DecodeInt128Numeric(BigInteger value, int scale)
+	{
+		return BigDecimal.Create(value, scale < 0 ? -scale : scale);
+	}
+
 	public static decimal DecodeDecimal(object value, int scale, int type)
 	{
 		var shift = scale < 0 ? -scale : scale;

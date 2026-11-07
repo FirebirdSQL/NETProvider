@@ -95,6 +95,11 @@ internal sealed class DbValue
 				}
 
 			default:
+				if (_value is BigDecimal bigDecimal)
+				{
+					// the field's CLR type is System.Decimal, which cannot hold this value exactly: throws
+					return bigDecimal.ToDecimal(CultureInfo.InvariantCulture);
+				}
 				return _value;
 		}
 	}
@@ -138,8 +143,23 @@ internal sealed class DbValue
 				}
 
 			default:
+				if (_value is BigDecimal bigDecimal)
+				{
+					// the field's CLR type is System.Decimal, which cannot hold this value exactly: throws
+					return bigDecimal.ToDecimal(CultureInfo.InvariantCulture);
+				}
 				return _value;
 		}
+	}
+
+	// Like GetValue, but keeps a BigDecimal as is (GetValue throws for it); used to copy decoded values into rows.
+	public object GetDecodedValue()
+	{
+		return _value is BigDecimal ? _value : GetValue();
+	}
+	public ValueTask<object> GetDecodedValueAsync(CancellationToken cancellationToken = default)
+	{
+		return _value is BigDecimal ? new ValueTask<object>(_value) : GetValueAsync(cancellationToken);
 	}
 
 	public void SetValue(object value)
@@ -273,6 +293,9 @@ internal sealed class DbValue
 			short s => s,
 			int i => i,
 			long l => l,
+			decimal d when decimal.Truncate(d) == d => new BigInteger(d),
+			BigDecimal bd when bd.TryToBigInteger(out var bi) => bi,
+			decimal or BigDecimal => throw new OverflowException($"Value {Convert.ToString(_value, CultureInfo.InvariantCulture)} cannot be represented exactly as {nameof(BigInteger)}."),
 			_ => (BigInteger)_value,
 		};
 	}
