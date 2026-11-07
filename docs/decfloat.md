@@ -36,6 +36,8 @@ command.Parameters.AddWithValue("d34", Decimal128.Parse("12345678901234567890123
 var value = reader.GetFieldValue<Decimal128>(0);
 ```
 
+By default `GetValue`, `GetFieldType`, `ExecuteScalar` and output parameters use `FbDecFloat`. With the connection string option `DecFloat Type=Ieee754` (`FbConnectionStringBuilder.DecFloatType = FbDecFloatType.Ieee754`) they use `Decimal64` for `DECFLOAT(16)` and `Decimal128` for `DECFLOAT(34)` instead, so that `DataTable`s, `DataAdapter`s and other code relying on `GetValue` get the .NET types. This option requires .NET 11 or later.
+
 ### Examples
 
 Examples can be found in [`FbDecFloat16SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat16SupportTests.cs), [`FbDecFloat34SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecFloat34SupportTests.cs) and [`FbDecimalIeee754SupportTests`](../src/FirebirdSql.Data.FirebirdClient.Tests/FbDecimalIeee754SupportTests.cs).
