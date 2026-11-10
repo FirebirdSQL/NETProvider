@@ -1076,7 +1076,7 @@ sealed class XdrReaderWriter : IXdrReader, IXdrWriter
 	{
 		var rented = ArrayPool<byte>.Shared.Rent(1);
 		TypeEncoder.EncodeBoolean(value, rented.AsSpan());
-		var task = WriteOpaqueAsync(rented, 1, cancellationToken);
+		var task = WriteOpaqueAsync(rented.AsMemory(0, 1), cancellationToken);
 		return ReturnAfter(task, rented);
 	}
 
