@@ -34,6 +34,9 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 	const int DirectReadWriteThreshold = 8 * 1024;
 
 	readonly IDataProvider _dataProvider;
+	// Cancellation may write while a normal flush is awaiting the transport.
+	// Keep the ring and codec state exclusively owned until that send completes.
+	readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
 
 	readonly ByteRingBuffer _outputBuffer;
 	readonly ByteRingBuffer _inputBuffer;
@@ -194,6 +197,19 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 
 	public void Write(ReadOnlySpan<byte> buffer)
 	{
+		_writeLock.Wait();
+		try
+		{
+			WriteCore(buffer);
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	void WriteCore(ReadOnlySpan<byte> buffer)
+	{
 		EnsureNotDisposed();
 		if (buffer.IsEmpty)
 			return;
@@ -217,6 +233,32 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 
 	public void Write(byte[] buffer, int offset, int count)
 	{
+		_writeLock.Wait();
+		try
+		{
+			WriteCore(buffer, offset, count);
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	public async ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+	{
+		await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await WriteCoreAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	void WriteCore(byte[] buffer, int offset, int count)
+	{
 		EnsureNotDisposed();
 		if (buffer == null || count <= 0)
 			return;
@@ -237,7 +279,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 
 		_outputBuffer.Write(buffer.AsSpan(offset, count));
 	}
-	public ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+	ValueTask WriteCoreAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
 		EnsureNotDisposed();
 		if (buffer == null || count <= 0)
@@ -265,7 +307,20 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 		}
 	}
 
-	public ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
+	public async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
+	{
+		await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await WriteCoreAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	ValueTask WriteCoreAsync(ReadOnlyMemory<byte> buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
 		EnsureNotDisposed();
 		if (count <= 0)
@@ -295,6 +350,19 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 
 	public void Flush()
 	{
+		_writeLock.Wait();
+		try
+		{
+			FlushCore();
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	void FlushCore()
+	{
 		EnsureNotDisposed();
 		try
 		{
@@ -316,6 +384,19 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure, I
 		}
 	}
 	public async ValueTask FlushAsync(CancellationToken cancellationToken = default)
+	{
+		await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await FlushCoreAsync(cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_writeLock.Release();
+		}
+	}
+
+	async ValueTask FlushCoreAsync(CancellationToken cancellationToken)
 	{
 		EnsureNotDisposed();
 		try
