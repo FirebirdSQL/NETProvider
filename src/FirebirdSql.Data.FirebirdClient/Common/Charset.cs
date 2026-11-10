@@ -141,6 +141,11 @@ internal sealed class Charset
 		return Encoding.GetString(buffer);
 	}
 
+	public string GetString(ReadOnlySpan<byte> buffer)
+	{
+		return Encoding.GetString(buffer);
+	}
+
 	public string GetString(byte[] buffer, int index, int count)
 	{
 		return Encoding.GetString(buffer, index, count);
