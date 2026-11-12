@@ -535,4 +535,60 @@ end";
 			await transaction.RollbackAsync();
 		}
 	}
+
+	[Test]
+	public async Task RecordsAffectedIsMinusOneForSelectTest()
+	{
+		// DbDataReader.RecordsAffected: "-1 for SELECT statements; 0 if no rows were affected or the statement failed."
+		await using (var command = new FbCommand("select INT_FIELD from TEST where 1 = 0", Connection))
+		{
+			var reader = await command.ExecuteReaderAsync();
+			while (await reader.ReadAsync())
+			{ }
+			await reader.CloseAsync();
+			Assert.AreEqual(-1, reader.RecordsAffected);
+		}
+	}
+
+	[Test]
+	public async Task RecordsAffectedForInsertReturningTest()
+	{
+		// INSERT ... RETURNING is classified by Firebird as a stored procedure execution, not as an INSERT.
+		await using (var transaction = await Connection.BeginTransactionAsync())
+		{
+			await using (var command = new FbCommand("insert into test (int_field) values (100001) returning int_field", Connection, transaction))
+			{
+				await using (var reader = await command.ExecuteReaderAsync())
+				{
+					while (await reader.ReadAsync())
+					{ }
+					Assert.AreEqual(1, reader.RecordsAffected);
+				}
+			}
+			await transaction.RollbackAsync();
+		}
+	}
+
+	[Test]
+	public async Task ExecuteNonQueryForStatementWithoutRowChangesIsMinusOneTest()
+	{
+		// Stored procedure execution that changes no rows keeps the -1 of "all other types of statements".
+		await using (var command = new FbCommand("execute block as begin end", Connection))
+		{
+			Assert.AreEqual(-1, await command.ExecuteNonQueryAsync());
+		}
+	}
+
+	[Test]
+	public async Task ExecuteNonQueryForInsertReturningTest()
+	{
+		await using (var transaction = await Connection.BeginTransactionAsync())
+		{
+			await using (var command = new FbCommand("insert into test (int_field) values (100002) returning int_field", Connection, transaction))
+			{
+				Assert.AreEqual(1, await command.ExecuteNonQueryAsync());
+			}
+			await transaction.RollbackAsync();
+		}
+	}
 }
