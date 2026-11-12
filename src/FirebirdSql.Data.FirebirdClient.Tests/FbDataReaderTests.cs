@@ -78,9 +78,9 @@ public class FbDataReaderTests : FbTestsBase
 				Assert.IsTrue(reader.HasRows);
 				Assert.IsTrue(await reader.ReadAsync());
 				Assert.AreEqual(1, reader.GetInt32(0));
-				Assert.IsTrue(reader.Read());
+				Assert.IsTrue(await reader.ReadAsync());
 				Assert.AreEqual(2, reader.GetInt32(0));
-				Assert.IsFalse(reader.Read());
+				Assert.IsFalse(await reader.ReadAsync());
 				Assert.IsTrue(reader.HasRows, "HasRows describes the result, not the current position");
 			}
 		}
