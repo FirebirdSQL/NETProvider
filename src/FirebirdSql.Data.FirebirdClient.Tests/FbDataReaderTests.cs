@@ -535,4 +535,22 @@ end";
 			await transaction.RollbackAsync();
 		}
 	}
+
+	[Test]
+	public async Task GetFieldTypeMatchesGetValueForOctetsTest()
+	{
+		// IDataRecord.GetFieldType: "the type of Object that would be returned from GetValue."
+		await using (var command = new FbCommand("select cast('ab' as varchar(10) character set octets), cast('ab' as char(4) character set octets) from rdb$database", Connection))
+		{
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				Assert.IsTrue(await reader.ReadAsync());
+				for (var i = 0; i < reader.FieldCount; i++)
+				{
+					Assert.AreEqual(typeof(byte[]), reader.GetValue(i).GetType());
+					Assert.AreEqual(typeof(byte[]), reader.GetFieldType(i));
+				}
+			}
+		}
+	}
 }

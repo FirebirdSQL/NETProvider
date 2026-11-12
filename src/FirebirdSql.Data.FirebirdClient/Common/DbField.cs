@@ -549,6 +549,12 @@ internal sealed class DbField
 
 	public Type GetSystemType()
 	{
+		// SetValue stores CHAR and VARCHAR in the OCTETS character set as byte[], so that is the type GetValue returns.
+		if ((SqlType == IscCodes.SQL_TEXT || SqlType == IscCodes.SQL_VARYING) && (Charset?.IsOctetsCharset ?? false) && DbDataType != DbDataType.Guid)
+		{
+			return typeof(byte[]);
+		}
+
 		return TypeHelper.GetTypeFromDbDataType(DbDataType);
 	}
 
