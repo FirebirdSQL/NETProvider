@@ -38,175 +38,175 @@ public class NorthwindSelectQueryFbTest : NorthwindSelectQueryRelationalTestBase
 		return AssertTranslationFailed(() => base.Member_binding_after_ctor_arguments_fails_with_client_eval(async));
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Projection_containing_DateTime_subtraction(bool async)
 	{
 		return base.Projection_containing_DateTime_subtraction(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Project_single_element_from_collection_with_OrderBy_over_navigation_Take_and_FirstOrDefault_2(bool async)
 	{
 		return base.Project_single_element_from_collection_with_OrderBy_over_navigation_Take_and_FirstOrDefault_2(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_nested_collection_deep(bool async)
 	{
 		return base.Select_nested_collection_deep(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_1(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_2(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_3(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_4(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_5(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_6(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_outer_7(bool async)
 	{
 		return base.SelectMany_correlated_with_outer_1(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_collection_being_correlated_subquery_which_references_inner_and_outer_entity(bool async)
 	{
 		return base.SelectMany_with_collection_being_correlated_subquery_which_references_inner_and_outer_entity(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_whose_selector_references_outer_source(bool async)
 	{
 		return base.SelectMany_whose_selector_references_outer_source(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Collection_projection_selecting_outer_element_followed_by_take(bool async)
 	{
 		return base.Collection_projection_selecting_outer_element_followed_by_take(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_distinct_not_containing_original_identifier(bool async)
 	{
 		return base.Correlated_collection_after_distinct_not_containing_original_identifier(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_distinct_with_complex_projection_containing_original_identifier(bool async)
 	{
 		return base.Correlated_collection_after_distinct_with_complex_projection_containing_original_identifier(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_groupby_with_complex_projection_containing_original_identifier(bool async)
 	{
 		return base.Correlated_collection_after_groupby_with_complex_projection_containing_original_identifier(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Projecting_after_navigation_and_distinct(bool async)
 	{
 		return base.Projecting_after_navigation_and_distinct(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_nested_collection_deep_distinct_no_identifiers(bool async)
 	{
 		return base.Select_nested_collection_deep_distinct_no_identifiers(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Take_on_correlated_collection_in_first(bool async)
 	{
 		return base.Take_on_correlated_collection_in_first(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Take_on_top_level_and_on_collection_projection_with_outer_apply(bool async)
 	{
 		return base.Take_on_top_level_and_on_collection_projection_with_outer_apply(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_after_groupby_with_complex_projection_not_containing_original_identifier(bool async)
 	{
 		return base.Correlated_collection_after_groupby_with_complex_projection_not_containing_original_identifier(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Reverse_in_projection_subquery(bool async)
 	{
 		return base.Reverse_in_projection_subquery(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Reverse_in_projection_subquery_single_result(bool async)
 	{
 		return base.Reverse_in_projection_subquery_single_result(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Reverse_in_SelectMany_with_Take(bool async)
 	{
 		return base.Reverse_in_SelectMany_with_Take(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Set_operation_in_pending_collection(bool async)
 	{
@@ -232,5 +232,12 @@ public class NorthwindSelectQueryFbTest : NorthwindSelectQueryRelationalTestBase
 			() => base
 				.SelectMany_with_collection_being_correlated_subquery_which_references_non_mapped_properties_from_inner_and_outer_entity(
 					async));
+	}
+
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task SelectMany_over_inline_array_projecting_range_variable_and_outer(bool async)
+	{
+		return base.SelectMany_over_inline_array_projecting_range_variable_and_outer(async);
 	}
 }

@@ -32,7 +32,7 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 	{ }
 
 	// Uses INTERSECT
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Multiple_occurrences_of_SqlQuery_with_db_parameter_adds_two_parameters(bool async)
 	{
@@ -74,70 +74,70 @@ public class SqlQueryFbTest : SqlQueryTestBase<NorthwindQueryFbFixture<NoopModel
 		return base.SqlQueryRaw_queryable_simple_projection_composed(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_with_dbParameter_mixed_in_subquery(bool async)
 	{
 		return base.SqlQueryRaw_with_dbParameter_mixed_in_subquery(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_queryable_multiple_composed_with_parameters_and_closure_parameters(bool async)
 	{
 		return base.SqlQueryRaw_queryable_multiple_composed_with_parameters_and_closure_parameters(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_queryable_multiple_composed_with_closure_parameters(bool async)
 	{
 		return base.SqlQueryRaw_queryable_multiple_composed_with_closure_parameters(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_queryable_multiple_composed(bool async)
 	{
 		return base.SqlQueryRaw_queryable_multiple_composed(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_in_subquery_with_positional_dbParameter_without_name(bool async)
 	{
 		return base.SqlQueryRaw_in_subquery_with_positional_dbParameter_without_name(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_in_subquery_with_positional_dbParameter_with_name(bool async)
 	{
 		return base.SqlQueryRaw_in_subquery_with_positional_dbParameter_with_name(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_in_subquery_with_dbParameter(bool async)
 	{
 		return base.SqlQueryRaw_in_subquery_with_dbParameter(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_does_not_parameterize_interpolated_string(bool async)
 	{
 		return base.SqlQueryRaw_does_not_parameterize_interpolated_string(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQueryRaw_queryable_with_null_parameter(bool async)
 	{
 		return base.SqlQueryRaw_queryable_with_null_parameter(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SqlQuery_queryable_multiple_composed_with_parameters_and_closure_parameters_interpolated(bool async)
 	{

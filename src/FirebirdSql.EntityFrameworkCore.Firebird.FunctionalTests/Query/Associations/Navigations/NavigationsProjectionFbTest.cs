@@ -21,7 +21,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
 
@@ -51,5 +50,15 @@ public class NavigationsProjectionFbTest : NavigationsProjectionRelationalTestBa
 		if (fbTestStore.ServerLessThan4())
 			return Task.CompletedTask;
 		return base.Select_subquery_required_related_FirstOrDefault(queryTrackingBehavior);
+	}
+
+	[Theory]
+	[MemberData(nameof(TrackingData))]
+	public override Task Select_subquery_FirstOrDefault_complex_collection(QueryTrackingBehavior queryTrackingBehavior)
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return Task.CompletedTask;
+		return base.Select_subquery_FirstOrDefault_complex_collection(queryTrackingBehavior);
 	}
 }

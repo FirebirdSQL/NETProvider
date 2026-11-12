@@ -30,14 +30,14 @@ public class NorthwindKeylessEntitiesQueryFbTest : NorthwindKeylessEntitiesQuery
 		: base(fixture)
 	{ }
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task KeylessEntity_by_database_view(bool async)
 	{
 		return base.KeylessEntity_by_database_view(async);
 	}
 
-	[DoesNotHaveTheDataTheory]
+	[Theory(Skip = SkipReasons.DoesNotHaveTheData)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Entity_mapped_to_view_on_right_side_of_join(bool async)
 	{

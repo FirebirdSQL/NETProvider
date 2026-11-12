@@ -20,6 +20,7 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
@@ -29,25 +30,25 @@ public class MappingQueryFbTest : MappingQueryTestBase<MappingQueryFbTest.Mappin
 		: base(fixture)
 	{ }
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void All_customers()
 	{
 		base.All_customers();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void All_employees()
 	{
 		base.All_employees();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void All_orders()
 	{
 		base.All_orders();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void Project_nullable_enum()
 	{
 		base.Project_nullable_enum();

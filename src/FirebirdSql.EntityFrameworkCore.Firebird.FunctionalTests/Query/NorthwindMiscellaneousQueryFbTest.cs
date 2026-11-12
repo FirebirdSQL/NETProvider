@@ -83,49 +83,49 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		await Assert.ThrowsAsync<InvalidOperationException>(() => base.Max_on_empty_sequence_throws(async));
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Complex_nested_query_doesnt_try_binding_to_grandparent_when_parent_returns_complex_result(bool async)
 	{
 		return base.Complex_nested_query_doesnt_try_binding_to_grandparent_when_parent_returns_complex_result(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_with_distinct_without_default_identifiers_projecting_columns(bool async)
 	{
 		return base.Correlated_collection_with_distinct_without_default_identifiers_projecting_columns(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_collection_with_distinct_without_default_identifiers_projecting_columns_with_navigation(bool async)
 	{
 		return base.Correlated_collection_with_distinct_without_default_identifiers_projecting_columns_with_navigation(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task DefaultIfEmpty_in_subquery_nested_filter_order_comparison(bool async)
 	{
 		return base.DefaultIfEmpty_in_subquery_nested_filter_order_comparison(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_correlated_subquery_ordered(bool async)
 	{
 		return base.Select_correlated_subquery_ordered(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_subquery_recursive_trivial(bool async)
 	{
 		return base.Select_subquery_recursive_trivial(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_subquery_hard(bool async)
 	{
@@ -139,21 +139,21 @@ public class NorthwindMiscellaneousQueryFbTest : NorthwindMiscellaneousQueryRela
 		return base.Entity_equality_orderby_subquery(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Subquery_with_navigation_inside_inline_collection(bool async)
 	{
 		return base.Subquery_with_navigation_inside_inline_collection(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(bool async)
 	{
 		return base.SelectMany_correlated_with_Select_value_type_and_DefaultIfEmpty_in_selector(async);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Where_nanosecond_and_microsecond_component(bool async)
 	{

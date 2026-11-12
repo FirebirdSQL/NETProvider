@@ -330,6 +330,23 @@ public class FbQuerySqlGenerator : QuerySqlGenerator
 		}
 	}
 
+	// Quoted collation name would be case sensitive, hence keeping it unquoted and allowing only regular identifier characters.
+	protected override Expression VisitCollate(CollateExpression collateExpression)
+	{
+		Visit(collateExpression.Operand);
+		foreach (var c in collateExpression.Collation)
+		{
+			if (!char.IsAsciiLetterOrDigit(c) && c != '_' && c != '$')
+			{
+				throw new InvalidOperationException($"Invalid collation name '{collateExpression.Collation}'.");
+			}
+		}
+		Sql
+			.Append(" COLLATE ")
+			.Append(collateExpression.Collation);
+		return collateExpression;
+	}
+
 	protected override void GeneratePseudoFromClause()
 	{
 		Sql.Append(" FROM RDB$DATABASE");

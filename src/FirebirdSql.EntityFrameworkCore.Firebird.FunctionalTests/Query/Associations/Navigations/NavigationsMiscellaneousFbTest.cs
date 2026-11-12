@@ -16,7 +16,7 @@
 //$Authors = Niek Schoemaker (@niekschoemaker)
 
 using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
 

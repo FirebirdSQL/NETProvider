@@ -81,28 +81,28 @@ public class NorthwindEFPropertyIncludeQueryFbTest : NorthwindEFPropertyIncludeQ
 		return base.Include_duplicate_collection_result_operator2(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Filtered_include_with_multiple_ordering(bool async)
 	{
 		return base.Filtered_include_with_multiple_ordering(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_outer_apply_with_filter(bool async)
 	{
 		return base.Include_collection_with_outer_apply_with_filter(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_outer_apply_with_filter_non_equality(bool async)
 	{
 		return base.Include_collection_with_outer_apply_with_filter_non_equality(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_cross_apply_with_filter(bool async)
 	{
@@ -123,21 +123,21 @@ public class NorthwindEFPropertyIncludeQueryFbTest : NorthwindEFPropertyIncludeQ
 		return base.Repro9735(async);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_Include_reference_GroupBy_Select(bool async)
 	{
 		return base.SelectMany_Include_reference_GroupBy_Select(async);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_Include_collection_GroupBy_Select(bool async)
 	{
 		return base.SelectMany_Include_collection_GroupBy_Select(async);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Join_Include_reference_GroupBy_Select(bool async)
 	{

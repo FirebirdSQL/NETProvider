@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
@@ -28,13 +29,13 @@ public class NorthwindCompiledQueryFbTest : NorthwindCompiledQueryTestBase<North
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override void Query_with_array_parameter()
 	{
 		base.Query_with_array_parameter();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Query_with_array_parameter_async()
 	{
 		return base.Query_with_array_parameter_async();

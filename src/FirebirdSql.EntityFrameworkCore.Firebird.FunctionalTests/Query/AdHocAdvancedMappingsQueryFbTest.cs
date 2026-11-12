@@ -24,5 +24,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class AdHocAdvancedMappingsQueryFbTest(NonSharedFixture fixture) : AdHocAdvancedMappingsQueryRelationalTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 }

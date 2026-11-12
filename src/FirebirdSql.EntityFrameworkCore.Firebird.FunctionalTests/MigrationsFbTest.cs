@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -38,6 +39,9 @@ public class MigrationsFbTest : MigrationsTestBase<MigrationsFbTest.MigrationsFb
 
 	[Fact(Skip = SkipReason)]
 	public override Task Create_table() => base.Create_table();
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Convert_owned_entity_with_no_schema_to_regular_entity() => base.Convert_owned_entity_with_no_schema_to_regular_entity();
 
 	[Fact(Skip = SkipReason)]
 	public override Task Create_table_all_settings() => base.Create_table_all_settings();

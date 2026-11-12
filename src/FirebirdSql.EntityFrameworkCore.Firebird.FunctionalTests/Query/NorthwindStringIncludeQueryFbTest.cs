@@ -90,21 +90,21 @@ public class NorthwindStringIncludeQueryFbTest : NorthwindStringIncludeQueryTest
 		return base.Include_duplicate_collection_result_operator2(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_cross_apply_with_filter(bool async)
 	{
 		return base.Include_collection_with_cross_apply_with_filter(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_outer_apply_with_filter_non_equality(bool async)
 	{
 		return base.Include_collection_with_outer_apply_with_filter_non_equality(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Include_collection_with_outer_apply_with_filter(bool async)
 	{
@@ -121,21 +121,21 @@ public class NorthwindStringIncludeQueryFbTest : NorthwindStringIncludeQueryTest
 				() => base.Include_collection_with_last_no_orderby(async))).Message);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Join_Include_reference_GroupBy_Select(bool async)
 	{
 		return base.Join_Include_reference_GroupBy_Select(async);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_Include_collection_GroupBy_Select(bool async)
 	{
 		return base.SelectMany_Include_collection_GroupBy_Select(async);
 	}
 
-	[LongExecutionTheory]
+	[Theory(Skip = SkipReasons.LongExecution)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_Include_reference_GroupBy_Select(bool async)
 	{

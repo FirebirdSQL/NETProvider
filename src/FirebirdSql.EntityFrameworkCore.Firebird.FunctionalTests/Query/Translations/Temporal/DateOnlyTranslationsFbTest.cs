@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations.Temporal;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations.Temporal;
 
@@ -33,43 +32,43 @@ public class DateOnlyTranslationsFbTest : DateOnlyTranslationsTestBase<BasicType
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task DayNumber()
 	{
 		return base.DayNumber();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task DayNumber_subtraction()
 	{
 		return base.DayNumber_subtraction();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task ToDateTime_constant_DateTime_with_property_TimeOnly()
 	{
 		return base.ToDateTime_constant_DateTime_with_property_TimeOnly();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task ToDateTime_property_with_constant_TimeOnly()
 	{
 		return base.ToDateTime_property_with_constant_TimeOnly();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task ToDateTime_property_with_property_TimeOnly()
 	{
 		return base.ToDateTime_property_with_property_TimeOnly();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task ToDateTime_with_complex_DateTime()
 	{
 		return base.ToDateTime_with_complex_DateTime();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task ToDateTime_with_complex_TimeOnly()
 	{
 		return base.ToDateTime_with_complex_TimeOnly();

@@ -18,7 +18,7 @@
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
 
@@ -30,37 +30,37 @@ public class NavigationsPrimitiveCollectionFbTest : NavigationsPrimitiveCollecti
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Any_predicate()
 	{
 		return base.Any_predicate();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Contains()
 	{
 		return base.Contains();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Count()
 	{
 		return base.Count();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Index()
 	{
 		return base.Index();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Nested_Count()
 	{
 		return base.Nested_Count();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Select_Sum()
 	{
 		return base.Select_Sum();

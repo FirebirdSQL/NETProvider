@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations;
 
@@ -35,51 +34,87 @@ public class MiscellaneousTranslationsFbTest : MiscellaneousTranslationsRelation
 
 
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToBoolean()
 	{
 		return base.Convert_ToBoolean();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToByte()
 	{
 		return base.Convert_ToByte();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToDecimal()
 	{
 		return base.Convert_ToDecimal();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToDouble()
 	{
 		return base.Convert_ToDouble();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToInt16()
 	{
 		return base.Convert_ToInt16();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToInt32()
 	{
 		return base.Convert_ToInt32();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToInt64()
 	{
 		return base.Convert_ToInt64();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Convert_ToString()
 	{
 		return base.Convert_ToString();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Byte_Parse()
+	{
+		return base.Byte_Parse();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Decimal_Parse()
+	{
+		return base.Decimal_Parse();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Double_Parse()
+	{
+		return base.Double_Parse();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Int_Parse()
+	{
+		return base.Int_Parse();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Long_Parse()
+	{
+		return base.Long_Parse();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Short_Parse()
+	{
+		return base.Short_Parse();
 	}
 }

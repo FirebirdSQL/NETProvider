@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations.Temporal;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations.Temporal;
 
@@ -33,31 +32,31 @@ public class TimeOnlyTranslationsFbTest : TimeOnlyTranslationsTestBase<BasicType
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Add_TimeSpan()
 	{
 		return base.Add_TimeSpan();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task IsBetween()
 	{
 		return base.IsBetween();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Microsecond()
 	{
 		return base.Microsecond();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Nanosecond()
 	{
 		return base.Nanosecond();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Subtract()
 	{
 		return base.Subtract();

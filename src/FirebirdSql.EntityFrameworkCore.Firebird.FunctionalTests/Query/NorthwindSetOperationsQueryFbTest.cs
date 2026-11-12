@@ -31,7 +31,7 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Union_Select_scalar(bool async)
 	{
@@ -48,77 +48,77 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 		return base.Union_inside_Concat(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Select_Except_reference_projection(bool async)
 	{
 		return base.Select_Except_reference_projection(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except(bool async)
 	{
 		return base.Except(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except_nested(bool async)
 	{
 		return base.Except_nested(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except_non_entity(bool async)
 	{
 		return base.Except_non_entity(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except_simple_followed_by_projecting_constant(bool async)
 	{
 		return base.Except_simple_followed_by_projecting_constant(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Intersect(bool async)
 	{
 		return base.Intersect(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Intersect_nested(bool async)
 	{
 		return base.Intersect_nested(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Intersect_non_entity(bool async)
 	{
 		return base.Intersect_non_entity(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Union_Intersect(bool async)
 	{
 		return base.Union_Intersect(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except_on_distinct(bool async)
 	{
 		return base.Except_on_distinct(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Intersect_on_distinct(bool async)
 	{
@@ -132,7 +132,7 @@ public class NorthwindSetOperationsQueryFbTest : NorthwindSetOperationsQueryRela
 		return Assert.ThrowsAsync<InvalidOperationException>(() => base.Client_eval_Union_FirstOrDefault(async));
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Except_nested2(bool async)
 	{

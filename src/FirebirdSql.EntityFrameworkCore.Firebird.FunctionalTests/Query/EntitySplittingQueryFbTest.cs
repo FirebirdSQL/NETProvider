@@ -24,5 +24,5 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class EntitySplittingQueryFbTest(NonSharedFixture fixture) : EntitySplittingQueryTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 }

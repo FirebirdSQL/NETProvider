@@ -16,7 +16,11 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Inheritance;
+using Microsoft.EntityFrameworkCore.TestModels.InheritanceModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
@@ -24,4 +28,16 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 public abstract class TPCInheritanceQueryFbFixtureBase : TPCInheritanceQueryFixture
 {
     protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+
+    // Complex collections are mapped to JSON, which is not supported on Firebird.
+    public override bool EnableComplexTypes => false;
+
+    public override DbContextOptionsBuilder AddOptions(DbContextOptionsBuilder builder)
+        => base.AddOptions(builder).ConfigureWarnings(w => w.Ignore(CoreEventId.MappedComplexPropertyIgnoredWarning));
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
+    {
+        base.OnModelCreating(modelBuilder, context);
+        modelBuilder.Entity<Drink>().Ignore(x => x.ComplexTypeCollection);
+    }
 }

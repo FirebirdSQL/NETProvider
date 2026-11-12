@@ -18,7 +18,7 @@
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations;
 
@@ -31,15 +31,21 @@ public class ByteArrayTranslationsFbTest : ByteArrayTranslationsTestBase<BasicTy
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task First()
 	{
 		return base.First();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task Index()
 	{
 		return base.Index();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
+	public override Task Any()
+	{
+		return base.Any();
 	}
 }

@@ -31,7 +31,7 @@ public class Ef6GroupByFbTest : Ef6GroupByTestBase<Ef6GroupByFbTest.Ef6GroupByFb
 		: base(fixture)
 	{ }
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Group_Join_from_LINQ_101(bool async)
 	{

@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations.Temporal;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations.Temporal;
 
@@ -35,105 +34,141 @@ public class DateTimeOffsetTranslationsFbTest : DateTimeOffsetTranslationsTestBa
 
 
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Now()
 	{
 		return base.Now();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task UtcNow()
 	{
 		return base.UtcNow();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task AddMilliseconds()
 	{
 		return base.AddMilliseconds();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task AddMinutes()
 	{
 		return base.AddMinutes();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Date()
 	{
 		return base.Date();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Day()
 	{
 		return base.Day();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task DayOfYear()
 	{
 		return base.DayOfYear();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Hour()
 	{
 		return base.Hour();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Microsecond()
 	{
 		return base.Microsecond();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Millisecond()
 	{
 		return base.Millisecond();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Minute()
 	{
 		return base.Minute();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Month()
 	{
 		return base.Month();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Nanosecond()
 	{
 		return base.Nanosecond();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Second()
 	{
 		return base.Second();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task ToUnixTimeMilliseconds()
 	{
 		return base.ToUnixTimeMilliseconds();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task ToUnixTimeSecond()
 	{
 		return base.ToUnixTimeSecond();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Year()
 	{
 		return base.Year();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Ctor_DateTime_TimeSpan()
+	{
+		return base.Ctor_DateTime_TimeSpan();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Ctor_DateTime()
+	{
+		return base.Ctor_DateTime();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task DateTime()
+	{
+		return base.DateTime();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task LocalDateTime()
+	{
+		return base.LocalDateTime();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task ToOffset()
+	{
+		return base.ToOffset();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task UtcDateTime()
+	{
+		return base.UtcDateTime();
 	}
 }

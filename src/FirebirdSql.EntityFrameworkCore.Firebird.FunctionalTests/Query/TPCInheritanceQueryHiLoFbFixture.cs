@@ -23,6 +23,8 @@ public class TPCInheritanceQueryHiLoFbFixture : TPCInheritanceQueryFbFixtureBase
 {
 	protected override string StoreName => "TPCHiLoInheritanceTest";
 
+	public override bool UseGeneratedKeys => true;
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
 	{
 		modelBuilder.UseHiLo();

@@ -29,12 +29,12 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class OperatorsQueryFbTest(NonSharedFixture fixture) : OperatorsQueryTestBase(fixture)
 {
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Concat_and_json_scalar(bool async)
 	{
 		return base.Concat_and_json_scalar(async);
 	}
 
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 }

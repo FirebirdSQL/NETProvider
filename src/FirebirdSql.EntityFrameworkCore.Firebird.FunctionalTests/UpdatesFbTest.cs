@@ -51,7 +51,7 @@ public class UpdatesFbTest : UpdatesRelationalTestBase<UpdatesFbTest.UpdatesFbFi
 				"FK_LoginEntityTypeWithAnExtrem~",
 				entityType.GetForeignKeys().Single().GetConstraintName());
 			Assert.Equal(
-				"IX_LoginEntityTypeWithAnExtrem~",
+				"IX_LoginEntityTypeWithAnExtre~1",
 				entityType.GetIndexes().Single().GetDatabaseName());
 		}
 	}

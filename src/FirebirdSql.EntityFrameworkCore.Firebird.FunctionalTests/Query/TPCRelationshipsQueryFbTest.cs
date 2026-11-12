@@ -17,6 +17,7 @@
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Inheritance;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;

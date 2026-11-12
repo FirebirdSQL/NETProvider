@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Translations.Temporal;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations.Temporal;
 
@@ -35,19 +34,19 @@ public class DateTimeTranslationsFbTest : DateTimeTranslationsTestBase<BasicType
 
 
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task UtcNow()
 	{
 		return base.UtcNow();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task subtract_and_TotalDays()
 	{
 	 	return base.subtract_and_TotalDays();
 	}
 
-	[NotSupportedByProviderFact]
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
 	public override Task TimeOfDay()
 	{
 		return base.TimeOfDay();

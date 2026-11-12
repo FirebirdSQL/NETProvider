@@ -164,11 +164,21 @@ public class ComplexTypeQueryFbTest : ComplexTypeQueryRelationalTestBase<Complex
 		return base.Union_of_same_nested_complex_type_projected_twice_with_pushdown(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Same_entity_with_complex_type_projected_twice_with_pushdown_as_part_of_another_projection(bool async)
 	{
 		return base.Same_entity_with_complex_type_projected_twice_with_pushdown_as_part_of_another_projection(async);
+	}
+
+	[Theory]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Same_complex_type_projected_twice_with_pushdown_as_part_of_another_projection(bool async)
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return Task.CompletedTask;
+		return base.Same_complex_type_projected_twice_with_pushdown_as_part_of_another_projection(async);
 	}
 
 	public class ComplexTypeQueryFbFixture : ComplexTypeQueryRelationalFixtureBase
@@ -180,5 +190,23 @@ public class ComplexTypeQueryFbTest : ComplexTypeQueryRelationalTestBase<Complex
 			base.OnModelCreating(modelBuilder, context);
 			ModelHelpers.SetStringLengths(modelBuilder);
 		}
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Complex_json_collection_inside_left_join_subquery()
+	{
+		return base.Complex_json_collection_inside_left_join_subquery();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
+	public override Task Project_json_complex_collection_together_with_collection_navigation()
+	{
+		return base.Project_json_complex_collection_together_with_collection_navigation();
+	}
+
+	[Fact(Skip = SkipReasons.NotSupportedByProvider)]
+	public override Task Complex_property_on_split_entity()
+	{
+		return base.Complex_property_on_split_entity();
 	}
 }

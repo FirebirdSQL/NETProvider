@@ -17,7 +17,7 @@
 
 using Microsoft.EntityFrameworkCore.Query.Translations.Operators;
 using Microsoft.EntityFrameworkCore.TestUtilities;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations.Operators;
 

@@ -15,8 +15,11 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
+using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query;
-using Xunit.Abstractions;
+using Microsoft.EntityFrameworkCore.Query.Inheritance;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
@@ -25,4 +28,11 @@ public class TPTInheritanceQueryFbTest : TPTInheritanceQueryTestBase<TPTInherita
 	public TPTInheritanceQueryFbTest(TPTInheritanceQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
 		: base(fixture, testOutputHelper)
 	{ }
+
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Primitive_collection_on_subtype(bool async)
+	{
+		return base.Primitive_collection_on_subtype(async);
+	}
 }

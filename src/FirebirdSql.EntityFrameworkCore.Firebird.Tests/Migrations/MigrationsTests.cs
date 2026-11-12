@@ -293,6 +293,23 @@ public class MigrationsTests : EntityFrameworkCoreTestsBase
 	}
 
 	[Test]
+	public async Task AddColumnWithPrecisionAndScale()
+	{
+		var operation = new AddColumnOperation()
+		{
+			Table = "People",
+			Name = "NewColumn",
+			ClrType = typeof(decimal),
+			Precision = 18,
+			Scale = 6,
+			IsNullable = false,
+		};
+		var batch = await Generate(new[] { operation });
+		Assert.AreEqual(1, batch.Count());
+		Assert.AreEqual(NewLineEnd(@"ALTER TABLE ""People"" ADD ""NewColumn"" DECIMAL(18,6) NOT NULL;"), batch[0].CommandText);
+	}
+
+	[Test]
 	public async Task AddColumnWithCollation()
 	{
 		var operation = new AddColumnOperation()

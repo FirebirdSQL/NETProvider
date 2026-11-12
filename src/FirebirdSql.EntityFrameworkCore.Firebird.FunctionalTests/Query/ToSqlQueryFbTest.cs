@@ -27,11 +27,11 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class ToSqlQueryFbTest(NonSharedFixture fixture) : ToSqlQueryTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 
 	public override async Task Entity_type_with_navigation_mapped_to_SqlQuery(bool async)
 	{
-		var contextFactory = await InitializeAsync<Context27629>(
+		var contextFactory = await InitializeNonSharedTest<Context27629>(
 			seed: async c =>
 			{
 				var author = new Author { Name = "Toast", Posts = { new Post { Title = "Sausages of the world!" } } };
@@ -44,7 +44,7 @@ public class ToSqlQueryFbTest(NonSharedFixture fixture) : ToSqlQueryTestBase(fix
 				await c.SaveChangesAsync();
 			});
 
-		using var context = contextFactory.CreateContext();
+		using var context = contextFactory.CreateDbContext();
 
 		var authors = await
 			(from o in context.Authors

@@ -20,7 +20,6 @@ using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Associations.OwnedNavigations;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.OwnedNavigations;
 
@@ -32,7 +31,7 @@ public class OwnedNavigationsSetOperationsFbTest : OwnedNavigationsSetOperations
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
 	}
 
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(TrackingData))]
 	public override Task Over_associate_collection_projected(QueryTrackingBehavior queryTrackingBehavior)
 	{

@@ -15,8 +15,10 @@
 
 //$Authors = Niek Schoemaker (@niekschoemaker)
 
+using System.Threading.Tasks;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.ComplexTableSplitting;
 
@@ -26,5 +28,11 @@ public class ComplexTableSplittingMiscellaneousFbTest : ComplexTableSplittingMis
 	{
 		Fixture.TestSqlLoggerFactory.Clear();
 		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
+	}
+
+	[Fact(Skip = SkipReasons.GeneratedNameTooLong)]
+	public override Task FromSql_on_root()
+	{
+		return base.FromSql_on_root();
 	}
 }

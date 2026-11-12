@@ -30,8 +30,9 @@ public class FbModelValidator : RelationalModelValidator
 		: base(dependencies, relationalDependencies)
 	{ }
 
-	protected override void ValidateValueGeneration(IEntityType entityType, IKey key, IDiagnosticsLogger<DbLoggerCategory.Model.Validation> logger)
+	protected override void ValidateValueGeneration(IKey key, IDiagnosticsLogger<DbLoggerCategory.Model.Validation> logger)
 	{
+		var entityType = key.DeclaringEntityType;
 		if (entityType.GetMappingStrategy() == RelationalAnnotationNames.TpcMappingStrategy && entityType.BaseType == null)
 		{
 			foreach (var storeGeneratedProperty in key.Properties.Where(p => (p.ValueGenerated & ValueGenerated.OnAdd) != 0 && p.GetValueGenerationStrategy() == FbValueGenerationStrategy.IdentityColumn))

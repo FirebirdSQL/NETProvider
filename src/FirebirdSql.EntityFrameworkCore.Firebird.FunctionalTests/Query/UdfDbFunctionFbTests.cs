@@ -59,55 +59,55 @@ public class UdfDbFunctionFbTests : UdfDbFunctionTestBase<UdfDbFunctionFbTests.F
 		base.QF_Correlated_Func_Call_With_Navigation();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_CrossJoin_Not_Correlated()
 	{
 		base.QF_CrossJoin_Not_Correlated();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void DbSet_mapped_to_function()
 	{
 		base.DbSet_mapped_to_function();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_LeftJoin_Select_Result()
 	{
 		base.QF_LeftJoin_Select_Result();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_Join()
 	{
 		base.QF_Join();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_LeftJoin_Select_Anonymous()
 	{
 		base.QF_LeftJoin_Select_Anonymous();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_Stand_Alone_Parameter()
 	{
 		base.QF_Stand_Alone_Parameter();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_Stand_Alone()
 	{
 		base.QF_Stand_Alone();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_Nested()
 	{
 		base.QF_Nested();
 	}
 
-	[DoesNotHaveTheDataFact]
+	[Fact(Skip = SkipReasons.DoesNotHaveTheData)]
 	public override void QF_CrossJoin_Parameter()
 	{
 		base.QF_CrossJoin_Parameter();

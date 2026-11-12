@@ -15,7 +15,7 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Xunit.Abstractions;
+using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 

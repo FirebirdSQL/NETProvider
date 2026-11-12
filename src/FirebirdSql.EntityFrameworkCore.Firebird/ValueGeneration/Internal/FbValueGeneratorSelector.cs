@@ -44,19 +44,6 @@ public class FbValueGeneratorSelector : RelationalValueGeneratorSelector
 
 	public new virtual IFbValueGeneratorCache Cache => (IFbValueGeneratorCache)base.Cache;
 
-	[Obsolete("Use TrySelect and throw if needed when the generator is not found.")]
-	public override ValueGenerator Select(IProperty property, ITypeBase entityType)
-	{
-		if (TrySelect(property, entityType, out var generator))
-		{
-			return generator;
-		}
-
-		throw new ArgumentException(
-			CoreStrings.InvalidValueGeneratorFactoryProperty(
-				nameof(FbSequenceValueGeneratorFactory), property.Name, property.DeclaringType.DisplayName()));
-	}
-
 	public override bool TrySelect(IProperty property, ITypeBase entityType, out ValueGenerator valueGenerator)
 	{
 		if (property.GetValueGeneratorFactory() != null

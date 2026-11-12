@@ -26,7 +26,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class AdHocQueryFiltersQueryFbTest(NonSharedFixture fixture) : AdHocQueryFiltersQueryRelationalTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 
 	[Fact(Skip = "PK name collision and not easy way to override model.")]
 	public override Task Self_reference_in_query_filter_works()

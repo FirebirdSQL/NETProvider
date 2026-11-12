@@ -30,7 +30,7 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class AdHocQuerySplittingQueryFbTest(NonSharedFixture fixture) : AdHocQuerySplittingQueryTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 
 	static readonly FieldInfo _querySplittingBehaviorFieldInfo = typeof(RelationalOptionsExtension).GetField("_querySplittingBehavior", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -67,6 +67,22 @@ public class AdHocQuerySplittingQueryFbTest(NonSharedFixture fixture) : AdHocQue
 	public override Task Can_query_with_nav_collection_in_projection_with_split_query_in_parallel_sync()
 	{
 		return base.Can_query_with_nav_collection_in_projection_with_split_query_in_parallel_sync();
+	}
+
+	[Theory(Skip = "Not supported because of current test initialization setup.")]
+	[InlineData(true)]
+	[InlineData(false)]
+	public override Task Split_include_collection_throws_for_orphan_child_rows_after_concurrent_insert(bool async)
+	{
+		return base.Split_include_collection_throws_for_orphan_child_rows_after_concurrent_insert(async);
+	}
+
+	[Theory(Skip = "Not supported because of current test initialization setup.")]
+	[InlineData(true)]
+	[InlineData(false)]
+	public override Task Split_include_collection_not_dropped_when_other_parent_made_childless_concurrently(bool async)
+	{
+		return base.Split_include_collection_not_dropped_when_other_parent_made_childless_concurrently(async);
 	}
 }
 

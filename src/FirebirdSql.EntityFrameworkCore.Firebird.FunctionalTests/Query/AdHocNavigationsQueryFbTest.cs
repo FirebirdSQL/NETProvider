@@ -28,27 +28,27 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
 public class AdHocNavigationsQueryFbTest(NonSharedFixture fixture) : AdHocNavigationsQueryRelationalTestBase(fixture)
 {
-	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
+	protected override ITestStoreFactory NonSharedTestStoreFactory => FbTestStoreFactory.Instance;
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Let_multiple_references_with_reference_to_outer()
 	{
 		return base.Let_multiple_references_with_reference_to_outer();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Projection_with_multiple_includes_and_subquery_with_set_operation()
 	{
 		return base.Projection_with_multiple_includes_and_subquery_with_set_operation();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task SelectMany_and_collection_in_projection_in_FirstOrDefault()
 	{
 		return base.SelectMany_and_collection_in_projection_in_FirstOrDefault();
 	}
 
-	[NotSupportedOnFirebirdFact]
+	[Fact(Skip = SkipReasons.NotSupportedOnFirebird)]
 	public override Task Correlated_collection_correctly_associates_entities_with_byte_array_keys()
 	{
 		return base.Correlated_collection_correctly_associates_entities_with_byte_array_keys();

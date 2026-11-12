@@ -17,10 +17,10 @@
 
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
+using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.ComplexTableSplitting;
 
@@ -33,7 +33,7 @@ public class ComplexTableSplittingProjectionFbTest : ComplexTableSplittingProjec
 	}
 
 	// Users OUTER join
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(TrackingData))]
 	public override Task Select_subquery_optional_related_FirstOrDefault(QueryTrackingBehavior queryTrackingBehavior)
 	{
@@ -41,10 +41,20 @@ public class ComplexTableSplittingProjectionFbTest : ComplexTableSplittingProjec
 	}
 
 	// Users OUTER join
-	[NotSupportedByProviderTheory]
+	[Theory(Skip = SkipReasons.NotSupportedByProvider)]
 	[MemberData(nameof(TrackingData))]
 	public override Task Select_subquery_required_related_FirstOrDefault(QueryTrackingBehavior queryTrackingBehavior)
 	{
 		return base.Select_subquery_required_related_FirstOrDefault(queryTrackingBehavior);
+	}
+
+	[Theory]
+	[MemberData(nameof(TrackingData))]
+	public override Task Select_subquery_FirstOrDefault_complex_collection(QueryTrackingBehavior queryTrackingBehavior)
+	{
+		var fbTestStore = (FbTestStore)Fixture.TestStore;
+		if (fbTestStore.ServerLessThan4())
+			return Task.CompletedTask;
+		return base.Select_subquery_FirstOrDefault_complex_collection(queryTrackingBehavior);
 	}
 }

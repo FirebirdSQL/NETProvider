@@ -44,56 +44,56 @@ public class ComplexNavigationsSharedTypeQueryFbTest : ComplexNavigationsSharedT
 		return AssertTranslationFailed(() => base.GroupJoin_client_method_in_OrderBy(async));
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_with_subquery_on_inner(bool async)
 	{
 		return base.GroupJoin_with_subquery_on_inner(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task GroupJoin_with_subquery_on_inner_and_no_DefaultIfEmpty(bool async)
 	{
 		return base.GroupJoin_with_subquery_on_inner_and_no_DefaultIfEmpty(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Let_let_contains_from_outer_let(bool async)
 	{
 		return base.Let_let_contains_from_outer_let(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Nested_SelectMany_correlated_with_join_table_correctly_translated_to_apply(bool async)
 	{
 		return base.Nested_SelectMany_correlated_with_join_table_correctly_translated_to_apply(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Prune_does_not_throw_null_ref(bool async)
 	{
 		return base.Prune_does_not_throw_null_ref(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Correlated_projection_with_first(bool async)
 	{
 		return base.Correlated_projection_with_first(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Multiple_select_many_in_projection(bool async)
 	{
 		return base.Multiple_select_many_in_projection(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Single_select_many_in_projection_with_take(bool async)
 	{

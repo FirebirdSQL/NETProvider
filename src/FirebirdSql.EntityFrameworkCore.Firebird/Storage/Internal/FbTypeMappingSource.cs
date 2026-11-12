@@ -46,7 +46,7 @@ public class FbTypeMappingSource : RelationalTypeMappingSource
 
 	readonly FloatTypeMapping _float = new FloatTypeMapping("FLOAT");
 	readonly DoubleTypeMapping _double = new DoubleTypeMapping("DOUBLE PRECISION");
-	readonly DecimalTypeMapping _decimal = new DecimalTypeMapping($"DECIMAL({DefaultDecimalPrecision},{DefaultDecimalScale})");
+	readonly FbDecimalTypeMapping _decimal = new FbDecimalTypeMapping("DECIMAL", DefaultDecimalPrecision, DefaultDecimalScale);
 
 	readonly FbDateTimeTypeMapping _timestamp = new FbDateTimeTypeMapping("TIMESTAMP", FbDbType.TimeStamp);
 	readonly FbDateTimeTypeMapping _date = new FbDateTimeTypeMapping("DATE", FbDbType.Date);

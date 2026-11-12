@@ -50,49 +50,49 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 		return base.GroupJoin_SelectMany_subquery_with_filter_orderby_and_DefaultIfEmpty(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_client_eval(bool async)
 	{
 		return base.SelectMany_with_client_eval(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_client_eval_with_collection_shaper(bool async)
 	{
 		return base.SelectMany_with_client_eval_with_collection_shaper(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_client_eval_with_collection_shaper_ignored(bool async)
 	{
 		return base.SelectMany_with_client_eval_with_collection_shaper_ignored(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_selecting_outer_element(bool async)
 	{
 		return base.SelectMany_with_selecting_outer_element(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_selecting_outer_entity(bool async)
 	{
 		return base.SelectMany_with_selecting_outer_entity(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task SelectMany_with_selecting_outer_entity_column_and_inner_column(bool async)
 	{
 		return base.SelectMany_with_selecting_outer_entity_column_and_inner_column(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Take_in_collection_projection_with_FirstOrDefault_on_top_level(bool async)
 	{
@@ -113,10 +113,17 @@ public class NorthwindJoinQueryFbTest : NorthwindJoinQueryRelationalTestBase<Nor
 		return base.Unflattened_GroupJoin_composed_2(async);
 	}
 
-	[NotSupportedOnFirebirdTheory]
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
 	[MemberData(nameof(IsAsyncData))]
 	public override Task Join_local_collection_int_closure_is_cached_correctly(bool async)
 	{
 		return base.Join_local_collection_int_closure_is_cached_correctly(async);
+	}
+
+	[Theory(Skip = SkipReasons.NotSupportedOnFirebird)]
+	[MemberData(nameof(IsAsyncData))]
+	public override Task Join_local_string_closure_is_cached_correctly(bool async)
+	{
+		return base.Join_local_string_closure_is_cached_correctly(async);
 	}
 }
