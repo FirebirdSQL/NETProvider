@@ -57,6 +57,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public int Read(byte[] buffer, int offset, int count)
 	{
+		CheckIOState();
 		if (_inputBuffer.Count < count)
 		{
 			var readBuffer = _readBuffer;
@@ -89,6 +90,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	}
 	public async ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
 	{
+		CheckIOState();
 		if (_inputBuffer.Count < count)
 		{
 			var readBuffer = _readBuffer;
@@ -98,6 +100,11 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 				read = await _dataProvider.ReadAsync(readBuffer, 0, readBuffer.Length, cancellationToken).ConfigureAwait(false);
 			}
 			catch (IOException)
+			{
+				IOFailed = true;
+				throw;
+			}
+			catch (OperationCanceledException)
 			{
 				IOFailed = true;
 				throw;
@@ -134,6 +141,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 
 	public void Flush()
 	{
+		CheckIOState();
 		var buffer = _outputBuffer.ToArray();
 		_outputBuffer.Clear();
 		var count = buffer.Length;
@@ -159,6 +167,7 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	}
 	public async ValueTask FlushAsync(CancellationToken cancellationToken = default)
 	{
+		CheckIOState();
 		var buffer = _outputBuffer.ToArray();
 		_outputBuffer.Clear();
 		var count = buffer.Length;
@@ -181,6 +190,11 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 			IOFailed = true;
 			throw;
 		}
+		catch (OperationCanceledException)
+		{
+			IOFailed = true;
+			throw;
+		}
 	}
 
 	public void StartCompression()
@@ -194,6 +208,12 @@ sealed class FirebirdNetworkHandlingWrapper : IDataProvider, ITracksIOFailure
 	{
 		_encryptor = CreateCipher(key);
 		_decryptor = CreateCipher(key);
+	}
+
+	void CheckIOState()
+	{
+		if (IOFailed)
+			throw new IOException("Error reading data from the connection.");
 	}
 
 	int ReadFromInputBuffer(byte[] buffer, int offset, int count)

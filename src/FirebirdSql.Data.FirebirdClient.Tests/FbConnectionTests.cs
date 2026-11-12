@@ -620,6 +620,40 @@ public class FbConnectionTests : FbTestsBase
 	}
 
 	[Test]
+	public async Task PooledConnectionUsableAfterCancelledBeginTransaction()
+	{
+		if (!EnsureServerType(FbServerType.Default))
+			return;
+
+		// The cancellation token reaches the socket read, so the transaction response stays unread.
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.Pooling = true;
+		csb.MinPoolSize = 0;
+		csb.MaxPoolSize = 1;
+		var connectionString = csb.ToString();
+		FbConnection.ClearPool(connectionString);
+
+		using (var cancellation = new CancellationTokenSource())
+		await using (var connection = new FbConnection(connectionString))
+		{
+			await connection.OpenAsync();
+			var beginning = connection.BeginTransactionAsync(cancellation.Token);
+			cancellation.Cancel();
+			Assert.CatchAsync<OperationCanceledException>(async () => await beginning);
+		}
+
+		await using (var connection = new FbConnection(connectionString))
+		{
+			await connection.OpenAsync();
+			await using (var command = connection.CreateCommand())
+			{
+				command.CommandText = "select 1 from rdb$database";
+				Assert.AreEqual(1, Convert.ToInt32(await command.ExecuteScalarAsync()));
+			}
+		}
+	}
+
+	[Test]
 	public async Task SrpWithLeadingZeros()
 	{
 		if (!EnsureServerVersionAtLeast(new Version(3, 0, 0, 0)))
