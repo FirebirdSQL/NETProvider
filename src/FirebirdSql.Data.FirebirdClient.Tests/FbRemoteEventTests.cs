@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
@@ -29,6 +30,46 @@ public class FbRemoteEventTests : FbTestsBase
 	public FbRemoteEventTests(FbServerType serverType, bool compression, FbWireCrypt wireCrypt)
 		: base(serverType, compression, wireCrypt)
 	{ }
+
+	[Test]
+	public async Task AutoRequeueDuringInitialRegistrationAndCancellationTest()
+	{
+		var errors = new ConcurrentQueue<Exception>();
+		var received = 0;
+		await using var publisherConnection = new FbConnection(Connection.ConnectionString);
+		await publisherConnection.OpenAsync();
+		using var stop = new CancellationTokenSource();
+		var publisher = Task.Run(async () =>
+		{
+			await using var command = publisherConnection.CreateCommand();
+			command.CommandText = "execute block as begin post_event 'test'; end";
+			while (!stop.IsCancellationRequested)
+			{
+				await command.ExecuteNonQueryAsync();
+				await Task.Delay(1);
+			}
+		});
+		try
+		{
+			for (var i = 0; i < 100; i++)
+			{
+				await using var @event = new FbRemoteEvent(Connection.ConnectionString);
+				@event.RemoteEventError += (_, e) => errors.Enqueue(e.Error);
+				@event.RemoteEventCounts += (_, _) => Interlocked.Increment(ref received);
+				@event.Open();
+				@event.QueueEvents(new[] { "test" });
+				await Task.Delay(10);
+				@event.CancelEvents();
+			}
+		}
+		finally
+		{
+			stop.Cancel();
+			await publisher;
+		}
+		Assert.Greater(received, 0);
+		Assert.AreEqual(0, errors.Count);
+	}
 
 	[Test]
 	public async Task EventSimplyComesBackTest()
