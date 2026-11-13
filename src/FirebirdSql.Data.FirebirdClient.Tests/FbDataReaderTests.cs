@@ -64,6 +64,7 @@ public class FbDataReaderTests : FbTestsBase
 			{
 				Assert.IsFalse(reader.HasRows);
 				Assert.IsFalse(await reader.ReadAsync());
+				Assert.IsFalse(await reader.ReadAsync());
 			}
 		}
 	}

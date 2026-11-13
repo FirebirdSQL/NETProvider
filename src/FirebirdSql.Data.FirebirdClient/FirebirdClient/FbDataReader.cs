@@ -244,6 +244,10 @@ public sealed class FbDataReader : DbDataReader
 	public override bool Read()
 	{
 		CheckState();
+		if (_eof)
+		{
+			return false;
+		}
 
 		if (IsCommandBehavior(CommandBehavior.SchemaOnly))
 		{
@@ -275,6 +279,10 @@ public sealed class FbDataReader : DbDataReader
 	public override async Task<bool> ReadAsync(CancellationToken cancellationToken)
 	{
 		CheckState();
+		if (_eof)
+		{
+			return false;
+		}
 
 		if (IsCommandBehavior(CommandBehavior.SchemaOnly))
 		{
