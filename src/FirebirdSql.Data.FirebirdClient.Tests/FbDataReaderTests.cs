@@ -55,6 +55,91 @@ public class FbDataReaderTests : FbTestsBase
 	}
 
 	[Test]
+	public async Task HasRowsIsFalseForAnEmptyResultTest()
+	{
+		// DbDataReader.HasRows: "true if the DbDataReader contains one or more rows; otherwise false."
+		await using (var command = new FbCommand("select INT_FIELD from TEST where 1 = 0", Connection))
+		{
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				Assert.IsFalse(reader.HasRows);
+				Assert.IsFalse(await reader.ReadAsync());
+				Assert.IsFalse(await reader.ReadAsync());
+			}
+		}
+	}
+
+	[Test]
+	public async Task HasRowsDoesNotSkipTheFirstRowTest()
+	{
+		await using (var command = new FbCommand("select INT_FIELD from TEST where INT_FIELD in (1, 2) order by INT_FIELD", Connection))
+		{
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				Assert.IsTrue(reader.HasRows);
+				Assert.IsTrue(await reader.ReadAsync());
+				Assert.AreEqual(1, reader.GetInt32(0));
+				Assert.IsTrue(await reader.ReadAsync());
+				Assert.AreEqual(2, reader.GetInt32(0));
+				Assert.IsFalse(await reader.ReadAsync());
+				Assert.IsTrue(reader.HasRows, "HasRows describes the result, not the current position");
+			}
+		}
+	}
+
+	[Test]
+	public async Task HasRowsThenCloseKeepsStoredProcedureOutputParametersTest()
+	{
+		await using (var create = Connection.CreateCommand())
+		{
+			create.CommandText = "RECREATE PROCEDURE HASROWS_OUTPUT (P1 INTEGER) RETURNS (R1 INTEGER) AS BEGIN R1 = P1 * 2; END";
+			await create.ExecuteNonQueryAsync();
+		}
+
+		await using (var command = new FbCommand("EXECUTE PROCEDURE HASROWS_OUTPUT(?)", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("P1", FbDbType.Integer).Value = 21;
+			var output = command.Parameters.Add("R1", FbDbType.Integer);
+			output.Direction = ParameterDirection.Output;
+
+			await using (var reader = await command.ExecuteReaderAsync())
+			{
+				Assert.IsTrue(reader.HasRows);
+				await reader.CloseAsync();
+			}
+
+			Assert.AreEqual(42, output.Value, "HasRows must not consume the stored procedure output row");
+		}
+	}
+
+	[Test]
+	public void HasRowsThenCloseKeepsStoredProcedureOutputParametersSyncTest()
+	{
+		using (var create = Connection.CreateCommand())
+		{
+			create.CommandText = "RECREATE PROCEDURE HASROWS_OUTPUT (P1 INTEGER) RETURNS (R1 INTEGER) AS BEGIN R1 = P1 * 2; END";
+			create.ExecuteNonQuery();
+		}
+
+		using (var command = new FbCommand("EXECUTE PROCEDURE HASROWS_OUTPUT(?)", Connection))
+		{
+			command.CommandType = CommandType.StoredProcedure;
+			command.Parameters.Add("P1", FbDbType.Integer).Value = 21;
+			var output = command.Parameters.Add("R1", FbDbType.Integer);
+			output.Direction = ParameterDirection.Output;
+
+			using (var reader = command.ExecuteReader())
+			{
+				Assert.IsTrue(reader.HasRows);
+				reader.Close();
+			}
+
+			Assert.AreEqual(42, output.Value, "HasRows must not consume the stored procedure output row");
+		}
+	}
+
+	[Test]
 	public async Task ReadClobTest()
 	{
 		await using (var transaction = await Connection.BeginTransactionAsync())
