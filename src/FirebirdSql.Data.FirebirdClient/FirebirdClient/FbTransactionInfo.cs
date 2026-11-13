@@ -33,6 +33,15 @@ public sealed class FbTransactionInfo
 
 	#region Methods
 
+	public long GetTransactionId()
+	{
+		return GetValue<long>(IscCodes.isc_info_tra_id);
+	}
+	public Task<long> GetTransactionIdAsync(CancellationToken cancellationToken = default)
+	{
+		return GetValueAsync<long>(IscCodes.isc_info_tra_id, cancellationToken);
+	}
+
 	public long GetTransactionSnapshotNumber()
 	{
 		return GetValue<long>(IscCodes.fb_info_tra_snapshot_number);
