@@ -92,4 +92,70 @@ public class FbBlobTests : FbTestsBase
 			CollectionAssert.AreEqual(insert_values, select_values);
 		}
 	}
+
+	[Test]
+	public async Task BinaryBlobTestWithLargeSegmentSize()
+	{
+		var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+		var insert_values = RandomNumberGenerator.GetBytes(200000);
+
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.BlobSegmentSize = 65535;
+
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await conn.OpenAsync();
+			await using (var transaction = await conn.BeginTransactionAsync())
+			{
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", conn, transaction))
+				{
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+
+				await transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", conn))
+			{
+				var select_values = (byte[])await select.ExecuteScalarAsync();
+				CollectionAssert.AreEqual(insert_values, select_values);
+			}
+		}
+	}
+
+	[Test]
+	public async Task BinaryBlobTestWithMaxSegmentSize()
+	{
+		var id_value = RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue);
+		var insert_values = RandomNumberGenerator.GetBytes(100000);
+
+		var csb = BuildConnectionStringBuilder(ServerType, Compression, WireCrypt);
+		csb.BlobSegmentSize = 65535;
+
+		await using (var conn = new FbConnection(csb.ToString()))
+		{
+			await conn.OpenAsync();
+			Assert.AreEqual(65535, conn.BlobSegmentSize);
+
+			await using (var transaction = await conn.BeginTransactionAsync())
+			{
+				await using (var insert = new FbCommand("INSERT INTO TEST (int_field, blob_field) values(@int_field, @blob_field)", conn, transaction))
+				{
+					insert.Parameters.Add("@int_field", FbDbType.Integer).Value = id_value;
+					insert.Parameters.Add("@blob_field", FbDbType.Binary).Value = insert_values;
+					await insert.ExecuteNonQueryAsync();
+				}
+
+				await transaction.CommitAsync();
+			}
+
+			await using (var select = new FbCommand($"SELECT blob_field FROM TEST WHERE int_field = {id_value}", conn))
+			{
+				var select_values = (byte[])await select.ExecuteScalarAsync();
+				CollectionAssert.AreEqual(insert_values, select_values);
+			}
+		}
+	}
 }

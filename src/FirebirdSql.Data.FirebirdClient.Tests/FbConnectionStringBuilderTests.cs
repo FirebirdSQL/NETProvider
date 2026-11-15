@@ -68,4 +68,26 @@ public class FbConnectionStringBuilderTests
 		var b = new FbConnectionStringBuilder("wire crypt=required");
 		Assert.AreEqual(FbWireCrypt.Required, b.WireCrypt);
 	}
+
+	[Test]
+	public void BlobSegmentSizeDefaultValue()
+	{
+		var b = new FbConnectionStringBuilder();
+		Assert.AreEqual(ConnectionString.DefaultValueBlobSegmentSize, b.BlobSegmentSize);
+	}
+
+	[Test]
+	public void BlobSegmentSizeSetter()
+	{
+		var b = new FbConnectionStringBuilder();
+		b.BlobSegmentSize = 65535;
+		Assert.That(b.ToString(), Does.Contain("blob segment size=65535"));
+	}
+
+	[Test]
+	public void BlobSegmentSizeGetter()
+	{
+		var b = new FbConnectionStringBuilder("blob segment size=32000");
+		Assert.AreEqual(32000, b.BlobSegmentSize);
+	}
 }

@@ -246,6 +246,12 @@ public sealed class FbConnection : DbConnection, ICloneable
 	}
 
 	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public int BlobSegmentSize
+	{
+		get { return _options.BlobSegmentSize; }
+	}
+
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 	public int CommandTimeout
 	{
 		get { return _options.CommandTimeout; }
