@@ -26,6 +26,8 @@ public class FbDateTimeTypeMapping : DateTimeTypeMapping
 {
 	readonly FbDbType _fbDbType;
 
+	public static new FbDateTimeTypeMapping Default { get; } = new("TIMESTAMP", FbDbType.TimeStamp);
+
 	public FbDateTimeTypeMapping(string storeType, FbDbType fbDbType)
 		: base(storeType)
 	{
@@ -37,6 +39,11 @@ public class FbDateTimeTypeMapping : DateTimeTypeMapping
 	{
 		_fbDbType = fbDbType;
 	}
+
+	public FbDbType FbDbType => _fbDbType;
+
+	public virtual FbDateTimeTypeMapping Clone(FbDbType fbDbType)
+		=> new FbDateTimeTypeMapping(Parameters, fbDbType);
 
 	protected override void ConfigureParameter(DbParameter parameter)
 	{

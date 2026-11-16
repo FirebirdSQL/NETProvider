@@ -21,6 +21,8 @@ namespace FirebirdSql.EntityFrameworkCore.Firebird.Storage.Internal;
 
 public class FbDateOnlyTypeMapping : DateOnlyTypeMapping
 {
+	public static new FbDateOnlyTypeMapping Default { get; } = new("DATE");
+
 	public FbDateOnlyTypeMapping(string storeType)
 		: base(storeType)
 	{ }

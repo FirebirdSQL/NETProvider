@@ -18,6 +18,7 @@
 using FirebirdSql.EntityFrameworkCore.Firebird.Scaffolding.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Design.Internal;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,10 +29,13 @@ public class FbDesignTimeServices : IDesignTimeServices
 	public void ConfigureDesignTimeServices(IServiceCollection serviceCollection)
 	{
 		serviceCollection.AddEntityFrameworkFirebird();
+#pragma warning disable EF1001
 		new EntityFrameworkRelationalDesignServicesBuilder(serviceCollection)
 			.TryAdd<IAnnotationCodeGenerator, AnnotationCodeGenerator>()
+			.TryAdd<ICSharpRuntimeAnnotationCodeGenerator, FbCSharpRuntimeAnnotationCodeGenerator>()
 			.TryAdd<IDatabaseModelFactory, FbDatabaseModelFactory>()
 			.TryAdd<IProviderConfigurationCodeGenerator, FbProviderCodeGenerator>()
 			.TryAddCoreServices();
+#pragma warning restore EF1001
 	}
 }
