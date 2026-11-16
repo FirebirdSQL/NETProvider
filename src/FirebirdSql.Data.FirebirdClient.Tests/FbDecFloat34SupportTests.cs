@@ -16,6 +16,7 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using System;
+using System.Globalization;
 using System.Numerics;
 using System.Threading.Tasks;
 using FirebirdSql.Data.TestsBase;
@@ -63,7 +64,24 @@ public class FbDecFloat34SupportTests : FbTestsBase
 			new object[] { new FbDecFloat(-10, 34), "-100000000000000000000000000000000000" },
 			new object[] { new FbDecFloat(BigInteger.Parse("123000000001"), -10), "123.000000001E-1" },
 			new object[] { new FbDecFloat(BigInteger.Parse("-123000000001"), -10), "-123.000000001E-1" },
+			new object[] { new FbDecFloat(1, 6144), "1E6144" },
+			new object[] { new FbDecFloat(BigInteger.Parse("12345678901234567890123456789012340"), 0), "12345678901234567890123456789012340" },
+			new object[] { new FbDecFloat(1000, -6179), "1E-6176" },
+			new object[] { (FbDecFloat)2.0, "2" },
+			new object[] { (FbDecFloat)1e-20, "1E-20" },
+			new object[] { (FbDecFloat)2.5f, "2.5" },
+			new object[] { (FbDecFloat)(0.1 + 0.2), "0.30000000000000004" },
+			new object[] { (FbDecFloat)100m, "100" },
+			new object[] { (FbDecFloat)1.10m, "1.10" },
+			new object[] { (FbDecFloat)decimal.MaxValue, "79228162514264337593543950335" },
 		};
+
+	static readonly object[] UnrepresentableValues = new object[]
+	{
+		new FbDecFloat(BigInteger.Parse("12345678901234567890123456789012345"), 0),
+		new FbDecFloat(1, 6145),
+		new FbDecFloat(1, -6177),
+	};
 
 	[TestCaseSource(nameof(TestValues))]
 	public async Task ReadsValueCorrectly(FbDecFloat value, string castValue)
@@ -88,6 +106,22 @@ public class FbDecFloat34SupportTests : FbTestsBase
 		}
 	}
 
+	[TestCaseSource(nameof(UnrepresentableValues))]
+	public async Task PassesUnrepresentableValueThrows(FbDecFloat value)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as decfloat(34)) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			Assert.ThrowsAsync<OverflowException>(() => cmd.ExecuteScalarAsync());
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(1 as decfloat(34)) from rdb$database";
+			Assert.AreEqual((FbDecFloat)1, (FbDecFloat)await cmd.ExecuteScalarAsync(), "connection must remain usable");
+		}
+	}
+
 	[Test]
 	public async Task ReadsValueNullCorrectly()
 	{
@@ -108,6 +142,137 @@ public class FbDecFloat34SupportTests : FbTestsBase
 			cmd.Parameters.AddWithValue("value", DBNull.Value);
 			var result = (DBNull)await cmd.ExecuteScalarAsync();
 			Assert.AreEqual(DBNull.Value, result);
+		}
+	}
+
+	static readonly object[] ClrValues = new[]
+	{
+			new object[] { 2.5m, "25", -1 },
+			new object[] { 1.10m, "110", -2 },
+			new object[] { -100m, "-100", 0 },
+			new object[] { 0.1, "1", -1 },
+			new object[] { -6.6, "-66", -1 },
+			new object[] { 2.5f, "25", -1 },
+			new object[] { 42, "42", 0 },
+			new object[] { -42L, "-42", 0 },
+			new object[] { (short)7, "7", 0 },
+			new object[] { (byte)7, "7", 0 },
+			new object[] { ulong.MaxValue, "18446744073709551615", 0 },
+			new object[] { new BigInteger(123456789), "123456789", 0 },
+		};
+
+	[TestCaseSource(nameof(ClrValues))]
+	public async Task PassesClrValueCorrectly(object value, string coefficient, int exponent)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as decfloat(34)) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			var result = (FbDecFloat)await cmd.ExecuteScalarAsync();
+			Assert.AreEqual(new FbDecFloat(BigInteger.Parse(coefficient, CultureInfo.InvariantCulture), exponent), result);
+		}
+	}
+
+	[TestCase("1.10", "1.10")]
+	[TestCase("-123.456", "-123.456")]
+	[TestCase("1E+20", "100000000000000000000")]
+	[TestCase("0", "0")]
+	[TestCase("0.0000000000009999999999999999", "0.0000000000009999999999999999")]
+	[TestCase("1234567890123456789012345678.9", "1234567890123456789012345678.9")]
+	[TestCase("7.9228162514264337593543950335", "7.9228162514264337593543950335")]
+	public async Task ReadsAsDecimalExactly(string castValue, string expected)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(expected, reader.GetDecimal(0).ToString(CultureInfo.InvariantCulture));
+				Assert.AreEqual(expected, reader.GetFieldValue<decimal>(0).ToString(CultureInfo.InvariantCulture));
+			}
+		}
+	}
+
+	[TestCase("1E+29")]
+	[TestCase("-1E+29")]
+	[TestCase("1E-29")]
+	[TestCase("nan")]
+	[TestCase("inf")]
+	[TestCase("1.0000000000000000000000000000001")]
+	[TestCase("79228162514264337593543950336")]
+	public async Task ReadsAsDecimalThrowsWhenNotExact(string castValue)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.Throws<OverflowException>(() => reader.GetDecimal(0));
+			}
+		}
+	}
+
+	[TestCase("1.10", 1.1)]
+	[TestCase("-6.6", -6.6)]
+	[TestCase("0.1", 0.1)]
+	[TestCase("nan", double.NaN)]
+	[TestCase("inf", double.PositiveInfinity)]
+	[TestCase("-inf", double.NegativeInfinity)]
+	[TestCase("1E-6000", 0d)]
+	[TestCase("1E+6000", double.PositiveInfinity)]
+	[TestCase("0.30000000000000004", 0.30000000000000004)]
+	public async Task ReadsAsDoubleNearest(string castValue, double expected)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(expected, reader.GetDouble(0));
+				Assert.AreEqual((float)expected, reader.GetFloat(0));
+			}
+		}
+	}
+
+	[TestCase("123", 123)]
+	[TestCase("1E+3", 1000)]
+	[TestCase("2.5", 2)]
+	[TestCase("3.5", 4)]
+	[TestCase("-2.5", -2)]
+	[TestCase("-3.5", -4)]
+	[TestCase("2.51", 3)]
+	[TestCase("1E-300", 0)]
+	public async Task ReadsAsIntegerRoundingToEven(string castValue, long expected)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.AreEqual(expected, reader.GetInt64(0));
+				Assert.AreEqual((int)expected, reader.GetInt32(0));
+				Assert.AreEqual((short)expected, reader.GetInt16(0));
+			}
+		}
+	}
+
+	[TestCase("1E+19")]
+	[TestCase("nan")]
+	[TestCase("-inf")]
+	public async Task ReadsAsIntegerThrowsOnOverflow(string castValue)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = $"select cast('{castValue}' as decfloat(34)) from rdb$database";
+			await using (var reader = await cmd.ExecuteReaderAsync())
+			{
+				await reader.ReadAsync();
+				Assert.Throws<OverflowException>(() => reader.GetInt64(0));
+			}
 		}
 	}
 
