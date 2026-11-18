@@ -63,7 +63,24 @@ public class FbDecFloat16SupportTests : FbTestsBase
 			new object[] { new FbDecFloat(-10, 34), "-100000000000000000000000000000000000" },
 			new object[] { new FbDecFloat(BigInteger.Parse("123000000001"), -10), "123.000000001E-1" },
 			new object[] { new FbDecFloat(BigInteger.Parse("-123000000001"), -10), "-123.000000001E-1" },
+			new object[] { new FbDecFloat(1, 384), "1E384" },
+			new object[] { new FbDecFloat(BigInteger.Parse("100000000000000000000"), -20), "1" },
+			new object[] { new FbDecFloat(100, -400), "1E-398" },
+			new object[] { (FbDecFloat)2.0, "2" },
+			new object[] { (FbDecFloat)1e-20, "1E-20" },
+			new object[] { (FbDecFloat)2.5f, "2.5" },
+			new object[] { (FbDecFloat)100m, "100" },
+			new object[] { (FbDecFloat)1.10m, "1.10" },
 		};
+
+	static readonly object[] UnrepresentableValues = new object[]
+	{
+		new FbDecFloat(BigInteger.Parse("30000000000000004"), -17),
+		new FbDecFloat(1, 385),
+		new FbDecFloat(1, -399),
+		(FbDecFloat)(0.1 + 0.2),
+		(FbDecFloat)decimal.MaxValue,
+	};
 
 	[TestCaseSource(nameof(TestValues))]
 	public async Task ReadsValueCorrectly(FbDecFloat value, string castValue)
@@ -85,6 +102,22 @@ public class FbDecFloat16SupportTests : FbTestsBase
 			cmd.Parameters.AddWithValue("value", value);
 			var result = (FbDecFloat)await cmd.ExecuteScalarAsync();
 			Assert.AreEqual(value, result);
+		}
+	}
+
+	[TestCaseSource(nameof(UnrepresentableValues))]
+	public async Task PassesUnrepresentableValueThrows(FbDecFloat value)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as decfloat(16)) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			Assert.ThrowsAsync<OverflowException>(() => cmd.ExecuteScalarAsync());
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(1 as decfloat(16)) from rdb$database";
+			Assert.AreEqual((FbDecFloat)1, (FbDecFloat)await cmd.ExecuteScalarAsync(), "connection must remain usable");
 		}
 	}
 

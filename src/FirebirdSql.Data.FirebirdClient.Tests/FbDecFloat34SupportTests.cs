@@ -63,7 +63,24 @@ public class FbDecFloat34SupportTests : FbTestsBase
 			new object[] { new FbDecFloat(-10, 34), "-100000000000000000000000000000000000" },
 			new object[] { new FbDecFloat(BigInteger.Parse("123000000001"), -10), "123.000000001E-1" },
 			new object[] { new FbDecFloat(BigInteger.Parse("-123000000001"), -10), "-123.000000001E-1" },
+			new object[] { new FbDecFloat(1, 6144), "1E6144" },
+			new object[] { new FbDecFloat(BigInteger.Parse("12345678901234567890123456789012340"), 0), "12345678901234567890123456789012340" },
+			new object[] { new FbDecFloat(1000, -6179), "1E-6176" },
+			new object[] { (FbDecFloat)2.0, "2" },
+			new object[] { (FbDecFloat)1e-20, "1E-20" },
+			new object[] { (FbDecFloat)2.5f, "2.5" },
+			new object[] { (FbDecFloat)(0.1 + 0.2), "0.30000000000000004" },
+			new object[] { (FbDecFloat)100m, "100" },
+			new object[] { (FbDecFloat)1.10m, "1.10" },
+			new object[] { (FbDecFloat)decimal.MaxValue, "79228162514264337593543950335" },
 		};
+
+	static readonly object[] UnrepresentableValues = new object[]
+	{
+		new FbDecFloat(BigInteger.Parse("12345678901234567890123456789012345"), 0),
+		new FbDecFloat(1, 6145),
+		new FbDecFloat(1, -6177),
+	};
 
 	[TestCaseSource(nameof(TestValues))]
 	public async Task ReadsValueCorrectly(FbDecFloat value, string castValue)
@@ -85,6 +102,22 @@ public class FbDecFloat34SupportTests : FbTestsBase
 			cmd.Parameters.AddWithValue("value", value);
 			var result = (FbDecFloat)await cmd.ExecuteScalarAsync();
 			Assert.AreEqual(value, result);
+		}
+	}
+
+	[TestCaseSource(nameof(UnrepresentableValues))]
+	public async Task PassesUnrepresentableValueThrows(FbDecFloat value)
+	{
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(@value as decfloat(34)) from rdb$database";
+			cmd.Parameters.AddWithValue("value", value);
+			Assert.ThrowsAsync<OverflowException>(() => cmd.ExecuteScalarAsync());
+		}
+		await using (var cmd = Connection.CreateCommand())
+		{
+			cmd.CommandText = "select cast(1 as decfloat(34)) from rdb$database";
+			Assert.AreEqual((FbDecFloat)1, (FbDecFloat)await cmd.ExecuteScalarAsync(), "connection must remain usable");
 		}
 	}
 
