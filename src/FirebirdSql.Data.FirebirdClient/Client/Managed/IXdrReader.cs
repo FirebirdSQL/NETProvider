@@ -27,12 +27,18 @@ namespace FirebirdSql.Data.Client.Managed;
 interface IXdrReader
 {
 	byte[] ReadBytes(byte[] buffer, int count);
+	void ReadBytes(Span<byte> buffer, int count);
+	ValueTask ReadBytesAsync(Memory<byte> buffer, int count, CancellationToken cancellationToken = default);
 	ValueTask<byte[]> ReadBytesAsync(byte[] buffer, int count, CancellationToken cancellationToken = default);
 
 	byte[] ReadOpaque(int length);
+	void ReadOpaque(Span<byte> buffer, int length);
+	ValueTask ReadOpaqueAsync(Memory<byte> buffer, int length, CancellationToken cancellationToken = default);
 	ValueTask<byte[]> ReadOpaqueAsync(int length, CancellationToken cancellationToken = default);
 
 	byte[] ReadBuffer();
+	void ReadBuffer(Span<byte> buffer);
+	ValueTask ReadBufferAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
 	ValueTask<byte[]> ReadBufferAsync(CancellationToken cancellationToken = default);
 
 	string ReadString();
