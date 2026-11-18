@@ -1569,6 +1569,10 @@ internal class GdsStatement : StatementBase
 
 			case DbDataType.Decimal:
 			case DbDataType.Numeric:
+				if ((field.DataType & ~1) == IscCodes.SQL_INT128)
+				{
+					return TypeDecoder.DecodeInt128Numeric(xdr.ReadInt128(), field.NumericScale);
+				}
 				return xdr.ReadDecimal(field.DataType, field.NumericScale);
 
 			case DbDataType.Float:
@@ -1667,6 +1671,10 @@ internal class GdsStatement : StatementBase
 
 			case DbDataType.Decimal:
 			case DbDataType.Numeric:
+				if ((field.DataType & ~1) == IscCodes.SQL_INT128)
+				{
+					return TypeDecoder.DecodeInt128Numeric(await xdr.ReadInt128Async(cancellationToken).ConfigureAwait(false), field.NumericScale);
+				}
 				return await xdr.ReadDecimalAsync(field.DataType, field.NumericScale, cancellationToken).ConfigureAwait(false);
 
 			case DbDataType.Float:

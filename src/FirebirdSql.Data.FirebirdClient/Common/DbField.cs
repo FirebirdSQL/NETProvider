@@ -450,9 +450,9 @@ internal sealed class DbField
 					break;
 
 				case IscCodes.SQL_INT128:
-					if (_numericScale < 0)
+					if (DbDataType is DbDataType.Numeric or DbDataType.Decimal)
 					{
-						DbValue.SetValue(TypeDecoder.DecodeDecimal(Int128Helper.GetInt128(buffer), _numericScale, _dataType));
+						DbValue.SetValue(TypeDecoder.DecodeInt128Numeric(Int128Helper.GetInt128(buffer), _numericScale));
 					}
 					else
 					{

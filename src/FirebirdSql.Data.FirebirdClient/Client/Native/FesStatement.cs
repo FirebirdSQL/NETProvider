@@ -413,7 +413,7 @@ internal sealed class FesStatement : StatementBase
 			for (var i = 0; i < values.Length; i++)
 			{
 				var d = descriptor[i];
-				var value = d.DbValue.GetValue();
+				var value = d.DbValue.GetDecodedValue();
 				values[i] = new DbValue(this, d, value);
 			}
 
@@ -485,7 +485,7 @@ internal sealed class FesStatement : StatementBase
 			for (var i = 0; i < values.Length; i++)
 			{
 				var d = descriptor[i];
-				var value = await d.DbValue.GetValueAsync(cancellationToken).ConfigureAwait(false);
+				var value = await d.DbValue.GetDecodedValueAsync(cancellationToken).ConfigureAwait(false);
 				values[i] = new DbValue(this, d, value);
 			}
 
@@ -573,7 +573,7 @@ internal sealed class FesStatement : StatementBase
 			for (var i = 0; i < row.Length; i++)
 			{
 				var d = _fields[i];
-				var value = d.DbValue.GetValue();
+				var value = d.DbValue.GetDecodedValue();
 				row[i] = new DbValue(this, d, value);
 			}
 			return row;
@@ -643,7 +643,7 @@ internal sealed class FesStatement : StatementBase
 			for (var i = 0; i < row.Length; i++)
 			{
 				var d = _fields[i];
-				var value = await d.DbValue.GetValueAsync(cancellationToken).ConfigureAwait(false);
+				var value = await d.DbValue.GetDecodedValueAsync(cancellationToken).ConfigureAwait(false);
 				row[i] = new DbValue(this, d, value);
 			}
 			return row;
