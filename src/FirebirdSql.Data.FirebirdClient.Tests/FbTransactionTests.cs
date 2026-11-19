@@ -139,4 +139,22 @@ public class FbTransactionTests : FbTestsBase
 			}
 		}
 	}
+
+	[Test]
+	public async Task CanGetTransactionId()
+	{
+		if (!EnsureServerVersionAtLeast(new Version(2, 5, 0, 0)))
+			return;
+
+		await using (var transaction1 = await Connection.BeginTransactionAsync())
+		{
+			var idFromInfo = await new FbTransactionInfo(transaction1).GetTransactionIdAsync();
+			Assert.NotZero(idFromInfo);
+
+			var command = new FbCommand("SELECT current_transaction FROM rdb$database", Connection, transaction1);
+			var idFromSql = await command.ExecuteScalarAsync();
+
+			Assert.AreEqual(idFromInfo, idFromSql);
+		}
+	}
 }
