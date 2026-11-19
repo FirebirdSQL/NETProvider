@@ -39,6 +39,9 @@ internal class GdsDatabase : DatabaseBase
 	protected GdsConnection _connection;
 	protected GdsEventManager _eventManager;
 	protected int _handle;
+	// The event listener can requeue asynchronously while QueueEvents is still reading its response.
+	// Keep complete event request/response exchanges on this database's protocol stream together.
+	private readonly SemaphoreSlim _eventOperationGate = new(1, 1);
 
 	#endregion
 
@@ -182,6 +185,18 @@ internal class GdsDatabase : DatabaseBase
 
 	public override void Detach()
 	{
+		_eventOperationGate.Wait();
+		try
+		{
+			DetachCore();
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private void DetachCore()
+	{
 		if (TransactionCount > 0)
 		{
 			throw IscException.ForErrorCodeIntParam(IscCodes.isc_open_trans, TransactionCount);
@@ -227,6 +242,18 @@ internal class GdsDatabase : DatabaseBase
 		}
 	}
 	public override async ValueTask DetachAsync(CancellationToken cancellationToken = default)
+	{
+		await _eventOperationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await DetachCoreAsync(cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private async ValueTask DetachCoreAsync(CancellationToken cancellationToken)
 	{
 		if (TransactionCount > 0)
 		{
@@ -541,6 +568,18 @@ internal class GdsDatabase : DatabaseBase
 
 	public override void QueueEvents(RemoteEvent remoteEvent)
 	{
+		_eventOperationGate.Wait();
+		try
+		{
+			QueueEventsCore(remoteEvent);
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private void QueueEventsCore(RemoteEvent remoteEvent)
+	{
 		try
 		{
 			if (_eventManager == null)
@@ -575,6 +614,18 @@ internal class GdsDatabase : DatabaseBase
 		}
 	}
 	public override async ValueTask QueueEventsAsync(RemoteEvent remoteEvent, CancellationToken cancellationToken = default)
+	{
+		await _eventOperationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await QueueEventsCoreAsync(remoteEvent, cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private async ValueTask QueueEventsCoreAsync(RemoteEvent remoteEvent, CancellationToken cancellationToken)
 	{
 		try
 		{
@@ -612,6 +663,18 @@ internal class GdsDatabase : DatabaseBase
 
 	public override void CancelEvents(RemoteEvent events)
 	{
+		_eventOperationGate.Wait();
+		try
+		{
+			CancelEventsCore(events);
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private void CancelEventsCore(RemoteEvent events)
+	{
 		try
 		{
 			Xdr.Write(IscCodes.op_cancel_events);
@@ -628,6 +691,18 @@ internal class GdsDatabase : DatabaseBase
 		}
 	}
 	public override async ValueTask CancelEventsAsync(RemoteEvent events, CancellationToken cancellationToken = default)
+	{
+		await _eventOperationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+		try
+		{
+			await CancelEventsCoreAsync(events, cancellationToken).ConfigureAwait(false);
+		}
+		finally
+		{
+			_eventOperationGate.Release();
+		}
+	}
+	private async ValueTask CancelEventsCoreAsync(RemoteEvent events, CancellationToken cancellationToken)
 	{
 		try
 		{

@@ -1,0 +1,49 @@
+diff --git a/src/FirebirdSql.Data.FirebirdClient/Client/Managed/Version10/GdsDatabase.cs b/src/FirebirdSql.Data.FirebirdClient/Client/Managed/Version10/GdsDatabase.cs
+index 37f134aa..673740d3 100644
+--- a/src/FirebirdSql.Data.FirebirdClient/Client/Managed/Version10/GdsDatabase.cs
++++ b/src/FirebirdSql.Data.FirebirdClient/Client/Managed/Version10/GdsDatabase.cs
+@@ -39,6 +39,7 @@ internal class GdsDatabase : DatabaseBase
+ 	protected GdsConnection _connection;
+ 	protected GdsEventManager _eventManager;
+ 	protected int _handle;
++	private readonly ManualResetEventSlim _asyncReadFinishedForProbe = new(false);
+ 
+ 	#endregion
+ 
+@@ -564,6 +565,15 @@ internal class GdsDatabase : DatabaseBase
+ 			Xdr.Write(remoteEvent.LocalId);
+ 
+ 			Xdr.Flush();
++			if (Environment.GetEnvironmentVariable("FB_EVENT_OPERATION_PROBE") == "1")
++			{
++				var firstOpcode = ReadOperation();
++				if (!_asyncReadFinishedForProbe.Wait(TimeSpan.FromSeconds(10)))
++					throw new TimeoutException("The asynchronous event requeue did not read the first response.");
++				var firstResponse = (GenericResponse)ReadResponse(firstOpcode);
++				remoteEvent.RemoteId = firstResponse.ObjectHandle;
++				return;
++			}
+ 
+ 			var response = (GenericResponse)ReadResponse();
+ 
+@@ -599,6 +609,20 @@ internal class GdsDatabase : DatabaseBase
+ 			await Xdr.WriteAsync(remoteEvent.LocalId, cancellationToken).ConfigureAwait(false);
+ 
+ 			await Xdr.FlushAsync(cancellationToken).ConfigureAwait(false);
++			if (Environment.GetEnvironmentVariable("FB_EVENT_OPERATION_PROBE") == "1")
++			{
++				try
++				{
++					var wrongOpcode = await ReadOperationAsync(cancellationToken).ConfigureAwait(false);
++					var wrongResponse = (GenericResponse)await ReadResponseAsync(wrongOpcode, cancellationToken).ConfigureAwait(false);
++					remoteEvent.RemoteId = wrongResponse.ObjectHandle;
++					return;
++				}
++				finally
++				{
++					_asyncReadFinishedForProbe.Set();
++				}
++			}
+ 
+ 			var response = (GenericResponse)await ReadResponseAsync(cancellationToken).ConfigureAwait(false);
+ 
