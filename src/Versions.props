@@ -5,7 +5,7 @@
 	</PropertyGroup>
 	<!-- EFCore -->
 	<PropertyGroup>
-		<EFCoreProviderVersion>14.0.0-rc1</EFCoreProviderVersion>
+		<EFCoreProviderVersion>14.0.0</EFCoreProviderVersion>
 		<EFCoreReferenceProviderVersion>10.3.4</EFCoreReferenceProviderVersion>
 		<EFCoreReferencePackageVersion>11.0.0</EFCoreReferencePackageVersion>
 	</PropertyGroup>
