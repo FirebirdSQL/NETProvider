@@ -84,6 +84,7 @@ public sealed class FbDataReader : DbDataReader
 		_connection = connection;
 		_commandBehavior = commandBehavior;
 		_fields = _command.GetFieldsDescriptor();
+		_recordsAffected = -1;
 
 		UpdateRecordsAffected();
 	}
@@ -1016,10 +1017,11 @@ public sealed class FbDataReader : DbDataReader
 	{
 		if (_command != null && !_command.IsDisposed)
 		{
-			if (_command.RecordsAffected != -1)
+			var recordsAffected = _command.StatementRecordsAffected;
+			if (recordsAffected != -1)
 			{
 				_recordsAffected = _recordsAffected == -1 ? 0 : _recordsAffected;
-				_recordsAffected += _command.RecordsAffected;
+				_recordsAffected += recordsAffected;
 			}
 		}
 	}
